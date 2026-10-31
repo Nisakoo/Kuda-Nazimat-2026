@@ -95,3 +95,18 @@ it('delivers one text message to two independent sessions over a controlled test
   for (const listener of [first, second]) expect(listener).toHaveBeenCalledWith(expect.objectContaining({ type: 'chat', message: expect.objectContaining({ playerId: 'p1', text: 'Привет <b>мир</b>' }) }));
   for (const session of sessions) session.dispose(); expect(clock.pending).toBe(0);
 });
+
+it('smooths the local avatar with the same history while keeping authoritative position current',()=>{
+  const s=setup();
+  s.adapter.receive({v:1,type:'delta',baseRevision:0,revision:1,tick:1,upsert:[player('p1',.3)],remove:[]});
+  s.clock.advance(50);s.session.update(1/60);
+  const view=s.session.getRenderState();
+  expect(view.previous.entities.find(e=>e.id==='p1')!.transform!.position.x).toBe(0);
+  expect(view.current.entities.find(e=>e.id==='p1')!.transform!.position.x).toBe(.3);
+  expect(view.alpha).toBeLessThan(1);
+  expect(s.session.getSnapshot().entities.find(e=>e.id==='p1')!.transform!.position.x).toBe(.3);
+  s.clock.advance(500);
+  const held=s.session.getRenderState();
+  expect(held.previous).toBe(held.current); // no extrapolation when the buffer runs out
+  s.session.dispose();
+});

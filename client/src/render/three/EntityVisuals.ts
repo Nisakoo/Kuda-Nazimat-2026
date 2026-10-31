@@ -1,20 +1,28 @@
 import { Group } from 'three';
-import type { Mesh, Scene } from 'three';
+import type { Scene } from 'three';
 import type { Entity, EntityId, Transform, WorldSnapshot } from '../../core/types';
 import { DEMO_NPCS } from '../../shared/demo';
 import type { SceneAssets } from './SceneAssets';
 import type { GltfLibrary, ModelInstance } from './GltfLibrary';
+import { createCharacter } from './CharacterRig';
+import type { CharacterRig } from './CharacterRig';
+import { CHARACTER_MOTION, damp, turnTowards } from './CharacterMotion';
 
 interface Visual {
   readonly group: Group;
-  readonly limbs: readonly Mesh[];
   readonly token: string;
   previous: Transform;
   current: Transform;
-  walking: boolean;
   animation: string;
+  speedLimit: number;
+  phase: number;
+  weight: number;
+  speed: number;
+  elapsed: number;
+  snap: boolean;
   readonly controller: AbortController;
   model: ModelInstance | null;
+  rig: CharacterRig | null;
   failed: boolean;
 }
 
@@ -37,23 +45,44 @@ export class EntityVisuals {
         this.visuals.set(entity.id, visual);
         this.scene.add(visual.group);
       }
+      const a = visual.current.position; const b = entity.transform.position;
+      if (Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z)>CHARACTER_MOTION.discontinuity || current.tick<previous.tick) visual.snap = true;
       visual.previous = old.get(entity.id)?.transform ?? entity.transform;
       visual.current = entity.transform;
-      visual.walking = entity.animationState?.name === 'walk';
       visual.animation = entity.animationState?.name ?? 'idle';
+      visual.speedLimit = entity.movement?.speed ?? 3;
     }
     for (const id of this.visuals.keys()) if (!live.has(id)) this.remove(id);
   }
 
-  animate(alpha: number, elapsed: number, delta = 0): void {
+  animate(alpha: number, _elapsed: number, delta = 0): void {
+    const dt = Math.min(CHARACTER_MOTION.maxDelta, Math.max(0,delta));
     for (const visual of this.visuals.values()) {
-      const from = visual.previous.position;
-      const to = visual.current.position;
-      visual.group.position.set(from.x + (to.x - from.x) * alpha, from.y + (to.y - from.y) * alpha, from.z + (to.z - from.z) * alpha);
-      const yawDelta = visual.current.rotationY - visual.previous.rotationY;
-      visual.group.rotation.y = visual.previous.rotationY + Math.atan2(Math.sin(yawDelta), Math.cos(yawDelta)) * alpha;
-      visual.limbs.forEach((limb, index) => { limb.rotation.x = visual.walking ? Math.sin(elapsed * 11 + (index % 2) * Math.PI) * 0.45 : 0; });
-      visual.model?.animate(visual.animation, delta);
+      const from = visual.previous.position; const to = visual.current.position;
+      const oldX = visual.group.position.x; const oldZ = visual.group.position.z;
+      const discontinuousPair = Math.hypot(to.x-from.x,to.y-from.y,to.z-from.z)>CHARACTER_MOTION.discontinuity;
+      const t = visual.snap || discontinuousPair ? 1 : Math.max(0,Math.min(1,alpha));
+      visual.group.position.set(from.x+(to.x-from.x)*t,from.y+(to.y-from.y)*t,from.z+(to.z-from.z)*t);
+      const distance = Math.hypot(visual.group.position.x-oldX,visual.group.position.z-oldZ);
+      const reset = visual.snap || delta>CHARACTER_MOTION.maxDelta || distance>CHARACTER_MOTION.discontinuity;
+      if (reset) {
+        visual.group.rotation.y = visual.current.rotationY;
+        visual.phase = 0; visual.speed = 0; visual.weight = 0;
+      }
+      const speed = !reset && dt>0 ? Math.min(distance/dt,visual.speedLimit*1.5) : 0;
+      visual.speed = damp(visual.speed,speed,CHARACTER_MOTION.blendRate,dt);
+      visual.weight = damp(visual.weight,speed>CHARACTER_MOTION.movingThreshold?1:0,CHARACTER_MOTION.blendRate,dt);
+      if (visual.weight<.005) { visual.weight=0; visual.speed=0; }
+      // Advance by distance, not elapsed wall time: no walking into a wall or after reconnect.
+      if (!reset) visual.phase = (visual.phase+distance/CHARACTER_MOTION.stride*Math.PI*2)%(Math.PI*2);
+      const oldYaw = visual.group.rotation.y;
+      visual.group.rotation.y = turnTowards(oldYaw,visual.current.rotationY,dt);
+      const turn = dt>0 ? (visual.group.rotation.y-oldYaw)/dt : 0;
+      visual.elapsed += dt;
+      visual.rig?.pose(visual.phase,visual.weight,visual.elapsed,turn);
+      const name = visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
+      visual.model?.animate(name,dt,name==='walk' ? Math.max(.2,visual.speed/3) : 1);
+      visual.snap = false;
     }
   }
 
@@ -68,91 +97,36 @@ export class EntityVisuals {
 
   private create(entity: Entity, token: string, player: boolean): Visual {
     const transform = entity.transform!;
-    const group = new Group();
-    group.name = `entity:${entity.id}`;
-    if (this.library?.has(entity.renderable!.assetId)) {
-      const visual: Visual = { group, limbs: [], token, previous: transform, current: transform, walking: false, animation: entity.animationState?.name ?? 'idle', controller: new AbortController(), model: null, failed: false };
-      group.position.set(transform.position.x, transform.position.y, transform.position.z);
-      this.loadModel(entity.id, entity.renderable!.assetId, visual);
-      return visual;
-    }
-    const npc = DEMO_NPCS.find((item) => item.id === entity.id);
-    const color = npc?.color ?? '#318e81';
-    const body = this.assets.mesh(this.marketStyle ? 'robe' : 'capsule', color);
-    body.scale.set(1.1, this.marketStyle ? 1 : .75, 1);
-    body.position.y = this.marketStyle ? .7 : .8;
-    group.add(body);
-    const head = this.assets.mesh(this.marketStyle ? 'facet' : 'sphere', this.marketStyle ? '#bd8b66' : '#eec8a2');
-    head.scale.set(0.4, 0.42, 0.38);
-    head.position.y = 1.55;
-    group.add(head);
-    const hair = this.assets.mesh('sphere', this.marketStyle ? '#ead8b5' : player ? '#34434b' : '#695343');
-    hair.scale.set(0.41, 0.22, 0.39);
-    hair.position.set(0, 1.82, -0.035);
-    group.add(hair);
-    const band = this.assets.mesh('cylinder', '#e7c789');
-    band.scale.set(0.405, 0.07, 0.385);
-    band.position.y = 1.78;
-    group.add(band);
-    for (const side of [-1, 1]) {
-      const eye = this.assets.mesh('sphere', '#3b302b');
-      eye.scale.set(0.045, 0.06, 0.025);
-      eye.position.set(side * 0.14, 1.57, 0.35);
-      group.add(eye);
-      const cheek = this.assets.mesh('sphere', '#dfac8e');
-      cheek.scale.set(0.08, 0.04, 0.022);
-      cheek.position.set(side * 0.23, 1.45, 0.31);
-      group.add(cheek);
-    }
-    const limbs: Mesh[] = [];
-    for (const side of [-1, 1]) {
-      const leg = this.assets.mesh('capsule', '#785d46');
-      leg.scale.set(0.5, 0.3, 0.6);
-      leg.position.set(side * 0.16, 0.23, 0);
-      group.add(leg);
-      limbs.push(leg);
-    }
-    for (const side of [-1, 1]) {
-      const arm = this.assets.mesh('capsule', color);
-      arm.scale.set(0.45, 0.43, 0.5);
-      arm.position.set(side * 0.39, 0.83, 0);
-      group.add(arm);
-      limbs.push(arm);
-    }
-    const front = this.assets.mesh('roundedBox', '#e8c783');
-    front.scale.set(0.42, 0.13, 0.1);
-    front.position.set(0, 0.85, 0.3);
-    group.add(front);
-    if (this.marketStyle) {
-      const shawl = this.assets.mesh('box', '#e1b765'); shawl.position.set(-.2, .85, .19); shawl.scale.set(.23, .85, .3); shawl.rotation.z = -.12; group.add(shawl);
-      const headcloth = this.assets.mesh('box', '#ead8b5'); headcloth.position.set(0, 1.56, -.26); headcloth.scale.set(.6, .48, .15); group.add(headcloth);
-    }
-    const ring = this.assets.mesh('cylinder', player ? '#8cddc2' : '#e5cf9d');
-    ring.scale.set(0.52, 0.035, 0.52);
-    ring.position.y = 0.015;
-    group.add(ring);
-    const label = this.assets.label(player ? 'Вы' : `${npc?.name ?? entity.character?.name} · ${npc?.topic ?? 'Гость'}`);
-    if (player) label.scale.set(1, 0.4, 1);
-    label.position.y = 2.45;
-    group.add(label);
-    group.position.set(transform.position.x, transform.position.y, transform.position.z);
-    return { group, limbs, token, previous: transform, current: transform, walking: false, animation: 'idle', controller: new AbortController(), model: null, failed: false };
+    const group = new Group(); group.name = `entity:${entity.id}`;
+    group.position.set(transform.position.x,transform.position.y,transform.position.z);
+    group.rotation.y = transform.rotationY;
+    const visual: Visual = { group, token, previous:transform, current:transform, animation:entity.animationState?.name??'idle', speedLimit:entity.movement?.speed??3, phase:0, weight:0, speed:0, elapsed:0, snap:true, controller:new AbortController(), model:null, rig:null, failed:false };
+    if (this.library?.has(entity.renderable!.assetId)) this.loadModel(entity.id,entity.renderable!.assetId,visual,entity,player);
+    else this.addCharacter(visual,entity,player);
+    return visual;
   }
 
-  retryFailed(): void {
-    for (const [id, visual] of [...this.visuals]) if (visual.failed) this.remove(id);
+  private addCharacter(visual: Visual, entity: Entity, player: boolean): void {
+    const npc = DEMO_NPCS.find(item=>item.id===entity.id);
+    const seed = [...entity.id].reduce((n,c)=>(n*31+c.charCodeAt(0))%997,0)/997*Math.PI*2;
+    visual.rig = createCharacter(this.assets,npc?.color??'#318e81',this.marketStyle,seed);
+    visual.group.add(visual.rig.root);
+    visual.rig.pose(0,0,0,0);
+    const label = this.assets.label(player?'Вы':`${npc?.name??entity.character?.name??'Гость'}${npc?.topic?` · ${npc.topic}`:''}`);
+    if (player) label.scale.set(1,.4,1);
+    label.position.y=2.45; visual.group.add(label);
   }
 
-  private loadModel(id: string, assetId: string, visual: Visual): void {
-    void this.library!.instantiate(assetId, visual.controller.signal).then((model) => {
-      if (visual.controller.signal.aborted || this.visuals.get(id) !== visual) { model.dispose(); return; }
-      visual.model = model;
-      visual.group.add(model.root);
-      this.report(id, null);
-    }, (error: unknown) => {
+  retryFailed(): void { for (const [id,visual] of [...this.visuals]) if (visual.failed) this.remove(id); }
+
+  private loadModel(id: string, assetId: string, visual: Visual, entity: Entity, player: boolean): void {
+    void this.library!.instantiate(assetId,visual.controller.signal).then(model=>{
+      if (visual.controller.signal.aborted || this.visuals.get(id)!==visual) { model.dispose(); return; }
+      visual.model=model; visual.group.add(model.root); this.report(id,null);
+    },(error:unknown)=>{
       if (visual.controller.signal.aborted) return;
-      visual.failed = true;
-      this.report(id, error instanceof Error ? error.message : 'Model load failed');
+      visual.failed=true; this.addCharacter(visual,entity,player);
+      this.report(id,error instanceof Error?error.message:'Model load failed');
     });
   }
 }
