@@ -93,7 +93,7 @@ export class World {
       if (mx === 0 && mz === 0) continue;
       const x = p.position.x + mx; const z = p.position.z + mz;
       if (!this.canStand(p, x, z)) continue;
-      p.position = { x, y: p.position.y, z };
+      p.position = { x, y: this.maps.get(p.mapId)!.heightAt(x, z), z };
       p.rotationY = Math.atan2(mx, mz);
       p.applied = { x: mx / step, z: mz / step };
       p.dirty = true;
@@ -105,6 +105,7 @@ export class World {
   private canStand(p: Player, x: number, z: number): boolean {
     const map = this.maps.get(p.mapId)!;
     if (!map.isWalkable(x, z)) return false;
+    if (Math.abs(map.heightAt(x, z) - p.position.y) > .35) return false;
     const chunks = map.footprintChunkIds(x, z);
     return chunks !== null && chunks.every((id) => p.prepared.has(id));
   }

@@ -1,7 +1,7 @@
 /** Original low-poly assets; generated offline with Three.js, no downloaded content. */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { Group, Mesh, MeshStandardMaterial, BoxGeometry, SphereGeometry, CylinderGeometry, IcosahedronGeometry, LatheGeometry, BufferAttribute, Vector2, Color, AnimationClip, QuaternionKeyframeTrack } from 'three';
+import { Group, Mesh, MeshStandardMaterial, BoxGeometry, SphereGeometry, CylinderGeometry, IcosahedronGeometry, LatheGeometry, BufferAttribute, BufferGeometry, Float32BufferAttribute, PlaneGeometry, Shape, ExtrudeGeometry, Vector2, Color, AnimationClip, QuaternionKeyframeTrack } from 'three';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 // GLTFExporter uses FileReader for binary Blob conversion, also in Node.
@@ -21,7 +21,11 @@ function box(color,x,y,z,sx,sy,sz,parent=root) { return part(new BoxGeometry(1,1
 function ball(color,x,y,z,sx,sy,sz,parent=root) { return part(new IcosahedronGeometry(1,0),color,x,y,z,sx,sy,sz,parent); }
 function cyl(color,x,y,z,r,h,top=r,parent=root) { return part(new CylinderGeometry(top,r,h,8),color,x,y,z,1,1,1,parent); }
 function obstacle(x,z,w,d) {collisions.push([x-w/2,z-d/2,x+w/2,z+d/2]);}
-function triangle(color,x,y,z,size,parent=root) {const mesh=part(new CylinderGeometry(size,size,0.025,3),color,x,y,z,1,1,1,parent);mesh.rotation.x=Math.PI/2;return mesh;}
+function triangle(color,x,y,z,size,parent=root) {
+ const g=new BufferGeometry();const a=-.866*size,b=-.5*size;
+ g.setAttribute('position',new Float32BufferAttribute([a,b,0,-a,b,0,0,size,0, 0,size,0,-a,b,0,a,b,0],3));g.computeVertexNormals();
+ return part(g,color,x,y,z,1,1,1,parent);
+}
 function band(x,y,z,w,parent=root) {box(C.teal,x,y,z,w,.14,.06,parent);for(let i=-w/2+.25;i<w/2;i+=.55)triangle(C.ochre,x+i,y+.2,z+.04,.15,parent);}
 function pot(x,y,z,s=1,color=C.clay,kind='jar',parent=root) {
   const profile=kind==='bowl'?[[.12,0],[.28,.08],[.5,.32],[.49,.39],[.42,.37],[.2,.12]]:kind==='tall'?[[.23,0],[.34,.12],[.37,.55],[.22,.87],[.2,1.05],[.26,1.08],[.25,1.16],[.17,1.14],[.16,1]]:[[.24,0],[.43,.15],[.48,.5],[.32,.75],[.19,.86],[.19,.98],[.25,1],[.25,1.08],[.15,1.07],[.15,.9]];
@@ -99,8 +103,6 @@ function horizon(){
   for(let i=0;i<5;i++) { const cloud=ball(i%2?'#f6ddbe':'#ead0b4',-28+i*14,13+(i%2)*3,-35-(i%3)*8,7,.7,2);cloud.rotation.y=.3; }
 }
 function market(){begin('market');horizon();paving();house(-10,-5,6,3.5,6);house(9,-7,6,3.7,5);house(-6,-12,5,2.7,4);house(6,-14,5,3,4);
-// Stepped landmark stays left of the street axis.
-for(let i=0;i<4;i++){box(i%2?C.sand:C.cream,-12,1+i*1.45,-12,7-i*1.2,2,7-i*1.2);box(C.teal,-12,2+i*1.45,-12,7.1-i*1.2,.15,7.1-i*1.2);for(const dx of [-1.3,1.3])box(C.teal,-12+dx,1.4+i*1.45,-8.45-i*.6,.25,1.5,.08);}obstacle(-12,-12,7,7);
 // Wide passable visual steps; no obstacle rises into the walking capsule.
 for(let i=0;i<5;i++)box(i%2?C.light:C.cream,0,.02+i*.018,-10-i*.7,4.8,.13,.68);
 for(const side of [-1,1]){box(C.sand,side*2.8,.45,-11.5,.5,.9,4.5);obstacle(side*2.8,-11.5,.5,4.5);plant(side*3.5,-13,1.1);}
@@ -128,8 +130,110 @@ merchant('shepherd',-3,6,C.ochre);box(C.wood,-3.6,.85,6,.08,1.7,.08);
 goat('white-goat',-5,1,'#e8e0c9','bell');goat('black-goat',4,0,'#4d4943','horns');goat('spotted-goat',-4,-5,'#b76b3f','spots');goat('kid-goat',4,-5,'#b9bab1','kid');
 box(C.wood,0,.25,-8,2.5,.5,.8);box('#759e9a',0,.5,-8,2.2,.03,.6);obstacle(0,-8,2.5,.8);palm(-13,-9,4.5);palm(13,3,5);
 }
+function mainBuilding(){
+ begin('main-building');
+ const component=(name,build)=>{const parent=root,g=new Group();g.name=name;parent.add(g);root=g;build();root=parent;};
+ // Build repeated props once at the origin. Cloned nodes share their exported mesh.
+ const prefabs=new Map();
+ const prop=(key,x,y,z,build,scale=1,heightScale=1)=>{
+  let prefab=prefabs.get(key);
+  if(!prefab){const parent=root,group=new Group(),start=collisions.length;root=group;build();root=parent;prefab={group,obstacles:collisions.splice(start)};prefabs.set(key,prefab);}
+  const instance=prefab.group.clone(true);instance.name=key;instance.position.set(x,y,z);instance.scale.set(scale,scale*heightScale,scale);root.add(instance);
+  for(const [x0,z0,x1,z1] of prefab.obstacles)collisions.push([x+x0*scale,z+z0*scale,x+x1*scale,z+z1*scale]);
+ };
+ const vessel=(x,y,z,scale=1)=>prop('courtyard-vessel',x,y,z,()=>pot(0,0,0),scale);
+ const planter=(x,z,scale)=>prop('courtyard-planter',x,0,z,()=>{plant(0,0,1);band(0,.4,.51,1);},scale);
+ const courtyardPalm=(x,z,height)=>prop('courtyard-palm',x,0,z,()=>palm(0,0,5.5),1,height/5.5);
+ const parapet=(x,y,z,w,d)=>{
+  for(const side of [-1,1]){box(C.cream,x+side*w/2,y+.22,z,.22,.44,d);box(C.cream,x,y+.22,z+side*d/2,w,.44,.22);}
+  for(let a=-w/2;a<=w/2+.01;a+=.9)for(const side of [-1,1])box(C.light,x+a,y+.58,z+side*d/2,.4,.35,.3);
+  for(let a=-d/2+.8;a<d/2;a+=.9)for(const side of [-1,1])box(C.light,x+side*w/2,y+.58,z+a,.3,.35,.4);
+ };
+ const pointed=(x,y,z,w,h,color=C.dark)=>{
+  box(color,x,y+h*.35,z,w,h*.7,.08);
+  const top=triangle(color,x,y+h*.77,z,w*.58);top.scale.y=h/(w*1.2);top.rotation.z=0;
+ };
+ const lantern=(x,z)=>prop('courtyard-lantern',x,0,z,()=>{const x=0,z=0;obstacle(x,z,.65,.65);box(C.sand,x,.17,z,.7,.34,.7);box(C.cream,x,.7,z,.52,.8,.52);box(C.teal,x,.49,z,.56,.1,.56);const light=box('#ffd48a',x,.82,z+.27,.25,.25,.025);light.rotation.z=Math.PI/4;box(C.light,x,1.16,z,.75,.13,.75);});
+ const bench=(x,z)=>{box(C.wood,x,.5,z,2,.16,.6);box(C.wood,x,.95,z-.25,2,.55,.12);for(const side of [-1,1])box(C.dark,x+side*.75,.25,z,.14,.5,.45);obstacle(x,z,2,.7);};
+ component('courtyard-ground',()=>{
+  box('#cbb58e',0,-.13,0,32,.2,32);
+  for(let i=0;i<8;i++){const p=box(i%3?C.cream:C.light,(i%2)*.08,.025,12.8-i*1.7,2.85,.09,1.5);p.rotation.y=(i%3-1)*.018;}
+  // Side lane joins the market at world x=-16, z=9.
+  for(let i=0;i<8;i++)box(i%2?C.cream:C.sand,2+i*1.85,.015,9,1.7,.08,2.6);
+  for(const side of [-1,1]){box(C.sand,side*12,.55,1, .5,1.1,22);obstacle(side*12,1,.5,22);}
+  // Eastern wall has a real side gate instead of a visual-only opening.
+  collisions.pop();
+  obstacle(12,-2,.5,16);obstacle(12,12.5,.5,3);
+  const wall=root.children.at(-1);root.remove(wall);wall.geometry.dispose();wall.material.dispose();
+  box(C.sand,12,.55,-2,.5,1.1,16);box(C.sand,12,.55,12.5,.5,1.1,3);
+  for(const side of [-1,1]){box(C.sand,side*7.5,.55,14,9,1.1,.5);obstacle(side*7.5,14,9,.5);}
+ });
+ component('stepped-building',()=>{
+  let base=0;
+  const tiers=[[14,10,4.4],[10.8,7.6,3],[7.9,5.5,2.6],[5.3,3.7,2.2],[2.8,2.5,2.6]];
+  for(let i=0;i<tiers.length;i++){
+   const [w,d,h]=tiers[i],z=-6;
+   if(i===4){
+    const cut=.3,shape=new Shape([new Vector2(-w/2+cut,-d/2),new Vector2(w/2-cut,-d/2),new Vector2(w/2,-d/2+cut),new Vector2(w/2,d/2-cut),new Vector2(w/2-cut,d/2),new Vector2(-w/2+cut,d/2),new Vector2(-w/2,d/2-cut),new Vector2(-w/2,-d/2+cut)]);
+    const geometry=new ExtrudeGeometry(shape,{depth:h,bevelEnabled:false});geometry.rotateX(-Math.PI/2);geometry.translate(0,-h/2,0);part(geometry,C.cream,0,base+h/2,z);
+   }else box(i%2?C.light:C.cream,0,base+h/2,z,w,h,d);
+   box(C.light,0,base+h-.12,z,w+.22,.22,d+.22);
+   for(let row=0;row<Math.floor(h/.65);row++)for(let col=0;col<Math.floor(w/1.3);col++){
+    part(new PlaneGeometry(1.24,.59),(row+col)%4?C.cream:C.sand,-w/2+.7+col*1.3,base+.32+row*.65,z+d/2+.035);
+   }
+   band(0,base+h-.55,z+d/2+.1,w);
+   for(const side of [-1,1]){
+    box(C.teal,side*w*.34,base+h*.48,z+d/2+.11,.38,h*.78,.14);
+    if(i>0)pointed(side*w*.22,base+.5,z+d/2+.15,.55,Math.min(1.65,h-.85));
+   }
+   parapet(0,base+h,z,w-.12,d-.12);
+   if(i<4)for(const side of [-1,1])for(let leaf=0;leaf<4;leaf++)ball(leaf%2?C.leaf:C.olive,side*(w/2-.18),base+h-.25-leaf*.27,z+d/2+.14,.22,.3,.13);
+   if(i===4)pointed(0,base+.4,z+d/2+.17,.48,1.3,'#ecc384');
+   base+=h;
+  }
+  obstacle(0,-6,14,10);
+ });
+ component('main-portal',()=>{
+  // Nested pointed frames with visible depth; the door remains closed.
+  for(let i=0;i<3;i++){
+   const w=3.4-i*.38,h=3.9-i*.3,z=-.83+i*.15;
+   for(const side of [-1,1]){box(i%2?C.clay:C.sand,side*w/2,1.42,z,.22,2.84,.28);const beam=box(i%2?C.clay:C.sand,side*w/4,3.05-i*.12,z,.22,Math.hypot(w/2,h-2.65),.28);beam.rotation.z=side*Math.atan2(w/2,h-2.65);}
+  }
+  pointed(0,.08,-.95,2.65,3.35);
+  for(let i=0;i<7;i++)box(i%2?C.wood:C.dark,-1.08+i*.36,1.12,-.63,.33,2.15,.08);
+  box('#e8b46a',0,2.65,-.61,.6,.12,.035);
+  for(let i=0;i<3;i++)box(C.light,0,.04+i*.035,.7-i*.45,4,.11,.44);
+  for(const side of [-1,1])box(C.teal,side*2.5,1.85,-.85,.6,3.7,.3);
+ });
+ component('exterior-stair',()=>{
+  // 2m wide stair, ground at z=7, 3m landing at z=-3.
+  for(let i=0;i<20;i++){
+   const y=(i+1)*.15,z=6.75-i*.5;
+   box(i%2?C.light:C.cream,9,y/2,z,2,y,.5);
+   for(const side of [-1,1])box(C.sand,9+side*1.25,y+.38,z,.35,.76,.5);
+  }
+  box(C.cream,9,1.5,-4.25,2,3,2.5);
+  for(const side of [-1,1]){box(C.sand,9+side*1.25,3.38,-4.25,.35,.76,2.5);obstacle(9+side*1.25,1,.35,13);}
+  box(C.sand,9,3.4,-5.55,2.8,.8,.35);obstacle(9,-5.55,2.8,.35);
+  for(const z of [7,-3,-5.4])for(const side of [-1,1]){const y=z===7?0:3;box(C.cream,9+side*1.25,y+.55,z,.5,1.1,.5);box(C.teal,9+side*1.25,y+.95,z,.54,.18,.54);}
+  vessel(10.8,3,-4.4,.6);vessel(7.4,0,7,.65);
+ });
+ component('courtyard-arch',()=>{
+  for(const side of [-1,1]){box(C.cream,side*3.3,2.3,14,.9,4.6,1);box(C.teal,side*3.3,3.8,14,.95,.18,1.05);obstacle(side*3.3,14,1,1.1);}
+  box(C.cream,0,5.0,14,7.6,.8,1);box(C.light,0,5.48,14,7.9,.18,1.2);
+ });
+ component('rest-canopy',()=>{canopy(-6,5,C.ochre);bench(-6,4.3);vessel(-7,0,6.8,1.15);vessel(-5.5,0,6.8,.7);box(C.teal,-5.4,.62,4.3,.4,.045,.55);obstacle(-7,6.8,1.1,1.1);});
+ component('courtyard-plants',()=>{courtyardPalm(-9,10,6.5);courtyardPalm(6,-.2,5.5);planter(5.5,5,1.3);planter(-9,-.5,1.4);planter(5.7,11.6,1.2);bench(5,2.8);const scroll=cyl(C.light,5,.65,2.8,.1,.8);scroll.rotation.z=Math.PI/2;});
+ component('courtyard-lanterns',()=>{for(const z of [3.4,11.8])for(const side of [-1,1])lantern(side*2.45,z);lantern(-9,3);lantern(6,7);});
+ component('babel-symbols',()=>{
+  // Original geometric glyphs, stored as a separately toggleable scene node.
+  for(const side of [-1,1]){const a=box(C.teal,2.3+side*.24,16.7,-6,.15,1.3,.15);a.rotation.z=side*.35;}box(C.teal,2.3,16.5,-6,.65,.13,.15);
+  for(const [x,y] of [[-2.6,16.8],[-2.2,16.8],[-2.6,16.3]]){const wedge=triangle(C.gold,x,y,-6,.23);wedge.rotation.z=Math.PI/2;box(C.gold,x+.22,y,-6,.42,.09,.1);}
+ });
+}
+
 // Merge static geometry with vertex colors, retaining named animated subgroups.
 function batch(group){for(const child of [...group.children])if(child.isGroup)batch(child);
 const geometries=[];for(const child of [...group.children]){if(!child.isMesh)continue;child.updateMatrix();const g=child.geometry.index?child.geometry.toNonIndexed():child.geometry.clone();g.applyMatrix4(child.matrix);g.deleteAttribute('uv');const count=g.attributes.position.count;const color=child.material.color;const colors=new Uint8Array(count*3);for(let i=0;i<count;i++)colors.set([Math.round(color.r*255),Math.round(color.g*255),Math.round(color.b*255)],i*3);g.setAttribute('color',new BufferAttribute(colors,3,true));geometries.push(g);group.remove(child);child.geometry.dispose();child.material.dispose();}
 if(geometries.length){const joined=mergeGeometries(geometries);const merged=mergeVertices(joined);joined.dispose();const hash=createHash('sha256');for(const key of Object.keys(merged.attributes).sort()){const attribute=merged.attributes[key];hash.update(key);hash.update(Buffer.from(attribute.array.buffer,attribute.array.byteOffset,attribute.array.byteLength));}if(merged.index)hash.update(Buffer.from(merged.index.array.buffer,merged.index.array.byteOffset,merged.index.array.byteLength));const key=hash.digest('hex');let shared=geometryPool.get(key);if(shared)merged.dispose();else{shared=merged;geometryPool.set(key,shared);}const mesh=new Mesh(shared,batchedMaterial);mesh.name=group.name+'-surface';group.add(mesh);for(const g of geometries)g.dispose();}}
-for(const [name,make] of [['market',market],['pasture',pasture]]){make();root.userData.collisions=collisions;batch(root);const tracks=clips.flatMap(clip=>clip.tracks);const data=await new GLTFExporter().parseAsync(root,{binary:true,animations:[new AnimationClip('idle',5,tracks)]});const bytes=Buffer.from(data);const target=new URL(name+'.glb',rootUrl);const previous=await readFile(target).catch(()=>null);if(!previous?.equals(bytes))await writeFile(target,bytes);console.log(`${name}: ${bytes.length} bytes; ${collisions.length} collision rectangles`);}
+for(const [name,make] of [['market',market],['pasture',pasture],['main-building',mainBuilding]]){make();root.userData.collisions=collisions;batch(root);const tracks=clips.flatMap(clip=>clip.tracks);const data=await new GLTFExporter().parseAsync(root,{binary:true,animations:[new AnimationClip('idle',5,tracks)]});const bytes=Buffer.from(data);const target=new URL(name+'.glb',rootUrl);const previous=await readFile(target).catch(()=>null);if(!previous?.equals(bytes))await writeFile(target,bytes);console.log(`${name}: ${bytes.length} bytes; ${collisions.length} collision rectangles`);}

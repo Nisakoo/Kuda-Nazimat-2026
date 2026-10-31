@@ -44,6 +44,7 @@ export class LocalSession implements GameSession {
 
   getSnapshot(): WorldSnapshot { return this.world.getSnapshot(); }
   setMovementGuard(guard: (position: Vector3) => boolean): void { this.world.setMovementGuard(guard); }
+  setSurfaceHeight(height: (x: number, z: number) => number): void { this.world.setSurfaceHeight(height); }
   initializeSpawn(position: Vector3): void { this.world.initializePosition(this.playerId, position); }
 
   subscribe(listener: (events: readonly WorldEvent[]) => void): () => void {

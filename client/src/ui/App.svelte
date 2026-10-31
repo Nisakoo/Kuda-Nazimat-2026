@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import type { AppSnapshot, GameApp } from '../app/GameApp';
   import Login from './Login.svelte';
+  import BabylonPanel from './BabylonPanel.svelte';
   import Dialog from './Dialog.svelte';
   import Settings from './Settings.svelte';
   import Chat from './Chat.svelte';
@@ -11,7 +12,8 @@
   const { game, startupError }: { game: GameApp | null; startupError: string | null } = $props();
   let viewport: HTMLDivElement;
   let state = $state<AppSnapshot>({
-    phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null, debug: false, coordinates: '',
+    babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '',
+    phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null, debug: false, buildingSymbols: true, coordinates: '',
     capture: 'idle', captureError: null,
     visualLoading: false, visualError: null, modelStats: '',
     worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
@@ -51,7 +53,7 @@
     <Login pending={state.authPending} error={state.authError} initialName={state.authName} login={(name) => game.login(name)} />
   {/if}
 
-  {#if !error && game && state.screen === 'welcome' && !state.authRequired}
+  {#if !error && game && state.screen === 'welcome' && !state.authRequired && state.babylonPanel !== 'setup'}
     <section class="welcome glass" aria-labelledby="scene-title">
       <p class="eyebrow">Добро пожаловать в Вавилон</p>
       <h1 id="scene-title">{#if marketMap}Рынок<br />Вавилона.{:else}Город<br />открытий.{/if}</h1>
@@ -72,11 +74,11 @@
   {/if}
 
   {#if !error && state.screen === 'playing'}
-    <div class="hud-top"><aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>{state.market ? `Козы пастуха · ${state.market.fed.length}/4` : marketMap ? 'Торговцы рынка · пастух' : 'Лея — история · Марк — наука'}</p></aside>
+    <div class="hud-top"><aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>{state.babylon?.state?.profile ? `Козы пастуха · ${state.babylon.state.fed.length}/4` : state.market ? `Козы пастуха · ${state.market.fed.length}/4` : marketMap ? 'Торговцы рынка · пастух' : 'Лея — история · Марк — наука'}</p></aside>
     {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p><p aria-label="Производительность">{state.performance}</p><p aria-label="Ресурсы сцены">{state.renderStats}</p></div>{/if}
     </div>
     {#if state.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
-    <div class="world-actions">{#if state.market}<button class="quest-button glass" onclick={() => game?.openMarketPanel('task')}>Козы пастуха · {state.market.fed.length}/4</button>{/if}<button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
+    <div class="world-actions">{#if state.babylon?.state?.profile}<button class="quest-button glass babel-task" onclick={() => game?.openBabylonPanel('task')}>{state.babylon.state.task} · {state.babylon.state.fed.length}/4</button>{/if}{#if state.market}<button class="quest-button glass" onclick={() => game?.openMarketPanel('task')}>Козы пастуха · {state.market.fed.length}/4</button>{/if}<button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
     {#if state.nearby && !state.dialog && state.phase === 'running'}
       <button class="interaction glass" onclick={() => game?.interact()}><kbd>E</kbd><span>{state.market ? 'Взаимодействовать' : 'Поговорить'}<span class="interaction-name">{state.nearby.name}</span></span></button>
     {/if}</div>
@@ -92,7 +94,7 @@
     </div></section>
   {/if}
 
-  {#if !error && game && state.screen === 'playing' && state.phase === 'stopped' && state.capture !== 'requesting' && !state.chatOpen && !state.settingsOpen && !state.marketPanel}
+  {#if !error && game && state.screen === 'playing' && state.phase === 'stopped' && state.capture !== 'requesting' && !state.chatOpen && !state.settingsOpen && !state.marketPanel && !state.babylonPanel}
     <div class="modal-backdrop"><dialog use:modal class="panel pause-panel" aria-labelledby="pause-title" oncancel={(event) => { event.preventDefault(); game.toggleMenu(); }}>
       <p class="eyebrow">Можно не торопиться</p><h2 id="pause-title">Пауза</h2><p class="subtle">Прогулка продолжится с этого места.</p>
       {#if state.captureError}<p class="capture-error" role="alert">{state.captureError}</p>{/if}
@@ -102,6 +104,8 @@
       {#if state.visualError}<p class="capture-error" role="alert">{state.visualError}</p><button class="secondary" onclick={() => game.retryVisuals()}>Повторить загрузку</button>{/if}
       <div class="menu-buttons"><button disabled={!state.worldReady} onclick={() => game.resume()}>{state.captureError ? 'Повторить захват' : 'Продолжить'}</button><button class="secondary" onclick={() => game.openChat()}>Общение</button><button class="secondary" onclick={() => game.restart(viewport)}>Перезапустить сцену</button><button class="secondary" onclick={() => game.leaveWorld()}>На главный экран</button></div>
       {#if state.market}<div class="menu-buttons market-menu"><button class="secondary" onclick={() => game.openMarketPanel('task')}>Задание</button><button class="secondary" onclick={() => game.openMarketPanel('inventory')}>Сумка</button><button class="secondary" onclick={() => game.openMarketPanel('stone')}>Камень</button><button class="secondary" onclick={() => game.openMarketPanel('words')}>Словарь</button><button class="secondary" onclick={() => game.openMarketPanel('intro')}>О мире и управлении</button></div>{/if}
+      {#if marketMap}<label class="debug-toggle"><input type="checkbox" checked={state.buildingSymbols} onchange={(event) => game.setBuildingSymbols(event.currentTarget.checked)} /> Символы над башней</label>{/if}
+      {#if state.babylon?.state?.profile}<div class="menu-buttons market-menu">{#each [['task', 'Задание'], ['inventory', 'Сумка'], ['stone', 'Камень'], ['words', 'Словарь'], ['languages', 'Языки'], ['intro', 'О мире и управлении']] as [panel, label]}<button class="secondary" onclick={() => game.openBabylonPanel(panel as import('../app/GameApp').BabylonPanel)}>{label}</button>{/each}</div>{/if}
       <label class="debug-toggle"><input type="checkbox" checked={state.debug} onchange={(event) => game.setDebug(event.currentTarget.checked)} /> Показывать координаты</label>
       <button class="secondary" onclick={() => game.openSettings()}>Настройки</button>
       <label class="debug-toggle radius-setting">Радиус загрузки <select aria-label="Радиус загрузки" value={state.chunkRadius} onchange={(event) => game.setChunkRadius(Number(event.currentTarget.value))}><option value={0}>Текущая область</option><option value={1}>Ближайшие области</option><option value={2}>Расширенный обзор</option></select></label>
@@ -120,6 +124,8 @@
   {#if game && state.chatOpen}<div class="modal-backdrop"><Chat messages={state.chatMessages} error={state.chatError ?? state.networkError} canSend={state.mode !== 'local' && state.networkStatus === 'connected'} send={(text) => game.sendChat(text)} close={() => game.closeChat()} /></div>{/if}
 
   {#if game && state.market}{#key state.market.runId}<MarketPanel {game} market={state.market} panel={state.marketPanel} target={state.marketTarget} />{/key}{/if}
+
+  {#if game && state.babylon}<BabylonPanel {game} view={state.babylon} panel={state.babylonPanel} target={state.babylonTarget} wordSeed={state.babylonWord} />{/if}
 
   <footer>
     <p class="status" role="status"><span class:active={state.phase === 'running'} class="dot"></span>{error ? 'Просмотр недоступен' : state.authRequired ? (state.authPending ? 'Вход на сервер…' : 'Войдите, чтобы открыть мир') : state.phase === 'running' ? 'Сцена открыта' : state.phase === 'stopped' ? 'Просмотр приостановлен' : 'Подготовка сцены…'}</p>

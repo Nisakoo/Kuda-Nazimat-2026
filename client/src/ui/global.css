@@ -127,3 +127,12 @@ button.question { font-weight: 500; background: #fffefa; border: 1px solid #cfdd
 .word-list li { margin-block: 16px; }
 .market-results { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
 .market-results dd { margin: 0; font-weight: 650; }
+
+.babel-panel label { display: grid; gap: .4rem; margin: .6rem 0; }
+.babel-panel form { display: grid; gap: .6rem; }
+.babel-panel textarea { min-height: 5rem; resize: vertical; }
+.babel-panel .chat-messages { max-height: 18rem; overflow-y: auto; padding-left: 1.4rem; }
+.babel-panel .chat-messages li { margin-bottom: .8rem; }
+.word-link { display: inline; padding: 0; margin: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; text-decoration: underline dotted; text-underline-offset: .2em; box-shadow: none; }
+.word-link:hover, .word-link:focus-visible { background: #ddede3; color: #214d49; }
+.babel-task { max-width: 28rem; white-space: normal; }

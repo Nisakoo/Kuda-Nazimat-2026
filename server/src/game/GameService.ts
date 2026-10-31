@@ -9,7 +9,7 @@ import { AoiStream } from './AoiStream.ts';
 import type { Channel } from './ports.ts';
 import type { PlacedPlayer, World } from './World.ts';
 
-export interface GameSettings { readonly maxPlayers: number; readonly disconnectGraceMs: number; readonly broadcastEvery: number }
+export interface GameSettings { readonly maxPlayers: number; readonly disconnectGraceMs: number; readonly broadcastEvery: number; readonly initialSpawn?: (playerId: string) => { mapId: string; position: { x: number; y: number; z: number }; force?: boolean } | null; readonly didSpawn?: (playerId: string) => void }
 
 interface Seat {
   readonly identity: PlayerIdentity;
@@ -61,6 +61,8 @@ export class GameService {
     return true;
   }
 
+  canAct(accountId: string, sessionKey: string): boolean { const seat = this.seats.get(accountId); return !!seat?.stream && seat.channel?.sessionKey === sessionKey; }
+
   isControlling(channel: Channel): boolean { return this.seatOf(channel) !== undefined; }
 
   /** REALTIME-006: keep the entity for the grace period, then save and free the seat. */
@@ -90,11 +92,20 @@ export class GameService {
     if (!map) return { ok: false, reason: 'unknown-map' };
     const { playerId, displayName } = seat.identity;
     const current = this.world.locate(playerId);
-    if (!current || current.mapId !== mapId) {
+    const initial = this.settings.initialSpawn?.(playerId);
+    const force = initial?.mapId === mapId && initial.force === true;
+    if (!current || current.mapId !== mapId || force) {
       if (current) this.world.remove(playerId);
       const saved = this.loadSaved(playerId);
-      const usable = saved !== null && saved.mapId === mapId && map.isWalkable(saved.position.x, saved.position.z);
-      this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : map.spawn, rotationY: usable ? saved.rotationY : Math.PI });
+      const usable = !force && saved !== null && saved.mapId === mapId && map.isWalkable(saved.position.x, saved.position.z);
+      const spawn = initial?.mapId === mapId && map.isWalkable(initial.position.x, initial.position.z) ? initial.position : map.spawn;
+      this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : spawn, rotationY: usable ? saved.rotationY : Math.PI });
+    }
+    if (force) {
+      // Save the role spawn before acknowledging it, so a reconnect never restores an old demo position.
+      const placed = this.world.locate(playerId)!;
+      this.players.save([{ id: playerId, mapId, position: placed.position, rotationY: placed.rotationY }]);
+      this.settings.didSpawn?.(playerId);
     }
     const stream = new AoiStream();
     const entities = this.world.aoi(playerId);

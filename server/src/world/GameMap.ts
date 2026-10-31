@@ -1,5 +1,6 @@
 import type { WorldDescriptor } from '../../../shared/protocol/types.ts';
 import type { WorldManifest } from '../../../shared/map/manifest.ts';
+import { surfaceHeight } from '../../../shared/map/manifest.ts';
 import { chunkCellOf, footprintCells, isWalkable } from '../../../shared/map/walkability.ts';
 import type { ChunkCell } from '../../../shared/map/walkability.ts';
 import type { Vector3 } from '../../../shared/world/types.ts';
@@ -34,6 +35,7 @@ export class GameMap {
   }
 
   get spawn(): Vector3 { return this.manifest.spawn; }
+  heightAt(x: number, z: number): number { return surfaceHeight(this.manifest.heightSurfaces, x, z); }
 
   isWalkable(x: number, z: number): boolean {
     return isWalkable(this.manifest, (cell) => this.collisions.get(cellKey(cell)), x, z);

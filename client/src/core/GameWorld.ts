@@ -9,6 +9,8 @@ export class GameWorld {
 
   private readonly bounds: MovementBounds | null;
   private movementGuard: ((position: Vector3) => boolean) | null = null;
+  private surfaceHeight: ((x: number, z: number) => number) | null = null;
+  setSurfaceHeight(height: (x: number, z: number) => number): void { this.surfaceHeight = height; }
   setMovementGuard(guard: (position: Vector3) => boolean): void { this.movementGuard = guard; }
   initializePosition(id: EntityId, position: Vector3): void {
     this.assertLocal();
@@ -86,7 +88,8 @@ export class GameWorld {
         position.x = Math.max(this.bounds.minX, Math.min(this.bounds.maxX, position.x));
         position.z = Math.max(this.bounds.minZ, Math.min(this.bounds.maxZ, position.z));
       }
-      if (attempting && this.movementGuard && !this.movementGuard(position)) { position.x = previous.x; position.z = previous.z; }
+      if (attempting && ((this.movementGuard && !this.movementGuard(position)) || Math.abs((this.surfaceHeight?.(position.x, position.z) ?? previous.y) - previous.y) > .35)) { position.x = previous.x; position.z = previous.z; }
+      if (attempting) position.y = (this.surfaceHeight?.(position.x, position.z) ?? previous.y);
       const moving = position.x !== previous.x || position.z !== previous.z;
       const animationName = moving ? 'walk' : 'idle';
       if (!moving && (!entity.animationState || entity.animationState.name === animationName)) continue;

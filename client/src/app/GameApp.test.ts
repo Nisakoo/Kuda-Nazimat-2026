@@ -41,7 +41,7 @@ describe('application lifecycle', () => {
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
     host = document.createElement('div');
     host.getBoundingClientRect = () => new DOMRect(0, 0, 640, 480);
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     createRenderer = vi.fn(() => renderer);
     app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, null);
   });
@@ -89,7 +89,7 @@ describe('application lifecycle', () => {
     app.start(host);
     app.dispose();
     const previousRenderer = renderer;
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     app = new GameApp(parseConfig({}, 'http://school.local'), () => renderer, undefined, null);
     app.start(host);
     advance(100);
@@ -308,7 +308,7 @@ describe('application lifecycle', () => {
       expect(position).toBeDefined();
       app.stop();
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({
-        phase: 'stopped', coordinates: `X ${position!.x.toFixed(1)} · Z ${position!.z.toFixed(1)}`,
+        phase: 'stopped', coordinates: `X ${position!.x.toFixed(1)} · Z ${position!.z.toFixed(1)} · Y ${position!.y.toFixed(1)}`,
       }));
       app.resume();
       advance(1000);

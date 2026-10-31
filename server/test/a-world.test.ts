@@ -1,6 +1,11 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { AoiStream } from '../src/game/AoiStream.ts';
 import { World } from '../src/game/World.ts';
+import { GameService } from '../src/game/GameService.ts';
+import { systemClock, systemScheduler } from '../src/common/time.ts';
+import { silentLogger } from '../src/common/logger.ts';
+import type { SavedPosition } from '../src/contracts.ts';
+import type { Channel } from '../src/game/ports.ts';
 import { loadWorld } from '../src/world/loader.ts';
 import type { LoadedWorld } from '../src/world/loader.ts';
 import { makeWorld, npc, SPAWN, WALL_MIN_X } from './a-helpers.ts';
@@ -16,6 +21,23 @@ function walk(world: World, direction: { x: number; z: number }, seconds: number
   for (let t = 0; t < seconds * 20; t++) { now += 50; world.setIntent('p', t + 1, direction, prepared, now); world.step(0.05, now); }
 }
 const fresh = (): World => { const w = new World(loaded.maps, loaded.npcs); w.add({ id: 'p', name: 'P', mapId: 'test', position: SPAWN, rotationY: 0 }); return w; };
+
+it('replaces an existing demo position with a role spawn once and preserves movement on reconnect', () => {
+  const world = fresh(); let force = true;
+  let saved: SavedPosition = { mapId: 'test', position: SPAWN, rotationY: 0 };
+  const position = { x: -2, y: 0, z: 5 };
+  const game = new GameService(world, { load: () => saved, save: list => { saved = list[0]!; } }, systemClock, systemScheduler, {
+    maxPlayers: 4, disconnectGraceMs: 100, broadcastEvery: 2,
+    initialSpawn: () => ({ mapId: 'test', position, force }), didSpawn: () => { force = false; },
+  }, silentLogger);
+  const identity = { playerId: 'p', accountId: 'a', displayName: 'P' };
+  const channel: Channel = { id: 'one', sessionKey: 'key', send() {}, close() {} };
+  game.attach(identity, channel); expect(game.join(channel, 'test').ok).toBe(true);
+  expect(world.locate('p')?.position).toEqual(position); expect(saved.position).toEqual(position); expect(force).toBe(false);
+  walk(world, { x: -1, z: 0 }, 1); const moved = world.locate('p')!.position;
+  const next = { ...channel, id: 'two' }; game.attach(identity, next); game.join(next, 'test');
+  expect(world.locate('p')?.position).toEqual(moved); expect(moved.x).toBeLessThan(position.x);
+});
 
 describe('world loading (SERVER-WORLD-002)', () => {
   it('validates sizes and indexes chunk, collision, model and manifest files', () => {

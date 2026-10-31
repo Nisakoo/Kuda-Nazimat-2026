@@ -1,6 +1,6 @@
 import type { EntityId, Transform, WorldSnapshot } from '../core/types';
 
-export interface CameraView { readonly yaw: number; readonly pitch: number; readonly distance: number }
+export interface CameraView { readonly yaw: number; readonly pitch: number; readonly distance: number; readonly focusHeight?: number; readonly fieldOfView?: number }
 export interface VisualChunk {
   readonly id: string;
   readonly objects: readonly { readonly id: string; readonly assetId: string; readonly transform: Transform; readonly animation?: string }[];
@@ -24,6 +24,7 @@ export interface RenderAdapter {
   resize(width: number, height: number, pixelRatio: number): void;
   syncWorld(previous: WorldSnapshot, current: WorldSnapshot, playerId: EntityId | null): void;
   setCamera(view: CameraView): void;
+  setBuildingSymbols(visible: boolean): void;
   registerModels(models: Readonly<Record<string, string>>): void;
   loadChunk(chunk: VisualChunk): Promise<void>;
   unloadChunk(id: string): void;

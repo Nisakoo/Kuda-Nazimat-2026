@@ -1,10 +1,11 @@
 import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { randomId } from '../common/ids.ts';
 import type { AccountStore, SessionStore } from '../auth/ports.ts';
 import type { DialogueStore } from '../npc/ports.ts';
 import type { PlayerIdentity, PlayerStore } from '../contracts.ts';
+import { applyMigrations, loadMigrations } from './migrate.ts';
 
 export function transaction<T>(db: DatabaseSync, action: () => T): T {
   db.exec('BEGIN IMMEDIATE');
@@ -16,15 +17,8 @@ export function openDatabase(path: string, now = Date.now()): DatabaseSync {
   const db = new DatabaseSync(path);
   try {
     db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 1000');
-    transaction(db, () => {
-      db.exec('CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, applied_at INTEGER NOT NULL)');
-      const versions = db.prepare('SELECT version FROM schema_migrations ORDER BY version').all();
-      if (versions.some((row) => row.version !== 1)) throw new Error('Неизвестная версия БД');
-      if (!versions.length) {
-        db.exec(readFileSync(new URL('./migrations/001.sql', import.meta.url), 'utf8'));
-        db.prepare('INSERT INTO schema_migrations VALUES (1, ?)').run(now);
-      }
-    });
+    const migrations = loadMigrations();
+    transaction(db, () => applyMigrations(db, migrations, now));
     return db;
   } catch (error) { db.close(); throw new Error(`Не удалось открыть БД ${path}`, { cause: error }); }
 }

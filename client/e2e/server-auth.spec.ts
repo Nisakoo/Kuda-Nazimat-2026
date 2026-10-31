@@ -115,12 +115,18 @@ test('a world 401 and client session expiry return to login without automaticall
   await expect(page.getByLabel('Имя игрока')).toBeVisible(); await expect(page.locator('canvas')).toHaveCount(0); expect(posts).toBe(2);
 });
 
-test('the same authorized UI opens the server market without local inventory controls', async ({ page }) => {
+test('switching to the server market enrolls BABEL and opens the authoritative inventory', async ({ page }) => {
   await login(page, 'Рынок'); await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.getByLabel('Карта', { exact: true }).fill('market'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
-  await expect(page.getByRole('heading', { name: 'Рынок Вавилона.' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Подготовка путешествия' })).toBeVisible();
+  await page.getByRole('button', { name: 'Далее: языки' }).click();
+  await page.getByRole('button', { name: 'Войти в Вавилон' }).click();
+  await expect(page.getByRole('dialog', { name: 'Добро пожаловать в Вавилон' })).toBeVisible();
+  await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true); await page.keyboard.press('Escape');
-  await expect(page.getByRole('button', { name: 'Сумка', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Сумка', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Ваша сумка' })).toContainText('настоящий сервер');
+  await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Выйти из сессии' }).click(); await expect(page.getByLabel('Имя игрока')).toBeVisible();
 });

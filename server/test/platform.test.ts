@@ -57,7 +57,7 @@ describe('SQLite v1', () => {
     const { db, stores, path } = database(); const p = stores.accounts.findOrCreate('Аня', 'аня', 1);
     for (const expiresAt of [9, 10, 11]) stores.sessions.create({ tokenHash: `hash${expiresAt}`, accountId: p.accountId, createdAt: 0, expiresAt });
     stores.sessions.prune(10); expect(stores.sessions.find('hash9')).toBeNull(); expect(stores.sessions.find('hash10')).not.toBeNull();
-    db.prepare('INSERT INTO schema_migrations VALUES (2, 0)').run();
+    db.prepare('INSERT INTO schema_migrations VALUES (999, 0)').run();
     expect(() => openDatabase(path)).toThrow('Не удалось открыть БД');
   });
   it('backs up a live WAL database and recovers after SIGKILL', async () => {

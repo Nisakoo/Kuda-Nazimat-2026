@@ -9,10 +9,17 @@ export interface ChunkEntry {
   readonly assets: readonly string[];
 }
 export interface WorldManifest {
+  readonly heightSurfaces?: readonly HeightSurface[];
   readonly mapId: string; readonly version: number; readonly worldBytes: number;
   readonly chunkSize: number; readonly spawn: Vector3; readonly origin: { readonly x: number; readonly z: number };
   readonly collisionResolution: number; readonly chunks: readonly ChunkEntry[];
   readonly models: Readonly<Record<string, string>>; readonly assets: Readonly<Record<string, AssetSize>>;
+}
+/** Bounded linear ramps along Z, including level landings. No overlapping floors. */
+export interface HeightSurface { readonly minX: number; readonly maxX: number; readonly minZ: number; readonly maxZ: number; readonly startY: number; readonly endY: number }
+export function surfaceHeight(surfaces: readonly HeightSurface[] | undefined, x: number, z: number): number {
+  const surface = surfaces?.find((s) => x >= s.minX && x <= s.maxX && z >= s.minZ && z <= s.maxZ);
+  return surface ? surface.startY + (surface.endY - surface.startY) * (z - surface.minZ) / (surface.maxZ - surface.minZ) : 0;
 }
 export interface ChunkObject { readonly id: string; readonly assetId: string; readonly transform: { readonly position: Vector3; readonly rotationY: number }; readonly animation: string }
 export interface ChunkPayload { readonly id: string; readonly objects: readonly ChunkObject[] }
@@ -47,7 +54,23 @@ export function parseManifest(raw: unknown, bootstrap: MapBootstrap): WorldManif
   for (const chunk of chunks) if (chunk.assets.length > 128 || chunk.assets.some((id) => !models[id])) throw new Error('Unknown chunk asset');
   if (integer(value.collisionResolution, 1) > 512 || integer(value.chunkSize, 1) > 1024) throw new Error('Map dimensions exceed client limits');
   const origin = object(value.origin);
-  return { mapId: text(value.mapId), version: 1, worldBytes: bootstrap.worldBytes, chunkSize: integer(value.chunkSize, 1), collisionResolution: integer(value.collisionResolution, 1), spawn: vector(value.spawn), origin: { x: integer(origin.x, -100_000), z: integer(origin.z, -100_000) }, chunks, models, assets };
+  let heightSurfaces: HeightSurface[] | undefined;
+  if (value.heightSurfaces !== undefined) {
+    if (!Array.isArray(value.heightSurfaces) || value.heightSurfaces.length > 128) throw new Error('Invalid height surfaces');
+    heightSurfaces = value.heightSurfaces.map((raw) => {
+      const s = object(raw);
+      const fields = ['minX', 'maxX', 'minZ', 'maxZ', 'startY', 'endY'] as const;
+      if (fields.some((key) => typeof s[key] !== 'number' || !Number.isFinite(s[key]) || Math.abs(s[key] as number) > 100_000)) throw new Error('Invalid height surface');
+      const result = Object.fromEntries(fields.map((key) => [key, s[key]])) as unknown as HeightSurface;
+      if (result.minX >= result.maxX || result.minZ >= result.maxZ || Math.abs(result.startY - result.endY) / (result.maxZ - result.minZ) > 1) throw new Error('Invalid ramp dimensions');
+      return result;
+    });
+    for (let i = 0; i < heightSurfaces.length; i++) for (const b of heightSurfaces.slice(i + 1)) {
+      const a = heightSurfaces[i]!;
+      if (a.minX < b.maxX && b.minX < a.maxX && a.minZ < b.maxZ && b.minZ < a.maxZ) throw new Error('Overlapping height surfaces');
+    }
+  }
+  return { mapId: text(value.mapId), version: 1, worldBytes: bootstrap.worldBytes, chunkSize: integer(value.chunkSize, 1), collisionResolution: integer(value.collisionResolution, 1), spawn: vector(value.spawn), origin: { x: integer(origin.x, -100_000), z: integer(origin.z, -100_000) }, chunks, models, assets, ...(heightSurfaces && { heightSurfaces }) };
 }
 
 /** Bootstrap a server derives from its own manifest; the client later checks the manifest against it. */

@@ -9,9 +9,11 @@ import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { NpcAnswer, NpcQuestions, PlayerIdentity, SessionVerifier } from '../contracts.ts';
 import type { GameService } from '../game/GameService.ts';
 import type { Channel } from '../game/ports.ts';
+import { hashToken } from '../auth/AuthService.ts';
 import { TokenBucket } from './TokenBucket.ts';
 
 export interface GatewayDeps {
+  readonly babylon?: { enrolled(playerId: string): boolean };
   readonly game: GameService;
   readonly sessions: SessionVerifier;
   readonly npc: NpcQuestions;
@@ -50,6 +52,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
     deps.sessions.verify(auth.token).then((check) => {
       if (!check.ok) { next(new HandshakeError('UNAUTHORIZED', 'Сессия отсутствует или истекла.')); return; }
       if (!deps.game.canAdmit(check.identity.accountId)) { next(new HandshakeError('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.')); return; }
+      socket.data.sessionKey = hashToken(auth.token as string);
       socket.data.identity = check.identity;
       socket.data.expiresAt = check.expiresAt;
       next();
@@ -63,6 +66,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
 
 class Connection implements Channel {
   readonly id: string;
+  readonly sessionKey: string;
   private readonly socket: Socket;
   private readonly deps: GatewayDeps;
   private readonly log: Logger;
@@ -77,7 +81,7 @@ class Connection implements Channel {
 
   constructor(socket: Socket, deps: GatewayDeps, log: Logger) {
     this.socket = socket; this.deps = deps; this.log = log;
-    this.id = socket.id;
+    this.id = socket.id; this.sessionKey = socket.data.sessionKey as string;
     this.identity = socket.data.identity as PlayerIdentity;
     this.expiresAt = socket.data.expiresAt as number;
     this.inputBucket = new TokenBucket(deps.clock, 30, 30);
@@ -152,6 +156,7 @@ class Connection implements Channel {
       return;
     }
     if (!game.identityOf(this)) { this.error(message.requestId, 'NOT_READY', 'Сначала войдите в мир.'); return; }
+    if ((message.type === 'chat-send' || message.type === 'npc-question') && this.deps.babylon?.enrolled(this.identity.playerId) && this.deps.game.locate(this.identity.accountId)?.mapId === 'market') { this.error(message.requestId, 'FORBIDDEN', 'Используйте общение BABEL с выбранным языком.'); return; }
     switch (message.type) {
       case 'input':
         if (this.inputBucket.take()) game.input(this, message.sequence, message.direction, message.preparedChunks);

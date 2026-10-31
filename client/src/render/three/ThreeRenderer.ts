@@ -8,6 +8,7 @@ import type { AssetManager } from '../../map/AssetManager';
 import { GltfLibrary } from './GltfLibrary';
 import { VisualChunks } from './VisualChunks';
 import { CameraObstruction } from './CameraObstruction';
+import { damp } from './CharacterMotion';
 
 export class ThreeRenderer implements RenderAdapter {
   private renderer: WebGLRenderer | null = null;
@@ -23,6 +24,7 @@ export class ThreeRenderer implements RenderAdapter {
   private library: GltfLibrary | null = null;
   private chunks: VisualChunks | null = null;
   private lastElapsed = 0;
+  private focusHeight = .8;
   private sun: DirectionalLight | null = null;
   private readonly errors = new Map<string, string>();
 
@@ -62,6 +64,7 @@ export class ThreeRenderer implements RenderAdapter {
   }
 
   setCamera(view: CameraView): void { this.view = { ...view }; }
+  setBuildingSymbols(visible: boolean): void { this.chunks?.setBuildingSymbols(visible); }
   registerModels(models: Readonly<Record<string, string>>): void { this.library?.register(models); }
   async loadChunk(chunk: VisualChunk): Promise<void> {
     if (!this.chunks) throw new Error('Renderer is not mounted');
@@ -100,7 +103,10 @@ export class ThreeRenderer implements RenderAdapter {
     if (position) this.target.copy(position);
     else this.target.set(0, 0, 0);
     if (this.sun) { this.sun.position.set(this.target.x + 18, 12, this.target.z - 12); this.sun.target.position.set(this.target.x, 0, this.target.z); }
-    this.target.y += 0.8;
+    this.focusHeight = damp(this.focusHeight, this.view.focusHeight ?? .8, 5, Math.min(delta, .1));
+    this.target.y += this.focusHeight;
+    const fov = this.view.fieldOfView ?? (this.camera.aspect < 1 ? 62 : 48);
+    if (Math.abs(this.camera.fov - fov) > .01) { this.camera.fov = damp(this.camera.fov, fov, 5, Math.min(delta, .1)); this.camera.updateProjectionMatrix(); }
     const { yaw, pitch, distance } = this.view;
     this.camera.position.set(
       this.target.x + Math.sin(yaw) * Math.cos(pitch) * distance,

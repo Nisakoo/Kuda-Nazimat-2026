@@ -17,7 +17,9 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
   await page.goto('/');
   if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
-  await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 9');
+  // Radius is an upper bound: large landmark assets may evict a distant chunk to keep the 10% cap.
+  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBeGreaterThanOrEqual(mapId === 'market' ? 2 : 9);
+  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
   await page.waitForTimeout(5000);
   const cdp = await page.context().newCDPSession(page);
   const heap = async () => { await cdp.send('HeapProfiler.collectGarbage'); return (await cdp.send('Runtime.getHeapUsage')).usedSize as number; };
@@ -48,7 +50,9 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
     await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
     if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
-    await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 9');
+    // Radius is an upper bound: large landmark assets may evict a distant chunk to keep the 10% cap.
+  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBeGreaterThanOrEqual(mapId === 'market' ? 2 : 9);
+  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
     await page.waitForTimeout(1200);
     expect(await old!.evaluate((element) => (element as HTMLCanvasElement).getContext('webgl2')!.isContextLost())).toBe(true);
     await old!.dispose();

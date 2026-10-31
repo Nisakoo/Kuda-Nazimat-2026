@@ -17,7 +17,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   const world = new World(loaded.maps, loaded.npcs, { ...DEFAULT_WORLD_SETTINGS, aoiRadius: config.aoiRadius });
   const log = deps.logger.child('game');
   const game = new GameService(world, deps.players, deps.clock, deps.scheduler, {
-    maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery: config.tickHz / config.broadcastHz,
+    maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery: config.tickHz / config.broadcastHz, initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
   }, log);
 
   const timers: TimerHandle[] = [];
@@ -55,6 +55,8 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   };
 
   return {
+    canAct: (accountId, sessionKey) => game.canAct(accountId, sessionKey),
+    location: accountId => game.locate(accountId),
     maps: [...loaded.maps.values()].map((map) => ({ mapId: map.id, worldBytes: map.manifest.worldBytes, chunks: map.manifest.chunks.length })),
     worldFile(path: string, accountId: string): WorldFileAccess {
       const file = loaded.files.get(path);
@@ -63,7 +65,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
     },
     attach(server: HttpServer): void {
       if (gateway) throw new Error('Игровой канал уже подключён');
-      gateway = attachGateway(server, { game, sessions: deps.sessions, npc: deps.npc, clock: deps.clock, scheduler: deps.scheduler, logger: deps.logger, corsOrigins: config.corsOrigins });
+      gateway = attachGateway(server, { game, sessions: deps.sessions, npc: deps.npc, clock: deps.clock, scheduler: deps.scheduler, logger: deps.logger, corsOrigins: config.corsOrigins, babylon: deps.babylon });
       running = true;
       startLoop();
     },

@@ -11,14 +11,16 @@ import { silentLogger } from '../src/common/logger.ts';
 import { parseServerMessage } from '../../shared/protocol/validate.ts';
 import type { ServerMessage } from '../../shared/protocol/types.ts';
 import { makeWorld, npc } from './a-helpers.ts';
+import { testLanguagePort } from '../src/babylon/TestLanguagePort.ts';
+import type { LanguagePort } from '../src/babylon/ports.ts';
 
 const cleanups: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
-async function setup(overrides: Record<string, unknown> = {}) {
-  const world = await makeWorld([npc('guide', 0, 6)]); const root = dirname(world.worldDir);
+async function setup(overrides: Record<string, unknown> = {}, language?: LanguagePort, mapId = 'test') {
+  const world = await makeWorld([npc('guide', 0, 6, { mapId })], mapId); const root = dirname(world.worldDir);
   await writeFile(join(root, 'index.html'), '<main>UI</main>');
-  const config = { ...parseConfig({ ...world, clientDir: root, dbPath: join(root, 'game.sqlite'), defaultMap: 'test', host: '127.0.0.1', staticChunkRadius: 0, saveIntervalMs: 50, disconnectGraceMs: 80, npc: { options: { delayMs: 100 } }, ...overrides }, join(root, 'config.json')), port: 0 };
-  const app = await startApplication(config, createGame, silentLogger); const address = app.server.address();
+  const config = { ...parseConfig({ ...world, clientDir: root, dbPath: join(root, 'game.sqlite'), defaultMap: mapId, host: '127.0.0.1', staticChunkRadius: 0, saveIntervalMs: 50, disconnectGraceMs: 80, npc: { options: { delayMs: 100 } }, ...overrides }, join(root, 'config.json')), port: 0 };
+  const app = await startApplication(config, createGame, silentLogger, language); const address = app.server.address();
   if (!address || typeof address === 'string') throw new Error('No address'); const origin = `http://127.0.0.1:${address.port}`;
   cleanups.push(async () => { await app.stop(); await rm(root, { force: true, recursive: true }); });
   const guest = async (name: string) => {
@@ -58,6 +60,31 @@ it('real HTTP auth, join, private world, periodic/grace save and NPC commit work
   const restored = await again.wait((p) => p.type === 'joined'); if (restored.type !== 'joined') throw new Error();
   expect(restored.playerId).toBe(joined.playerId); expect(restored.snapshot.entities.find((e) => e.id === joined.playerId)?.transform?.position.x).toBe(savedX);
 });
+
+it('BABEL HTTP requires auth and the controlling seat, rejects forged ownership and cannot commit after takeover', async () => {
+  let started!: () => void, release!: () => void;
+  const began = new Promise<void>(resolve => { started = resolve; });
+  const language: LanguagePort = { ...testLanguagePort, async translate(...args) { started(); await new Promise<void>(resolve => { release = resolve; }); return testLanguagePort.translate(...args); } };
+  const { origin, guest, connect } = await setup({}, language, 'market');
+  const a = await guest('Отправитель'), b = await guest('Получатель');
+  let sequence = 0;
+  const post = (token: string, action: unknown, requestId = `b${++sequence}`) => fetch(`${origin}/api/babylon`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ v: 2, requestId, action }) });
+  expect((await post('', { type: 'state' })).status).toBe(401);
+  for (const p of [a, b]) expect((await post(p.token, { type: 'enroll', size: 2, native: 'ru', learning: 'en' })).status).toBe(200);
+  expect((await post(a.token, { type: 'carve', drawing: [[[1, 1]]] })).status).toBe(403);
+  expect((await post(a.token, { type: 'word-save', word: 'goat', translation: 'коза', note: '', playerId: 'victim' })).status).toBe(400);
+  const first = await connect(a.token); first.command('join', { mapId: 'market' }); await first.wait(p => p.type === 'joined');
+  const oldChat = first.command('chat-send', { text: 'Обход перевода' }); await first.wait(p => p.type === 'error' && p.requestId === oldChat);
+  const pending = post(a.token, { type: 'chat', text: 'Купи финики' }); await began;
+  const nextToken = (await guest('Отправитель')).token;
+  const next = await connect(nextToken); next.command('join', { mapId: 'market' }); await next.wait(p => p.type === 'joined');
+  release(); expect((await pending).status).toBe(503);
+  expect((await post(a.token, { type: 'carve', drawing: [[[1, 1]]] })).status).toBe(403);
+  expect((await post(nextToken, { type: 'carve', drawing: [[[1, 1]]] }, 'stone')).status).toBe(200);
+  expect((await post(nextToken, { type: 'carve', drawing: [[[1, 1]]] }, 'stone')).status).toBe(200);
+  const state = await (await post(b.token, { type: 'state' })).json() as { state: { messages: unknown[]; stones: unknown[] } };
+  expect(state.state.messages).toEqual([]); expect(state.state.stones).toHaveLength(1);
+});
 it('session expiry closes the real socket and rejects protected HTTP and old tokens', async () => {
   const { origin, guest, connect } = await setup({ sessionTtlMs: 700 }); const session = await guest('Короткая');
   const client = await connect(session.token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
@@ -94,4 +121,12 @@ it('failed responder startup leaves real movement and chat available with a degr
   const npcId = client.command('npc-question', { targetId: 'guide', text: 'История' });
   const error = await client.wait((p) => p.type === 'error' && p.requestId === npcId);
   expect(error.type === 'error' && error.code).toBe('UNAVAILABLE'); expect(JSON.stringify(error)).not.toContain('private adapter failure');
+});
+
+it('an enrolled BABEL player can still use legacy chat and NPCs on the old maps', async () => {
+  const { origin, guest, connect } = await setup(); const session = await guest('Старые карты');
+  expect((await fetch(`${origin}/api/babylon`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.token}` }, body: JSON.stringify({ v: 2, requestId: 'enroll', action: { type: 'enroll', size: 1, native: 'ru', learning: 'en' } }) })).status).toBe(200);
+  const client = await connect(session.token); client.command('join', { mapId: 'test' }); await client.wait(p => p.type === 'joined');
+  const chat = client.command('chat-send', { text: 'Прежняя карта' }); await client.wait(p => p.type === 'chat' && p.requestId === chat);
+  const question = client.command('npc-question', { targetId: 'guide', text: 'История' }); await client.wait(p => p.type === 'npc-answer' && p.requestId === question);
 });

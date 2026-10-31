@@ -2,9 +2,14 @@ import type { CameraView, RenderAdapter } from '../render/RenderAdapter';
 import { ThreeRenderer } from '../render/three/ThreeRenderer';
 import type { Entity, GameCommand, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from '../session/GameSession';
+import { BabylonClient } from '../multiplayer/BabylonClient';
+import type { BabylonView } from '../multiplayer/BabylonClient';
+import type { BabylonAction } from '../../../shared/babylon/types.ts';
+import { MARKET_GOATS } from '../session/MarketSession';
 import { MarketSession } from '../session/MarketSession';
 import type { MarketState, MarketItem, Stone } from '../session/MarketSession';
 import { MARKET_WORLD } from '../shared/marketWorld.generated';
+import { surfaceHeight } from '../../../shared/map/manifest.ts';
 import { LocalSession } from '../session/LocalSession';
 import { answerDemoDialog, openDemoDialog } from '../session/demoDialogue';
 import type { DemoDialog } from '../session/demoDialogue';
@@ -31,6 +36,8 @@ import { guestName, requestGuestSession } from '../multiplayer/GuestAuth';
 import { FrameMetrics } from './FrameMetrics';
 
 const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };
+export type BabylonPanel = 'setup' | 'languages' | 'intro' | 'task' | 'inventory' | 'stone' | 'words' | 'interaction' | 'chat';
+export type { BabylonView };
 export type MarketPanel = 'intro' | 'task' | 'inventory' | 'stone' | 'words' | 'interaction' | 'results';
 export type ClientMode = 'local' | 'mock' | 'online';
 
@@ -52,12 +59,17 @@ const localEntities: readonly Entity[] = [
 
 interface Nearby { readonly id: string; readonly name: string }
 export interface AppSnapshot {
+  readonly babylon: BabylonView | null;
+  readonly babylonPanel: BabylonPanel | null;
+  readonly babylonTarget: string | null;
+  readonly babylonWord: string;
   readonly phase: 'idle' | 'running' | 'stopped' | 'unavailable' | 'error' | 'disposed';
   readonly message: string | null;
   readonly screen: 'welcome' | 'playing';
   readonly nearby: Nearby | null;
   readonly dialog: DemoDialog | null;
   readonly debug: boolean;
+  readonly buildingSymbols: boolean;
   readonly coordinates: string;
   readonly capture: 'idle' | 'requesting' | 'locked' | 'error';
   readonly captureError: string | null;
@@ -93,6 +105,7 @@ export interface AppSnapshot {
 
 /** Composition root; all UI/input commands cross this facade. */
 export class GameApp {
+  private babylonClient: BabylonClient | null = null;
   private renderer: RenderAdapter | null = null;
   private modelAssets: AssetManager | null = null;
   private world: ChunkManager | null = null;
@@ -135,7 +148,8 @@ export class GameApp {
     if (config.mapId === 'market') this.camera = { yaw: 0, pitch: .5, distance: 18 };
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
-      debug: config.debug, coordinates: '',
+      babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '',
+      debug: config.debug, buildingSymbols: true, coordinates: '',
       capture: 'idle', captureError: null,
       visualLoading: false, visualError: null, modelStats: '',
       worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
@@ -145,6 +159,13 @@ export class GameApp {
       performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
     });
   }
+
+  private presentCamera(): void {
+    const courtyard = this.snapshot.region === 'Двор Вавилонской башни';
+    this.renderer?.setCamera(courtyard ? { ...this.camera, distance: this.camera.distance + 9, focusHeight: 4.5, fieldOfView: 60 } : this.camera);
+  }
+
+  setBuildingSymbols(visible: boolean): void { this.renderer?.setBuildingSymbols(visible); this.patch({ buildingSymbols: visible }); }
 
   subscribe(listener: (snapshot: AppSnapshot) => void): () => void {
     if (this.snapshot.phase === 'disposed') return () => {};
@@ -162,6 +183,10 @@ export class GameApp {
       if (this.config.session === 'online' && !this.session) {
         if (!this.mock && (!this.serverSession || this.serverSession.expiresAt <= browserClock.now())) {
           this.serverSession = null; this.patch({ authRequired: true, worldReady: false }); this.setState('idle'); return;
+        }
+        if (!this.mock && this.config.mapId === 'market' && this.serverSession) {
+          if (!this.babylonClient) { this.startBabylon(); return; }
+          if (!this.snapshot.babylon?.state?.profile) return;
         }
         this.network = this.createNetwork(this.mock, this.config.serverUrl, browserClock);
         const online = new OnlineSession(this.network, this.config.mapId, browserClock);
@@ -194,10 +219,11 @@ export class GameApp {
         this.modelAssets = new AssetManager(new HttpAssetSource(new URL('assets/models/', origin).href, this.httpAccess()), this.createMap !== null ? this.worldBudget : undefined, (url) => sizes.get(url));
         this.renderer = this.createRenderer(this.modelAssets);
         this.renderer.mount(host);
+        this.renderer.setBuildingSymbols(this.snapshot.buildingSymbols);
         if (this.config.session === 'local' || this.mock) this.renderer.registerModels({ 'demo-tablet': 'demo/tablet.glb', 'demo-tablet-json': 'demo/tablet.gltf' });
         this.previous = this.current = this.session.getSnapshot();
         this.renderer.syncWorld(this.previous, this.current, this.session.playerId);
-        this.renderer.setCamera(this.camera);
+        this.presentCamera();
         this.unsubscribeSession ??= this.session.subscribe(this.onSessionEvents);
         if (this.createMap !== null) {
           this.world = new ChunkManager(this.createMap?.(this.worldBudget) ?? new HttpMapSource(this.activeBootstrap, this.worldBudget, origin.href, this.httpAccess()), this.renderer);
@@ -226,12 +252,12 @@ export class GameApp {
           },
           captureFailed: (captureError) => this.patch({ capture: 'error', captureError }),
           look: (dx, dy) => {
-            this.camera = { ...this.camera, yaw: this.camera.yaw - dx * 0.004, pitch: Math.max(0.5, Math.min(1.05, this.camera.pitch + dy * 0.003)) };
-            this.renderer?.setCamera(this.camera);
+            this.camera = { ...this.camera, yaw: this.camera.yaw - dx * 0.004, pitch: Math.max(this.config.mapId === 'market' ? .15 : .5, Math.min(1.05, this.camera.pitch + dy * 0.003)) };
+            this.presentCamera();
           },
           zoom: (delta) => {
             this.camera = { ...this.camera, distance: Math.max(3.5, Math.min(22, this.camera.distance + delta * 0.01)) };
-            this.renderer?.setCamera(this.camera);
+            this.presentCamera();
           },
         });
         this.loop = new GameLoop({
@@ -290,7 +316,7 @@ export class GameApp {
   }
 
   private requestPlay(): void {
-    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady) return;
+    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.babylonPanel) return;
     this.patch({ capture: 'requesting', captureError: null });
     this.input.requestCapture();
   }
@@ -306,6 +332,7 @@ export class GameApp {
   }
 
   toggleMenu(): void {
+    if (this.snapshot.babylonPanel) { void this.closeBabylonPanel(); return; }
     if (this.snapshot.marketPanel) { this.closeMarketPanel(); return; }
     if (this.snapshot.dialog) { this.closeDialog(); return; }
     if (this.snapshot.screen !== 'playing' || !this.host) return;
@@ -333,6 +360,7 @@ export class GameApp {
   interact(): void {
     if (!this.canControl()) return;
     this.updateHud(true);
+    if (this.snapshot.nearby && this.snapshot.babylon?.state?.profile) { this.openBabylonPanel('interaction', this.snapshot.nearby.id); return; }
     if (this.snapshot.nearby) this.send({ type: 'interact', targetId: this.snapshot.nearby.id });
   }
 
@@ -381,7 +409,7 @@ export class GameApp {
       const config = parseConfig({ session: mode === 'local' ? 'local' : 'online', serverUrl, mapId, chunkRadius, debug }, window.location.origin);
       if ((mode === 'local' || mode === 'mock') && !['demo', 'science', 'market'].includes(mapId)) throw new Error('Для локальной прогулки доступны market, demo и science.');
       if (mode === 'mock' && mapId === 'market') throw new Error('Рынок пока доступен в локальной прогулке. Тестовая сеть использует demo или science.');
-      this.cancelLogin();
+      this.cancelLogin(); this.stopBabylon();
       if (config.serverUrl !== this.config.serverUrl || mode !== 'online') { this.serverSession = null; this.patch({ authName: '' }); }
       this.mock = mode === 'mock'; this.config = config;
       this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mapId: config.mapId, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
@@ -420,12 +448,13 @@ export class GameApp {
   provideServerSession(raw: unknown): void {
     const session = parseServerSession(raw, browserClock.now());
     this.cancelLogin();
+    this.stopBabylon();
     this.serverSession = session; this.mock = false; this.config = Object.freeze({ ...this.config, session: 'online' });
     this.patch({ authRequired: false, authPending: false, authError: null, mode: 'online', networkError: null, networkStatus: 'unauthorized' });
     if (this.host) this.restart(this.host);
   }
   logout(): void {
-    this.cancelLogin(); this.serverSession = null;
+    this.cancelLogin(); this.stopBabylon(); this.serverSession = null;
     this.patch({ authRequired: this.snapshot.mode === 'online', authError: null, authName: '', networkError: null, networkStatus: 'unauthorized' });
     if (this.mock) { this.mock = false; this.config = Object.freeze({ ...this.config, session: 'local' }); this.patch({ mode: 'local' }); }
     if (this.host) this.restart(this.host);
@@ -433,6 +462,7 @@ export class GameApp {
   reconnect(): void { if (this.session instanceof OnlineSession) { this.patch({ networkError: null }); this.session.reconnect(); } }
   simulateNetworkLoss(): void { if (this.network instanceof MockNetworkAdapter) this.network.drop(); }
   openChat(): void {
+    if (this.snapshot.babylon?.state?.profile) { this.openBabylonPanel('chat'); return; }
     this.input?.stop(); this.stop();
     this.patch({ chatOpen: true, chatError: this.session instanceof OnlineSession ? null : 'Общение игроков доступно в сетевом или тестовом режиме.' });
   }
@@ -453,7 +483,7 @@ export class GameApp {
   }
   private expireServerSession(message = 'Серверная сессия истекла или отклонена. Войдите снова.'): void {
     const host = this.host;
-    this.cancelLogin(); this.serverSession = null;
+    this.cancelLogin(); this.stopBabylon(); this.serverSession = null;
     this.detach(); this.releaseResources();
     this.host = host;
     this.patch({ authRequired: true, authPending: false, authError: message, screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, chatMessages: [], dialogPending: false, dialogError: null, networkStatus: 'unauthorized', networkError: null });
@@ -496,7 +526,10 @@ export class GameApp {
     void world.start(position, (manifest) => {
       if (manifest.mapId !== this.config.mapId) throw new Error('Map ID mismatch');
       this.renderer?.registerModels(manifest.models);
-      if (this.session instanceof LocalSession) this.session.initializeSpawn(manifest.spawn);
+      if (this.session instanceof LocalSession) {
+        this.session.initializeSpawn(manifest.spawn);
+        this.session.setSurfaceHeight((x, z) => surfaceHeight(manifest.heightSurfaces, x, z));
+      }
     }).catch((error: unknown) => {
       if (this.world === world) this.worldFailure = error instanceof Error ? error.message : 'World load failed';
     }).finally(() => { if (this.world === world) { this.worldStarting = false; this.updateVisualStatus(); } });
@@ -525,6 +558,7 @@ export class GameApp {
     const cacheStats = `${budget.bytes} / ${budget.limit} байт · Чанки: ${worldStats?.ready ?? 0} · Ожидание: ${worldStats?.loading ?? 0}`;
     if (visualLoading !== this.snapshot.visualLoading || visualError !== this.snapshot.visualError || worldReady !== this.snapshot.worldReady || worldWaiting !== this.snapshot.worldWaiting || region !== this.snapshot.region || (this.snapshot.debug && (modelStats !== this.snapshot.modelStats || cacheStats !== this.snapshot.cacheStats))) {
       this.patch({ visualLoading, visualError, modelStats, worldReady, worldWaiting, region, cacheStats });
+      this.presentCamera();
     }
   }
 
@@ -540,7 +574,7 @@ export class GameApp {
 
   dispose(): void {
     if (this.snapshot.phase === 'disposed') return;
-    this.cancelLogin(); this.serverSession = null;
+    this.cancelLogin(); this.stopBabylon(); this.serverSession = null;
     this.detach();
     this.releaseResources();
     this.setState('disposed');
@@ -556,7 +590,7 @@ export class GameApp {
   }
 
   private canControl(): boolean {
-    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen && !this.snapshot.marketPanel;
+    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen && !this.snapshot.marketPanel && !this.snapshot.babylonPanel;
   }
 
   private readonly onSessionEvents = (events: readonly WorldEvent[]): void => {
@@ -600,6 +634,44 @@ export class GameApp {
   }
   marketRemoveWord(id: number): void { if (this.session instanceof MarketSession) { this.session.removeWord(id); this.patch({ market: this.session.market }); } }
 
+  private startBabylon(): void {
+    if (!this.serverSession) return;
+    this.babylonClient = new BabylonClient(this.config.serverUrl, this.serverSession, view => {
+      const before = this.snapshot.babylon?.state;
+      let panel = this.snapshot.babylonPanel;
+      if (view.state && !view.state.profile) panel = 'setup';
+      else if (view.state?.profile && (!before?.profile || panel === 'setup')) panel = view.state.introSeen ? null : 'intro';
+      if (view.state?.party?.completed && before?.party && !before.party.completed) { this.input?.stop(); this.stop(); panel = 'task'; }
+      this.patch({ babylon: view, babylonPanel: panel });
+      if (view.state?.profile && !this.session && this.host) this.start(this.host);
+    }, () => this.expireServerSession('Сессия истекла. Войдите снова.'));
+    this.patch({ babylonPanel: 'setup' });
+    void this.babylonClient.start();
+  }
+  private stopBabylon(): void {
+    this.babylonClient?.dispose(); this.babylonClient = null;
+    this.patch({ babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '' });
+  }
+  openBabylonPanel(panel: BabylonPanel, target: string | null = null): void {
+    if (!this.babylonClient) return;
+    this.input?.stop(); this.stop(); this.patch({ babylonPanel: panel, babylonTarget: target });
+  }
+  async closeBabylonPanel(): Promise<void> {
+    if (this.snapshot.babylonPanel === 'setup') return;
+    if (this.snapshot.babylonPanel === 'intro' && !this.snapshot.babylon?.state?.introSeen) {
+      if (!await this.babylonAction({ type: 'intro-seen' })) return;
+    }
+    this.patch({ babylonPanel: null, babylonTarget: null, babylonWord: '' });
+  }
+  babylonAction(action: BabylonAction, requestId?: string): Promise<boolean> { return this.babylonClient?.send(action, requestId) ?? Promise.resolve(false); }
+  retryBabylon(): Promise<boolean> { return this.babylonClient?.repeat() ?? Promise.resolve(false); }
+  learnWord(word: string): void {
+    const clean = word.trim().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').slice(0, 200);
+    if (!clean) return;
+    this.openBabylonPanel('words'); this.patch({ babylonWord: clean });
+    void this.babylonAction({ type: 'suggest', word: clean });
+  }
+
   private updateHud(force = false): void {
     if (!this.current || this.snapshot.screen !== 'playing') return;
     const player = this.current.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
@@ -615,10 +687,14 @@ export class GameApp {
         distance = candidate;
       }
     }
+    if (this.snapshot.babylon?.state?.profile && this.config.mapId === 'market') for (const goat of MARKET_GOATS) {
+      const candidate = Math.hypot(player.x - goat.x, player.y, player.z - goat.z);
+      if (candidate <= 2.7 && candidate < distance) { nearby = { id: goat.id, name: goat.name }; distance = candidate; }
+    }
     const changes: Partial<AppSnapshot> = {};
     if (nearby?.id !== this.snapshot.nearby?.id) Object.assign(changes, { nearby });
     if (this.snapshot.debug && (force || this.current.tick % 6 === 0)) {
-      const coordinates = 'X ' + player.x.toFixed(1) + ' · Z ' + player.z.toFixed(1);
+      const coordinates = 'X ' + player.x.toFixed(1) + ' · Z ' + player.z.toFixed(1) + ' · Y ' + player.y.toFixed(1);
       if (coordinates !== this.snapshot.coordinates) Object.assign(changes, { coordinates });
     }
     if (Object.keys(changes).length > 0) this.patch(changes);

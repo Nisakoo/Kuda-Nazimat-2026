@@ -5,6 +5,11 @@ import type { CreateGame } from '../contracts.ts';
 import type { Logger } from '../common/logger.ts';
 import { systemClock, systemScheduler } from '../common/time.ts';
 import { openDatabase, sqliteStores } from '../persistence/database.ts';
+import { BabylonService } from '../babylon/BabylonService.ts';
+import { testLanguagePort } from '../babylon/TestLanguagePort.ts';
+import type { LanguagePort } from '../babylon/ports.ts';
+import { sqliteBabylon } from '../persistence/babylon.ts';
+import { randomId } from '../common/ids.ts';
 import { createAuthService } from '../auth/AuthService.ts';
 import { createResponder } from '../npc/adapters/index.ts';
 import { createNpcDialogueService } from '../npc/NpcDialogueService.ts';
@@ -19,7 +24,7 @@ export function addresses(host: string, port: number): string[] {
   else if (host !== '127.0.0.1' && host !== 'localhost') urls.push(`http://${host.includes(':') ? `[${host}]` : host}:${port}/`);
   return [...new Set(urls)];
 }
-export async function startApplication(config: Config, createGame: CreateGame, logger: Logger) {
+export async function startApplication(config: Config, createGame: CreateGame, logger: Logger, languagePort: LanguagePort = testLanguagePort) {
   try { if (!(await stat(join(config.clientDir, 'index.html'))).isFile()) throw new Error(); }
   catch { throw new Error(`Нет сборки ${config.clientDir}/index.html. Выполните npm --prefix client run build`); }
   try { if (!(await stat(config.worldDir)).isDirectory()) throw new Error(); }
@@ -33,9 +38,10 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   try {
     npc = createNpcDialogueService({ responder: createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler }), dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger: logger.child('npc') }, config.npc);
     await npc.start();
-    game = await createGame(config, { sessions: auth, players: stores.players, npc, clock: systemClock, scheduler: systemScheduler, logger: logger.child('game') });
+    const babylon = new BabylonService({ store: sqliteBabylon(db), language: languagePort, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, measure: (kind, durationMs, success) => logger.info('BABEL language operation', { kind, durationMs, success }) });
+    game = await createGame(config, { sessions: auth, players: stores.players, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger: logger.child('game') });
     const npcService = npc;
-    http = createHttpServer(config, { auth, game, npcReady: () => npcService.ready(), logger: logger.child('http') });
+    http = createHttpServer(config, { auth, game, npcReady: () => npcService.ready(), logger: logger.child('http'), babylon, cancelBabylon: npc.cancelConnection });
     game.attach(http.server);
     stores.sessions.prune(Date.now() - 86400000);
     await new Promise<void>((resolve, reject) => {

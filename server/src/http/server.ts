@@ -4,13 +4,15 @@ import { extname, resolve, sep } from 'node:path';
 import type { Config } from '../app/config.ts';
 import type { GameRuntime, SessionVerifier } from '../contracts.ts';
 import type { Logger } from '../common/logger.ts';
-import { validName } from '../auth/AuthService.ts';
+import { validName, hashToken } from '../auth/AuthService.ts';
+import { parseBabylonRequest } from '../../../shared/babylon/validate.ts';
+import { BabylonError, type BabylonService } from '../babylon/BabylonService.ts';
 
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 function json(res: ServerResponse, status: number, value: unknown): void { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(value)); }
 function error(res: ServerResponse, status: number, code: string, message: string): void { json(res, status, { error: { code, message } }); }
-async function body(req: IncomingMessage): Promise<unknown> {
-  if (req.headers['content-type']?.split(';')[0]?.trim() !== 'application/json' || Number(req.headers['content-length'] ?? 0) > 1024) {
+async function body(req: IncomingMessage, limit = 1024): Promise<unknown> {
+  if (req.headers['content-type']?.split(';')[0]?.trim() !== 'application/json' || Number(req.headers['content-length'] ?? 0) > limit) {
     req.resume(); throw new Error('Expected JSON up to 1 KiB');
   }
   const encoded = await new Promise<Buffer>((resolve, reject) => {
@@ -20,7 +22,7 @@ async function body(req: IncomingMessage): Promise<unknown> {
     const aborted = () => fail();
     const data = (chunk: Buffer) => {
       bytes += chunk.length;
-      if (bytes > 1024) { fail(); req.resume(); return; }
+      if (bytes > limit) { fail(); req.resume(); return; }
       buffers.push(chunk);
     };
     const end = () => { cleanup(); resolve(Buffer.concat(buffers)); };
@@ -28,7 +30,7 @@ async function body(req: IncomingMessage): Promise<unknown> {
   });
   return JSON.parse(encoded.toString('utf8'));
 }
-export function createHttpServer(config: Config, deps: { auth: SessionVerifier & { guest(name: string): { token: string; expiresAt: number } }; game: GameRuntime; npcReady(): boolean; logger: Logger }) {
+export function createHttpServer(config: Config, deps: { auth: SessionVerifier & { guest(name: string): { token: string; expiresAt: number } }; game: GameRuntime; npcReady(): boolean; logger: Logger; babylon?: BabylonService; cancelBabylon?(connectionId: string): void }) {
   let stopping = false;
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -49,6 +51,29 @@ export function createHttpServer(config: Config, deps: { auth: SessionVerifier &
       catch { name = null; }
       if (!name) { error(res, 400, 'INVALID', 'Введите имя длиной 1–32 символа без управляющих символов'); return; }
       json(res, 200, deps.auth.guest(name)); return;
+    }
+    if (req.method === 'POST' && path === '/api/babylon' && deps.babylon) {
+      const bearer = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.headers.authorization ?? '');
+      const session = bearer ? await deps.auth.verify(bearer[1]!) : { ok: false as const };
+      if (!session.ok) { req.resume(); error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      let packet;
+      try { packet = parseBabylonRequest(await body(req, 262144)); }
+      catch { error(res, 400, 'INVALID', 'Некорректное действие BABEL v2'); return; }
+      const sessionKey = hashToken(bearer![1]!);
+      const gameplay = ['buy', 'feed', 'npc', 'chat', 'carve'].includes(packet.action.type);
+      if (gameplay && !deps.game.canAct?.(session.identity.accountId, sessionKey)) { error(res, 403, 'FORBIDDEN', 'Войдите в мир в этом окне, чтобы выполнить действие'); return; }
+      const connectionId = 'babel:' + sessionKey;
+      const close = () => { if (!res.writableEnded) deps.cancelBabylon?.(connectionId); };
+      res.once('close', close);
+      try {
+        const result = await deps.babylon.handle(session.identity, packet, connectionId, async () => (await deps.auth.verify(bearer![1]!)).ok && (!gameplay || !!deps.game.canAct?.(session.identity.accountId, sessionKey)));
+        if (!res.destroyed) json(res, 200, result);
+      } catch (cause) {
+        const failure = cause instanceof BabylonError ? cause : new BabylonError('UNAVAILABLE', 'Сервис временно недоступен');
+        const status = { INVALID: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, CONFLICT: 409, NOT_READY: 409, RATE_LIMIT: 429, UNAVAILABLE: 503 }[failure.code];
+        if (!res.destroyed) json(res, status, { v: 2, requestId: packet.requestId, error: { code: failure.code, message: failure.message } });
+      } finally { res.off('close', close); }
+      return;
     }
     if (!['GET', 'HEAD'].includes(req.method ?? '')) { res.writeHead(404); res.end(); return; }
     if (path === '/api/health') { json(res, 200, { status: 'ok', protocol: 1, npc: deps.npcReady() ? 'ready' : 'unavailable' }); return; }
