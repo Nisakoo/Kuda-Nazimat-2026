@@ -4,7 +4,7 @@ type: module-design
 status: ready
 implementation: partial
 parent: architecture
-summary: Базовый Vite-клиент; реализована только обвязка Makefile.
+summary: Базовый Vite-клиент с технической Three.js-сценой и управляемым жизненным циклом.
 related:
   - client-core.md
   - client-render.md
@@ -20,7 +20,7 @@ related:
 
 Подготовить минимальную основу браузерного клиента учебного многопользовательского 3D-мира: запуск приложения, сцена three.js, UI и границы подключения к серверу. Структура должна позволять добавлять игру по отдельным спекам без смешивания рендеринга, сетевого обмена и интерфейса.
 
-Один Vite-проект в `client/`: TypeScript strict, Svelte 5 + CSS, Three.js, Socket.IO Client, Vitest. Это требования к будущей реализации; сейчас есть только документация и обвязка Makefile.
+Один Vite-проект в `client/`: TypeScript strict, Svelte 5 + CSS, Three.js, Socket.IO Client, Vitest. Основа определяет запуск, техническую сцену и конфигурацию; игровые модули добавляются по отдельным спекам.
 
 ## Требования
 
