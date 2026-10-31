@@ -1,9 +1,9 @@
 ---
 id: TASK-028
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/client-multiplayer.md
-requirements: [NET-007]
+requirements: [NET-003–004, NET-006–007]
 related:
   - spec: ../specs/server-auth.md
     requirements: [AUTH-006]
@@ -13,7 +13,7 @@ depends_on: [TASK-012]
 # Клиентский вызов mock-входа
 
 ## Цель и изменения требований
-Закрыть описанную в SERVER-DEMO внешнюю зависимость. Новых серверных API и требований нет. Реализация UI не входит в набор B; разрешённое изменение клиента в нём — только TASK-027.
+Закрыть описанную в SERVER-DEMO внешнюю зависимость. Новых серверных API и требований нет. По дополнительному указанию пользователя UI и необходимые клиентские изменения разрешены. Уточнены NET-003/007 и S4–S7: форма, timeout/отмена, локальный logout без отзыва серверного токена.
 
 ## Реализация
 - [ ] В online без сессии запросить имя, отправить POST /api/auth/guest {name} и передать {token, expiresAt} в GameApp.provideServerSession.
@@ -25,4 +25,4 @@ depends_on: [TASK-012]
 - [ ] make client-test, check, check:imports, build и браузерный сценарий с реальным сервером.
 
 ## Результат
-Не реализовано в наборе B; блокирует браузерную репетицию TASK-026.
+Реализация и проверки выполняются; полный игровой сценарий зависит от набора A.

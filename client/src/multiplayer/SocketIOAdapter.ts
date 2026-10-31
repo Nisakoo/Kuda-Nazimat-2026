@@ -47,7 +47,7 @@ export class SocketIOAdapter implements NetworkAdapter {
       try {
         const message = parseServerMessage(raw);
         for (const listener of this.messages) listener(message);
-        if (message.type === 'error' && message.code === 'UNAUTHORIZED') this.unauthorized();
+        if (message.type === 'error' && message.code === 'UNAUTHORIZED') this.unauthorized(message.message);
         else if (message.type === 'error' && message.code === 'VERSION') this.fatal(message.message);
       } catch (error) { this.fatal(error instanceof ProtocolError ? error.message : 'Ошибка игрового протокола.'); }
     });
@@ -69,7 +69,7 @@ export class SocketIOAdapter implements NetworkAdapter {
       if (this.session && this.clock.now() < this.session.expiresAt) this.scheduleExpiry(); else this.unauthorized();
     }, Math.min(2_147_000_000, this.session.expiresAt - this.clock.now()));
   }
-  private unauthorized(): void { this.close(); this.set('unauthorized', 'Серверная сессия истекла или отклонена. Выполните вход на сервере.'); }
+  private unauthorized(message = 'Серверная сессия истекла или отклонена. Войдите снова.'): void { this.close(); this.set('unauthorized', message); }
   private fatal(error: string): void { this.close(); this.set('error', error); }
   private cancelRetry(): void { if (this.retry !== null) this.clock.clear(this.retry); this.retry = null; }
   private close(): void {

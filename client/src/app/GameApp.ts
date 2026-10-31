@@ -27,6 +27,7 @@ import { MockNetworkAdapter } from '../multiplayer/MockNetworkAdapter';
 import type { Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
 import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../../../shared/protocol/types.ts';
 import { parseServerSession } from '../../../shared/protocol/validate.ts';
+import { guestName, requestGuestSession } from '../multiplayer/GuestAuth';
 import { FrameMetrics } from './FrameMetrics';
 
 const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };
@@ -71,6 +72,10 @@ export interface AppSnapshot {
   readonly mode: ClientMode;
   readonly settingsOpen: boolean;
   readonly settingsError: string | null;
+  readonly authRequired: boolean;
+  readonly authPending: boolean;
+  readonly authError: string | null;
+  readonly authName: string;
   readonly networkStatus: ConnectionStatus;
   readonly networkError: string | null;
   readonly chatOpen: boolean;
@@ -96,6 +101,8 @@ export class GameApp {
   private generation = 0;
   private mock = false;
   private serverSession: ServerSession | null = null;
+  private authRequest: AbortController | null = null;
+  private authTimer: number | null = null;
   private network: NetworkAdapter | null = null;
   private unsubscribeOnline: (() => void) | null = null;
   private npcRequest: string | null = null;
@@ -122,6 +129,7 @@ export class GameApp {
     private readonly createSession: () => GameSession = () => this.config.mapId === 'market' ? new MarketSession() : new LocalSession('local-player', localEntities),
     private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
     private readonly createNetwork: (mock: boolean, url: string, clock: Clock) => NetworkAdapter = (mock, url, clock) => mock ? createMockDemo(clock) : new SocketIOAdapter(url, clock),
+    private readonly requestLogin = requestGuestSession,
   ) {
     if (config.mapId === 'market') this.camera = { yaw: 0, pitch: .5, distance: 18 };
     this.snapshot = Object.freeze({
@@ -130,6 +138,7 @@ export class GameApp {
       capture: 'idle', captureError: null,
       visualLoading: false, visualError: null, modelStats: '',
       worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
+      authRequired: config.session === 'online', authPending: false, authError: null, authName: '',
       mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
       performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
@@ -150,7 +159,9 @@ export class GameApp {
       if (this.host && this.host !== host) this.releaseResources();
       this.host = host;
       if (this.config.session === 'online' && !this.session) {
-        if (!this.mock && !this.serverSession) { this.setState('unavailable', 'Сетевой режим требует входа на локальном сервере. Серверная сессия пока не предоставлена. В настройках доступен тестовый транспорт.'); return; }
+        if (!this.mock && (!this.serverSession || this.serverSession.expiresAt <= browserClock.now())) {
+          this.serverSession = null; this.patch({ authRequired: true, worldReady: false }); this.setState('idle'); return;
+        }
         this.network = this.createNetwork(this.mock, this.config.serverUrl, browserClock);
         const online = new OnlineSession(this.network, this.config.mapId, browserClock);
         this.session = online;
@@ -301,6 +312,7 @@ export class GameApp {
   }
 
   restart(host: HTMLElement): void {
+    this.cancelLogin();
     if (this.snapshot.phase === 'disposed') throw new Error('Приложение уже завершено.');
     const screen = 'welcome';
     this.detach();
@@ -368,23 +380,52 @@ export class GameApp {
       const config = parseConfig({ session: mode === 'local' ? 'local' : 'online', serverUrl, mapId, chunkRadius, debug }, window.location.origin);
       if ((mode === 'local' || mode === 'mock') && !['demo', 'science', 'market'].includes(mapId)) throw new Error('Для локальной прогулки доступны market, demo и science.');
       if (mode === 'mock' && mapId === 'market') throw new Error('Рынок пока доступен в локальной прогулке. Тестовая сеть использует demo или science.');
-      if (config.serverUrl !== this.config.serverUrl || mode !== 'online') this.serverSession = null;
+      this.cancelLogin();
+      if (config.serverUrl !== this.config.serverUrl || mode !== 'online') { this.serverSession = null; this.patch({ authName: '' }); }
       this.mock = mode === 'mock'; this.config = config;
-      this.patch({ mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
+      this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
       if (this.host) this.restart(this.host);
       return true;
     } catch (error) { this.patch({ settingsError: error instanceof Error ? error.message : 'Некорректные настройки.' }); return false; }
   }
 
+  async login(rawName: string): Promise<void> {
+    if (this.snapshot.phase === 'disposed' || this.snapshot.mode !== 'online' || !this.snapshot.authRequired || this.authRequest) return;
+    let name: string;
+    try { name = guestName(rawName); }
+    catch (error) { this.patch({ authError: (error as Error).message }); return; }
+    const request = new AbortController(); this.authRequest = request;
+    this.patch({ authPending: true, authError: null, authName: name });
+    this.authTimer = window.setTimeout(() => {
+      if (this.authRequest !== request) return;
+      this.cancelLogin(); this.patch({ authError: 'Сервер не ответил за 10 секунд. Попробуйте войти снова.' });
+    }, 10000);
+    try {
+      const session = await this.requestLogin(this.config.serverUrl, name, request.signal);
+      if (this.authRequest !== request) return;
+      this.provideServerSession(session);
+    } catch (error) {
+      if (this.authRequest === request) this.patch({ authError: error instanceof Error ? error.message : 'Не удалось войти. Попробуйте снова.' });
+    } finally { if (this.authRequest === request) this.cancelLogin(); }
+  }
+  private cancelLogin(): void {
+    const request = this.authRequest; this.authRequest = null;
+    if (this.authTimer !== null) window.clearTimeout(this.authTimer);
+    this.authTimer = null; request?.abort();
+    if (this.snapshot.authPending) this.patch({ authPending: false });
+  }
+
   /** Integration boundary: only the local server's login flow supplies this context. */
   provideServerSession(raw: unknown): void {
     const session = parseServerSession(raw, browserClock.now());
+    this.cancelLogin();
     this.serverSession = session; this.mock = false; this.config = Object.freeze({ ...this.config, session: 'online' });
-    this.patch({ mode: 'online', networkError: null, networkStatus: 'unauthorized' });
+    this.patch({ authRequired: false, authPending: false, authError: null, mode: 'online', networkError: null, networkStatus: 'unauthorized' });
     if (this.host) this.restart(this.host);
   }
   logout(): void {
-    this.serverSession = null;
+    this.cancelLogin(); this.serverSession = null;
+    this.patch({ authRequired: this.snapshot.mode === 'online', authError: null, authName: '', networkError: null, networkStatus: 'unauthorized' });
     if (this.mock) { this.mock = false; this.config = Object.freeze({ ...this.config, session: 'local' }); this.patch({ mode: 'local' }); }
     if (this.host) this.restart(this.host);
   }
@@ -403,25 +444,26 @@ export class GameApp {
   }
   private worldRoot(): URL { return this.config.session === 'online' && !this.mock ? new URL(`${this.config.serverUrl.replace(/\/$/, '')}/world/`) : new URL(import.meta.env.BASE_URL, window.location.href); }
   private httpAccess() {
+    const session = this.serverSession;
     return this.config.session === 'online' && !this.mock ? {
-      token: () => this.serverSession && this.serverSession.expiresAt > browserClock.now() ? this.serverSession.token : null,
-      unauthorized: () => this.expireServerSession(),
+      token: () => session && session === this.serverSession && session.expiresAt > browserClock.now() ? session.token : null,
+      unauthorized: () => { if (session === this.serverSession) this.expireServerSession(); },
     } : undefined;
   }
-  private expireServerSession(): void {
+  private expireServerSession(message = 'Серверная сессия истекла или отклонена. Войдите снова.'): void {
     const host = this.host;
-    this.serverSession = null;
+    this.cancelLogin(); this.serverSession = null;
     this.detach(); this.releaseResources();
     this.host = host;
-    this.patch({ screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, networkStatus: 'unauthorized', networkError: 'Серверная сессия истекла. Выполните вход на локальном сервере.' });
-    this.setState('unavailable', 'Сетевой режим требует повторного входа на локальном сервере.');
+    this.patch({ authRequired: true, authPending: false, authError: message, screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, chatMessages: [], dialogPending: false, dialogError: null, networkStatus: 'unauthorized', networkError: null });
+    this.setState('idle');
   }
   private readonly onOnlineNotice = (notice: OnlineNotice): void => {
     if (notice.type === 'status') {
       this.patch({ networkStatus: notice.state.status, networkError: notice.state.error });
       if (notice.state.status !== 'connected') {
         this.input?.stop(); this.stop(); this.patch({ worldReady: false });
-        if (notice.state.status === 'unauthorized' && notice.state.error && !this.mock) this.expireServerSession();
+        if (notice.state.status === 'unauthorized' && notice.state.error && !this.mock) this.expireServerSession(notice.state.error);
       }
     } else if (notice.type === 'joined') {
       const host = this.host;
@@ -497,6 +539,7 @@ export class GameApp {
 
   dispose(): void {
     if (this.snapshot.phase === 'disposed') return;
+    this.cancelLogin(); this.serverSession = null;
     this.detach();
     this.releaseResources();
     this.setState('disposed');

@@ -55,3 +55,10 @@ it('treats authorization rejection, expiry and incompatible packets as terminal'
     expect(s.clock.pending).toBe(0); s.adapter.dispose();
   }
 });
+
+it('preserves the takeover reason and never retries a rejected session', () => {
+  const s = setup(); s.adapter.connect(s.context); s.trigger('connect');
+  s.trigger('game', { v: 1, type: 'error', requestId: 'server', code: 'UNAUTHORIZED', message: 'Игра открыта в другом окне.' });
+  expect(s.adapter.state).toEqual({ status: 'unauthorized', error: 'Игра открыта в другом окне.' });
+  s.clock.advance(10000); expect(s.socket.connect).toHaveBeenCalledOnce(); s.adapter.dispose();
+});

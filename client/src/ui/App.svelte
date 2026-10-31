@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { AppSnapshot, GameApp } from '../app/GameApp';
+  import Login from './Login.svelte';
   import Dialog from './Dialog.svelte';
   import Settings from './Settings.svelte';
   import Chat from './Chat.svelte';
@@ -14,6 +15,7 @@
     capture: 'idle', captureError: null,
     visualLoading: false, visualError: null, modelStats: '',
     worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
+    authRequired: false, authPending: false, authError: null, authName: '',
     mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
     performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
@@ -44,7 +46,11 @@
     </div>
   </header>
 
-  {#if !error && game && state.screen === 'welcome'}
+  {#if !error && game && state.authRequired}
+    <Login pending={state.authPending} error={state.authError} initialName={state.authName} login={(name) => game.login(name)} />
+  {/if}
+
+  {#if !error && game && state.screen === 'welcome' && !state.authRequired}
     <section class="welcome glass" aria-labelledby="scene-title">
       <p class="eyebrow">Добро пожаловать в Вавилон</p>
       <h1 id="scene-title">{#if state.market}Рынок<br />Вавилона.{:else}Город<br />открытий.{/if}</h1>
@@ -52,6 +58,7 @@
       {#if state.captureError}<p class="capture-error" role="alert">{state.captureError}</p>{/if}
       {#if state.networkError}<p class="capture-error" role="alert">{state.networkError}</p>{/if}
       {#if state.mode !== 'local'}<p class="small subtle">{state.mode === 'mock' ? 'Тестовый участник и сетевые ответы имитируются; это проверка клиента без сервера.' : 'Сетевая игра использует локальный сервер.'}</p><button class="secondary" onclick={() => game.reconnect()}>Повторить подключение</button>{/if}
+      {#if state.mode === 'online'}<button class="secondary capture-exit" onclick={() => game.logout()}>Выйти из сессии</button>{/if}
       {#if state.visualError}<p class="capture-error" role="alert">{state.visualError}</p><button class="secondary" onclick={() => game.retryVisuals()}>Повторить загрузку</button>{/if}
       {#if state.visualLoading}<p class="small subtle">Загружаем оформление…</p>{/if}
       {#if !state.worldReady}<p class="small subtle">Готовим окрестности точки появления…</p>{/if}
@@ -59,7 +66,7 @@
       {#if state.captureError || state.capture === 'requesting'}<button class="secondary capture-exit" onclick={() => game.leaveWorld()}>На главный экран</button>{/if}
       {#if state.market}<button class="secondary capture-exit" onclick={() => game.openMarketPanel('intro')}>О мире и управлении</button>{/if}
       <div class="welcome-controls"><p><kbd>W A S D</kbd> движение относительно камеры</p><p><kbd>E</kbd> разговор с персонажем</p><p><kbd>Мышь</kbd> обзор · колесо — масштаб</p><p><kbd>Esc</kbd> освободить курсор и открыть меню</p></div>
-      <p class="small subtle">Демо работает локально. Учебные ответы подготовлены заранее.</p>
+      <p class="small subtle">{state.mode === 'online' ? 'Позиция и история разговоров сохраняются на сервере.' : 'Демо работает локально. Учебные ответы подготовлены заранее.'}</p>
     </section>
   {/if}
 
@@ -77,6 +84,7 @@
 
   {#if error}
     <section class="modal-backdrop"><div class="panel" role="alert"><p class="eyebrow">Просмотр недоступен</p><h2>{state.phase === 'unavailable' ? 'Режим пока недоступен' : 'Не удалось запустить сцену'}</h2><p>{error}</p>
+      {#if game && state.mode === 'online' && !state.authRequired}<button class="secondary" onclick={() => game.logout()}>Выйти из сессии</button>{/if}
       {#if game && state.phase === 'error'}<button onclick={() => game.restart(viewport)}>Попробовать снова</button>
       {:else if startupError}<button onclick={() => window.location.reload()}>Повторить</button>{/if}
       {#if game}<button class="secondary" onclick={() => game.openSettings()}>Настройки</button>{/if}
@@ -113,7 +121,7 @@
   {#if game && state.market}{#key state.market.runId}<MarketPanel {game} market={state.market} panel={state.marketPanel} target={state.marketTarget} />{/key}{/if}
 
   <footer>
-    <p class="status" role="status"><span class:active={state.phase === 'running'} class="dot"></span>{error ? 'Просмотр недоступен' : state.phase === 'running' ? 'Сцена открыта' : state.phase === 'stopped' ? 'Просмотр приостановлен' : 'Подготовка сцены…'}</p>
+    <p class="status" role="status"><span class:active={state.phase === 'running'} class="dot"></span>{error ? 'Просмотр недоступен' : state.authRequired ? (state.authPending ? 'Вход на сервер…' : 'Войдите, чтобы открыть мир') : state.phase === 'running' ? 'Сцена открыта' : state.phase === 'stopped' ? 'Просмотр приостановлен' : 'Подготовка сцены…'}</p>
     {#if state.screen === 'playing' && !error}<p class="hints"><kbd>W A S D</kbd> идти <span>·</span> <kbd>E</kbd> говорить <span>·</span> <kbd>Мышь</kbd> обзор <span>·</span> <kbd>Esc</kbd> меню</p>{/if}
   </footer>
 </main>

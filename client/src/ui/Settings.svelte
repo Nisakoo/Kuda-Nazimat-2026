@@ -16,7 +16,7 @@
   <form class="settings-form" onsubmit={(event) => { event.preventDefault(); apply(selected, server, map, Number(radius), debug); }}>
     <label>Режим <select aria-label="Режим сессии" bind:value={selected}><option value="local">Локальная прогулка</option><option value="mock">Тестовый сетевой режим</option><option value="online">Локальный сервер</option></select></label>
     {#if selected === 'mock'}<p class="small subtle">Проверка клиента без сервера: участник и ответы имитируются. Сохранений и адаптивного ИИ здесь нет.</p>{/if}
-    {#if selected === 'online'}<p class="small subtle">Требуется готовая сессия входа с локального сервера. Форма входа подключается при интеграции с сервером.</p>{/if}
+    {#if selected === 'online'}<p class="small subtle">После применения настроек войдите по имени. При смене сервера потребуется новый вход.</p>{/if}
     <label>Адрес сервера <input aria-label="Адрес сервера" bind:value={server} type="url" required /></label>
     <label>Карта <input aria-label="Карта" bind:value={map} list="available-maps" maxlength="80" required /></label>
     <datalist id="available-maps"><option value="market">Рынок Вавилона</option><option value="demo">Площадь открытий</option><option value="science">Сады науки</option></datalist>
