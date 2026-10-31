@@ -59,7 +59,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   const cleanup = setInterval(() => {
     try { stores.sessions.prune(Date.now() - 86400000); } catch { logger.error('Не удалось очистить сессии'); }
   }, 3600000);
-  for (const map of runtime.maps) logger.info('Карта готова', { ...map, clientCacheBytes: Math.floor(map.worldBytes * 0.1) });
+  for (const map of runtime.maps) logger.info('Карта готова', { ...map });
   const address = transport.server.address();
   if (address && typeof address !== 'string') for (const url of addresses(config.host, address.port)) logger.info('Сервер доступен', { url });
   let stopping: Promise<void> | undefined;

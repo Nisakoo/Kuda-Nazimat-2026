@@ -2,7 +2,7 @@ export interface ClientConfig {
   readonly session: 'local' | 'online';
   readonly serverUrl: string;
   readonly mapId: string;
-  // null selects the map's default radius (one chunk in the demo).
+  // null selects the map's default radius (two for market, one for demo/science).
   readonly chunkRadius: number | null;
   readonly debug: boolean;
 }

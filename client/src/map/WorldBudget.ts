@@ -2,7 +2,7 @@ export interface BudgetLease { release(): void }
 interface Allocation { readonly bytes: number; readonly memory: number; owners: number }
 export class BudgetExhausted extends Error { constructor() { super('World budget exhausted'); this.name = 'BudgetExhausted'; } }
 
-/** Static-world source-byte accounting, with a separate conservative payload-memory cap. */
+/** Shared resource accounting and an emergency payload-memory cap; chunks are selected by radius. */
 export class WorldBudget {
   private readonly allocations = new Map<string, Allocation>();
   private peakBytes = 0;
@@ -11,13 +11,12 @@ export class WorldBudget {
   private readonly emptyListeners = new Set<() => void>();
   whenEmpty(): Promise<void> { return this.allocations.size === 0 ? Promise.resolve() : new Promise((resolve) => this.emptyListeners.add(resolve)); }
   get epoch(): number { return this.releases; }
-  constructor(readonly worldBytes: number, readonly memoryLimit = 32 * 1024 * 1024) {
-    if (!Number.isSafeInteger(worldBytes) || worldBytes <= 0 || !Number.isSafeInteger(memoryLimit) || memoryLimit <= 0) throw new Error('Invalid world budget');
+  constructor(readonly memoryLimit = 64 * 1024 * 1024) {
+    if (!Number.isSafeInteger(memoryLimit) || memoryLimit <= 0) throw new Error('Invalid world budget');
   }
-  get limit(): number { return Math.floor(this.worldBytes / 10); }
   get stats() {
     const values = [...this.allocations.values()];
-    return { bytes: values.reduce((sum, value) => sum + value.bytes, 0), memory: values.reduce((sum, value) => sum + value.memory, 0), limit: this.limit, memoryLimit: this.memoryLimit, peakBytes: this.peakBytes, peakMemory: this.peakMemory, resources: values.length };
+    return { bytes: values.reduce((sum, value) => sum + value.bytes, 0), memory: values.reduce((sum, value) => sum + value.memory, 0), memoryLimit: this.memoryLimit, peakBytes: this.peakBytes, peakMemory: this.peakMemory, resources: values.length };
   }
   reserve(key: string, bytes: number, memory: number): BudgetLease {
     if (!Number.isSafeInteger(bytes) || bytes < 0 || !Number.isSafeInteger(memory) || memory < bytes) throw new Error('Invalid resource size');
@@ -25,7 +24,7 @@ export class WorldBudget {
     if (allocation && (allocation.bytes !== bytes || allocation.memory !== memory)) throw new Error('Conflicting resource size');
     if (!allocation) {
       const current = this.stats;
-      if (current.bytes + bytes > this.limit || current.memory + memory > this.memoryLimit) throw new BudgetExhausted();
+      if (current.memory + memory > this.memoryLimit) throw new BudgetExhausted();
       allocation = { bytes, memory, owners: 0 };
       this.allocations.set(key, allocation);
       this.peakBytes = Math.max(this.peakBytes, current.bytes + bytes);
@@ -51,7 +50,7 @@ export class WorldBudget {
     }
     const extra = [...unique.values()].filter((resource) => !this.allocations.has(resource.key));
     const current = this.stats;
-    if (current.bytes + extra.reduce((sum, resource) => sum + resource.bytes, 0) > this.limit || current.memory + extra.reduce((sum, resource) => sum + resource.memory, 0) > this.memoryLimit) throw new BudgetExhausted();
+    if (current.memory + extra.reduce((sum, resource) => sum + resource.memory, 0) > this.memoryLimit) throw new BudgetExhausted();
     const leases: BudgetLease[] = [];
     try { for (const resource of unique.values()) leases.push(this.reserve(resource.key, resource.bytes, resource.memory)); }
     catch (error) { for (const lease of leases) lease.release(); throw error; }

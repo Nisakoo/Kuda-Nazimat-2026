@@ -28,8 +28,8 @@ test.beforeAll(async () => {
   await start();
 });
 test.afterAll(async () => { await stop(); if (directory) await rm(directory, { recursive: true, force: true }); });
-async function login(page: Page, name: string, size?: string, learning = 'en') {
-  await page.route('**/config.json', route => route.fulfill({ json: { session: 'online', serverUrl: origin, mapId: 'market', debug: true, chunkRadius: 0 } }));
+async function login(page: Page, name: string, size?: string, learning = 'en', chunkRadius: number | null = 0) {
+  await page.route('**/config.json', route => route.fulfill({ json: { session: 'online', serverUrl: origin, mapId: 'market', debug: true, chunkRadius } }));
   await page.goto(origin); await page.getByLabel('Имя игрока').fill(name); await page.getByRole('button', { name: 'Войти', exact: true }).click();
   if (size) {
     await expect(page.getByRole('dialog', { name: 'Подготовка путешествия' })).toBeVisible();
@@ -115,4 +115,24 @@ test('solo buys and feeds through the real server, rejects wrong food and restor
   await expect(page.getByRole('dialog', { name: 'Козы пастуха' })).toContainText('All four goats have been fed');
   await page.screenshot({ path: 'test-results/babylon-solo-complete.png' });
   await stop(); await start(); await login(page, 'Соло-тест'); await menu(page, 'Задание'); await expect(page.getByRole('dialog', { name: 'Козы пастуха' })).toContainText('All four goats have been fed');
+});
+
+test('real server authorizes the default 25-chunk window at the market and tower', async ({ page }) => {
+  test.setTimeout(90000);
+  const errors: string[] = [];
+  const rejected: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('response', response => { if (response.url().includes('/world/') && !response.ok()) rejected.push(response.url()); });
+  await login(page, 'Обзор-тест', '1', 'en', null);
+  const cache = page.getByLabel('Кеш мира');
+  await expect(cache).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+  await walk(page, 'z', 9); await walk(page, 'x', -32);
+  await expect(page.getByRole('heading', { name: 'Двор Вавилонской башни', exact: true })).toBeVisible();
+  await expect(cache).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+  await page.mouse.move(850, 250, { steps: 20 });
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: 'test-results/tower-25-chunks-online.png' });
+  const memory = (await cache.textContent())!.match(/^(\d+) \/ (\d+)/)!;
+  expect(Number(memory[1])).toBeLessThanOrEqual(Number(memory[2]));
+  expect(errors).toEqual([]); expect(rejected).toEqual([]);
 });

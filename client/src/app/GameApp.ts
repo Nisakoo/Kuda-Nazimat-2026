@@ -109,7 +109,7 @@ export class GameApp {
   private renderer: RenderAdapter | null = null;
   private modelAssets: AssetManager | null = null;
   private world: ChunkManager | null = null;
-  private worldBudget = new WorldBudget(DEMO_WORLD.worldBytes);
+  private worldBudget = new WorldBudget();
   private activeBootstrap: WorldDescriptor | null = null;
   private waitingBudget = false;
   private generation = 0;
@@ -152,7 +152,7 @@ export class GameApp {
       debug: config.debug, buildingSymbols: true, coordinates: '',
       capture: 'idle', captureError: null,
       visualLoading: false, visualError: null, modelStats: '',
-      worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
+      worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? (config.mapId === 'market' ? 2 : 1),
       authRequired: config.session === 'online', authPending: false, authError: null, authName: '',
       mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
@@ -213,7 +213,7 @@ export class GameApp {
       if (!this.renderer) {
         this.session ??= this.createSession();
         if (this.session instanceof MarketSession) this.patch({ market: this.session.market, marketPanel: 'intro' });
-        this.worldBudget = new WorldBudget(this.activeBootstrap.worldBytes);
+        this.worldBudget = new WorldBudget();
         const origin = this.worldRoot();
         const sizes = new Map(Object.entries(this.activeBootstrap.assets).map(([path, size]) => [new URL(path, origin).href, size]));
         this.modelAssets = new AssetManager(new HttpAssetSource(new URL('assets/models/', origin).href, this.httpAccess()), this.createMap !== null ? this.worldBudget : undefined, (url) => sizes.get(url));
@@ -555,7 +555,7 @@ export class GameApp {
     const worldWaiting = this.waitingForWorld && Boolean(worldStats?.loading || worldStats?.deferred);
     const region = position ? this.world?.region(position) || 'Площадь открытий' : 'Площадь открытий';
     const budget = this.worldBudget.stats;
-    const cacheStats = `${budget.bytes} / ${budget.limit} байт · Чанки: ${worldStats?.ready ?? 0} · Ожидание: ${worldStats?.loading ?? 0}`;
+    const cacheStats = `${budget.memory} / ${budget.memoryLimit} байт памяти · Чанки: ${worldStats?.ready ?? 0} · Ожидание: ${worldStats?.loading ?? 0} · Отложено: ${worldStats?.deferred ?? 0}${worldStats?.deferred ? ' (защита памяти)' : ''}`;
     if (visualLoading !== this.snapshot.visualLoading || visualError !== this.snapshot.visualError || worldReady !== this.snapshot.worldReady || worldWaiting !== this.snapshot.worldWaiting || region !== this.snapshot.region || (this.snapshot.debug && (modelStats !== this.snapshot.modelStats || cacheStats !== this.snapshot.cacheStats))) {
       this.patch({ visualLoading, visualError, modelStats, worldReady, worldWaiting, region, cacheStats });
       this.presentCamera();

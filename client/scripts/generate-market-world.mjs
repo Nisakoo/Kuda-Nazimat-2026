@@ -29,4 +29,4 @@ let json='';for(let pass=0;pass<10;pass++){json=JSON.stringify(manifest);const t
 json=JSON.stringify(manifest);await writeChanged(new URL('manifest.json',root),json);
 const bootstrap={manifestUrl:'maps/market/manifest.json',manifestBytes:Buffer.byteLength(json),worldBytes:manifest.worldBytes,assets};
 await writeChanged(new URL('../src/shared/marketWorld.generated.ts',import.meta.url),`// Generated local world metadata.\nexport const MARKET_WORLD = ${JSON.stringify(bootstrap)} as const;\n`);
-console.log(`Market world ${manifest.worldBytes} bytes; cache cap ${Math.floor(manifest.worldBytes/10)} bytes.`);
+console.log(`Market world ${manifest.worldBytes} bytes.`);

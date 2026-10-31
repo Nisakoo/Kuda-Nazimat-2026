@@ -113,6 +113,7 @@ export class ThreeRenderer implements RenderAdapter {
       this.target.y + Math.sin(pitch) * distance,
       this.target.z + Math.cos(yaw) * Math.cos(pitch) * distance,
     );
+    // Update before camera probes; suppress only the renderer's duplicate scene traversal.
     this.scene.updateMatrixWorld(true);
     this.cameraDirection.copy(this.camera.position).sub(this.target).normalize();
     const halfHeight = Math.tan(this.camera.fov*Math.PI/360)*this.camera.near+.08;
@@ -120,7 +121,9 @@ export class ThreeRenderer implements RenderAdapter {
       halfHeight*this.camera.aspect,halfHeight,this.scene.children.filter(child=>child.name.startsWith('chunk:')),delta);
     this.camera.position.copy(this.target).addScaledVector(this.cameraDirection,allowed);
     this.camera.lookAt(this.target);
-    this.renderer.render(this.scene, this.camera);
+    this.scene.matrixWorldAutoUpdate = false;
+    try { this.renderer.render(this.scene, this.camera); }
+    finally { this.scene.matrixWorldAutoUpdate = true; }
   }
 
   dispose(): void {

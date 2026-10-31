@@ -1,0 +1,50 @@
+{
+  "method": "Vite dev, market spawn, 1280x800, six seconds after warmup; prototype performance.now instrumentation; separate DPR 1 and 2 runs",
+  "profiles": [
+    {
+      "dpr": 1,
+      "metrics": {
+        "renderMs": {
+          "n": 361,
+          "mean": 3.472853182755679,
+          "p95": 4.399999976158142
+        },
+        "cameraMs": {
+          "n": 361,
+          "mean": 0.8360110782190043,
+          "p95": 1.100000023841858
+        },
+        "objects": 355,
+        "meshes": 240
+      },
+      "performance": "FPS 58.9 · Кадр 17.0 ms · P95 17.3 ms · CPU 3.5 ms",
+      "cache": "1810665 / 1912050 байт · Чанки: 8 · Ожидание: 0 · Отложено: 1 (лимит кеша или памяти)",
+      "resources": "Draw 264 · Геометрии 37 · Текстуры 6 · Ресурсы 22 · Память 31007616 / 33554432 · Пик 1810665",
+      "position": "X 0.0 · Z 8.0 · Y 0.0",
+      "errors": []
+    },
+    {
+      "dpr": 2,
+      "metrics": {
+        "renderMs": {
+          "n": 317,
+          "mean": 1.321451103649681,
+          "p95": 2
+        },
+        "cameraMs": {
+          "n": 317,
+          "mean": 0.28643532995169846,
+          "p95": 0.40000009536743164
+        },
+        "objects": 355,
+        "meshes": 240
+      },
+      "performance": "FPS 50.8 · Кадр 19.7 ms · P95 35.0 ms · CPU 2.3 ms",
+      "cache": "1810665 / 1912050 байт · Чанки: 8 · Ожидание: 0 · Отложено: 1 (лимит кеша или памяти)",
+      "resources": "Draw 264 · Геометрии 37 · Текстуры 6 · Ресурсы 22 · Память 31007616 / 33554432 · Пик 1810665",
+      "position": "X 0.0 · Z 8.0 · Y 0.0",
+      "errors": []
+    }
+  ],
+  "limitations": "CPU timings only; short runs show scheduling/GPU variability and are not a production FPS acceptance result."
+}
