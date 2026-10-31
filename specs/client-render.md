@@ -2,7 +2,7 @@
 id: client-render
 type: module-design
 status: ready
-implementation: partial
+implementation: complete
 parent: architecture
 summary: Отображать состояние сущностей и чанков единственным ThreeRenderer.
 ---

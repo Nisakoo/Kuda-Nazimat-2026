@@ -9,6 +9,7 @@ import { InputController } from '../input/InputController';
 import { DEMO_BOUNDS, DEMO_NPCS, DEMO_SPAWN } from '../shared/demo';
 import { GameLoop } from './GameLoop';
 import type { ClientConfig } from './config';
+import { AssetManager, HttpAssetSource } from '../map/AssetManager';
 
 const localEntities: readonly Entity[] = [
   {
@@ -23,6 +24,7 @@ const localEntities: readonly Entity[] = [
     interactable: { radius: 2.2, label: 'Поговорить' },
     renderable: { assetId: npc.id }, animationState: { name: 'idle' },
   })),
+  { id: 'floating-tablet', transform: { position: { x: 0, y: 0, z: -2.5 }, rotationY: 0 }, renderable: { assetId: 'demo-tablet' }, animationState: { name: 'idle' } },
 ];
 
 interface Nearby { readonly id: string; readonly name: string }
@@ -36,11 +38,15 @@ export interface AppSnapshot {
   readonly coordinates: string;
   readonly capture: 'idle' | 'requesting' | 'locked' | 'error';
   readonly captureError: string | null;
+  readonly visualLoading: boolean;
+  readonly visualError: string | null;
+  readonly modelStats: string;
 }
 
 /** Composition root; all UI/input commands cross this facade. */
 export class GameApp {
   private renderer: RenderAdapter | null = null;
+  private modelAssets: AssetManager | null = null;
   private session: GameSession | null = null;
   private loop: GameLoop | null = null;
   private input: InputController | null = null;
@@ -55,13 +61,14 @@ export class GameApp {
 
   constructor(
     readonly config: ClientConfig,
-    private readonly createRenderer: () => RenderAdapter = () => new ThreeRenderer(),
+    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets),
     private readonly createSession: () => GameSession = () => new LocalSession('local-player', localEntities, DEMO_BOUNDS),
   ) {
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
       debug: config.debug, coordinates: '',
       capture: 'idle', captureError: null,
+      visualLoading: false, visualError: null, modelStats: '',
     });
   }
 
@@ -84,8 +91,10 @@ export class GameApp {
       this.host = host;
       if (!this.renderer) {
         this.session = this.createSession();
-        this.renderer = this.createRenderer();
+        this.modelAssets = new AssetManager(new HttpAssetSource(new URL(`${import.meta.env.BASE_URL}assets/models/`, window.location.href).href));
+        this.renderer = this.createRenderer(this.modelAssets);
         this.renderer.mount(host);
+        this.renderer.registerModels({ 'demo-tablet': 'demo/tablet.glb', 'demo-tablet-json': 'demo/tablet.gltf' });
         this.previous = this.current = this.session.getSnapshot();
         this.renderer.syncWorld(this.previous, this.current, this.session.playerId);
         this.renderer.setCamera(this.camera);
@@ -127,9 +136,10 @@ export class GameApp {
             if (this.previous && this.current) this.renderer?.syncWorld(this.previous, this.current, this.session?.playerId ?? null);
             this.updateHud();
           },
-          render: (alpha, elapsed) => this.renderer?.render(elapsed, alpha),
+          render: (alpha, elapsed) => { this.renderer?.render(elapsed, alpha); this.updateVisualStatus(); },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
         });
+        this.loadDemoDecorations();
       }
       this.resize();
       this.observer = new ResizeObserver(this.resize);
@@ -211,6 +221,31 @@ export class GameApp {
   setDebug(debug: boolean): void {
     this.patch({ debug });
     this.updateHud(true);
+  }
+
+  retryVisuals(): void {
+    this.renderer?.retryFailedModels();
+    if (this.current) this.renderer?.syncWorld(this.current, this.current, this.session?.playerId ?? null);
+    this.loadDemoDecorations();
+  }
+
+  private loadDemoDecorations(): void {
+    const renderer = this.renderer;
+    if (!renderer) return;
+    for (const [id, x] of [['demo-west', -2], ['demo-east', 2]] as const) {
+      void renderer.loadChunk({ id, objects: [{ id: `${id}-tablet`, assetId: 'demo-tablet', transform: { position: { x, y: 0, z: 2.3 }, rotationY: x < 0 ? 0.4 : -0.4 }, animation: 'idle' }] }).catch(() => { if (this.renderer === renderer) this.updateVisualStatus(); });
+    }
+  }
+
+  private updateVisualStatus(): void {
+    const diagnostics = this.renderer?.getDiagnostics();
+    if (!diagnostics) return;
+    const visualLoading = diagnostics.pending > 0;
+    const visualError = diagnostics.errors.length ? 'Не удалось загрузить часть оформления. Откройте меню, чтобы повторить загрузку.' : null;
+    const modelStats = `Модели: ${diagnostics.models} · Экземпляры: ${diagnostics.instances}`;
+    if (visualLoading !== this.snapshot.visualLoading || visualError !== this.snapshot.visualError || (this.snapshot.debug && modelStats !== this.snapshot.modelStats)) {
+      this.patch({ visualLoading, visualError, modelStats });
+    }
   }
 
   dispose(): void {
@@ -304,6 +339,8 @@ export class GameApp {
     this.session = null;
     this.previous = this.current = null;
     this.renderer?.dispose();
+    this.modelAssets?.dispose();
+    this.modelAssets = null;
     this.renderer = null;
     this.host = null;
   }

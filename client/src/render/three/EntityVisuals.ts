@@ -3,6 +3,7 @@ import type { Mesh, Scene } from 'three';
 import type { Entity, EntityId, Transform, WorldSnapshot } from '../../core/types';
 import { DEMO_NPCS } from '../../shared/demo';
 import type { SceneAssets } from './SceneAssets';
+import type { GltfLibrary, ModelInstance } from './GltfLibrary';
 
 interface Visual {
   readonly group: Group;
@@ -11,11 +12,16 @@ interface Visual {
   previous: Transform;
   current: Transform;
   walking: boolean;
+  animation: string;
+  readonly controller: AbortController;
+  model: ModelInstance | null;
+  failed: boolean;
 }
 
 export class EntityVisuals {
   private readonly visuals = new Map<EntityId, Visual>();
-  constructor(private readonly scene: Scene, private readonly assets: SceneAssets) {}
+  constructor(private readonly scene: Scene, private readonly assets: SceneAssets, private readonly library?: GltfLibrary, private readonly report: (id: string, error: string | null) => void = () => {}) {}
+  get ids(): readonly string[] { return [...this.visuals.keys()]; }
 
   sync(previous: WorldSnapshot, current: WorldSnapshot, playerId: EntityId | null): void {
     const old = new Map(previous.entities.map((entity) => [entity.id, entity]));
@@ -34,18 +40,20 @@ export class EntityVisuals {
       visual.previous = old.get(entity.id)?.transform ?? entity.transform;
       visual.current = entity.transform;
       visual.walking = entity.animationState?.name === 'walk';
+      visual.animation = entity.animationState?.name ?? 'idle';
     }
     for (const id of this.visuals.keys()) if (!live.has(id)) this.remove(id);
   }
 
-  animate(alpha: number, elapsed: number): void {
+  animate(alpha: number, elapsed: number, delta = 0): void {
     for (const visual of this.visuals.values()) {
       const from = visual.previous.position;
       const to = visual.current.position;
       visual.group.position.set(from.x + (to.x - from.x) * alpha, from.y + (to.y - from.y) * alpha, from.z + (to.z - from.z) * alpha);
-      const delta = visual.current.rotationY - visual.previous.rotationY;
-      visual.group.rotation.y = visual.previous.rotationY + Math.atan2(Math.sin(delta), Math.cos(delta)) * alpha;
+      const yawDelta = visual.current.rotationY - visual.previous.rotationY;
+      visual.group.rotation.y = visual.previous.rotationY + Math.atan2(Math.sin(yawDelta), Math.cos(yawDelta)) * alpha;
       visual.limbs.forEach((limb, index) => { limb.rotation.x = visual.walking ? Math.sin(elapsed * 11 + (index % 2) * Math.PI) * 0.45 : 0; });
+      visual.model?.animate(visual.animation, delta);
     }
   }
 
@@ -54,7 +62,7 @@ export class EntityVisuals {
 
   private remove(id: EntityId): void {
     const visual = this.visuals.get(id);
-    if (visual) this.assets.release(visual.group);
+    if (visual) { visual.controller.abort(); visual.model?.dispose(); this.assets.release(visual.group); this.report(id, null); }
     this.visuals.delete(id);
   }
 
@@ -62,6 +70,12 @@ export class EntityVisuals {
     const transform = entity.transform!;
     const group = new Group();
     group.name = `entity:${entity.id}`;
+    if (this.library?.has(entity.renderable!.assetId)) {
+      const visual: Visual = { group, limbs: [], token, previous: transform, current: transform, walking: false, animation: entity.animationState?.name ?? 'idle', controller: new AbortController(), model: null, failed: false };
+      group.position.set(transform.position.x, transform.position.y, transform.position.z);
+      this.loadModel(entity.id, entity.renderable!.assetId, visual);
+      return visual;
+    }
     const npc = DEMO_NPCS.find((item) => item.id === entity.id);
     const color = npc?.color ?? '#318e81';
     const body = this.assets.mesh('capsule', color);
@@ -118,6 +132,23 @@ export class EntityVisuals {
     label.position.y = 2.45;
     group.add(label);
     group.position.set(transform.position.x, transform.position.y, transform.position.z);
-    return { group, limbs, token, previous: transform, current: transform, walking: false };
+    return { group, limbs, token, previous: transform, current: transform, walking: false, animation: 'idle', controller: new AbortController(), model: null, failed: false };
+  }
+
+  retryFailed(): void {
+    for (const [id, visual] of [...this.visuals]) if (visual.failed) this.remove(id);
+  }
+
+  private loadModel(id: string, assetId: string, visual: Visual): void {
+    void this.library!.instantiate(assetId, visual.controller.signal).then((model) => {
+      if (visual.controller.signal.aborted || this.visuals.get(id) !== visual) { model.dispose(); return; }
+      visual.model = model;
+      visual.group.add(model.root);
+      this.report(id, null);
+    }, (error: unknown) => {
+      if (visual.controller.signal.aborted) return;
+      visual.failed = true;
+      this.report(id, error instanceof Error ? error.message : 'Model load failed');
+    });
   }
 }

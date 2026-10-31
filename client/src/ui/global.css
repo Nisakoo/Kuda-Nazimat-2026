@@ -5,6 +5,7 @@ dialog::backdrop { background: #213b3238; }
 body { margin: 0; overflow: hidden; }
 .capture-error { color: #8b4937; background: #f2e4d0; border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.6; }
 .capture-exit { width: 100%; margin-top: 8px; }
+.asset-warning { position: absolute; top: 180px; right: 24px; z-index: 2; max-width: 280px; padding: 12px; border-radius: 8px; font-size: 12px; }
 button, input { font: inherit; }
 button { cursor: pointer; border: 0; border-radius: 10px; padding: 13px 19px; font-weight: 650; font-size: 14px; color: #fff; background: #246d61; transition: background .15s; }
 button:hover { background: #19584e; }

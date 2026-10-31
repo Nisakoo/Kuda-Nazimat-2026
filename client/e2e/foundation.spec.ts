@@ -42,7 +42,8 @@ test('local build renders with external access blocked and handles resize, pause
     await expect(page.getByRole('status')).toHaveText('Сцена открыта');
   }
   expect(requests.every((url) => new URL(url).origin === 'http://127.0.0.1:4173')).toBe(true);
-  expect(requests.some((url) => /\/(maps|assets\/models)\//.test(url))).toBe(false);
+  expect(requests.some((url) => /\/maps\//.test(url))).toBe(false);
+  expect(requests.filter((url) => /\/assets\/models\//.test(url)).every((url) => url.endsWith('/demo/tablet.glb'))).toBe(true);
   expect(errors).toEqual([]);
 });
 

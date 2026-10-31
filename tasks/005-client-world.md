@@ -1,7 +1,7 @@
 ---
 id: TASK-005
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/client-world-streaming.md
 requirements: [MAP-001–009]
 depends_on: [TASK-004]

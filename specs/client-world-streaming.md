@@ -2,7 +2,7 @@
 id: client-world-streaming
 type: module-design
 status: draft
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Загружать мир по положению игрока и освобождать ненужные данные.
 ---
