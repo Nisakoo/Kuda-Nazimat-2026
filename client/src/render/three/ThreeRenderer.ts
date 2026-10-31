@@ -1,4 +1,4 @@
-import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
+import { Raycaster, Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFSoftShadowMap } from 'three';
 import type { CameraView, RenderAdapter, VisualChunk, RenderDiagnostics } from '../RenderAdapter';
 import type { EntityId, WorldSnapshot } from '../../core/types';
 import { SceneAssets } from './SceneAssets';
@@ -17,12 +17,15 @@ export class ThreeRenderer implements RenderAdapter {
   private playerId: EntityId | null = null;
   private view: CameraView = { yaw: 0, pitch: 0.7, distance: 15 };
   private readonly target = new Vector3();
+  private readonly cameraRay = new Raycaster();
+  private readonly cameraDirection = new Vector3();
   private library: GltfLibrary | null = null;
   private chunks: VisualChunks | null = null;
   private lastElapsed = 0;
+  private sun: DirectionalLight | null = null;
   private readonly errors = new Map<string, string>();
 
-  constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true) {}
+  constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true, private readonly marketStyle = false) {}
 
   mount(container: HTMLElement): void {
     if (this.renderer) throw new Error('Сцена уже создана.');
@@ -30,17 +33,25 @@ export class ThreeRenderer implements RenderAdapter {
     this.renderer.domElement.setAttribute('aria-label', 'Трёхмерная сцена');
     this.renderer.domElement.setAttribute('role', 'img');
     this.scene = new Scene();
-    this.scene.background = new Color('#e8d9ba');
-    this.scene.fog = new Fog('#e8d9ba', 38, 80);
+    this.scene.background = new Color(this.marketStyle ? '#edc5a4' : '#e8d9ba');
+    this.scene.fog = new Fog(this.marketStyle ? '#edc5a4' : '#e8d9ba', 38, 80);
     this.camera = new PerspectiveCamera(48, 1, 0.1, 120);
-    const sun = new DirectionalLight('#fff0cf', 2);
-    sun.position.set(-8, 18, 10);
-    this.scene.add(new HemisphereLight('#f3f4ec', '#b5a17b', 2), sun);
+    const sun = new DirectionalLight(this.marketStyle ? '#ffcf91' : '#fff0cf', this.marketStyle ? 2.7 : 2);
+    sun.position.set(this.marketStyle ? 18 : -8, this.marketStyle ? 12 : 18, this.marketStyle ? -12 : 10);
+    if (this.marketStyle) {
+      this.renderer.toneMapping = ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.05;
+      this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = PCFSoftShadowMap;
+      sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+      Object.assign(sun.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24, near: 1, far: 85 });
+      sun.shadow.normalBias = .035; sun.shadow.bias = -.0001;
+      this.sun = sun; this.scene.add(sun.target);
+    }
+    this.scene.add(new HemisphereLight(this.marketStyle ? '#ffe5cd' : '#f3f4ec', this.marketStyle ? '#aa8164' : '#b5a17b', this.marketStyle ? 1.8 : 2), sun);
     this.assets = new SceneAssets();
     if (this.proceduralDemo) this.scene.add(createDemoScenery(this.assets));
     this.library = new GltfLibrary(this.modelAssets);
     this.chunks = new VisualChunks(this.scene, this.library);
-    this.visuals = new EntityVisuals(this.scene, this.assets, this.library, (id, error) => { if (error) this.errors.set(`entity:${id}`, error); else this.errors.delete(`entity:${id}`); });
+    this.visuals = new EntityVisuals(this.scene, this.assets, this.library, (id, error) => { if (error) this.errors.set(`entity:${id}`, error); else this.errors.delete(`entity:${id}`); }, this.marketStyle);
     container.append(this.renderer.domElement);
   }
 
@@ -87,6 +98,7 @@ export class ThreeRenderer implements RenderAdapter {
     const position = this.visuals.position(this.playerId);
     if (position) this.target.copy(position);
     else this.target.set(0, 0, 0);
+    if (this.sun) { this.sun.position.set(this.target.x + 18, 12, this.target.z - 12); this.sun.target.position.set(this.target.x, 0, this.target.z); }
     this.target.y += 0.8;
     const { yaw, pitch, distance } = this.view;
     this.camera.position.set(
@@ -94,6 +106,13 @@ export class ThreeRenderer implements RenderAdapter {
       this.target.y + Math.sin(pitch) * distance,
       this.target.z + Math.cos(yaw) * Math.cos(pitch) * distance,
     );
+    if (this.marketStyle) {
+      this.scene.updateMatrixWorld(true);
+      this.cameraDirection.copy(this.camera.position).sub(this.target).normalize();
+      this.cameraRay.set(this.target, this.cameraDirection); this.cameraRay.near = .5; this.cameraRay.far = distance;
+      const hit = this.cameraRay.intersectObjects(this.scene.children.filter(child => child.name.startsWith('chunk:')), true)[0];
+      if (hit) this.camera.position.copy(this.target).addScaledVector(this.cameraDirection, Math.max(.7, hit.distance - .25));
+    }
     this.camera.lookAt(this.target);
     this.renderer.render(this.scene, this.camera);
   }
@@ -103,6 +122,7 @@ export class ThreeRenderer implements RenderAdapter {
     this.visuals?.dispose();
     this.library?.dispose();
     this.assets?.dispose();
+    this.sun?.shadow.dispose(); this.sun = null;
     this.scene?.clear();
     if (this.renderer) {
       this.renderer.dispose();

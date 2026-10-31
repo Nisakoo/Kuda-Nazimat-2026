@@ -4,6 +4,7 @@
   import Dialog from './Dialog.svelte';
   import Settings from './Settings.svelte';
   import Chat from './Chat.svelte';
+  import MarketPanel from './MarketPanel.svelte';
   import { modal } from './modal';
 
   const { game, startupError }: { game: GameApp | null; startupError: string | null } = $props();
@@ -15,7 +16,7 @@
     worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
     mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
-    performance: '', renderStats: '',
+    performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
   });
   const networkLabels = { unauthorized: 'Не авторизован', connecting: 'Подключение…', connected: 'Подключён', lost: 'Связь потеряна', error: 'Ошибка связи', disconnected: 'Отключён' };
   const error = $derived(startupError ?? state.message);
@@ -46,8 +47,8 @@
   {#if !error && game && state.screen === 'welcome'}
     <section class="welcome glass" aria-labelledby="scene-title">
       <p class="eyebrow">Добро пожаловать в Вавилон</p>
-      <h1 id="scene-title">Город<br />открытий.</h1>
-      <p class="description">Кирпичные башни, тёплый песчаник и тень пальм. Познакомьтесь с Леей и Марком на площади древнего города.</p>
+      <h1 id="scene-title">{#if state.market}Рынок<br />Вавилона.{:else}Город<br />открытий.{/if}</h1>
+      <p class="description">{state.market ? 'Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.' : 'Кирпичные башни, тёплый песчаник и тень пальм. Познакомьтесь с Леей и Марком на площади древнего города.'}</p>
       {#if state.captureError}<p class="capture-error" role="alert">{state.captureError}</p>{/if}
       {#if state.networkError}<p class="capture-error" role="alert">{state.networkError}</p>{/if}
       {#if state.mode !== 'local'}<p class="small subtle">{state.mode === 'mock' ? 'Тестовый участник и сетевые ответы имитируются; это проверка клиента без сервера.' : 'Сетевая игра использует локальный сервер.'}</p><button class="secondary" onclick={() => game.reconnect()}>Повторить подключение</button>{/if}
@@ -56,20 +57,22 @@
       {#if !state.worldReady}<p class="small subtle">Готовим окрестности точки появления…</p>{/if}
       <button class="primary large" disabled={state.capture === 'requesting' || !state.worldReady} onclick={() => game.enterWorld()}>{state.capture === 'requesting' ? 'Захватываем мышь…' : state.captureError ? 'Повторить захват' : 'Начать прогулку'} <span aria-hidden="true">↗</span></button>
       {#if state.captureError || state.capture === 'requesting'}<button class="secondary capture-exit" onclick={() => game.leaveWorld()}>На главный экран</button>{/if}
+      {#if state.market}<button class="secondary capture-exit" onclick={() => game.openMarketPanel('intro')}>О мире и управлении</button>{/if}
       <div class="welcome-controls"><p><kbd>W A S D</kbd> движение относительно камеры</p><p><kbd>E</kbd> разговор с персонажем</p><p><kbd>Мышь</kbd> обзор · колесо — масштаб</p><p><kbd>Esc</kbd> освободить курсор и открыть меню</p></div>
       <p class="small subtle">Демо работает локально. Учебные ответы подготовлены заранее.</p>
     </section>
   {/if}
 
   {#if !error && state.screen === 'playing'}
-    <aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>Лея — история · Марк — наука</p></aside>
+    <div class="hud-top"><aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>{state.market ? `Козы пастуха · ${state.market.fed.length}/4` : 'Лея — история · Марк — наука'}</p></aside>
     {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p><p aria-label="Производительность">{state.performance}</p><p aria-label="Ресурсы сцены">{state.renderStats}</p></div>{/if}
+    </div>
     {#if state.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
-    <button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
-    {#if state.visualError && state.phase === 'running' && !state.dialog}<p class="asset-warning glass" role="alert">{state.visualError}</p>{/if}
+    <div class="world-actions">{#if state.market}<button class="quest-button glass" onclick={() => game?.openMarketPanel('task')}>Козы пастуха · {state.market.fed.length}/4</button>{/if}<button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
     {#if state.nearby && !state.dialog && state.phase === 'running'}
-      <button class="interaction glass" onclick={() => game?.interact()}><kbd>E</kbd><span>Поговорить<span class="interaction-name">{state.nearby.name}</span></span></button>
-    {/if}
+      <button class="interaction glass" onclick={() => game?.interact()}><kbd>E</kbd><span>{state.market ? 'Взаимодействовать' : 'Поговорить'}<span class="interaction-name">{state.nearby.name}</span></span></button>
+    {/if}</div>
+    {#if state.visualError && state.phase === 'running' && !state.dialog}<p class="asset-warning glass" role="alert">{state.visualError}</p>{/if}
   {/if}
 
   {#if error}
@@ -80,7 +83,7 @@
     </div></section>
   {/if}
 
-  {#if !error && game && state.screen === 'playing' && state.phase === 'stopped' && state.capture !== 'requesting' && !state.chatOpen && !state.settingsOpen}
+  {#if !error && game && state.screen === 'playing' && state.phase === 'stopped' && state.capture !== 'requesting' && !state.chatOpen && !state.settingsOpen && !state.marketPanel}
     <div class="modal-backdrop"><dialog use:modal class="panel pause-panel" aria-labelledby="pause-title" oncancel={(event) => { event.preventDefault(); game.toggleMenu(); }}>
       <p class="eyebrow">Можно не торопиться</p><h2 id="pause-title">Пауза</h2><p class="subtle">Прогулка продолжится с этого места.</p>
       {#if state.captureError}<p class="capture-error" role="alert">{state.captureError}</p>{/if}
@@ -89,9 +92,10 @@
       {#if state.mode === 'mock'}<button class="secondary" onclick={() => game.simulateNetworkLoss()}>Проверить разрыв связи</button>{/if}
       {#if state.visualError}<p class="capture-error" role="alert">{state.visualError}</p><button class="secondary" onclick={() => game.retryVisuals()}>Повторить загрузку</button>{/if}
       <div class="menu-buttons"><button disabled={!state.worldReady} onclick={() => game.resume()}>{state.captureError ? 'Повторить захват' : 'Продолжить'}</button><button class="secondary" onclick={() => game.openChat()}>Общение</button><button class="secondary" onclick={() => game.restart(viewport)}>Перезапустить сцену</button><button class="secondary" onclick={() => game.leaveWorld()}>На главный экран</button></div>
+      {#if state.market}<div class="menu-buttons market-menu"><button class="secondary" onclick={() => game.openMarketPanel('task')}>Задание</button><button class="secondary" onclick={() => game.openMarketPanel('inventory')}>Сумка</button><button class="secondary" onclick={() => game.openMarketPanel('stone')}>Камень</button><button class="secondary" onclick={() => game.openMarketPanel('words')}>Словарь</button><button class="secondary" onclick={() => game.openMarketPanel('intro')}>О мире и управлении</button></div>{/if}
       <label class="debug-toggle"><input type="checkbox" checked={state.debug} onchange={(event) => game.setDebug(event.currentTarget.checked)} /> Показывать координаты</label>
       <button class="secondary" onclick={() => game.openSettings()}>Настройки</button>
-      <label class="debug-toggle">Радиус загрузки <select aria-label="Радиус загрузки" value={state.chunkRadius} onchange={(event) => game.setChunkRadius(Number(event.currentTarget.value))}><option value="0">Текущая область</option><option value="1">Ближайшие области</option><option value="2">Расширенный обзор</option></select></label>
+      <label class="debug-toggle radius-setting">Радиус загрузки <select aria-label="Радиус загрузки" value={state.chunkRadius} onchange={(event) => game.setChunkRadius(Number(event.currentTarget.value))}><option value={0}>Текущая область</option><option value={1}>Ближайшие области</option><option value={2}>Расширенный обзор</option></select></label>
       <p class="small subtle">Мышь свободна. Нажмите «Продолжить», чтобы вернуть управление.<br />WASD — идти · мышь — обзор · E — поговорить</p>
     </dialog></div>
   {/if}
@@ -105,6 +109,8 @@
   {/if}
   {#if game && state.settingsOpen}<div class="modal-backdrop"><Settings mode={state.mode} config={game.config} error={state.settingsError} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} /></div>{/if}
   {#if game && state.chatOpen}<div class="modal-backdrop"><Chat messages={state.chatMessages} error={state.chatError ?? state.networkError} canSend={state.mode !== 'local' && state.networkStatus === 'connected'} send={(text) => game.sendChat(text)} close={() => game.closeChat()} /></div>{/if}
+
+  {#if game && state.market}{#key state.market.runId}<MarketPanel {game} market={state.market} panel={state.marketPanel} target={state.marketTarget} />{/key}{/if}
 
   <footer>
     <p class="status" role="status"><span class:active={state.phase === 'running'} class="dot"></span>{error ? 'Просмотр недоступен' : state.phase === 'running' ? 'Сцена открыта' : state.phase === 'stopped' ? 'Просмотр приостановлен' : 'Подготовка сцены…'}</p>

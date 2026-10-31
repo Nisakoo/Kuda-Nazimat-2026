@@ -2,17 +2,20 @@ import { expect, test } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 import { expectCapture } from './helpers';
 
-test('profiles sixty seconds offline and checks retained resources after five complete restarts', async ({ page }, testInfo) => {
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
+for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds offline and checks retained resources after five complete restarts`, async ({ page }, testInfo) => {
   test.setTimeout(120000);
   const external: string[] = []; const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route('**/*', (route) => {
     const url = new URL(route.request().url());
     if (url.origin !== 'http://127.0.0.1:4173') { external.push(url.href); return route.abort(); }
-    if (url.pathname === '/config.json') return route.fulfill({ json: { debug: true, chunkRadius: 1 } });
+    if (url.pathname === '/config.json') return route.fulfill({ json: { mapId, debug: true, chunkRadius: 1 } });
     return route.continue();
   });
   await page.goto('/');
+  if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
   await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 9');
   await page.waitForTimeout(5000);
@@ -43,7 +46,8 @@ test('profiles sixty seconds offline and checks retained resources after five co
     await page.keyboard.press('Escape'); await expectCapture(page, false);
     const old = await page.locator('canvas').elementHandle();
     await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
-    await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
+    if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
+  await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
     await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 9');
     await page.waitForTimeout(1200);
     expect(await old!.evaluate((element) => (element as HTMLCanvasElement).getContext('webgl2')!.isContextLost())).toBe(true);

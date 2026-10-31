@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { expectCapture } from './helpers';
 
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
 test('streams a nearby region, blocks a slow boundary and stays within its reserved budget', async ({ page }) => {
   let release!: () => void;
   const delayed = new Promise<void>((done) => { release = done; });
