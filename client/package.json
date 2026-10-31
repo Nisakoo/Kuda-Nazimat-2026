@@ -1,0 +1,42 @@
+{
+  "name": "educational-world-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.12.0 || >=24.0.0"
+  },
+  "scripts": {
+    "predev": "node scripts/generate-demo-world.mjs",
+    "dev": "vite --host 0.0.0.0",
+    "prebuild": "node scripts/generate-demo-world.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "node scripts/generate-demo-world.mjs && svelte-check --tsconfig ./tsconfig.json && tsc --noEmit && npm run check:core",
+    "check:core": "tsc --project tsconfig.core.json",
+    "check:imports": "depcruise src --config .dependency-cruiser.cjs",
+    "pretest": "node scripts/generate-demo-world.mjs",
+    "test": "vitest run",
+    "test:browser": "npm run build && playwright test",
+    "test:render": "playwright test --config playwright.render.config.ts",
+    "models:generate": "node scripts/create-demo-models.mjs",
+    "world:generate": "node scripts/generate-demo-world.mjs"
+  },
+  "dependencies": {
+    "socket.io-client": "4.8.4",
+    "svelte": "5.57.3",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@types/node": "24.19.2",
+    "@types/three": "0.187.0",
+    "dependency-cruiser": "17.4.3",
+    "happy-dom": "21.0.4",
+    "svelte-check": "4.7.7",
+    "typescript": "5.9.3",
+    "vite": "8.3.5",
+    "vitest": "4.1.12"
+  }
+}

@@ -1,0 +1,10 @@
+[
+  {"direction":"client","valid":true,"packet":{"v":1,"type":"join","requestId":"c1_1","mapId":"demo"}},
+  {"direction":"client","valid":true,"packet":{"v":1,"type":"input","requestId":"c1_2","sequence":1,"direction":{"x":0,"z":-1},"preparedChunks":["0_0","0_-1"]}},
+  {"direction":"client","valid":false,"packet":{"v":2,"type":"join","requestId":"c1_1","mapId":"demo"}},
+  {"direction":"client","valid":false,"packet":{"v":1,"type":"input","requestId":"c1_2","sequence":1,"direction":{"x":1,"z":0},"preparedChunks":[],"playerId":"someone-else","position":{"x":999,"y":0,"z":0}}},
+  {"direction":"server","valid":true,"packet":{"v":1,"type":"joined","requestId":"c1_1","playerId":"p1","revision":0,"snapshot":{"tick":0,"entities":[{"id":"p1","character":{"kind":"player","name":"Игрок"},"transform":{"position":{"x":0,"y":0,"z":6},"rotationY":0}}]},"world":{"manifestUrl":"manifest.json","manifestBytes":100,"worldBytes":1000000,"assets":{}}}},
+  {"direction":"server","valid":true,"packet":{"v":1,"type":"delta","baseRevision":0,"revision":1,"tick":2,"upsert":[{"id":"p2","transform":{"position":{"x":2,"y":0,"z":6},"rotationY":0}}],"remove":[]}},
+  {"direction":"server","valid":false,"packet":{"v":1,"type":"delta","baseRevision":0,"revision":1,"tick":2,"upsert":[{"id":"p2","health":999}],"remove":[]}},
+  {"direction":"server","valid":false,"packet":{"v":1,"type":"npc-answer","requestId":"c1_8","targetId":"guide","text":42}}
+]

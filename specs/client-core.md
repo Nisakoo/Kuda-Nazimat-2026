@@ -2,7 +2,7 @@
 id: client-core
 type: module-design
 status: ready
-implementation: not-started
+implementation: complete
 parent: architecture
 summary: Обеспечить тестируемую локальную симуляцию без браузера и внешних технологий.
 ---

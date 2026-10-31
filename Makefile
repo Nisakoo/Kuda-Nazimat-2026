@@ -1,13 +1,13 @@
 .DEFAULT_GOAL := help
 
-# Set defaults when implementing the client. Commands run from the repo root.
-CLIENT_RUN_CMD ?=
-CLIENT_TEST_CMD ?=
+# Commands run from the repo root; overrides remain available.
+CLIENT_RUN_CMD ?= npm --prefix client run dev
+CLIENT_TEST_CMD ?= npm --prefix client test
 
 .PHONY: help client client-test
 
 help:
-	@printf '%s\n' 'make client       Start the client' 'make client-test  Run client tests' 'Client commands await implementation; see README.md.'
+	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'See README.md for installation, type checks, build and browser checks.'
 
 client:
 ifeq ($(strip $(CLIENT_RUN_CMD)),)

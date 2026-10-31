@@ -1,0 +1,137 @@
+{
+  "measuredAt": "2026-10-31T13:21:42.827Z",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+    "viewport": "1280x800",
+    "dpr": 1
+  },
+  "baselineHeap": 7641340,
+  "baselineResources": {
+    "drawCalls": 231,
+    "geometries": 14,
+    "textures": 13
+  },
+  "samples": [
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 205,
+      "cacheBytes": 703483,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 93,
+      "cacheBytes": 703483,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 66,
+      "cacheBytes": 547859,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 79,
+      "cacheBytes": 547859,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 79,
+      "cacheBytes": 547859,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 79,
+      "cacheBytes": 547859,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 83,
+      "cacheBytes": 547859,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 59.8,
+      "p95": 17.5,
+      "drawCalls": 68,
+      "cacheBytes": 703496,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 59.8,
+      "p95": 17.5,
+      "drawCalls": 79,
+      "cacheBytes": 703496,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.5,
+      "drawCalls": 66,
+      "cacheBytes": 703496,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.4,
+      "drawCalls": 83,
+      "cacheBytes": 547859,
+      "cacheLimit": 1759366
+    },
+    {
+      "fps": 60,
+      "p95": 17.4,
+      "drawCalls": 79,
+      "cacheBytes": 547859,
+      "cacheLimit": 1759366
+    }
+  ],
+  "heaps": [
+    8963152,
+    9058212,
+    9204460,
+    9318564,
+    9347952
+  ],
+  "counts": [
+    {
+      "drawCalls": 231,
+      "geometries": 14,
+      "textures": 13
+    },
+    {
+      "drawCalls": 231,
+      "geometries": 14,
+      "textures": 13
+    },
+    {
+      "drawCalls": 231,
+      "geometries": 14,
+      "textures": 13
+    },
+    {
+      "drawCalls": 231,
+      "geometries": 14,
+      "textures": 13
+    },
+    {
+      "drawCalls": 231,
+      "geometries": 14,
+      "textures": 13
+    }
+  ],
+  "external": [],
+  "errors": []
+}

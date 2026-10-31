@@ -1,0 +1,9 @@
+client/node_modules/
+client/dist/
+client/test-results/
+client/render-test-results/
+client/public/maps/demo/
+client/src/shared/demoWorld.generated.ts
+client/playwright-report/
+*.tsbuildinfo
+.DS_Store
