@@ -7,3 +7,5 @@ client/src/shared/demoWorld.generated.ts
 client/playwright-report/
 *.tsbuildinfo
 .DS_Store
+client/public/maps/market/
+client/src/shared/marketWorld.generated.ts

@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import type { Locator } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
 async function usableControls(panel: Locator) {
   const controls = panel.locator('button, input:not([type=hidden]), select');
   for (const control of await controls.all()) {

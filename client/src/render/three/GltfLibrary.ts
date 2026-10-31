@@ -83,6 +83,7 @@ export class GltfLibrary {
 
   private makeInstance(lease: Lease<Template>): ModelInstance {
     const root = clone(lease.value.scene);
+    root.traverse(object => { if ('isMesh' in object) { object.castShadow = true; object.receiveShadow = true; } });
     const mixer = new AnimationMixer(root);
     let animation = '';
     let disposed = false;

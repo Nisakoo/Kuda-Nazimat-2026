@@ -19,7 +19,7 @@
     {#if selected === 'online'}<p class="small subtle">Требуется готовая сессия входа с локального сервера. Форма входа подключается при интеграции с сервером.</p>{/if}
     <label>Адрес сервера <input aria-label="Адрес сервера" bind:value={server} type="url" required /></label>
     <label>Карта <input aria-label="Карта" bind:value={map} list="available-maps" maxlength="80" required /></label>
-    <datalist id="available-maps"><option value="demo">Площадь открытий</option><option value="science">Сады науки</option></datalist>
+    <datalist id="available-maps"><option value="market">Рынок Вавилона</option><option value="demo">Площадь открытий</option><option value="science">Сады науки</option></datalist>
     <label>Радиус загрузки <select aria-label="Радиус загрузки" bind:value={radius}><option value={0}>Текущая область</option><option value={1}>Ближайшие области</option><option value={2}>Расширенный обзор</option></select></label>
     <label class="debug-toggle"><input type="checkbox" bind:checked={debug} /> Диагностика</label>
     {#if error}<p role="alert" class="capture-error">{error}</p>{/if}
