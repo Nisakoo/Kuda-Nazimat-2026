@@ -1,0 +1,26 @@
+# Candidate only; prepare and install offline before gameplay.
+mlx-lm==0.32.2
+# Explicit pin for the tokenizer's Jinja chat-template renderer.
+jinja2==3.1.6
+#
+# Candidate artifact preparation (not yet smoke-tested or qualified):
+# 1. Pin and obtain the post-trained Qwen/Qwen3.5-2B source snapshot and
+#    dependencies during preparation. Do not use a Base or a VLM package.
+# 2. With mlx-lm 0.32.2, convert the local source directory into a new directory:
+#    python -m mlx_lm.convert --hf-path /absolute/local/source --mlx-path /absolute/output -q --q-bits 4 --q-group-size 64
+#    No trust-remote-code option or upload is permitted. Conversion is NOT a
+#    gameplay operation and has not been verified on the target hardware.
+# 3. In 0.32.2, qwen3_5 sanitizes vision tensors and save_config removes
+#    vision_config when the loaded model does not retain a vision tower. Inspect
+#    the actual output: config.json must have no vision_config and all output
+#    safetensors headers must have no vision, visual, or audio tensor names.
+#    Retain model_type=qwen3_5, text_config, quantization, tokenizer and template.
+#    Reject unexpected multimodal output; do not disguise it by editing config.
+#    The converter can copy source *.py files; remove these before the manifest.
+# 4. Verify the 4-bit/group-64 metadata, all tensors, tokenizer, template and
+#    provenance. Create an external JSON map from every output relative file
+#    path to its lowercase SHA-256, after all changes. Make the artifact immutable.
+#    Configure absolute modelDir and modelManifest paths and runnerVersion
+#    0.32.2. Smoke-test actual loading, non-thinking generation and offline use.
+# The worker independently checks the manifest, config and safetensors names.
+# These checks cannot prove provenance, tensor semantics, or model quality.

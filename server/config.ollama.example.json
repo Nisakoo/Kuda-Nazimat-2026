@@ -1,0 +1,25 @@
+{
+  "host": "127.0.0.1",
+  "port": 8080,
+  "defaultMap": "market",
+  "npc": {
+    "adapter": "ollama",
+    "maxConcurrent": 1,
+    "maxUnfinished": 4,
+    "timeoutMs": 8000,
+    "options": {
+      "python": "/absolute/ollama-venv/bin/python3",
+      "executable": "/absolute/path/to/ollama",
+      "modelsDir": "/absolute/dedicated-ollama-models",
+      "tokenizerDir": "/absolute/pinned-qwen35-tokenizer",
+      "tokenizerManifest": "/absolute/tokenizer-sha256.json",
+      "model": "qwen3.5:2b-q4_K_M",
+      "modelDigest": "REPLACE_WITH_FULL_LOCAL_MANIFEST_SHA256",
+      "runnerVersion": "REPLACE_WITH_INSTALLED_X.Y.Z",
+      "port": 11501,
+      "threads": 2,
+      "numGpu": 0,
+      "startupTimeoutMs": 120000
+    }
+  }
+}

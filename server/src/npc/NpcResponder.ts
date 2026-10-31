@@ -13,4 +13,8 @@ export interface NpcResponder {
   /** Resolves with the final text; `onPartial` must not be called after the promise settles or the signal aborts. */
   answer(request: NpcAnswerRequest, signal: AbortSignal, onPartial?: PartialAnswer): Promise<{ text: string }>;
   stop(): Promise<void>;
+  /** Optional local-runtime health; never performs IO or starts recovery. */
+  status?(): 'ready' | 'unavailable';
+  /** Optional fixed diagnostic code, never a prompt, path, or third-party exception. */
+  lastFailure?(): string | undefined;
 }

@@ -1,48 +1,116 @@
-import type { NpcQuestions } from '../contracts.ts';
-import type { Clock, Scheduler } from '../common/time.ts';
+import type { NpcAnswer, NpcQuestion, NpcQuestions } from '../contracts.ts';
+import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
-import { MS_BUCKETS, MetricsRegistry, type Metrics } from '../common/metrics.ts';
 import type { NpcResponder } from './NpcResponder.ts';
 import type { DialogueStore } from './ports.ts';
-import { createGenerationQueue } from './GenerationQueue.ts';
+
+interface Job {
+  question: NpcQuestion; deadline: number; controller: AbortController; running: boolean; settled: boolean;
+  resolve: (answer: NpcAnswer) => void; timeout?: TimerHandle; stuck?: TimerHandle;
+}
 export function normalizeAnswer(text: string): string { return text.replace(/\r\n/g, '\n').replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, '').trim().slice(0, 4000); }
-export function createNpcDialogueService(deps: { responder: NpcResponder; dialogue: DialogueStore; clock: Clock; scheduler: Scheduler; logger: Logger; metrics?: Metrics }, config: { maxConcurrent: number; maxUnfinished: number; timeoutMs: number; streamTimeoutMs?: number }) {
-  const { responder, dialogue, clock } = deps;
-  const logger = deps.logger.child('npc');
-  const firstPartial = (deps.metrics ?? new MetricsRegistry()).histogram('npc_first_partial_ms', 'Время от приёма вопроса до первого временного текста', MS_BUCKETS);
-  const queue = createGenerationQueue(deps, config);
-  let available = false, stopped = false;
-  const ask: NpcQuestions['ask'] = (q, onPartial) => {
-    if (!available || stopped) return Promise.resolve({ ok: false, reason: 'unavailable' });
-    return queue.generate(q.player.playerId, q.connectionId, async (signal, deadline) => {
-      // Partials are display-only: normalized like the answer, silenced once the job is aborted or expired.
-      const accepted = clock.now(); let partials = 0;
-      const partial = onPartial && ((text: string) => {
-        const clean = normalizeAnswer(text);
-        if (!clean || signal.aborted || clock.now() >= deadline) return;
-        if (partials++ === 0) { firstPartial.observe(clock.now() - accepted); logger.debug('npc.request.first_partial', 'Первый временный текст', { playerId: q.player.playerId, requestId: q.requestId, npcId: q.npc.id, ms: clock.now() - accepted }); }
-        onPartial(clean);
-      });
-      const result = await responder.answer({ requestKey: `${q.connectionId}:${q.requestId}`, playerId: q.player.playerId, playerName: q.player.displayName, npc: q.npc, question: q.question, history: dialogue.history(q.player.playerId, q.npc.id).slice(-6), locale: 'ru', deadlineAt: deadline }, signal, partial);
-      if (signal.aborted || clock.now() >= deadline) throw new Error('Expired');
-      const text = normalizeAnswer(result.text); if (!text) throw new Error('Empty answer');
-      try { dialogue.append(q.player.playerId, q.npc.id, q.question, text, clock.now()); }
-      catch (error) { logger.error('db.transaction.failed', 'Не удалось сохранить ответ NPC', { operation: 'dialogue.append', playerId: q.player.playerId, npcId: q.npc.id, error }); throw error; }
-      return text;
-    }, { requestId: q.requestId, kind: onPartial ? 'npc-stream' : 'npc', ...(onPartial ? { timeoutMs: config.streamTimeoutMs ?? config.timeoutMs } : {}) });
-  };
+export function createNpcDialogueService(deps: { responder: NpcResponder; dialogue: DialogueStore; clock: Clock; scheduler: Scheduler; logger: Logger }, config: { maxConcurrent: number; maxUnfinished: number; timeoutMs: number }): NpcQuestions & { start(): Promise<void>; stop(): Promise<void>; ready(): boolean } {
+  const { responder, dialogue, clock, scheduler, logger } = deps;
+  const jobs = new Set<Job>(); const queue: Job[] = [];
+  let active = 0; let available = false; let stopped = false;
+  let recoveryTimer: TimerHandle | undefined;
+  let starting: Promise<void> | undefined;
+  const backendReady = () => responder.status?.() !== 'unavailable';
+  async function startResponder(): Promise<void> {
+    if (starting) return starting;
+    const operation = (async () => {
+      try { await responder.start(); available = !stopped && backendReady(); }
+      catch {
+        available = false;
+        const code = responder.lastFailure?.();
+        const allowed = ['unsupported_platform', 'startup_timeout', 'resource_limit', 'memory_unavailable', 'model_unavailable', 'runner_mismatch', 'tokenizer_unavailable', 'protocol_error', 'unavailable'];
+        logger.error('NpcResponder недоступен: проверьте локальные пакеты, модель, платформу и профиль', { code: code && allowed.includes(code) ? code : 'unavailable' });
+      }
+    })();
+    starting = operation;
+    try { await operation; } finally { if (starting === operation) starting = undefined; }
+  }
+  function scheduleRecovery(): void {
+    // Only an adapter with live health opts into recovery. Never retry a player's question.
+    if (!responder.status || stopped || active > 0 || starting || recoveryTimer) return;
+    recoveryTimer = scheduler.setTimeout(() => {
+      recoveryTimer = undefined;
+      if (!stopped && active === 0) void startResponder();
+    }, 2000);
+  }
+  function failQueued(): void {
+    for (const job of [...queue]) {
+      job.controller.abort(); settle(job, { ok: false, reason: 'unavailable' }); remove(job);
+    }
+  }
+  const settle = (job: Job, answer: NpcAnswer) => { if (!job.settled) { job.settled = true; job.resolve(answer); } };
+  function remove(job: Job): void {
+    jobs.delete(job);
+    if (job.timeout) scheduler.clearTimeout(job.timeout);
+    if (job.stuck) scheduler.clearTimeout(job.stuck);
+    const index = queue.indexOf(job); if (index >= 0) queue.splice(index, 1);
+  }
+  function abort(job: Job, reason: 'cancelled' | 'timeout'): void {
+    if (job.controller.signal.aborted) return;
+    job.controller.abort(); settle(job, { ok: false, reason });
+    if (!job.running) { remove(job); pump(); }
+    else job.stuck = scheduler.setTimeout(() => logger.error('NPC не завершился после abort', { playerId: job.question.player.playerId }), 2000);
+  }
+  async function run(job: Job): Promise<void> {
+    const q = job.question;
+    try {
+      const result = await responder.answer({ requestKey: `${q.connectionId}:${q.requestId}`, playerId: q.player.playerId, playerName: q.player.displayName, npc: q.npc, question: q.question, history: dialogue.history(q.player.playerId, q.npc.id).slice(-6), locale: 'ru', deadlineAt: job.deadline }, job.controller.signal);
+      if (job.controller.signal.aborted) return;
+      if (clock.now() >= job.deadline) { abort(job, 'timeout'); return; }
+      const text = normalizeAnswer(result.text);
+      if (!text) throw new Error('Empty answer');
+      // Synchronous check + SQLite commit: cancellation cannot interleave here.
+      dialogue.append(q.player.playerId, q.npc.id, q.question, text, clock.now());
+      settle(job, { ok: true, text });
+    } catch {
+      if (!job.controller.signal.aborted) settle(job, { ok: false, reason: 'unavailable' });
+    } finally {
+      active--; remove(job);
+      if (!backendReady()) { available = false; failQueued(); scheduleRecovery(); }
+      pump();
+    }
+  }
+  function pump(): void {
+    while (!stopped && available && backendReady() && active < config.maxConcurrent && queue.length) {
+      const job = queue.shift()!;
+      if (clock.now() >= job.deadline) { abort(job, 'timeout'); continue; }
+      job.running = true; active++; void run(job);
+    }
+  }
   return {
     async start() {
-      stopped = false; queue.start();
-      try { await responder.start(); available = true; logger.info('npc.responder.ready', 'Ответчик NPC готов'); }
-      catch (error) { available = false; logger.error('npc.responder.unavailable', 'NpcResponder недоступен', { error }); }
+      stopped = false;
+      await startResponder();
     },
-    ready: () => available && !stopped,
-    ask,
-    generate: queue.generate,
-    cancel: queue.cancel,
-    cancelConnection: queue.cancelConnection,
-    state: queue.state,
-    async stop() { stopped = true; available = false; queue.stop(); await responder.stop(); },
+    ready: () => available && !stopped && backendReady(),
+    ask(question) {
+      if (!available || stopped || !backendReady()) {
+        available = false; failQueued(); scheduleRecovery();
+        return Promise.resolve({ ok: false, reason: 'unavailable' });
+      }
+      if ([...jobs].some((job) => job.question.player.playerId === question.player.playerId)) return Promise.resolve({ ok: false, reason: 'player-busy' });
+      if (jobs.size >= config.maxUnfinished) return Promise.resolve({ ok: false, reason: 'server-busy' });
+      return new Promise((resolve) => {
+        const job: Job = { question, deadline: clock.now() + config.timeoutMs, controller: new AbortController(), running: false, settled: false, resolve };
+        jobs.add(job); queue.push(job);
+        job.timeout = scheduler.setTimeout(() => abort(job, 'timeout'), config.timeoutMs);
+        pump();
+      });
+    },
+    cancelConnection(connectionId) { for (const job of [...jobs]) if (job.question.connectionId === connectionId) abort(job, 'cancelled'); },
+    async stop() {
+      stopped = true; available = false;
+      if (recoveryTimer) scheduler.clearTimeout(recoveryTimer);
+      recoveryTimer = undefined;
+      for (const job of [...jobs]) abort(job, 'cancelled');
+      await responder.stop();
+      await starting;
+      available = false;
+    },
   };
 }
