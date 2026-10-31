@@ -3,24 +3,27 @@ id: TASK-011
 type: implementation-task
 status: todo
 spec: ../specs/server-persistence.md
-requirements: [STORE-001–010]
+requirements: [STORE-001–005, STORE-011]
 depends_on: [TASK-010]
+scheduling_note: STORE-006–010 реализуются в TASK-015 вместе с PROTO v2
 ---
 
 # Сервер: SQLite
 
 ## Цель и изменения требований
-Реализовать STORE-001–010. Уточнён STORE-004: доступ к SQLite не блокирует игровой шаг. STORE-006–010 определяют историю и компактную память, durable-final, идемпотентность/reset и retention; уточнены резервирование квот, сохранение причин ошибок, восстановление после crash и атомарные гонки commit/cancel/reset/deadline. Открытые решения физической схемы/runtime закрыть до зависимой реализации.
+Реализовать хранилище v1. Изменены STORE-001–005 (схема, миграции, интервал сохранения, DatabaseSync без worker, backup); добавлен STORE-011 (история NPC v1). STORE-006–010 перенесены на этап v2.
 
 ## Реализация
-- [ ] Согласовать схему и интервал сохранения; реализовать миграции, транзакции, восстановление и backup.
-- [ ] Реализовать отдельные dialogue requests/results, memory и dedup ledger, транзакционный финал, reset epoch, снимок preferences при admission, retention и авторизованные чтение/экспорт/удаление. Проверить crash до/после commit и очистку без повторной generation.
-- [ ] Обновить документацию по фактическому результату.
+- [ ] Проверить `node:sqlite` на закреплённой версии Node (WAL, foreign keys, наличие FTS5 — записать для AI-008).
+- [ ] Соединение `DatabaseSync`, миграция v1; реализации `AccountStore`, `SessionStore`, `PlayerStore`, `DialogueStore` и их in-memory версии для тестов сервисов.
+- [ ] Очистка старых сессий; описание backup/restore в README сервера.
 
 ## Приёмка
-- [ ] STORE-001–010 / S1–S6 проверены на тестовых игроках, истории NPC и событиях сохранения без зависимости от готовых auth/realtime/ИИ; проверены повтор requestId, недоступная БД, reset с активным запросом, оба порядка гонки commit/cancel/reset, снимок preferences, generation/absolute deadline против commit, восстановленный terminal без partial seq, durable-код ошибки и provisional persistence_error, retention и чужой доступ. Реальные inference-события проверяются в TASK-015/018, перезапуск всей системы — в TASK-016.
-- [ ] Релевантные тесты, типизация и сборка проходят; для изменений клиента выполнен `make client-test`.
-- [ ] Неисполненные проверки явно отмечены и не выданы за успешные.
+- [ ] STORE-001–003, 011 / S1: перезапуск восстанавливает игрока и историю без дубликатов (проверка через Store-порты; полный путь через join — в TASK-014).
+- [ ] STORE-002, 004 / S2: сбой посреди транзакции возвращает ошибку без частичной записи; шаг мира не обращается к БД.
+- [ ] STORE-003, 005 / S3: kill процесса и восстановление из `VACUUM INTO` проверены, `integrity_check` = ok.
+- [ ] STORE-011 / S7: лимит 50 записей и ошибка записи.
+- [ ] `make server-test` и `npm run check` проходят.
 
 ## Результат
 - Файлы: —

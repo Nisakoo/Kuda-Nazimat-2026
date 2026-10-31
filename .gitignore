@@ -7,3 +7,6 @@ client/src/shared/demoWorld.generated.ts
 client/playwright-report/
 *.tsbuildinfo
 .DS_Store
+server/node_modules/
+server/data/
+server/config.json
