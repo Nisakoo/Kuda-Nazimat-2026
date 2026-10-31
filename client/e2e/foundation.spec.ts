@@ -33,6 +33,7 @@ test('local build renders with external access blocked and handles resize, pause
     const previous = await canvas.elementHandle();
     await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
+    await page.getByRole('button', { name: 'Начать прогулку' }).click();
     await expectCapture(page, true);
     await expect(canvas).toHaveCount(1);
     expect(await previous?.evaluate((element) => element.isConnected)).toBe(false);
@@ -42,8 +43,8 @@ test('local build renders with external access blocked and handles resize, pause
     await expect(page.getByRole('status')).toHaveText('Сцена открыта');
   }
   expect(requests.every((url) => new URL(url).origin === 'http://127.0.0.1:4173')).toBe(true);
-  expect(requests.some((url) => /\/maps\//.test(url))).toBe(false);
-  expect(requests.filter((url) => /\/assets\/models\//.test(url)).every((url) => url.endsWith('/demo/tablet.glb'))).toBe(true);
+  expect(new Set(requests.filter((url) => /\/maps\/.*\.json$/.test(url))).size).toBeLessThanOrEqual(10);
+  expect(requests.filter((url) => /\/assets\/models\//.test(url)).every((url) => /\/demo\/(tablet|courtyard|science|history)\.glb$/.test(url))).toBe(true);
   expect(errors).toEqual([]);
 });
 

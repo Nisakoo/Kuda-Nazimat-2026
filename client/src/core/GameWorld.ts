@@ -1,5 +1,6 @@
 import { EntityManager } from './EntityManager';
 import type { CommandResult, Entity, EntityId, GameCommand, MovementBounds, RejectionReason, WorldEvent, WorldSnapshot } from './types';
+import type { Vector3 } from './types';
 
 export class GameWorld {
   private entities: EntityManager;
@@ -7,6 +8,15 @@ export class GameWorld {
   private events: WorldEvent[] = [];
 
   private readonly bounds: MovementBounds | null;
+  private movementGuard: ((position: Vector3) => boolean) | null = null;
+  setMovementGuard(guard: (position: Vector3) => boolean): void { this.movementGuard = guard; }
+  initializePosition(id: EntityId, position: Vector3): void {
+    this.assertLocal();
+    if (this.tick !== 0) throw new Error('Initial position must be set before simulation');
+    const entity = this.entities.get(id);
+    if (!entity?.transform) throw new Error('Missing player transform');
+    this.entities.replace({ ...entity, transform: { ...entity.transform, position } });
+  }
 
   constructor(readonly authority: 'local' | 'replica', entities: readonly Entity[] = [], bounds: MovementBounds | null = null) {
     if (bounds && (!Object.values(bounds).every(Number.isFinite) || bounds.minX > bounds.maxX || bounds.minZ > bounds.maxZ)) {
@@ -76,6 +86,7 @@ export class GameWorld {
         position.x = Math.max(this.bounds.minX, Math.min(this.bounds.maxX, position.x));
         position.z = Math.max(this.bounds.minZ, Math.min(this.bounds.maxZ, position.z));
       }
+      if (attempting && this.movementGuard && !this.movementGuard(position)) { position.x = previous.x; position.z = previous.z; }
       const moving = position.x !== previous.x || position.z !== previous.z;
       const animationName = moving ? 'walk' : 'idle';
       if (!moving && (!entity.animationState || entity.animationState.name === animationName)) continue;

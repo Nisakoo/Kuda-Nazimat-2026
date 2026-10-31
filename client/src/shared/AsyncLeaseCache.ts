@@ -57,8 +57,8 @@ export class AsyncLeaseCache<T> {
     this.disposed = true;
     for (const entry of this.entries.values()) {
       entry.controller.abort();
-      if (entry.value !== undefined) { this.destroy(entry.value); delete entry.value; }
     }
-    this.entries.clear();
+    // Ready leases may still be in an asynchronous decoder. Their last owner,
+    // rather than disposal of the container, releases data and budget tickets.
   }
 }

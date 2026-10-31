@@ -96,6 +96,7 @@ test('pauses, clears held keys on blur, restarts and returns to the welcome scre
   await expect(coords).toHaveText(stopped!);
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
+  await page.getByRole('button', { name: 'Начать прогулку' }).click();
   await expectCapture(page, true);
   await expect(coords).toContainText('Z 6.0');
   await expect(page.locator('canvas')).toHaveCount(1);

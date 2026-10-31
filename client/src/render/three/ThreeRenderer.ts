@@ -22,7 +22,7 @@ export class ThreeRenderer implements RenderAdapter {
   private lastElapsed = 0;
   private readonly errors = new Map<string, string>();
 
-  constructor(private readonly modelAssets: AssetManager) {}
+  constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true) {}
 
   mount(container: HTMLElement): void {
     if (this.renderer) throw new Error('Сцена уже создана.');
@@ -37,7 +37,7 @@ export class ThreeRenderer implements RenderAdapter {
     sun.position.set(-8, 18, 10);
     this.scene.add(new HemisphereLight('#f3f4ec', '#b5a17b', 2), sun);
     this.assets = new SceneAssets();
-    this.scene.add(createDemoScenery(this.assets));
+    if (this.proceduralDemo) this.scene.add(createDemoScenery(this.assets));
     this.library = new GltfLibrary(this.modelAssets);
     this.chunks = new VisualChunks(this.scene, this.library);
     this.visuals = new EntityVisuals(this.scene, this.assets, this.library, (id, error) => { if (error) this.errors.set(`entity:${id}`, error); else this.errors.delete(`entity:${id}`); });

@@ -38,7 +38,7 @@ describe('application lifecycle', () => {
     host.getBoundingClientRect = () => new DOMRect(0, 0, 640, 480);
     renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0 })), dispose: vi.fn() };
     createRenderer = vi.fn(() => renderer);
-    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer);
+    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, null);
   });
 
   afterEach(() => {
@@ -85,7 +85,7 @@ describe('application lifecycle', () => {
     app.dispose();
     const previousRenderer = renderer;
     renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0 })), dispose: vi.fn() };
-    app = new GameApp(parseConfig({}, 'http://school.local'), () => renderer);
+    app = new GameApp(parseConfig({}, 'http://school.local'), () => renderer, undefined, null);
     app.start(host);
     advance(100);
     expect(previousRenderer.dispose).toHaveBeenCalledTimes(1);
@@ -146,7 +146,7 @@ describe('application lifecycle', () => {
 
   it('does not create a renderer or connection for the unavailable online mode', () => {
     app.dispose();
-    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer);
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null);
     const listener = vi.fn();
     app.subscribe(listener);
     app.start(host);
@@ -193,7 +193,7 @@ describe('application lifecycle', () => {
     const session = new LocalSession('test', [{ id: 'test', character: { kind: 'player', name: 'Test' } }]);
     const disposed = vi.spyOn(session, 'dispose');
     app.dispose();
-    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, () => session);
+    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, () => session, null);
     vi.mocked(renderer.mount).mockImplementationOnce(() => { throw new Error('No WebGL'); });
     app.start(host);
     expect(disposed).toHaveBeenCalledTimes(1);
@@ -217,7 +217,7 @@ describe('application lifecycle', () => {
     } });
     try {
       app.dispose();
-      app = new GameApp(parseConfig({ debug: true }, 'http://school.local'), createRenderer);
+      app = new GameApp(parseConfig({ debug: true }, 'http://school.local'), createRenderer, undefined, null);
       const listener = vi.fn();
       app.subscribe(listener);
       app.start(host);
@@ -249,7 +249,7 @@ describe('application lifecycle', () => {
     vi.spyOn(session, 'update').mockImplementationOnce(() => { throw new Error('Simulation failed'); });
     const disposed = vi.spyOn(session, 'dispose');
     app.dispose();
-    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, () => session);
+    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, () => session, null);
     const listener = vi.fn();
     app.subscribe(listener);
     app.start(host);

@@ -6,10 +6,15 @@ import { LocalSession } from '../session/LocalSession';
 import { answerDemoDialog, openDemoDialog } from '../session/demoDialogue';
 import type { DemoDialog } from '../session/demoDialogue';
 import { InputController } from '../input/InputController';
-import { DEMO_BOUNDS, DEMO_NPCS, DEMO_SPAWN } from '../shared/demo';
+import { DEMO_NPCS, DEMO_SPAWN } from '../shared/demo';
 import { GameLoop } from './GameLoop';
 import type { ClientConfig } from './config';
 import { AssetManager, HttpAssetSource } from '../map/AssetManager';
+import { WorldBudget } from '../map/WorldBudget';
+import { HttpMapSource } from '../map/HttpMapSource';
+import { ChunkManager } from '../map/ChunkManager';
+import type { MapSource } from '../map/types';
+import { DEMO_WORLD } from '../shared/demoWorld.generated';
 
 const localEntities: readonly Entity[] = [
   {
@@ -41,12 +46,22 @@ export interface AppSnapshot {
   readonly visualLoading: boolean;
   readonly visualError: string | null;
   readonly modelStats: string;
+  readonly worldReady: boolean;
+  readonly worldWaiting: boolean;
+  readonly region: string;
+  readonly cacheStats: string;
+  readonly chunkRadius: number;
 }
 
 /** Composition root; all UI/input commands cross this facade. */
 export class GameApp {
   private renderer: RenderAdapter | null = null;
   private modelAssets: AssetManager | null = null;
+  private world: ChunkManager | null = null;
+  private readonly worldBudget = new WorldBudget(DEMO_WORLD.worldBytes);
+  private worldStarting = false;
+  private worldFailure: string | null = null;
+  private waitingForWorld = false;
   private session: GameSession | null = null;
   private loop: GameLoop | null = null;
   private input: InputController | null = null;
@@ -61,14 +76,16 @@ export class GameApp {
 
   constructor(
     readonly config: ClientConfig,
-    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets),
-    private readonly createSession: () => GameSession = () => new LocalSession('local-player', localEntities, DEMO_BOUNDS),
+    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false),
+    private readonly createSession: () => GameSession = () => new LocalSession('local-player', localEntities),
+    private readonly createMap: ((budget: WorldBudget) => MapSource) | null = (budget) => new HttpMapSource(DEMO_WORLD, budget, new URL(import.meta.env.BASE_URL, window.location.href).href),
   ) {
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
       debug: config.debug, coordinates: '',
       capture: 'idle', captureError: null,
       visualLoading: false, visualError: null, modelStats: '',
+      worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
     });
   }
 
@@ -91,7 +108,9 @@ export class GameApp {
       this.host = host;
       if (!this.renderer) {
         this.session = this.createSession();
-        this.modelAssets = new AssetManager(new HttpAssetSource(new URL(`${import.meta.env.BASE_URL}assets/models/`, window.location.href).href));
+        const origin = new URL(import.meta.env.BASE_URL, window.location.href);
+        const sizes = new Map(Object.entries(DEMO_WORLD.assets).map(([path, size]) => [new URL(path, origin).href, size]));
+        this.modelAssets = new AssetManager(new HttpAssetSource(new URL('assets/models/', origin).href), this.createMap ? this.worldBudget : undefined, (url) => sizes.get(url));
         this.renderer = this.createRenderer(this.modelAssets);
         this.renderer.mount(host);
         this.renderer.registerModels({ 'demo-tablet': 'demo/tablet.glb', 'demo-tablet-json': 'demo/tablet.gltf' });
@@ -99,6 +118,15 @@ export class GameApp {
         this.renderer.syncWorld(this.previous, this.current, this.session.playerId);
         this.renderer.setCamera(this.camera);
         this.unsubscribeSession = this.session.subscribe(this.onSessionEvents);
+        if (this.createMap) {
+          this.world = new ChunkManager(this.createMap(this.worldBudget), this.renderer);
+          this.world.setRadius(this.snapshot.chunkRadius);
+          this.session.setMovementGuard((position) => {
+            this.waitingForWorld = !this.world?.isPrepared(position);
+            return this.world?.canWalk(position) ?? false;
+          });
+          this.startWorld();
+        }
         this.input = new InputController(host, {
           canControl: () => this.canControl(),
           cameraYaw: () => this.camera.yaw,
@@ -130,13 +158,20 @@ export class GameApp {
         }, {
           beforeUpdate: () => this.input?.sample(),
           update: (delta) => {
+            if (this.snapshot.phase !== 'running') return;
+            if (this.world && !this.world.manifest) return;
             this.previous = this.current;
             this.session?.update(delta);
             this.current = this.session?.getSnapshot() ?? null;
             if (this.previous && this.current) this.renderer?.syncWorld(this.previous, this.current, this.session?.playerId ?? null);
             this.updateHud();
+            const player = this.current?.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
+            if (player) this.world?.plan(player);
           },
-          render: (alpha, elapsed) => { this.renderer?.render(elapsed, alpha); this.updateVisualStatus(); },
+          render: (alpha, elapsed) => {
+            this.renderer?.render(elapsed, alpha); this.updateVisualStatus();
+            if (this.snapshot.phase === 'stopped' && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
+          },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
         });
         this.loadDemoDecorations();
@@ -164,7 +199,7 @@ export class GameApp {
   }
 
   private requestPlay(): void {
-    if (!this.input || this.snapshot.capture === 'requesting') return;
+    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady) return;
     this.patch({ capture: 'requesting', captureError: null });
     this.input.requestCapture();
   }
@@ -176,6 +211,7 @@ export class GameApp {
     this.detach();
     this.updateHud(true);
     this.setState('stopped');
+    if (this.world?.stats.loading || this.renderer?.getDiagnostics().pending) this.loop?.start();
   }
 
   toggleMenu(): void {
@@ -186,14 +222,13 @@ export class GameApp {
 
   restart(host: HTMLElement): void {
     if (this.snapshot.phase === 'disposed') throw new Error('Приложение уже завершено.');
-    const screen = this.snapshot.screen;
+    const screen = 'welcome';
     this.detach();
     this.releaseResources();
     this.camera = { yaw: 0, pitch: 0.7, distance: 15 };
-    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null });
+    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null });
     this.setState('idle');
     this.start(host);
-    if (screen === 'playing' && this.snapshot.phase === 'running') this.requestPlay();
   }
 
   leaveWorld(): void {
@@ -227,6 +262,25 @@ export class GameApp {
     this.renderer?.retryFailedModels();
     if (this.current) this.renderer?.syncWorld(this.current, this.current, this.session?.playerId ?? null);
     this.loadDemoDecorations();
+    if (this.world?.manifest) this.world.retry(); else this.startWorld();
+    // The same frame loop drains asynchronous model work while simulation stays paused.
+    if (this.snapshot.phase === 'stopped') this.loop?.start();
+    this.updateVisualStatus();
+  }
+
+  setChunkRadius(radius: number): void { this.world?.setRadius(radius); this.patch({ chunkRadius: radius }); }
+
+  private startWorld(): void {
+    const world = this.world;
+    if (!world || this.worldStarting) return;
+    this.worldStarting = true;
+    this.worldFailure = null;
+    void world.start(undefined, (manifest) => {
+      this.renderer?.registerModels(manifest.models);
+      if (this.session instanceof LocalSession) this.session.initializeSpawn(manifest.spawn);
+    }).catch((error: unknown) => {
+      if (this.world === world) this.worldFailure = error instanceof Error ? error.message : 'World load failed';
+    }).finally(() => { if (this.world === world) { this.worldStarting = false; this.updateVisualStatus(); } });
   }
 
   private loadDemoDecorations(): void {
@@ -241,10 +295,17 @@ export class GameApp {
     const diagnostics = this.renderer?.getDiagnostics();
     if (!diagnostics) return;
     const visualLoading = diagnostics.pending > 0;
-    const visualError = diagnostics.errors.length ? 'Не удалось загрузить часть оформления. Откройте меню, чтобы повторить загрузку.' : null;
+    const worldStats = this.world?.stats;
+    const visualError = this.worldFailure || worldStats?.errors.length ? 'Не удалось загрузить участок мира. Повторите загрузку в меню.' : diagnostics.errors.length ? 'Не удалось загрузить часть оформления. Откройте меню, чтобы повторить загрузку.' : null;
     const modelStats = `Модели: ${diagnostics.models} · Экземпляры: ${diagnostics.instances}`;
-    if (visualLoading !== this.snapshot.visualLoading || visualError !== this.snapshot.visualError || (this.snapshot.debug && modelStats !== this.snapshot.modelStats)) {
-      this.patch({ visualLoading, visualError, modelStats });
+    const position = this.current?.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
+    const worldReady = this.world ? Boolean(position && this.world.isPrepared(position)) : true;
+    const worldWaiting = this.waitingForWorld && Boolean(worldStats?.loading || worldStats?.deferred);
+    const region = position ? this.world?.region(position) || 'Площадь открытий' : 'Площадь открытий';
+    const budget = this.worldBudget.stats;
+    const cacheStats = `${budget.bytes} / ${budget.limit} байт · Чанки: ${worldStats?.ready ?? 0} · Ожидание: ${worldStats?.loading ?? 0}`;
+    if (visualLoading !== this.snapshot.visualLoading || visualError !== this.snapshot.visualError || worldReady !== this.snapshot.worldReady || worldWaiting !== this.snapshot.worldWaiting || region !== this.snapshot.region || (this.snapshot.debug && (modelStats !== this.snapshot.modelStats || cacheStats !== this.snapshot.cacheStats))) {
+      this.patch({ visualLoading, visualError, modelStats, worldReady, worldWaiting, region, cacheStats });
     }
   }
 
@@ -265,7 +326,7 @@ export class GameApp {
   }
 
   private canControl(): boolean {
-    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && !this.snapshot.dialog;
+    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog;
   }
 
   private readonly onSessionEvents = (events: readonly WorldEvent[]): void => {
@@ -335,6 +396,11 @@ export class GameApp {
     this.input = null;
     this.unsubscribeSession?.();
     this.unsubscribeSession = null;
+    this.world?.dispose();
+    this.world = null;
+    this.worldStarting = false;
+    this.worldFailure = null;
+    this.waitingForWorld = false;
     this.session?.dispose();
     this.session = null;
     this.previous = this.current = null;

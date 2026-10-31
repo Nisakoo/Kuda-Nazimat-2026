@@ -7,16 +7,20 @@
     "node": "^22.12.0 || >=24.0.0"
   },
   "scripts": {
+    "predev": "node scripts/generate-demo-world.mjs",
     "dev": "vite --host 0.0.0.0",
+    "prebuild": "node scripts/generate-demo-world.mjs",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc --noEmit && npm run check:core",
+    "check": "node scripts/generate-demo-world.mjs && svelte-check --tsconfig ./tsconfig.json && tsc --noEmit && npm run check:core",
     "check:core": "tsc --project tsconfig.core.json",
     "check:imports": "depcruise src --config .dependency-cruiser.cjs",
+    "pretest": "node scripts/generate-demo-world.mjs",
     "test": "vitest run",
     "test:browser": "npm run build && playwright test",
     "test:render": "playwright test --config playwright.render.config.ts",
-    "models:generate": "node scripts/create-demo-models.mjs"
+    "models:generate": "node scripts/create-demo-models.mjs",
+    "world:generate": "node scripts/generate-demo-world.mjs"
   },
   "dependencies": {
     "socket.io-client": "4.8.4",

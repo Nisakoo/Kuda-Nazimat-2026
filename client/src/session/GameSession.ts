@@ -1,4 +1,5 @@
 import type { EntityId, GameCommand, WorldEvent, WorldSnapshot } from '../core/types';
+import type { Vector3 } from '../core/types';
 
 /** Shared contract for LocalSession and the future OnlineSession; no transport objects. */
 export interface GameSession {
@@ -7,6 +8,7 @@ export interface GameSession {
   send(command: GameCommand): void;
   update(deltaSeconds: number): void;
   getSnapshot(): WorldSnapshot;
+  setMovementGuard(guard: (position: Vector3) => boolean): void;
   subscribe(listener: (events: readonly WorldEvent[]) => void): () => void;
   dispose(): void;
 }

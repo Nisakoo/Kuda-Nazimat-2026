@@ -10,6 +10,7 @@
     phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null, debug: false, coordinates: '',
     capture: 'idle', captureError: null,
     visualLoading: false, visualError: null, modelStats: '',
+    worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
   });
   const error = $derived(startupError ?? state.message);
 
@@ -42,7 +43,8 @@
       {#if state.captureError}<p class="capture-error" role="alert">{state.captureError}</p>{/if}
       {#if state.visualError}<p class="capture-error" role="alert">{state.visualError}</p><button class="secondary" onclick={() => game.retryVisuals()}>Повторить загрузку</button>{/if}
       {#if state.visualLoading}<p class="small subtle">Загружаем оформление…</p>{/if}
-      <button class="primary large" disabled={state.capture === 'requesting'} onclick={() => game.enterWorld()}>{state.capture === 'requesting' ? 'Захватываем мышь…' : state.captureError ? 'Повторить захват' : 'Начать прогулку'} <span aria-hidden="true">↗</span></button>
+      {#if !state.worldReady}<p class="small subtle">Готовим окрестности точки появления…</p>{/if}
+      <button class="primary large" disabled={state.capture === 'requesting' || !state.worldReady} onclick={() => game.enterWorld()}>{state.capture === 'requesting' ? 'Захватываем мышь…' : state.captureError ? 'Повторить захват' : 'Начать прогулку'} <span aria-hidden="true">↗</span></button>
       {#if state.captureError || state.capture === 'requesting'}<button class="secondary capture-exit" onclick={() => game.leaveWorld()}>На главный экран</button>{/if}
       <div class="welcome-controls"><p><kbd>W A S D</kbd> движение относительно камеры</p><p><kbd>E</kbd> разговор с персонажем</p><p><kbd>Мышь</kbd> обзор · колесо — масштаб</p><p><kbd>Esc</kbd> освободить курсор и открыть меню</p></div>
       <p class="small subtle">Демо работает локально. Учебные ответы подготовлены заранее.</p>
@@ -50,8 +52,9 @@
   {/if}
 
   {#if !error && state.screen === 'playing'}
-    <aside class="location glass"><p class="eyebrow">Вавилон</p><h1>Площадь открытий</h1><p>Лея — история · Марк — наука</p></aside>
-    {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p></div>{/if}
+    <aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>Лея — история · Марк — наука</p></aside>
+    {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p></div>{/if}
+    {#if state.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
     {#if state.visualError && state.phase === 'running' && !state.dialog}<p class="asset-warning glass" role="alert">{state.visualError}</p>{/if}
     {#if state.nearby && !state.dialog && state.phase === 'running'}
       <button class="interaction glass" onclick={() => game?.interact()}><kbd>E</kbd><span>Поговорить<span class="interaction-name">{state.nearby.name}</span></span></button>
@@ -72,6 +75,7 @@
       {#if state.visualError}<p class="capture-error" role="alert">{state.visualError}</p><button class="secondary" onclick={() => game.retryVisuals()}>Повторить загрузку</button>{/if}
       <div class="menu-buttons"><button onclick={() => game.resume()}>{state.captureError ? 'Повторить захват' : 'Продолжить'}</button><button class="secondary" onclick={() => game.restart(viewport)}>Перезапустить сцену</button><button class="secondary" onclick={() => game.leaveWorld()}>На главный экран</button></div>
       <label class="debug-toggle"><input type="checkbox" checked={state.debug} onchange={(event) => game.setDebug(event.currentTarget.checked)} /> Показывать координаты</label>
+      <label class="debug-toggle">Радиус загрузки <select aria-label="Радиус загрузки" value={state.chunkRadius} onchange={(event) => game.setChunkRadius(Number(event.currentTarget.value))}><option value="0">Текущая область</option><option value="1">Ближайшие области</option><option value="2">Расширенный обзор</option></select></label>
       <p class="small subtle">Мышь свободна. Нажмите «Продолжить», чтобы вернуть управление.<br />WASD — идти · мышь — обзор · E — поговорить</p>
     </dialog></div>
   {/if}

@@ -6,7 +6,7 @@ import type { AssetManager } from '../../map/AssetManager';
 import { abortError, AsyncLeaseCache } from '../../shared/AsyncLeaseCache';
 import type { Lease } from '../../shared/AsyncLeaseCache';
 
-interface Template { readonly scene: Object3D; readonly animations: AnimationClip[] }
+interface Template { readonly scene: Object3D; readonly animations: AnimationClip[]; readonly sources: readonly Lease<ArrayBuffer>[] }
 export interface ModelInstance {
   readonly root: Object3D;
   animate(name: string, delta: number): void;
@@ -29,6 +29,7 @@ function disposeTemplate(template: Template): void {
   for (const geometry of geometries) geometry.dispose();
   for (const material of materials) material.dispose();
   for (const texture of textures) { texture.dispose(); if (typeof ImageBitmap !== 'undefined' && texture.source.data instanceof ImageBitmap) texture.source.data.close(); }
+  for (const source of template.sources) source.release();
 }
 
 function readJson(bytes: ArrayBuffer): Record<string, unknown> {
@@ -119,6 +120,7 @@ export class GltfLibrary {
     if (!path) throw new Error(`Unknown model: ${id}`);
     const leases: Lease<ArrayBuffer>[] = [];
     const urls: string[] = [];
+    let succeeded = false;
     try {
       const main = await this.assets.acquire(path, signal);
       leases.push(main);
@@ -153,9 +155,10 @@ export class GltfLibrary {
         throw new Error('Unprepared glTF URL');
       });
       const gltf = await new GLTFLoader(manager).parseAsync(main.value, '');
-      return { scene: gltf.scene, animations: gltf.animations };
+      succeeded = true;
+      return { scene: gltf.scene, animations: gltf.animations, sources: leases };
     } finally {
-      for (const lease of leases) lease.release();
+      if (!succeeded) for (const lease of leases) lease.release();
       for (const url of urls) URL.revokeObjectURL(url);
     }
   }

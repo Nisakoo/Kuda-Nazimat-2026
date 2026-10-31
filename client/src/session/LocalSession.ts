@@ -1,6 +1,7 @@
 import { GameWorld } from '../core/GameWorld';
 import type { Entity, EntityId, GameCommand, MovementBounds, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from './GameSession';
+import type { Vector3 } from '../core/types';
 
 export class LocalSession implements GameSession {
   readonly mode = 'local';
@@ -42,6 +43,8 @@ export class LocalSession implements GameSession {
   }
 
   getSnapshot(): WorldSnapshot { return this.world.getSnapshot(); }
+  setMovementGuard(guard: (position: Vector3) => boolean): void { this.world.setMovementGuard(guard); }
+  initializeSpawn(position: Vector3): void { this.world.initializePosition(this.playerId, position); }
 
   subscribe(listener: (events: readonly WorldEvent[]) => void): () => void {
     this.assertActive();

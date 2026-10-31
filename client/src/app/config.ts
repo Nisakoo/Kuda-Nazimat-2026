@@ -2,7 +2,7 @@ export interface ClientConfig {
   readonly session: 'local' | 'online';
   readonly serverUrl: string;
   readonly mapId: string;
-  // The streaming radius is deliberately unset until MAP decisions are agreed.
+  // null selects the map's default radius (one chunk in the demo).
   readonly chunkRadius: number | null;
   readonly debug: boolean;
 }
@@ -27,8 +27,8 @@ export function parseConfig(raw: unknown, origin: string): ClientConfig {
   }
   const chunkRadius = values.chunkRadius ?? null;
   if (chunkRadius !== null &&
-      (typeof chunkRadius !== 'number' || !Number.isSafeInteger(chunkRadius) || chunkRadius < 0)) {
-    throw new Error('Радиус чанков должен быть целым неотрицательным числом или null.');
+      (typeof chunkRadius !== 'number' || !Number.isSafeInteger(chunkRadius) || chunkRadius < 0 || chunkRadius > 2)) {
+    throw new Error('Радиус чанков должен быть целым числом от 0 до 2 или null.');
   }
   const debug = values.debug === undefined ? false : values.debug;
   if (typeof debug !== 'boolean') {
