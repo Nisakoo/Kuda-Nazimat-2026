@@ -1,0 +1,84 @@
+:root { --ui-ink: #073c48; --ui-teal: #086e70; --ui-mint: #d4e2d3; --ui-paper: #fbf1df; --ui-line: #e5cfad; color: var(--ui-ink); font-family: 'Trebuchet MS', Arial, sans-serif; }
+button, input, select, textarea { font: inherit; }
+button { min-height: 44px; border-radius: 3px; background: var(--ui-teal); }
+button:hover { background: #055558; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #138e93; outline-offset: 3px; }
+.parchment { background: linear-gradient(125deg, #fff8ec, var(--ui-paper) 55%, #f1e4cc); color: var(--ui-ink); border: 2px solid #fff9e9; box-shadow: 0 8px 28px #63412730, inset 0 0 0 1px var(--ui-line); border-radius: 4px; }
+header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
+.brand { color: var(--ui-ink); font-size: 27px; font-weight: 500; letter-spacing: 0; gap: 14px; }
+.header-actions .mode { font-size: 11px; background: #fbf1dfdc; }
+.settings-button { padding: 10px; background: var(--ui-paper); border-radius: 4px; }
+.language-button { display: flex; align-items: center; gap: 10px; padding: 10px 15px; font-size: 15px; }
+.language-button:hover { background: #fff9ed; }
+.game-screen .header-actions .mode { display: none; }
+.game-screen .header-actions > .small { padding: 8px; background: #fff6e5d9; border-radius: 3px; }
+.game-screen .hud-top { position: absolute; top: 88px; left: 32px; right: 32px; margin: 0; }
+.location { padding: 0; pointer-events: auto; }
+.task-chip { display: flex; gap: 13px; align-items: center; max-width: min(540px, 70vw); padding: 12px 18px; font-size: 16px; text-align: left; }
+.task-chip:hover { background: #fff6e5; }
+.task-count { color: #617b7c; white-space: nowrap; }
+.task-gem { background: #078c88; color: white; width: 23px; height: 23px; display: grid; place-items: center; border-radius: 4px; flex: 0 0 auto; }
+.game-screen footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px 16px; background: none; pointer-events: none; }
+.game-screen footer .hints { display: none; }
+.game-screen footer .status { margin: 3px; padding: 4px 8px; background: #fff8e9d9; border-radius: 2px; }
+.hud-dock { position: fixed; z-index: 4; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(860px, calc(100vw - 32px)); min-height: 64px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px 18px; gap: 2px; }
+.hud-dock::before, .hud-dock::after { content: '◢'; color: #078687; position: absolute; top: 5px; left: 5px; font-size: 12px; }
+.hud-dock::after { left: auto; right: 5px; transform: rotate(90deg); }
+.hud-dock button { display: flex; align-items: center; justify-content: center; gap: 13px; min-width: 0; padding: 8px 10px; background: none; border-right: 1px solid var(--ui-line); color: var(--ui-ink); position: relative; font-size: 15px; font-weight: 500; }
+.hud-dock button:last-child { border: 0; }
+.hud-dock button:hover, .hud-dock .chosen { background: var(--ui-mint); }
+.hud-dock .chosen::after { content: ''; position: absolute; bottom: 0; left: 12%; right: 12%; height: 3px; background: var(--ui-teal); }
+.game-screen .stamina { bottom: 105px; }
+.game-screen .world-actions { margin-bottom: 180px; }
+.game-screen .modal-backdrop { background: none; backdrop-filter: none; }
+.game-screen dialog::backdrop { background: #513f2820; }
+.game-screen .panel, .game-screen .dialog-panel { background: var(--ui-paper); border: 2px solid #fff9e9; border-radius: 4px; color: var(--ui-ink); box-shadow: 0 10px 35px #5c3b2138; }
+dialog.babel-panel { max-height: calc(100svh - 190px); margin: auto auto 108px; overflow: visible; position: fixed; }
+.babel-content { border-radius: 4px; }
+.babel-navigation { border: 0; }
+.babel-panel .babel-language-pair { color: #657d80; margin: -4px 0 8px; text-align: right; }
+.babel-panel .babel-add-word { display: block; padding: 4px 0; min-height: 32px; background: transparent; color: var(--ui-ink); font-size: 12px; }
+.map-dialog { width: min(940px, calc(100vw - 40px)); max-height: calc(100svh - 190px); margin: auto auto 108px; padding: 20px 26px 12px; overflow-y: auto; overflow-x: visible; }
+.map-dialog .panel-top { border-bottom: 1px solid var(--ui-line); margin-bottom: 10px; }
+.map-dialog .panel-top h2 { font-size: 28px; letter-spacing: -.025em; }
+.map-dialog .panel-top p { color: #657d80; margin: 8px 0 10px; }
+.icon-button { background: transparent; color: var(--ui-ink); font-size: 24px; }
+.icon-button:hover { background: var(--ui-mint); }
+.map-frame { position: relative; border-radius: 5px; overflow: hidden; background: #dbd7b1; }
+.world-map { display: block; width: 100%; height: clamp(220px, 42svh, 510px); }
+.map-label { font-size: 1.7px; font-weight: 600; text-anchor: middle; fill: var(--ui-ink); paint-order: stroke; stroke: #fff5df; stroke-width: .65px; stroke-linejoin: round; }
+.map-north { position: absolute; top: 12px; right: 16px; text-align: center; font-size: 16px; }
+.map-disclaimer { color: #657d80; font-size: 12px; line-height: 1.4; }
+.map-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.map-controls p { display: flex; flex: 1; gap: 9px; align-items: center; font-size: 13px; }
+.map-dot { display: inline-block; width: 16px; height: 16px; border: 2px solid white; border-radius: 100%; background: #138f96; }
+.map-dot.partner { background: #bc7159; }
+.map-diamond { color: #138f96; }
+.window-hint { text-align: center; color: #657d80; font-size: 12px; margin: 10px 0 0; }
+.entry-screen footer { display: none; }
+.entry-screen .header-actions > :not(.settings-button) { display: none; }
+.entry-screen header .settings-button { position: fixed; bottom: 26px; right: 28px; width: 62px; height: 62px; }
+@media(max-width: 700px) {
+  header { padding: 16px; gap: 8px; }
+  .brand { font-size: 20px; gap: 8px; }
+  .brand svg { width: 32px; }
+  .game-screen .header-actions { gap: 6px; }
+  .game-screen .header-actions > .small { display: none; }
+  .language-button { font-size: 12px; padding: 8px; gap: 6px; }
+  .language-button svg { width: 18px; }
+  .game-screen .header-actions > button:not(.language-button):not(.settings-button) { display: none; }
+  .game-screen .hud-top { top: 80px; left: 16px; right: 16px; }
+  .task-chip { max-width: calc(100vw - 32px); padding: 10px 13px; font-size: 14px; gap: 9px; }
+  .hud-dock { bottom: 24px; width: calc(100vw - 20px); padding: 4px 8px; min-height: 64px; }
+  .hud-dock button { flex-direction: column; gap: 4px; padding: 4px 2px; font-size: 11px; }
+  .hud-dock svg { width: 24px; height: 24px; }
+  .map-dialog { width: calc(100vw - 20px); padding: 16px; max-height: calc(100svh - 180px); margin-bottom: 106px; }
+  .map-dialog .panel-top h2 { font-size: 23px; }
+  .map-controls p { flex-basis: 100%; }
+  .map-controls button { padding: 10px 12px; }
+}
+@media(max-height: 600px) {
+  .map-dialog { max-height: calc(100svh - 100px); margin-bottom: 88px; }
+  .hud-dock { bottom: 16px; min-height: 56px; }
+  .map-dialog .world-map { height: 180px; }
+}

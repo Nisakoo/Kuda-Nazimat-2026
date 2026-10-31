@@ -1,0 +1,12 @@
+<script lang="ts">
+  const { name, size = 28 }: { name: 'inventory' | 'map' | 'words' | 'chat' | 'settings' | 'globe' | 'logo'; size?: number } = $props();
+</script>
+<svg width={size} height={size} viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  {#if name === 'inventory'}<path d="M10 9V5h12v4M9 10h14l3 17H6l3-17ZM12 5V3h8v2" />
+  {:else if name === 'map'}<path d="m3 7 8-3 10 4 8-3v22l-8 3-10-4-8 3V7Zm8-3v22m10-18v22" /><path d="M18 11c0-5 7-5 7 0 0 2-3.5 6-3.5 6S18 13 18 11Z" />
+  {:else if name === 'words'}<path d="M16 7C12 3 7 3 2 5v23c5-2 10-2 14 1 4-3 9-3 14-1V5c-5-2-10-2-14 2Zm0 0v22" />
+  {:else if name === 'chat'}<path d="M7 25 3 30l1-10A13 13 0 1 1 7 25Z" /><path d="M9 15h1m5 0h1m5 0h1" />
+  {:else if name === 'globe'}<circle cx="16" cy="16" r="13"/><ellipse cx="16" cy="16" rx="6" ry="13"/><path d="M3 16h26M6 8c6 4 14 4 20 0M6 24c6-4 14-4 20 0"/>
+  {:else if name === 'settings'}<path d="m13 3-1 4-4 2-4-1-2 5 3 3-1 4 4 4 4-1 3 4h5l1-4 4-2 4 1 2-5-3-3 1-4-4-4-4 1-3-4h-5Z" transform="translate(1 1) scale(.93)"/><circle cx="16" cy="16" r="5"/>
+  {:else}<path d="M11 5h10M6 15h20M1 25h30" />{/if}
+</svg>

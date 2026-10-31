@@ -191,6 +191,36 @@ describe('application lifecycle', () => {
     } finally { app.dispose(); vi.useRealTimers(); }
   });
 
+  it('applies authoritative online deltas while the map has stopped gameplay', async () => {
+    app.dispose(); vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null; let transport!: MockNetworkAdapter;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: () => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); } });
+    const player = (x: number) => ({ id: 'saved-player', motion: motionStatus(initialMotion({ x, y: 0, z: 8 })), character: { kind: 'player' as const, name: 'Saved' }, transform: { position: { x, y: 0, z: 8 }, rotationY: 0 } });
+    try {
+      app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, (_mock, _url, clock) => transport = new MockNetworkAdapter(clock, (message, network) => {
+        if (message.type === 'join') network.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'saved-player', revision: 0, snapshot: { tick: 0, entities: [player(8)] }, world: DEMO_WORLD });
+      }));
+      const listener = vi.fn(); app.subscribe(listener); app.start(host); app.applySettings('mock', 'http://school.local', 'demo', 1, false);
+      await vi.advanceTimersByTimeAsync(100); advance(0); app.enterWorld(); app.toggleHudPanel('map');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ phase: 'stopped', mapOpen: true }));
+      transport.receive({ v: 3, type: 'delta', revision: 1, baseRevision: 0, tick: 6, upsert: [player(9)], remove: [] });
+      await vi.advanceTimersByTimeAsync(1);
+      expect(transport.state.status).toBe('connected');
+      expect(pending.size).toBeGreaterThan(0);
+      advance(100); advance(120);
+      expect(app.getWorldSnapshot()?.entities[0]?.transform?.position.x).toBe(9);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapPlayer: expect.objectContaining({ x: 9, authoritative: true }) }));
+    } finally {
+      app.dispose(); vi.useRealTimers();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
   it('submits one login, passes the validated session to the transport and forgets it on logout', async () => {
     let resolve!: (session: ServerSession) => void;
     const login = vi.fn(() => new Promise<ServerSession>((done) => { resolve = done; }));
@@ -321,6 +351,65 @@ describe('application lifecycle', () => {
       else Reflect.deleteProperty(document, 'pointerLockElement');
       if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty);
       else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
+  it('switches HUD panels and blocks capture until the map closes', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    const request = vi.fn(() => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: request });
+    try {
+      app.dispose(); app = new GameApp(parseConfig({ mapId: 'market' }, 'http://school.local'), createRenderer, undefined, null);
+      const listener = vi.fn(); app.subscribe(listener); app.start(host); app.closeMarketPanel(); app.enterWorld();
+      expect(locked).toBe(host);
+      app.toggleHudPanel('inventory');
+      expect(locked).toBeNull();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'inventory', mapOpen: false, phase: 'stopped' }));
+      app.toggleHudPanel('map');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, mapOpen: true, mapPlayer: expect.objectContaining({ authoritative: false }) }));
+      app.resume(); expect(request).toHaveBeenCalledTimes(1);
+      app.toggleHudPanel('words');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, marketPanel: 'words' }));
+      app.toggleHudPanel('words');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'stopped' }));
+      app.resume(); expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      app.dispose();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
+  it('opens inventory with I and leaves capture idle until an explicit resume', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    const request = vi.fn(() => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: request });
+    try {
+      app.dispose(); app = new GameApp(parseConfig({ mapId: 'market' }, 'http://school.local'), createRenderer, undefined, null);
+      const listener = vi.fn(); app.subscribe(listener); app.start(host); app.closeMarketPanel(); app.enterWorld();
+      expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(1);
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI' }));
+      expect(locked).toBeNull();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'inventory', phase: 'stopped', capture: 'idle' }));
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI' }));
+      expect(locked).toBeNull(); expect(request).toHaveBeenCalledTimes(1);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'inventory', phase: 'stopped', capture: 'idle' }));
+      app.toggleHudPanel('inventory');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'stopped', capture: 'idle' }));
+      expect(locked).toBeNull(); expect(request).toHaveBeenCalledTimes(1);
+      app.resume(); expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      app.dispose();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
     }
   });
 

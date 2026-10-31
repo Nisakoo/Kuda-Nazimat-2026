@@ -1,0 +1,44 @@
+/* Presentation only. Babylon state and commands remain in GameApp. */
+dialog.babel-panel { width: min(860px, calc(100% - 32px)); max-height: calc(100svh - 32px); padding: 0; overflow: hidden; display: flex; flex-direction: column; color: #073c48; background: #fbf1df; border: 2px solid #ead7b9; border-radius: 4px; box-shadow: 0 12px 40px #49311c50; }
+dialog.babel-panel:not([open]) { display: none; }
+.babel-panel::backdrop { background: #213b3240; }
+.babel-content { padding: 24px 30px; overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.babel-navigation { flex: none; border-top: 1px solid #e9d5b6; }
+.babel-panel .panel-top { border-bottom: 1px solid #e9d5b6; padding-bottom: 12px; }
+.babel-panel .panel-top h2 { font-size: clamp(1.35rem, 3vw, 2rem); }
+.babel-panel .icon-button { min-width: 44px; min-height: 44px; color: #073c48; background: transparent; }
+.babel-panel button:not(.word-link) { min-height: 44px; }
+.babel-panel button:focus-visible, .babel-panel input:focus-visible, .babel-panel textarea:focus-visible, .babel-panel select:focus-visible { outline: 3px solid #086e70; outline-offset: 2px; }
+.babel-panel input, .babel-panel textarea { box-sizing: border-box; width: 100%; border: 1px solid #e0c7a8; border-radius: 5px; padding: 10px; color: #073c48; background: #fffaf1; font: inherit; }
+.babel-muted { color: #657d80; }
+.babel-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.babel-word-toolbar { display: flex; gap: 12px; align-items: end; }
+.babel-word-toolbar label { flex: 1; min-width: 0; }
+.babel-word-toolbar button { margin-bottom: .6rem; }
+.babel-word-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; border-top: 1px solid #e9d5b6; padding-top: 16px; }
+.babel-panel .babel-word-list { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow: auto; }
+.babel-panel .babel-word-list li { margin: 0; border-bottom: 1px solid #e9d5b6; }
+.babel-word-list button { display: grid; grid-template-columns: 1fr 1fr auto; width: 100%; gap: 8px; text-align: left; background: transparent; color: #073c48; overflow-wrap: anywhere; }
+.babel-word-list button.active { background: #d4e2d3; }
+.babel-word-note { display: block; color: #657d80; }
+.babel-word-detail { border-left: 1px solid #e9d5b6; padding-left: 24px; min-width: 0; overflow-wrap: anywhere; }
+.babel-word-detail h3, .babel-word-detail h4 { margin: 0 0 8px; }
+.babel-word-detail p { margin: 0 0 12px; }
+.babel-note { background: #fff8ec; border: 1px solid #e9d5b6; padding: 10px; white-space: pre-wrap; }
+.babel-inventory h3 { border-bottom: 1px solid #e9d5b6; padding-bottom: 8px; }
+.babel-inventory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+.babel-panel .babel-item { display: grid; align-content: center; gap: 8px; min-height: 90px; background: #f1e4d1; color: #073c48; border: 1px solid #e0c7a8; }
+.babel-panel .babel-item.selected { outline: 2px solid #086e70; outline-offset: -2px; background: #d4e2d3; }
+.babel-chat { list-style: none; padding: 0; margin: 16px 0; max-height: 38svh; overflow-y: auto; }
+.babel-chat li { display: flex; gap: 12px; margin-bottom: 16px; }
+.babel-chat li.outgoing { flex-direction: row-reverse; text-align: right; }
+.babel-avatar { flex: 0 0 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: #d9bd93; color: #073c48; font-weight: bold; }
+.babel-message { min-width: 0; max-width: 78%; }
+.babel-message small { color: #657d80; }
+.babel-bubble { text-align: left; background: #e9dac8; padding: 10px 14px; border-radius: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.outgoing .babel-bubble { background: #d4e2d3; }
+.babel-stone svg { display: block; width: min(180px, 100%); background: #dac095; border-radius: 6px; }
+.babel-panel .babel-compose { display: flex; align-items: end; gap: 8px; border-top: 1px solid #e9d5b6; padding-top: 12px; }
+.babel-compose label { flex: 1; min-width: 0; }
+.babel-panel .babel-compose textarea { min-height: 44px; height: 44px; }
+@media (max-width: 600px) { dialog.babel-panel { width: calc(100% - 16px); max-height: calc(100svh - 16px); } .babel-content { padding: 16px; } .babel-word-layout { grid-template-columns: 1fr; gap: 12px; } .babel-word-list { max-height: 180px; } .babel-word-detail { border-left: 0; border-top: 1px solid #e9d5b6; padding: 12px 0 0; } .babel-panel .babel-compose { flex-wrap: wrap; } .babel-compose label { flex-basis: 100%; order: -1; } }

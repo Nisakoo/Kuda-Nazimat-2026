@@ -39,8 +39,8 @@ test.beforeAll(async () => {
 });
 test.afterAll(async () => { await stopServer(); if (directory) await rm(directory, { recursive: true, force: true }); });
 async function login(page: Page, name: string) {
-  await page.goto(origin); await expect(page.getByRole('heading', { name: 'Войти в мир' })).toBeVisible();
-  await page.getByLabel('Имя игрока').fill(name); await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await page.goto(origin); await expect(page.getByRole('heading', { name: 'Войти в город' })).toBeVisible();
+  await page.getByLabel('Имя игрока').fill(name); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
   await expect(page.getByLabel('Состояние связи')).toHaveText('Подключён');
 }
@@ -54,13 +54,13 @@ test('real guest login authorizes world, takeover returns the form, logout and r
   const protectedRequests: string[] = []; let posts = 0; const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('request', (request) => { if (request.url().includes('/world/')) protectedRequests.push(request.headers().authorization ?? ''); if (request.url().endsWith('/api/auth/guest')) posts++; });
-  await page.goto(origin); await expect(page.getByRole('button', { name: 'Войти', exact: true })).toBeDisabled();
+  await page.goto(origin); await expect(page.getByRole('button', { name: 'Начать путешествие →', exact: true })).toBeDisabled();
   expect(protectedRequests).toEqual([]); expect(posts).toBe(0);
-  await page.getByLabel('Имя игрока').fill('Аня'); await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await page.getByLabel('Имя игрока').fill('Аня'); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled(); expect(posts).toBe(1);
   expect(protectedRequests.length).toBeGreaterThan(0); expect(protectedRequests.every((value) => /^Bearer [\w-]{43}$/.test(value))).toBe(true);
   const other = await context.newPage(); await login(other, 'аня');
-  await expect(page.getByRole('heading', { name: 'Войти в мир' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Войти в город' })).toBeVisible();
   await expect(page.getByRole('alert')).toContainText('Игра открыта в другом окне.'); await expect(page.locator('canvas')).toHaveCount(0);
   await other.getByRole('button', { name: 'Выйти из сессии' }).click(); await expect(other.getByLabel('Имя игрока')).toBeVisible();
   await other.reload(); await expect(other.getByLabel('Имя игрока')).toBeVisible();
@@ -91,23 +91,23 @@ test('real players exchange chat and NPC memory survives a server restart', asyn
 test('login errors remain text, pending login is cancelled by settings, and small-screen form fits', async ({ page }) => {
   await page.setViewportSize({ width: 640, height: 480 }); await page.goto(origin);
   await page.route('**/api/auth/guest', route => route.fulfill({ status: 400, json: { error: { code: 'INVALID', message: '<img src=x onerror=alert(1)> Ошибка имени' } } }));
-  await page.getByLabel('Имя игрока').fill('Тест'); await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await page.getByLabel('Имя игрока').fill('Тест'); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('<img'); await expect(page.locator('img')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Войти', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Начать путешествие →', exact: true })).toBeEnabled();
   await page.screenshot({ path: 'test-results/server-login-640.png' });
   await page.unroute('**/api/auth/guest');
   await page.route('**/api/auth/guest', async (route) => { await new Promise<void>((resolve) => setTimeout(resolve, 500)); await route.abort().catch(() => {}); });
-  await page.getByRole('button', { name: 'Войти', exact: true }).click(); await expect(page.getByRole('button', { name: 'Входим…' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click(); await expect(page.getByRole('button', { name: 'Входим…' })).toBeDisabled();
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.getByLabel('Адрес сервера').fill('http://127.0.0.1:1'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
-  await expect(page.getByLabel('Имя игрока')).toBeVisible(); await expect(page.getByRole('button', { name: 'Войти', exact: true })).toBeDisabled();
+  await expect(page.getByLabel('Имя игрока')).toBeVisible(); await expect(page.getByRole('button', { name: 'Начать путешествие →', exact: true })).toBeDisabled();
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 
 test('a world 401 and client session expiry return to login without automatically posting again', async ({ page }) => {
   let posts = 0; page.on('request', (request) => { if (request.url().endsWith('/api/auth/guest')) posts++; });
   await page.route('**/world/**', route => route.fulfill({ status: 401, json: { error: { code: 'UNAUTHORIZED', message: 'Истекла' } } }));
-  await page.goto(origin); await page.getByLabel('Имя игрока').fill('Сессия'); await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await page.goto(origin); await page.getByLabel('Имя игрока').fill('Сессия'); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('сессия истекла или отклонена');
   await expect(page.getByLabel('Имя игрока')).toBeVisible(); await expect(page.locator('canvas')).toHaveCount(0); expect(posts).toBe(1);
   await page.unroute('**/world/**'); await page.clock.install(); await login(page, 'Сессия');
@@ -118,15 +118,16 @@ test('a world 401 and client session expiry return to login without automaticall
 test('switching to the server market enrolls BABEL and opens the authoritative inventory', async ({ page }) => {
   await login(page, 'Рынок'); await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.getByLabel('Карта', { exact: true }).fill('market'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
-  await expect(page.getByRole('dialog', { name: 'Подготовка путешествия' })).toBeVisible();
-  await page.getByRole('button', { name: 'Далее: языки' }).click();
-  await page.getByRole('button', { name: 'Войти в Вавилон' }).click();
+  await expect(page.getByRole('dialog', { name: 'Куда отправимся?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Далее: языки →' }).click();
+  await expect(page.getByRole('dialog', { name: 'Ваши языки' })).toBeVisible();
+  await page.getByRole('button', { name: 'Войти в Вавилон →' }).click();
   await expect(page.getByRole('dialog', { name: 'Добро пожаловать в Вавилон' })).toBeVisible();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true); await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Сумка', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Ваша сумка' })).toContainText('настоящий сервер');
+  await expect(page.getByRole('dialog', { name: 'Инвентарь' })).toContainText('настоящий сервер');
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Выйти из сессии' }).click(); await expect(page.getByLabel('Имя игрока')).toBeVisible();
 });

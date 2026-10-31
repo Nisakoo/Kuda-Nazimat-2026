@@ -10,6 +10,7 @@ export interface InputActions {
   look(dx: number, dy: number): void;
   zoom(delta: number): void;
   interact(): void;
+  inventory?(): void;
   menu(): void;
   captured(): void;
   interrupted(): void;
@@ -195,6 +196,7 @@ export class InputController {
     if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') { event.preventDefault(); this.keys.add(event.code); this.dirty = true; }
     if (event.code === 'Space') { event.preventDefault(); if (!event.repeat && !this.keys.has('Space')) this.actions.jump(); this.keys.add('Space'); this.dirty = true; }
     if (event.code === 'KeyE' && !event.repeat) { event.preventDefault(); this.actions.interact(); }
+    if (event.code === 'KeyI' && !event.repeat) { event.preventDefault(); this.actions.inventory?.(); }
   };
 
   private readonly keyUp = (event: KeyboardEvent): void => { this.keys.delete(event.code); };

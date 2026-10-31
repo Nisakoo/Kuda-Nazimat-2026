@@ -1,9 +1,10 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { GameApp, MarketPanel } from '../app/GameApp';
   import { MARKET_GOATS, MARKET_ITEMS, MARKET_PEOPLE } from '../session/MarketSession';
   import type { MarketState, StonePoint, Word } from '../session/MarketSession';
   import { modal } from './modal';
-  const { game, market, panel, target }: { game: GameApp; market: MarketState; panel: MarketPanel | null; target: string | null } = $props();
+  const { game, market, panel, target, navigation }: { game: GameApp; market: MarketState; panel: MarketPanel | null; target: string | null; navigation?: Snippet } = $props();
   const actor = $derived([...MARKET_PEOPLE, ...MARKET_GOATS].find(actor => actor.id === target));
   const goat = $derived(MARKET_GOATS.find(goat => goat.id === target));
   const titles = { intro: 'Добро пожаловать в Вавилон', task: 'Козы пастуха', inventory: 'Ваша сумка', stone: 'Высечь камень', words: 'Личный словарь', interaction: 'Взаимодействие', results: 'Спасибо за помощь!' };
@@ -71,6 +72,11 @@
       {#if market.notice}<p class="market-notice" role="status">{market.notice}</p>{/if}
       <p class="small subtle">Только локальный стенд · без серверного сохранения</p>
       <button class="secondary" onclick={() => game.closeMarketPanel()}>Закрыть</button>
+      {#if navigation}<div class="market-navigation">{@render navigation()}</div>{/if}
     </dialog>
   </div>
 {/if}
+
+<style>
+  .market-navigation { position: sticky; bottom: 0; background: #fafaf2; padding-top: 8px; z-index: 1; }
+</style>

@@ -103,6 +103,17 @@ describe('confirmed pointer lock and input intentions', () => {
     input.requestCapture(); input.sample(); expect(actions.jump).toHaveBeenCalledTimes(2);
   });
 
+  it('handles physical I once while captured, but not in text or with modifiers', () => {
+    actions.inventory = vi.fn();
+    input.requestCapture();
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', key: 'ш' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', repeat: true }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', ctrlKey: true }));
+    const field = document.createElement('input'); document.body.append(field);
+    field.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', bubbles: true }));
+    expect(actions.inventory).toHaveBeenCalledTimes(1);
+  });
+
   it('does not enable movement or look while the request is pending', () => {
     Object.defineProperty(surface, 'requestPointerLock', { value: () => new Promise<void>(() => {}) });
     input.requestCapture();

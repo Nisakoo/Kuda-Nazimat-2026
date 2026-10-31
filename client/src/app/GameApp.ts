@@ -17,6 +17,7 @@ import { InputController } from '../input/InputController';
 import { DEMO_NPCS, DEMO_SPAWN } from '../shared/demo';
 import { GameLoop } from './GameLoop';
 import { parseConfig } from './config';
+import { rememberConnection } from './connectionPreference';
 import type { ClientConfig } from './config';
 import { AssetManager, HttpAssetSource } from '../map/AssetManager';
 import { WorldBudget } from '../map/WorldBudget';
@@ -40,6 +41,8 @@ export type BabylonPanel = 'setup' | 'languages' | 'intro' | 'task' | 'inventory
 export type { BabylonView };
 export type MarketPanel = 'intro' | 'task' | 'inventory' | 'stone' | 'words' | 'interaction' | 'results';
 export type ClientMode = 'local' | 'mock' | 'online';
+export type HudPanel = 'inventory' | 'map' | 'words' | 'chat';
+export interface MapPlayer { readonly x: number; readonly z: number; readonly yaw: number; readonly authoritative: boolean }
 
 const localEntities: readonly Entity[] = [
   {
@@ -63,6 +66,8 @@ export interface AppSnapshot {
   readonly babylonPanel: BabylonPanel | null;
   readonly babylonTarget: string | null;
   readonly babylonWord: string;
+  readonly mapOpen: boolean;
+  readonly mapPlayer: MapPlayer | null;
   readonly phase: 'idle' | 'running' | 'stopped' | 'unavailable' | 'error' | 'disposed';
   readonly message: string | null;
   readonly screen: 'welcome' | 'playing';
@@ -150,7 +155,7 @@ export class GameApp {
     if (config.mapId === 'market') this.camera = { yaw: 0, pitch: .5, distance: 18 };
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
-      babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '',
+      babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '', mapOpen: false, mapPlayer: null,
       debug: config.debug, buildingSymbols: true, coordinates: '',
       capture: 'idle', captureError: null,
       visualLoading: false, visualError: null, modelStats: '',
@@ -244,6 +249,7 @@ export class GameApp {
           jump: () => { this.session?.send({ type: 'jump' }); },
           clearInput: () => { this.session?.send({ type: 'clear-input' }); },
           interact: () => this.interact(),
+          inventory: () => this.toggleHudPanel('inventory'),
           menu: () => this.toggleMenu(),
           captured: () => {
             if (this.session instanceof MarketSession) this.session.beginTour();
@@ -271,7 +277,15 @@ export class GameApp {
         }, {
           beforeUpdate: () => this.input?.sample(),
           update: (delta) => {
-            if (this.snapshot.phase !== 'running') return;
+            if (this.snapshot.phase !== 'running') {
+              // Menus pause local simulation, not authoritative network delivery.
+              if (this.session instanceof OnlineSession) {
+                this.session.update(0);
+                this.current = this.session.getSnapshot();
+                this.updateHud();
+              }
+              return;
+            }
             if (this.world && !this.world.manifest) return;
             const localPosition = this.current?.entities.find(entity => entity.id === this.session?.playerId)?.transform?.position;
             if (this.world && this.session instanceof LocalSession && localPosition && !this.world.isPrepared(localPosition)) return;
@@ -293,7 +307,7 @@ export class GameApp {
             } else this.renderer?.render(elapsed, alpha);
             this.updateVisualStatus();
             if (this.snapshot.debug) this.updateMetrics(began);
-            if (this.snapshot.phase === 'stopped' && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
+            if (this.snapshot.phase === 'stopped' && !(this.session instanceof OnlineSession) && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
           },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
         });
@@ -323,7 +337,7 @@ export class GameApp {
   }
 
   private requestPlay(): void {
-    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.babylonPanel) return;
+    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.babylonPanel || this.snapshot.mapOpen || this.snapshot.settingsOpen || this.snapshot.chatOpen || this.snapshot.marketPanel || this.snapshot.dialog) return;
     this.patch({ capture: 'requesting', captureError: null });
     this.input.requestCapture();
   }
@@ -335,10 +349,11 @@ export class GameApp {
     this.detach();
     this.updateHud(true);
     this.setState('stopped');
-    if (this.world?.stats.loading || this.renderer?.getDiagnostics().pending) this.loop?.start();
+    if (this.session instanceof OnlineSession || this.world?.stats.loading || this.renderer?.getDiagnostics().pending) this.loop?.start();
   }
 
   toggleMenu(): void {
+    if (this.snapshot.mapOpen) { this.closeMap(); return; }
     if (this.snapshot.babylonPanel) { void this.closeBabylonPanel(); return; }
     if (this.snapshot.marketPanel) { this.closeMarketPanel(); return; }
     if (this.snapshot.dialog) { this.closeDialog(); return; }
@@ -353,7 +368,7 @@ export class GameApp {
     this.detach();
     this.releaseResources();
     this.camera = { yaw: 0, pitch: this.config.mapId === 'market' ? .5 : .7, distance: this.config.mapId === 'market' ? 18 : 15 };
-    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null, market: null, marketPanel: null, marketTarget: null });
+    this.patch({ screen, mapOpen: false, mapPlayer: null, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null, market: null, marketPanel: null, marketTarget: null });
     this.setState('idle');
     this.start(host);
   }
@@ -409,7 +424,10 @@ export class GameApp {
     this.world?.setRadius(radius); this.config = Object.freeze({ ...this.config, chunkRadius: radius }); this.patch({ chunkRadius: radius });
   }
 
-  openSettings(): void { this.input?.stop(); this.stop(); this.patch({ settingsOpen: true, settingsError: null }); }
+  openSettings(): void {
+    this.input?.stop(); this.stop();
+    this.patch({ mapOpen: false, chatOpen: false, marketPanel: null, babylonPanel: this.snapshot.babylonPanel === 'setup' ? 'setup' : null, settingsOpen: true, settingsError: null });
+  }
   closeSettings(): void { this.patch({ settingsOpen: false }); if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host); }
   applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean): boolean {
     try {
@@ -419,6 +437,7 @@ export class GameApp {
       this.cancelLogin(); this.stopBabylon();
       if (config.serverUrl !== this.config.serverUrl || mode !== 'online') { this.serverSession = null; this.patch({ authName: '' }); }
       this.mock = mode === 'mock'; this.config = config;
+      try { rememberConnection(config.serverUrl, window.localStorage); } catch { /* Storage is optional; never persist authentication. */ }
       this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mapId: config.mapId, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
       if (this.host) this.restart(this.host);
       return true;
@@ -598,7 +617,7 @@ export class GameApp {
   }
 
   private canControl(): boolean {
-    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen && !this.snapshot.marketPanel && !this.snapshot.babylonPanel;
+    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen && !this.snapshot.marketPanel && !this.snapshot.babylonPanel && !this.snapshot.mapOpen;
   }
 
   private readonly onSessionEvents = (events: readonly WorldEvent[]): void => {
@@ -649,8 +668,9 @@ export class GameApp {
       let panel = this.snapshot.babylonPanel;
       if (view.state && !view.state.profile) panel = 'setup';
       else if (view.state?.profile && (!before?.profile || panel === 'setup')) panel = view.state.introSeen ? null : 'intro';
-      if (view.state?.party?.completed && before?.party && !before.party.completed) { this.input?.stop(); this.stop(); panel = 'task'; }
-      this.patch({ babylon: view, babylonPanel: panel });
+      const completed = Boolean(view.state?.party?.completed && before?.party && !before.party.completed);
+      if (completed) { this.input?.stop(); this.stop(); panel = 'task'; }
+      this.patch({ babylon: view, babylonPanel: panel, ...(completed ? { mapOpen: false, chatOpen: false, settingsOpen: false, marketPanel: null, dialog: null } : {}) });
       if (view.state?.profile && !this.session && this.host) this.start(this.host);
     }, () => this.expireServerSession('Сессия истекла. Войдите снова.'));
     this.patch({ babylonPanel: 'setup' });
@@ -662,8 +682,29 @@ export class GameApp {
   }
   openBabylonPanel(panel: BabylonPanel, target: string | null = null): void {
     if (!this.babylonClient) return;
-    this.input?.stop(); this.stop(); this.patch({ babylonPanel: panel, babylonTarget: target });
+    this.input?.stop(); this.stop(); this.patch({ mapOpen: false, chatOpen: false, settingsOpen: false, babylonPanel: panel, babylonTarget: target });
   }
+  toggleHudPanel(panel: HudPanel): void {
+    if (this.snapshot.screen !== 'playing' || this.snapshot.settingsOpen || this.snapshot.dialog || this.snapshot.babylonPanel === 'intro') return;
+    if (panel === 'map') {
+      if (this.snapshot.mapOpen) { this.closeMap(); return; }
+      this.input?.stop(); this.stop();
+      this.patch({ mapOpen: true, babylonPanel: null, babylonTarget: null, marketPanel: null, chatOpen: false });
+      this.updateHud(true);
+      return;
+    }
+    this.patch({ mapOpen: false });
+    if (this.snapshot.babylon?.state?.profile) {
+      if (this.snapshot.babylonPanel === panel) void this.closeBabylonPanel();
+      else this.openBabylonPanel(panel);
+    } else if (panel === 'chat') {
+      if (this.snapshot.chatOpen) this.closeChat(); else { this.patch({ marketPanel: null }); this.openChat(); }
+    } else if (this.snapshot.market) {
+      this.patch({ chatOpen: false });
+      if (this.snapshot.marketPanel === panel) this.closeMarketPanel(); else this.openMarketPanel(panel);
+    }
+  }
+  closeMap(): void { this.patch({ mapOpen: false }); }
   async closeBabylonPanel(): Promise<void> {
     if (this.snapshot.babylonPanel === 'setup') return;
     if (this.snapshot.babylonPanel === 'intro' && !this.snapshot.babylon?.state?.introSeen) {
@@ -682,7 +723,8 @@ export class GameApp {
 
   private updateHud(force = false): void {
     if (!this.current || this.snapshot.screen !== 'playing') return;
-    const player = this.current.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
+    const transform = this.current.entities.find((entity) => entity.id === this.session?.playerId)?.transform;
+    const player = transform?.position;
     if (!player) return;
     let nearby: Nearby | null = null;
     let distance = Infinity;
@@ -700,6 +742,11 @@ export class GameApp {
       if (candidate <= 2.7 && candidate < distance) { nearby = { id: goat.id, name: goat.name }; distance = candidate; }
     }
     const changes: Partial<AppSnapshot> = {};
+    if (this.snapshot.mapOpen && (force || this.current.tick % 6 === 0)) {
+      const mapPlayer = { x: player.x, z: player.z, yaw: transform!.rotationY, authoritative: this.session instanceof OnlineSession };
+      const old = this.snapshot.mapPlayer;
+      if (!old || old.x !== mapPlayer.x || old.z !== mapPlayer.z || old.yaw !== mapPlayer.yaw) Object.assign(changes, { mapPlayer });
+    }
     const motion = this.current.entities.find(entity => entity.id === this.session?.playerId)?.motion;
     if (motion && (motion.stamina !== this.snapshot.stamina || motion.sprintBlocked !== this.snapshot.sprintBlocked)) Object.assign(changes, { stamina: motion.stamina, sprintBlocked: motion.sprintBlocked });
     if (nearby?.id !== this.snapshot.nearby?.id) Object.assign(changes, { nearby });

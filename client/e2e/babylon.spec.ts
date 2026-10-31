@@ -30,12 +30,22 @@ test.beforeAll(async () => {
 test.afterAll(async () => { await stop(); if (directory) await rm(directory, { recursive: true, force: true }); });
 async function login(page: Page, name: string, size?: string, learning = 'en', chunkRadius: number | null = 0) {
   await page.route('**/config.json', route => route.fulfill({ json: { session: 'online', serverUrl: origin, mapId: 'market', debug: true, chunkRadius } }));
-  await page.goto(origin); await page.getByLabel('Имя игрока').fill(name); await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await page.goto(origin); await page.getByLabel('Имя игрока').fill(name); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
   if (size) {
-    await expect(page.getByRole('dialog', { name: 'Подготовка путешествия' })).toBeVisible();
-    const select = page.getByLabel('Число игроков'); if (await select.isEnabled()) await select.selectOption(size);
-    await page.getByRole('button', { name: 'Далее: языки' }).click(); await page.getByLabel('Изучаемый язык').selectOption(learning);
-    await page.getByRole('button', { name: 'Войти в Вавилон' }).click();
+    const mode = page.getByRole('dialog', { name: 'Куда отправимся?' });
+    await expect(mode).toBeVisible();
+    if (size !== '1') {
+      const friends = mode.getByRole('radio', { name: 'С друзьями' });
+      if (await friends.count() && await friends.isEnabled()) {
+        await friends.check();
+        const count = mode.getByLabel('Число игроков');
+        if (await count.count() && await count.isEnabled()) await count.selectOption(size);
+      }
+    }
+    await mode.getByRole('button', { name: 'Далее: языки →' }).click();
+    await expect(page.getByRole('dialog', { name: 'Ваши языки' })).toBeVisible();
+    await page.getByLabel('Изучаемый язык').selectOption(learning);
+    await page.getByRole('button', { name: 'Войти в Вавилон →' }).click();
     await expect(page.getByRole('dialog', { name: 'Добро пожаловать в Вавилон' })).toBeVisible();
     await expectCapture(page, false); await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   }

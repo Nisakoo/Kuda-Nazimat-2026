@@ -1,0 +1,42 @@
+
+Running 2 tests using 1 worker
+
+  ✓  1 e2e/ui-hud.spec.ts:56:1 › real guest entry preserves only the connection address and returns from mode with Escape (8.3s)
+  ✘  2 e2e/ui-hud.spec.ts:73:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (2.2m)
+
+
+  1) e2e/ui-hud.spec.ts:73:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.evaluate: Target page, context or browser has been closed
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at /data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:32
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:3)
+        at enroll (/data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:48:3)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:76:3
+
+    Error Context: test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/error-context.md
+
+    Error Context: test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/ui-hud.spec.ts:73:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture 
+  1 passed (2.6m)

@@ -1,6 +1,7 @@
 import { mount, unmount } from 'svelte';
 import { GameApp } from './app/GameApp';
 import { parseConfig } from './app/config';
+import { restoreConnection } from './app/connectionPreference';
 import App from './ui/App.svelte';
 import './ui/global.css';
 
@@ -12,7 +13,9 @@ let startupError: string | null = null;
 try {
   const response = await fetch(`${import.meta.env.BASE_URL}config.json`, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Ошибка загрузки настроек (${response.status}).`);
-  game = new GameApp(parseConfig(await response.json(), window.location.origin));
+  let config = parseConfig(await response.json(), window.location.origin);
+  try { config = restoreConnection(config, window.localStorage, window.location.origin); } catch { /* Browser storage can be disabled. */ }
+  game = new GameApp(config);
 } catch (error) {
   startupError = error instanceof Error ? error.message : 'Не удалось загрузить настройки клиента.';
 }

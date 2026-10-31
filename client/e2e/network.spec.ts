@@ -59,7 +59,7 @@ test('changes the map and restores local play after an unauthorized real session
   await page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.getByLabel('Режим сессии').selectOption('online');
   await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
-  await expect(page.getByRole('heading', { name: 'Войти в мир' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Войти в город' })).toBeVisible();
   await expect(page.locator('canvas')).toHaveCount(0);
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.getByLabel('Режим сессии').selectOption('local');
