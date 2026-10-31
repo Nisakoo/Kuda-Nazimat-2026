@@ -86,7 +86,7 @@ PLAYWRIGHT_CHANNEL=chrome npm --prefix client run test:render
 | chunkRadius | null | Радиус 1; допустимы 0–2 |
 | debug | false | Координаты, FPS/время кадра, draw calls, ресурсы и кэш |
 
-PROTO v1: namespace `/game`, событие `game`, auth `{version:1, token}`. Защищённый HTTP — `<serverUrl>/world/` с тем же Bearer token, без публичного fallback. Ограниченные retry/очереди, корреляция и восстановление — [PROTO](specs/protocol.md). Сессия хранится только в памяти. Реальный вход/отзыв и проверка доступа требуют отдельного сервера.
+PROTO v1: namespace `/game`, событие `game`, auth `{version:1, token}`. Защищённый HTTP — `<serverUrl>/world/` с тем же Bearer token, без публичного fallback. Ограниченные retry/очереди, корреляция и восстановление — [PROTO](specs/protocol.md). Сессия хранится только в памяти. Вход (mock по имени) и проверка доступа — на сервере `server/` (раздел «Сервер»).
 
 ## Сервер
 
@@ -122,10 +122,10 @@ PROTO v1: namespace `/game`, событие `game`, auth `{version:1, token}`. �
 
 [AGENTS.md](AGENTS.md) — правила проекта; [architecture.md](architecture.md) — границы; [SDD](.agents/skills/sdd/SKILL.md) — порядок работы. `specs/` содержит требования, `tasks/` — реализацию и доказательства. `status` спеки описывает готовность документа, `implementation` — фактическую реализацию; готовая спека не означает готовую систему.
 
-Клиентские TASK-001, 003–005, 019–020 выполнены в их границах. TASK-006–009 сохраняют результаты предыдущей приёмки, но после rebase остаются in-progress: новые требования UI-005/NET-004/PROTO-007 к NPC streaming/cancel/preferences/result ещё не реализованы и не проверены. TASK-002 сохраняет незавершённую физическую проверку CLIENT S4. NET-007 / TASK-016, серверные TASK-010–015 и системная автономная демонстрация не выполнены. Поэтому CLIENT/NET/PROTO и архитектура остаются partial там, где требуется реальная интеграция; RENDER/MAP и прежний объём UI/QUALITY имеют собственную подтверждённую приёмку.
+Клиентские TASK-001, 003–005, 019–020 выполнены в их границах. TASK-006–009 сохраняют результаты предыдущей приёмки, но после rebase остаются in-progress: новые требования UI-005/NET-004/PROTO-007 к NPC streaming/cancel/preferences/result ещё не реализованы и не проверены. PROTO-007 отнесён к v2, NPC-часть UI-005/NET-004 для v1 уточнена (`npc-question`/`npc-answer`); повторная приёмка — за клиентской командой. TASK-002 сохраняет незавершённую физическую проверку CLIENT S4. NET-007 / TASK-016, серверные TASK-010–015, 021–023 и системная автономная демонстрация не выполнены. Поэтому CLIENT/NET/PROTO и архитектура остаются partial там, где требуется реальная интеграция; RENDER/MAP и прежний объём UI/QUALITY имеют собственную подтверждённую приёмку.
 
 `make help` показывает команды; CLIENT_RUN_CMD/CLIENT_TEST_CMD можно переопределить, пустые значения и ошибки не скрываются. Серверные решения по runtime, входу и сохранениям — в серверных спеках; локальный ИИ — в AI/LLM.
 
-После rebase сохранены [GAME — Вавилон](specs/game-babylon.md) и [MARKET — рыночная демо-сцена](specs/demo-scene-market.md). Текущая площадь не считается реализацией всей новой рыночной сцены. Совместимость старых npc-question/npc-answer с новым NPC-подконтрактом требует отдельной реализации.
+После rebase сохранены [GAME — Вавилон](specs/game-babylon.md) и [MARKET — рыночная демо-сцена](specs/demo-scene-market.md). Текущая площадь не считается реализацией всей новой рыночной сцены. `npc-question`/`npc-answer` — NPC-контракт v1; потоковый подконтракт PROTO-007 — v2 и требует отдельной реализации на клиенте и сервере.
 
 Номера TASK-017/018 из main принадлежат [runtime MLX/Ollama](tasks/017-local-llm-runtime.md) и [LLM-квалификации](tasks/018-npc-llm-qualification.md). Клиентские демо перенумерованы в [TASK-019](tasks/019-client-playable-demo.md) и [TASK-020](tasks/020-client-babylon-controls.md), чтобы ID не повторялись.

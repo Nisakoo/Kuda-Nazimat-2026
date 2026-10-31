@@ -16,7 +16,7 @@ related:
 
 ## Цель
 
-Быстро получать многоязычные ответы NPC на серверном ноутбуке через MLX или Ollama без облака. MLX/Ollama — серверные backend, а не клиентские LocalSession/OnlineSession. Реализация принадлежит будущему отдельному серверному проекту.
+Быстро получать многоязычные ответы NPC на серверном ноутбуке через MLX или Ollama без облака. MLX/Ollama — серверные backend, а не клиентские LocalSession/OnlineSession. Реализация — в `server/`, адаптером порта NpcResponder ([NPC](server-npc-dialogue.md), NPC-005).
 
 ## Выбор модели
 
