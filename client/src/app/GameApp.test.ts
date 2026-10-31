@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RenderAdapter } from '../render/RenderAdapter';
+import { LocalSession } from '../session/LocalSession';
 import { GameApp } from './GameApp';
 import { parseConfig } from './config';
 
@@ -35,7 +36,7 @@ describe('application lifecycle', () => {
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
     host = document.createElement('div');
     host.getBoundingClientRect = () => new DOMRect(0, 0, 640, 480);
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), dispose: vi.fn() };
     createRenderer = vi.fn(() => renderer);
     app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer);
   });
@@ -83,7 +84,7 @@ describe('application lifecycle', () => {
     app.start(host);
     app.dispose();
     const previousRenderer = renderer;
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), dispose: vi.fn() };
     app = new GameApp(parseConfig({}, 'http://school.local'), () => renderer);
     app.start(host);
     advance(100);
@@ -115,7 +116,7 @@ describe('application lifecycle', () => {
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
     document.dispatchEvent(new Event('visibilitychange'));
     advance(100_000);
-    expect(renderer.render).toHaveBeenLastCalledWith(0.016);
+    expect(renderer.render).toHaveBeenLastCalledWith(0.016, expect.any(Number));
   });
 
   it('reports initialization failure, cleans partial resources and allows retry', () => {
@@ -127,7 +128,7 @@ describe('application lifecycle', () => {
     expect(renderer.dispose).toHaveBeenCalledTimes(1);
     expect(pending.size).toBe(0);
     app.restart(host);
-    expect(listener).toHaveBeenLastCalledWith({ phase: 'running', message: null });
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ phase: 'running', message: null }));
     expect(pending.size).toBe(1);
   });
 
@@ -165,5 +166,56 @@ describe('application lifecycle', () => {
     const calls = listener.mock.calls.length;
     app.subscribe(listener);
     expect(listener).toHaveBeenCalledTimes(calls);
+  });
+
+  it('updates LocalSession with fixed steps and keeps simulation data out of UI notifications', () => {
+    const listener = vi.fn();
+    app.subscribe(listener);
+    app.start(host);
+    expect(app.send({ type: 'move', direction: { x: 1, z: 0 } })).toBe(true);
+    advance(0);
+    advance(100);
+    expect(app.getWorldSnapshot()?.tick).toBe(5);
+    const player = app.getWorldSnapshot()?.entities.find((entity) => entity.id === 'local-player');
+    expect(player?.transform?.position.x).toBeCloseTo(0.25);
+    expect(listener).toHaveBeenCalledTimes(2); // initial state and start only
+    app.stop();
+    expect(app.send({ type: 'move', direction: { x: 0, z: 0 } })).toBe(false);
+    advance(1000);
+    expect(app.getWorldSnapshot()?.tick).toBe(5);
+    app.restart(host);
+    expect(app.getWorldSnapshot()?.tick).toBe(0);
+    app.dispose();
+    expect(app.getWorldSnapshot()).toBeNull();
+  });
+
+  it('cleans the session when WebGL initialization fails', () => {
+    const session = new LocalSession('test', [{ id: 'test', character: { kind: 'player', name: 'Test' } }]);
+    const disposed = vi.spyOn(session, 'dispose');
+    app.dispose();
+    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, () => session);
+    vi.mocked(renderer.mount).mockImplementationOnce(() => { throw new Error('No WebGL'); });
+    app.start(host);
+    expect(disposed).toHaveBeenCalledTimes(1);
+    expect(app.getWorldSnapshot()).toBeNull();
+    expect(pending.size).toBe(0);
+  });
+
+  it('cleans the loop, session and renderer when a simulation step fails', () => {
+    const session = new LocalSession('test', [{ id: 'test', character: { kind: 'player', name: 'Test' } }]);
+    vi.spyOn(session, 'update').mockImplementationOnce(() => { throw new Error('Simulation failed'); });
+    const disposed = vi.spyOn(session, 'dispose');
+    app.dispose();
+    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, () => session);
+    const listener = vi.fn();
+    app.subscribe(listener);
+    app.start(host);
+    advance(0);
+    advance(20);
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ phase: 'error' }));
+    expect(disposed).toHaveBeenCalledTimes(1);
+    expect(renderer.dispose).toHaveBeenCalledTimes(1);
+    expect(pending.size).toBe(0);
+    expect(observerCount).toBe(0);
   });
 });

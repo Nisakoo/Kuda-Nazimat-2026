@@ -2,7 +2,7 @@
 id: client-input-ui
 type: module-design
 status: draft
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Управлять игроком и взаимодействиями через InputController и Svelte 5.
 ---

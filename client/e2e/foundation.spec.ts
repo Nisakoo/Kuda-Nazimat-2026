@@ -21,12 +21,14 @@ test('local build renders with external access blocked and handles resize, pause
   await expect(canvas).toHaveJSProperty('width', 390);
   await expect(canvas).toHaveJSProperty('height', 844);
   await page.screenshot({ path: 'test-results/foundation-mobile.png' });
-  await page.getByRole('button', { name: 'Приостановить', exact: true }).click();
+  await page.getByRole('button', { name: 'Начать прогулку' }).click();
+  await page.keyboard.press('Escape');
   await expect(page.getByRole('status')).toHaveText('Просмотр приостановлен');
   await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
   await expect(page.getByRole('status')).toHaveText('Сцена открыта');
   for (let cycle = 0; cycle < 5; cycle++) {
     const previous = await canvas.elementHandle();
+    await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
     await expect(canvas).toHaveCount(1);
     expect(await previous?.evaluate((element) => element.isConnected)).toBe(false);

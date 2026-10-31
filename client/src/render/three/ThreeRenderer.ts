@@ -1,15 +1,19 @@
-import {
-  BoxGeometry, CircleGeometry, Color, DirectionalLight, HemisphereLight,
-  Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, WebGLRenderer,
-} from 'three';
-import type { RenderAdapter } from '../RenderAdapter';
+import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
+import type { CameraView, RenderAdapter } from '../RenderAdapter';
+import type { EntityId, WorldSnapshot } from '../../core/types';
+import { SceneAssets } from './SceneAssets';
+import { EntityVisuals } from './EntityVisuals';
+import { createDemoScenery } from './demoScenery';
 
 export class ThreeRenderer implements RenderAdapter {
   private renderer: WebGLRenderer | null = null;
   private scene: Scene | null = null;
   private camera: PerspectiveCamera | null = null;
-  private cube: Mesh<BoxGeometry, MeshStandardMaterial> | null = null;
-  private ground: Mesh<CircleGeometry, MeshStandardMaterial> | null = null;
+  private assets: SceneAssets | null = null;
+  private visuals: EntityVisuals | null = null;
+  private playerId: EntityId | null = null;
+  private view: CameraView = { yaw: 0, pitch: 0.7, distance: 15 };
+  private readonly target = new Vector3();
 
   mount(container: HTMLElement): void {
     if (this.renderer) throw new Error('Сцена уже создана.');
@@ -17,48 +21,54 @@ export class ThreeRenderer implements RenderAdapter {
     this.renderer.domElement.setAttribute('aria-label', 'Трёхмерная сцена');
     this.renderer.domElement.setAttribute('role', 'img');
     this.scene = new Scene();
-    this.scene.background = new Color('#111c26');
-    this.camera = new PerspectiveCamera(42, 1, 0.1, 100);
-    this.camera.position.set(5, 3.8, 6);
-    this.camera.lookAt(0, 0.6, 0);
-
-    this.cube = new Mesh(
-      new BoxGeometry(1.5, 1.5, 1.5),
-      new MeshStandardMaterial({ color: '#71d9be', roughness: 0.35, metalness: 0.15 }),
-    );
-    this.cube.position.y = 1.2;
-    this.ground = new Mesh(
-      new CircleGeometry(3.1, 64),
-      new MeshStandardMaterial({ color: '#243747', roughness: 1 }),
-    );
-    this.ground.rotation.x = -Math.PI / 2;
-    const sun = new DirectionalLight('#fff0d6', 3);
-    sun.position.set(3, 6, 4);
-    this.scene.add(this.cube, this.ground, new HemisphereLight('#c5eaff', '#19252d', 2), sun);
+    this.scene.background = new Color('#c9d9d4');
+    this.scene.fog = new Fog('#c9d9d4', 35, 75);
+    this.camera = new PerspectiveCamera(48, 1, 0.1, 120);
+    const sun = new DirectionalLight('#fff3d9', 2.5);
+    sun.position.set(-8, 18, 10);
+    this.scene.add(new HemisphereLight('#e5f2ff', '#a2ab87', 2.5), sun);
+    this.assets = new SceneAssets();
+    this.scene.add(createDemoScenery(this.assets));
+    this.visuals = new EntityVisuals(this.scene, this.assets);
     container.append(this.renderer.domElement);
   }
+
+  syncWorld(previous: WorldSnapshot, current: WorldSnapshot, playerId: EntityId | null): void {
+    this.playerId = playerId;
+    this.visuals?.sync(previous, current, playerId);
+  }
+
+  setCamera(view: CameraView): void { this.view = { ...view }; }
 
   resize(width: number, height: number, pixelRatio: number): void {
     if (!this.renderer || !this.camera) return;
     this.camera.aspect = width / height;
-    this.camera.fov = width < height ? 58 : 42;
+    this.camera.fov = width < height ? 62 : 48;
     this.camera.updateProjectionMatrix();
     this.renderer.setPixelRatio(pixelRatio);
     this.renderer.setSize(width, height, false);
   }
 
-  render(elapsedSeconds: number): void {
-    if (!this.renderer || !this.scene || !this.camera || !this.cube) return;
-    this.cube.rotation.set(0.15, elapsedSeconds * 0.3, 0.08);
-    this.cube.position.y = 1.2 + Math.sin(elapsedSeconds) * 0.08;
+  render(elapsedSeconds: number, alpha: number): void {
+    if (!this.renderer || !this.scene || !this.camera || !this.visuals) return;
+    this.visuals.animate(alpha, elapsedSeconds);
+    const position = this.visuals.position(this.playerId);
+    if (position) this.target.copy(position);
+    else this.target.set(0, 0, 0);
+    this.target.y += 0.8;
+    const { yaw, pitch, distance } = this.view;
+    this.camera.position.set(
+      this.target.x + Math.sin(yaw) * Math.cos(pitch) * distance,
+      this.target.y + Math.sin(pitch) * distance,
+      this.target.z + Math.cos(yaw) * Math.cos(pitch) * distance,
+    );
+    this.camera.lookAt(this.target);
     this.renderer.render(this.scene, this.camera);
   }
 
   dispose(): void {
-    for (const mesh of [this.cube, this.ground]) {
-      mesh?.geometry.dispose();
-      mesh?.material.dispose();
-    }
+    this.visuals?.dispose();
+    this.assets?.dispose();
     this.scene?.clear();
     if (this.renderer) {
       this.renderer.dispose();
@@ -68,7 +78,8 @@ export class ThreeRenderer implements RenderAdapter {
     this.renderer = null;
     this.scene = null;
     this.camera = null;
-    this.cube = null;
-    this.ground = null;
+    this.assets = null;
+    this.visuals = null;
+    this.playerId = null;
   }
 }

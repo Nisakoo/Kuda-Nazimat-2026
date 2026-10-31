@@ -3,6 +3,16 @@ module.exports = {
     { name: 'no-cycles', severity: 'error', from: {}, to: { circular: true } },
     { name: 'no-unresolved', severity: 'error', from: {}, to: { couldNotResolve: true } },
     {
+      name: 'core-has-no-external-dependencies', severity: 'error',
+      from: { path: '^src/core/', pathNot: '\\.test\\.ts$' },
+      to: { pathNot: '^src/core/' },
+    },
+    {
+      name: 'session-through-core', severity: 'error',
+      from: { path: '^src/session/', pathNot: '\\.test\\.ts$' },
+      to: { pathNot: '^src/(session|core|shared)/' },
+    },
+    {
       name: 'ui-through-app', severity: 'error',
       from: { path: '^src/ui/' },
       to: { path: '^src/(render|multiplayer)/' },

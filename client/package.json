@@ -10,7 +10,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc --noEmit",
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc --noEmit && npm run check:core",
+    "check:core": "tsc --project tsconfig.core.json",
     "check:imports": "depcruise src --config .dependency-cruiser.cjs",
     "test": "vitest run",
     "test:browser": "npm run build && playwright test"
