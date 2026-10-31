@@ -1,10 +1,10 @@
 ---
-id: TASK-023
+id: TASK-026
 type: implementation-task
 status: todo
 spec: ../specs/server-demo.md
 requirements: [SERVER-DEMO-001–009]
-depends_on: [TASK-022]
+depends_on: [TASK-025]
 ---
 
 # Сервер: готовность к защите

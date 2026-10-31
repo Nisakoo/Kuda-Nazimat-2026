@@ -2,7 +2,7 @@
 id: demo-scene-market
 type: scene-design
 status: draft
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Демо-сцена «Рынок Вавилона» — облик рыночной площади, пастбище и совместное задание «Козы пастуха».
 related:

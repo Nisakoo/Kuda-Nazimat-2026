@@ -4,7 +4,7 @@ type: implementation-task
 status: todo
 spec: ../specs/server-foundation.md
 requirements: [SERVER-001–008]
-depends_on: [TASK-021]
+depends_on: [TASK-024]
 ---
 
 # Сервер: каркас
@@ -22,7 +22,7 @@ depends_on: [TASK-021]
 - [ ] SERVER-001–004, 008 / S1: сервер стартует на loopback и LAN-адресе, отдаёт клиент и `/config.json` с `session: "online"`; `npm run check` проходит, нарушения направления зависимостей ловятся тестовым примером.
 - [ ] SERVER-003 / S2: `/maps/...`, выход за корень и неизвестные пути — 404.
 - [ ] SERVER-005 / S3: неверная конфигурация и отсутствующие каталоги дают понятную ошибку без открытия порта; остановка ≤10 с (полное сохранение проверяется после TASK-011/014).
-- [ ] SERVER-006 / S4 и SERVER-007 / S5 проверяются после TASK-014 и TASK-022; до этого отмечены непроверенными.
+- [ ] SERVER-006 / S4 и SERVER-007 / S5 проверяются после TASK-014 и TASK-025; до этого отмечены непроверенными.
 - [ ] `make server-test` и `npm run check` проходят.
 
 ## Результат

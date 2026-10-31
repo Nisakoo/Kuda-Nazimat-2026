@@ -2,6 +2,9 @@ import type { CameraView, RenderAdapter } from '../render/RenderAdapter';
 import { ThreeRenderer } from '../render/three/ThreeRenderer';
 import type { Entity, GameCommand, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from '../session/GameSession';
+import { MarketSession } from '../session/MarketSession';
+import type { MarketState, MarketItem, Stone } from '../session/MarketSession';
+import { MARKET_WORLD } from '../shared/marketWorld.generated';
 import { LocalSession } from '../session/LocalSession';
 import { answerDemoDialog, openDemoDialog } from '../session/demoDialogue';
 import type { DemoDialog } from '../session/demoDialogue';
@@ -27,6 +30,7 @@ import { parseServerSession } from '../shared/protocol/validate';
 import { FrameMetrics } from './FrameMetrics';
 
 const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };
+export type MarketPanel = 'intro' | 'task' | 'inventory' | 'stone' | 'words' | 'interaction' | 'results';
 export type ClientMode = 'local' | 'mock' | 'online';
 
 const localEntities: readonly Entity[] = [
@@ -74,6 +78,9 @@ export interface AppSnapshot {
   readonly chatError: string | null;
   readonly dialogPending: boolean;
   readonly dialogError: string | null;
+  readonly market: MarketState | null;
+  readonly marketPanel: MarketPanel | null;
+  readonly marketTarget: string | null;
   readonly performance: string;
   readonly renderStats: string;
 }
@@ -111,11 +118,12 @@ export class GameApp {
 
   constructor(
     public config: ClientConfig,
-    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false),
-    private readonly createSession: () => GameSession = () => new LocalSession('local-player', localEntities),
+    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false, this.config.mapId === 'market'),
+    private readonly createSession: () => GameSession = () => this.config.mapId === 'market' ? new MarketSession() : new LocalSession('local-player', localEntities),
     private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
     private readonly createNetwork: (mock: boolean, url: string, clock: Clock) => NetworkAdapter = (mock, url, clock) => mock ? createMockDemo(clock) : new SocketIOAdapter(url, clock),
   ) {
+    if (config.mapId === 'market') this.camera = { yaw: 0, pitch: .5, distance: 18 };
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
       debug: config.debug, coordinates: '',
@@ -124,7 +132,7 @@ export class GameApp {
       worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
       mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
-      performance: '', renderStats: '',
+      performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
     });
   }
 
@@ -154,8 +162,8 @@ export class GameApp {
       }
       if (this.config.session === 'online' && !this.activeBootstrap) return;
       if (!this.activeBootstrap) {
-        if (!['demo', 'science'].includes(this.config.mapId)) throw new Error('Unknown local map');
-        this.activeBootstrap = this.config.mapId === 'science' ? SCIENCE_WORLD : DEMO_WORLD;
+        if (!['demo', 'science', 'market'].includes(this.config.mapId)) throw new Error('Unknown local map');
+        this.activeBootstrap = this.config.mapId === 'market' ? MARKET_WORLD : this.config.mapId === 'science' ? SCIENCE_WORLD : DEMO_WORLD;
       }
       if (!this.renderer && this.worldBudget.stats.resources > 0) {
         if (!this.waitingBudget) {
@@ -167,6 +175,7 @@ export class GameApp {
       }
       if (!this.renderer) {
         this.session ??= this.createSession();
+        if (this.session instanceof MarketSession) this.patch({ market: this.session.market, marketPanel: 'intro' });
         this.worldBudget = new WorldBudget(this.activeBootstrap.worldBytes);
         const origin = this.worldRoot();
         const sizes = new Map(Object.entries(this.activeBootstrap.assets).map(([path, size]) => [new URL(path, origin).href, size]));
@@ -194,6 +203,7 @@ export class GameApp {
           interact: () => this.interact(),
           menu: () => this.toggleMenu(),
           captured: () => {
+            if (this.session instanceof MarketSession) this.session.beginTour();
             this.patch({ capture: 'locked', captureError: null, screen: 'playing' });
             if (this.host) this.start(this.host);
             this.updateHud(true);
@@ -242,7 +252,7 @@ export class GameApp {
           },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
         });
-        if (this.config.session === 'local' || this.mock) this.loadDemoDecorations();
+        if ((this.config.session === 'local' || this.mock) && this.config.mapId !== 'market') this.loadDemoDecorations();
       }
       this.resize();
       this.observer = new ResizeObserver(this.resize);
@@ -284,6 +294,7 @@ export class GameApp {
   }
 
   toggleMenu(): void {
+    if (this.snapshot.marketPanel) { this.closeMarketPanel(); return; }
     if (this.snapshot.dialog) { this.closeDialog(); return; }
     if (this.snapshot.screen !== 'playing' || !this.host) return;
     if (this.snapshot.phase === 'running') this.stop();
@@ -294,8 +305,8 @@ export class GameApp {
     const screen = 'welcome';
     this.detach();
     this.releaseResources();
-    this.camera = { yaw: 0, pitch: 0.7, distance: 15 };
-    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null });
+    this.camera = { yaw: 0, pitch: this.config.mapId === 'market' ? .5 : .7, distance: this.config.mapId === 'market' ? 18 : 15 };
+    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null, market: null, marketPanel: null, marketTarget: null });
     this.setState('idle');
     this.start(host);
   }
@@ -338,7 +349,7 @@ export class GameApp {
   retryVisuals(): void {
     this.renderer?.retryFailedModels();
     if (this.current) this.renderer?.syncWorld(this.current, this.current, this.session?.playerId ?? null);
-    if (this.config.session === 'local' || this.mock) this.loadDemoDecorations();
+    if ((this.config.session === 'local' || this.mock) && this.config.mapId !== 'market') this.loadDemoDecorations();
     if (this.world?.manifest) this.world.retry(); else this.startWorld();
     // The same frame loop drains asynchronous model work while simulation stays paused.
     if (this.snapshot.phase === 'stopped') this.loop?.start();
@@ -355,7 +366,8 @@ export class GameApp {
   applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean): boolean {
     try {
       const config = parseConfig({ session: mode === 'local' ? 'local' : 'online', serverUrl, mapId, chunkRadius, debug }, window.location.origin);
-      if ((mode === 'local' || mode === 'mock') && !['demo', 'science'].includes(mapId)) throw new Error('Для демо доступны карты demo и science.');
+      if ((mode === 'local' || mode === 'mock') && !['demo', 'science', 'market'].includes(mapId)) throw new Error('Для локальной прогулки доступны market, demo и science.');
+      if (mode === 'mock' && mapId === 'market') throw new Error('Рынок пока доступен в локальной прогулке. Тестовая сеть использует demo или science.');
       if (config.serverUrl !== this.config.serverUrl || mode !== 'online') this.serverSession = null;
       this.mock = mode === 'mock'; this.config = config;
       this.patch({ mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
@@ -500,12 +512,13 @@ export class GameApp {
   }
 
   private canControl(): boolean {
-    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen;
+    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen && !this.snapshot.marketPanel;
   }
 
   private readonly onSessionEvents = (events: readonly WorldEvent[]): void => {
     for (const event of events) {
       if (event.type !== 'interacted' || event.actorId !== this.session?.playerId) continue;
+      if (this.session instanceof MarketSession) { this.openMarketPanel('interaction', event.targetId); continue; }
       const target = this.session?.getSnapshot().entities.find((entity) => entity.id === event.targetId);
       const dialog: DemoDialog | null = this.session instanceof OnlineSession
         ? target?.character?.kind === 'npc' ? { source: this.mock ? 'mock' : 'server', npcId: target.id, name: target.character.name, topic: target.interactable?.label ?? 'Разговор', questions: [], messages: [] } : null
@@ -513,6 +526,35 @@ export class GameApp {
       if (dialog) { this.input?.stop(); this.patch({ dialog, capture: 'idle', captureError: null }); }
     }
   };
+
+  openMarketPanel(panel: MarketPanel, target: string | null = null): void {
+    if (!(this.session instanceof MarketSession)) return;
+    this.input?.stop(); this.stop();
+    this.patch({ marketPanel: panel, marketTarget: target, market: this.session.market });
+  }
+  closeMarketPanel(): void {
+    this.patch({ marketPanel: null, marketTarget: null });
+    if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host);
+  }
+  marketBuy(id: MarketItem): void {
+    if (!(this.session instanceof MarketSession) || !this.snapshot.marketTarget) return;
+    this.session.buy(this.snapshot.marketTarget, id); this.patch({ market: this.session.market });
+  }
+  marketSelect(id: MarketItem): void { if (this.session instanceof MarketSession) { this.session.select(id); this.patch({ market: this.session.market }); } }
+  marketFeed(): void {
+    if (!(this.session instanceof MarketSession) || !this.snapshot.marketTarget) return;
+    this.session.feed(this.snapshot.marketTarget);
+    this.patch({ market: this.session.market, ...(this.session.market.completed ? { marketPanel: 'results' as const } : {}) });
+  }
+  marketCarve(stone: Stone): boolean {
+    if (!(this.session instanceof MarketSession)) return false;
+    const result = this.session.carve(stone); this.patch({ market: this.session.market }); return result;
+  }
+  marketSaveWord(word: string, translation: string, note: string, id?: number): boolean {
+    if (!(this.session instanceof MarketSession)) return false;
+    const result = this.session.saveWord(word, translation, note, id); this.patch({ market: this.session.market }); return result;
+  }
+  marketRemoveWord(id: number): void { if (this.session instanceof MarketSession) { this.session.removeWord(id); this.patch({ market: this.session.market }); } }
 
   private updateHud(force = false): void {
     if (!this.current || this.snapshot.screen !== 'playing') return;

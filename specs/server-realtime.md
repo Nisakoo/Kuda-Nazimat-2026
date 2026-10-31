@@ -35,7 +35,7 @@ related:
 
   Ответ — `joined {requestId, playerId, revision: 0, snapshot, world}`: `snapshot` — AOI (REALTIME-005) с tick сервера, `world` — bootstrap карты (SERVER-WORLD-003). Сущности v1:
   - **игрок:** `{id: playerId, character {kind: "player", name: displayName}, transform, movement {direction, speed: 3}, renderable {assetId: "demo-player"}, animationState {name: "idle"}}`;
-  - **NPC:** `{id, character {kind: "npc", name}, transform, interactable {radius, label}, renderable {assetId}, animationState {name: "idle"}}` из SERVER-WORLD-008.
+  - **NPC:** `{id, character {kind: "npc", name}, transform, interactable {radius, label: тема}, renderable {assetId}?, animationState {name: "idle"}}` из SERVER-WORLD-008; `renderable` — только если задан `assetId`.
 - **REALTIME-003 (движение):** `input` задаёт намерение по правилам PROTO-008 п. 4: последнее, сброс через 250 ms, старые sequence игнорируются. На каждом шаге (`dt = 1/tickHz`) кандидат — `позиция + direction × 3 м/с × dt`; длина direction ограничена 1. Кандидат принимается, если:
   1. все четыре пробы SHARED-005 проходимы;
   2. чанк каждой пробы входит в последний принятый `preparedChunks`.
@@ -81,7 +81,7 @@ related:
 
 ## Сценарии
 
-- **S1 · REALTIME-001–002, 005:** Given 2 тестовых клиента на demo; When оба выполняют join; Then каждый получает `joined`, где есть он сам, второй игрок и оба NPC, а все пакеты проходят `parseServerMessage`. When первый двигается; Then второй получает delta с revision +1 и полной сущностью первого, без пустых delta в покое.
+- **S1 · REALTIME-001–002, 005:** Given 2 тестовых клиента на market; When оба выполняют join; Then каждый получает `joined`, где есть он сам, второй игрок и NPC карты, а все пакеты проходят `parseServerMessage`. When первый двигается; Then второй получает delta с revision +1 и полной сущностью первого, без пустых delta в покое.
 - **S2 · REALTIME-003:** Given игрок у стены courtyard с подготовленными чанками; When он идёт в стену по диагонали; Then скользит вдоль неё, внутрь не проходит. When `preparedChunks` пуст или содержит только текущий чанк, а игрок идёт к границе; Then останавливается до неподготовленного чанка. When после `input` с движением больше ничего не приходит; Then игрок останавливается через ≤250 ms.
 - **S3 · REALTIME-001, 003–004:** Given пакет с полем `position`, чужим playerId, `v: 2`, повтором requestId и 40 `input` за секунду; When сервер их получает; Then мир не меняется незаконно, клиент получает INVALID/VERSION, лишние input отброшены без error.
 - **S4 · REALTIME-005:** Given клиент пропустил delta; When он отправляет `resync`; Then получает snapshot с текущей revision, следующий delta имеет `baseRevision` = этой revision. Given игрок уходит дальше `aoiRadius`; Then наблюдатель получает его ID в `remove`.

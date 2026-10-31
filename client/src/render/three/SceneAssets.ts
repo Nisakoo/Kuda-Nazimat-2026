@@ -1,9 +1,9 @@
-import { BoxGeometry, CapsuleGeometry, CircleGeometry, CylinderGeometry, SphereGeometry, Mesh, MeshStandardMaterial, CanvasTexture, Sprite, SpriteMaterial, SRGBColorSpace } from 'three';
+import { IcosahedronGeometry, BoxGeometry, CapsuleGeometry, CircleGeometry, CylinderGeometry, SphereGeometry, Mesh, MeshStandardMaterial, CanvasTexture, Sprite, SpriteMaterial, SRGBColorSpace } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { BufferGeometry, Material, Object3D } from 'three';
 import { ResourcePool } from './ResourcePool';
 
-export type Shape = 'box' | 'roundedBox' | 'sphere' | 'cylinder' | 'circle' | 'capsule';
+export type Shape = 'box' | 'roundedBox' | 'sphere' | 'cylinder' | 'circle' | 'capsule' | 'facet' | 'robe';
 
 export class SceneAssets {
   private readonly geometry = new ResourcePool<BufferGeometry>();
@@ -14,6 +14,8 @@ export class SceneAssets {
   mesh(shape: Shape, color: string, brick = false): Mesh {
     const geometry = this.geometry.acquire(shape, () => {
       switch (shape) {
+        case 'facet': return new IcosahedronGeometry(1, 1);
+        case 'robe': return new CylinderGeometry(.25, .42, 1.1, 10);
         case 'box': return new BoxGeometry(1, 1, 1);
         case 'roundedBox': return new RoundedBoxGeometry(1, 1, 1, 2, 0.08);
         case 'sphere': return new SphereGeometry(1, 16, 12);
@@ -26,6 +28,7 @@ export class SceneAssets {
     const map = brick ? this.textures.acquire(key, () => this.brickTexture(color)) : null;
     const material = this.materials.acquire(key, () => new MeshStandardMaterial({ color: map ? '#ffffff' : color, map, roughness: 0.9 }));
     const mesh = new Mesh(geometry, material);
+    mesh.castShadow = true; mesh.receiveShadow = true;
     this.releases.set(mesh, () => { this.geometry.release(shape); this.materials.release(key); if (brick) this.textures.release(key); });
     return mesh;
   }

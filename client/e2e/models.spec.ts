@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { expectCapture } from './helpers';
 
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
 test('optional decoration failure is visible, retry succeeds, and the game remains playable', async ({ page }) => {
   let unavailable = true;
   await page.route('**/config.json', (route) => route.fulfill({ json: { debug: true } }));

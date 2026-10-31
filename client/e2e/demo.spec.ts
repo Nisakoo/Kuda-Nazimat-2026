@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { expectCapture, resume } from './helpers';
 
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
 async function walk(page: Page, key: string, milliseconds: number) {
   await page.keyboard.down(key);
   await page.clock.runFor(milliseconds);

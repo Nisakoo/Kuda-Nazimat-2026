@@ -4,7 +4,7 @@ type: implementation-task
 status: todo
 spec: ../specs/server-world.md
 requirements: [SERVER-WORLD-001–008]
-depends_on: [TASK-010, TASK-021]
+depends_on: [TASK-010, TASK-024]
 scheduling_note: проверка сессии в /world/ подключается после TASK-012, позиция игрока — через порт из TASK-014
 ---
 

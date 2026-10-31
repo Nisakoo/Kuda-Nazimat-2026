@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { expectCapture, resume } from './helpers';
 
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
 test('local build renders with external access blocked and handles resize, pause and restart', async ({ page }) => {
   const requests: string[] = [];
   const errors: string[] = [];
@@ -8,7 +10,7 @@ test('local build renders with external access blocked and handles resize, pause
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route('**/*', (route) => {
     return new URL(route.request().url()).origin === 'http://127.0.0.1:4173'
-      ? route.continue() : route.abort();
+      ? route.fallback() : route.abort();
   });
   await page.goto('/');
   await expect(page.getByRole('status')).toHaveText('Сцена открыта');

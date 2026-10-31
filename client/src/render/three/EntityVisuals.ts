@@ -20,7 +20,7 @@ interface Visual {
 
 export class EntityVisuals {
   private readonly visuals = new Map<EntityId, Visual>();
-  constructor(private readonly scene: Scene, private readonly assets: SceneAssets, private readonly library?: GltfLibrary, private readonly report: (id: string, error: string | null) => void = () => {}) {}
+  constructor(private readonly scene: Scene, private readonly assets: SceneAssets, private readonly library?: GltfLibrary, private readonly report: (id: string, error: string | null) => void = () => {}, private readonly marketStyle = false) {}
   get ids(): readonly string[] { return [...this.visuals.keys()]; }
 
   sync(previous: WorldSnapshot, current: WorldSnapshot, playerId: EntityId | null): void {
@@ -78,15 +78,15 @@ export class EntityVisuals {
     }
     const npc = DEMO_NPCS.find((item) => item.id === entity.id);
     const color = npc?.color ?? '#318e81';
-    const body = this.assets.mesh('capsule', color);
-    body.scale.set(1.1, 0.75, 1);
-    body.position.y = 0.8;
+    const body = this.assets.mesh(this.marketStyle ? 'robe' : 'capsule', color);
+    body.scale.set(1.1, this.marketStyle ? 1 : .75, 1);
+    body.position.y = this.marketStyle ? .7 : .8;
     group.add(body);
-    const head = this.assets.mesh('sphere', '#eec8a2');
+    const head = this.assets.mesh(this.marketStyle ? 'facet' : 'sphere', this.marketStyle ? '#bd8b66' : '#eec8a2');
     head.scale.set(0.4, 0.42, 0.38);
     head.position.y = 1.55;
     group.add(head);
-    const hair = this.assets.mesh('sphere', player ? '#34434b' : '#695343');
+    const hair = this.assets.mesh('sphere', this.marketStyle ? '#ead8b5' : player ? '#34434b' : '#695343');
     hair.scale.set(0.41, 0.22, 0.39);
     hair.position.set(0, 1.82, -0.035);
     group.add(hair);
@@ -123,6 +123,10 @@ export class EntityVisuals {
     front.scale.set(0.42, 0.13, 0.1);
     front.position.set(0, 0.85, 0.3);
     group.add(front);
+    if (this.marketStyle) {
+      const shawl = this.assets.mesh('box', '#e1b765'); shawl.position.set(-.2, .85, .19); shawl.scale.set(.23, .85, .3); shawl.rotation.z = -.12; group.add(shawl);
+      const headcloth = this.assets.mesh('box', '#ead8b5'); headcloth.position.set(0, 1.56, -.26); headcloth.scale.set(.6, .48, .15); group.add(headcloth);
+    }
     const ring = this.assets.mesh('cylinder', player ? '#8cddc2' : '#e5cf9d');
     ring.scale.set(0.52, 0.035, 0.52);
     ring.position.y = 0.015;

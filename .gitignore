@@ -7,6 +7,8 @@ client/src/shared/demoWorld.generated.ts
 client/playwright-report/
 *.tsbuildinfo
 .DS_Store
+client/public/maps/market/
+client/src/shared/marketWorld.generated.ts
 server/node_modules/
 server/data/
 server/config.json

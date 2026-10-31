@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { expectCapture, resume } from './helpers';
 
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
 test('switches to a labelled mock session, exchanges text, handles loss and reconnects cleanly', async ({ page }) => {
   const errors: string[] = []; const sockets: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

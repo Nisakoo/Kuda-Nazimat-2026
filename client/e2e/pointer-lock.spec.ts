@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { expectCapture, resume } from './helpers';
 
+test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
+
 test('real pointer lock survives repeated relative movement, releases on loss and resumes with clean input', async ({ page }) => {
   await page.route('**/config.json', (route) => route.fulfill({ json: { debug: true } }));
   await page.clock.install();

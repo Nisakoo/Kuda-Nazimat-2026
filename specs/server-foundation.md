@@ -45,8 +45,8 @@ related:
   | host / port | `0.0.0.0` / `8080` | LAN; для автономного режима допустим `127.0.0.1` |
   | clientDir | `../client/dist` | сборка клиента |
   | worldDir | `../client/public` | корень данных мира (раскладка MAP) |
-  | maps | `{"demo": "maps/demo/manifest.json"}` | mapId → manifest относительно worldDir |
-  | defaultMap | `demo` | mapId для `/config.json` |
+  | maps | `{"market": "maps/market/manifest.json", "demo": "maps/demo/manifest.json", "science": "maps/demo/science.json"}` | mapId → manifest относительно worldDir (генерирует клиентский `world:generate`) |
+  | defaultMap | `market` | mapId для `/config.json`; совпадает с картой клиента по умолчанию |
   | contentDir | `content` | серверный контент (NPC) |
   | dbPath | `data/game.sqlite` | SQLite |
   | maxPlayers | `4` | активные игроки |

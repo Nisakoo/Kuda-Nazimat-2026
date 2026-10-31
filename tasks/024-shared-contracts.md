@@ -1,5 +1,5 @@
 ---
-id: TASK-021
+id: TASK-024
 type: implementation-task
 status: todo
 spec: ../specs/shared-contracts.md

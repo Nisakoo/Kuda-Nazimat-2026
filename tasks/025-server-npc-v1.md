@@ -1,5 +1,5 @@
 ---
-id: TASK-022
+id: TASK-025
 type: implementation-task
 status: todo
 spec: ../specs/server-npc-dialogue.md
