@@ -12,6 +12,7 @@
 - [architecture.md](architecture.md) — границы, стек и целевые модули.
 - [SDD-скилл](.agents/skills/sdd/SKILL.md) — порядок работы и шаблоны.
 - `specs/` — долгоживущие требования; `tasks/` — этапы реализации и доказательства.
+- [Сеттинг «Вавилон» и механика перевода](specs/game-babylon.md), [демо-сцена «Рынок Вавилона»](specs/demo-scene-market.md) — игровой замысел и первая локация (draft).
 - [Локальная LLM](specs/server-llm-runtime.md), [NPC](specs/server-ai.md), [хранение диалогов](specs/server-persistence.md), [квалификация моделей](specs/npc-llm-evaluation.md) — направление локального ИИ.
 
 В начале спек: `id`, `type`, `status`, `implementation`, `parent`, `summary`. `status` описывает документ (draft/ready/retired), `implementation` — код (not-started/partial/complete). У задач вся метаинформация находится в YAML: `id`, `type`, `status`, `spec`, `requirements`, `depends_on`, при необходимости `related` и `scheduling_note`. Статусы: todo / in-progress / blocked / done. Ссылки в метаданных — относительные пути, зависимости — ID задач. В теле остаются цель, шаги, приёмка и результаты. Значения метаданных пишутся без лишних кавычек. У архитектуры `status: active`. Большинство серверных/интеграционных спек — draft из-за явно перечисленных открытых решений.
