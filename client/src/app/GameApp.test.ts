@@ -201,6 +201,49 @@ describe('application lifecycle', () => {
     expect(pending.size).toBe(0);
   });
 
+  it('publishes the final coordinates on pause and resumes without replaying held movement', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => {
+      locked = null;
+      document.dispatchEvent(new Event('pointerlockchange'));
+    } });
+    Object.defineProperty(host, 'requestPointerLock', { value: () => {
+      locked = host;
+      document.dispatchEvent(new Event('pointerlockchange'));
+      return Promise.resolve();
+    } });
+    try {
+      app.dispose();
+      app = new GameApp(parseConfig({ debug: true }, 'http://school.local'), createRenderer);
+      const listener = vi.fn();
+      app.subscribe(listener);
+      app.start(host);
+      app.enterWorld();
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyW' }));
+      advance(0);
+      advance(50); // less than the HUD's ordinary six-step refresh interval
+      const position = app.getWorldSnapshot()?.entities[0]?.transform?.position;
+      expect(position).toBeDefined();
+      app.stop();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({
+        phase: 'stopped', coordinates: `X ${position!.x.toFixed(1)} · Z ${position!.z.toFixed(1)}`,
+      }));
+      app.resume();
+      advance(1000);
+      advance(1020);
+      expect(app.getWorldSnapshot()?.entities[0]?.transform?.position).toEqual(position);
+    } finally {
+      app.dispose();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty);
+      else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty);
+      else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
   it('cleans the loop, session and renderer when a simulation step fails', () => {
     const session = new LocalSession('test', [{ id: 'test', character: { kind: 'player', name: 'Test' } }]);
     vi.spyOn(session, 'update').mockImplementationOnce(() => { throw new Error('Simulation failed'); });

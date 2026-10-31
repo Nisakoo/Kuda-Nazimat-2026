@@ -65,34 +65,49 @@ export class EntityVisuals {
     const npc = DEMO_NPCS.find((item) => item.id === entity.id);
     const color = npc?.color ?? '#318e81';
     const body = this.assets.mesh('capsule', color);
-    body.position.y = 0.95;
+    body.scale.set(1.1, 0.75, 1);
+    body.position.y = 0.8;
     group.add(body);
     const head = this.assets.mesh('sphere', '#eec8a2');
-    head.scale.setScalar(0.27);
-    head.position.y = 1.73;
+    head.scale.set(0.4, 0.42, 0.38);
+    head.position.y = 1.55;
     group.add(head);
     const hair = this.assets.mesh('sphere', player ? '#34434b' : '#695343');
-    hair.scale.set(0.28, 0.17, 0.28);
-    hair.position.set(0, 1.91, -0.015);
+    hair.scale.set(0.41, 0.22, 0.39);
+    hair.position.set(0, 1.82, -0.035);
     group.add(hair);
+    const band = this.assets.mesh('cylinder', '#e7c789');
+    band.scale.set(0.405, 0.07, 0.385);
+    band.position.y = 1.78;
+    group.add(band);
+    for (const side of [-1, 1]) {
+      const eye = this.assets.mesh('sphere', '#3b302b');
+      eye.scale.set(0.045, 0.06, 0.025);
+      eye.position.set(side * 0.14, 1.57, 0.35);
+      group.add(eye);
+      const cheek = this.assets.mesh('sphere', '#dfac8e');
+      cheek.scale.set(0.08, 0.04, 0.022);
+      cheek.position.set(side * 0.23, 1.45, 0.31);
+      group.add(cheek);
+    }
     const limbs: Mesh[] = [];
     for (const side of [-1, 1]) {
-      const leg = this.assets.mesh('box', '#344b5d');
-      leg.scale.set(0.21, 0.52, 0.24);
-      leg.position.set(side * 0.16, 0.31, 0);
+      const leg = this.assets.mesh('capsule', '#785d46');
+      leg.scale.set(0.5, 0.3, 0.6);
+      leg.position.set(side * 0.16, 0.23, 0);
       group.add(leg);
       limbs.push(leg);
     }
     for (const side of [-1, 1]) {
-      const arm = this.assets.mesh('box', color);
-      arm.scale.set(0.17, 0.61, 0.23);
-      arm.position.set(side * 0.39, 1.02, 0);
+      const arm = this.assets.mesh('capsule', color);
+      arm.scale.set(0.45, 0.43, 0.5);
+      arm.position.set(side * 0.39, 0.83, 0);
       group.add(arm);
       limbs.push(arm);
     }
-    const front = this.assets.mesh('box', '#fcf7e9');
-    front.scale.set(0.18, 0.18, 0.08);
-    front.position.set(0, 1.2, 0.29);
+    const front = this.assets.mesh('roundedBox', '#e8c783');
+    front.scale.set(0.42, 0.13, 0.1);
+    front.position.set(0, 0.85, 0.3);
     group.add(front);
     const ring = this.assets.mesh('cylinder', player ? '#8cddc2' : '#e5cf9d');
     ring.scale.set(0.52, 0.035, 0.52);

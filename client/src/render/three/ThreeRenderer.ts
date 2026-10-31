@@ -21,12 +21,12 @@ export class ThreeRenderer implements RenderAdapter {
     this.renderer.domElement.setAttribute('aria-label', 'Трёхмерная сцена');
     this.renderer.domElement.setAttribute('role', 'img');
     this.scene = new Scene();
-    this.scene.background = new Color('#c9d9d4');
-    this.scene.fog = new Fog('#c9d9d4', 35, 75);
+    this.scene.background = new Color('#e8d9ba');
+    this.scene.fog = new Fog('#e8d9ba', 38, 80);
     this.camera = new PerspectiveCamera(48, 1, 0.1, 120);
-    const sun = new DirectionalLight('#fff3d9', 2.5);
+    const sun = new DirectionalLight('#fff0cf', 2);
     sun.position.set(-8, 18, 10);
-    this.scene.add(new HemisphereLight('#e5f2ff', '#a2ab87', 2.5), sun);
+    this.scene.add(new HemisphereLight('#f3f4ec', '#b5a17b', 2), sun);
     this.assets = new SceneAssets();
     this.scene.add(createDemoScenery(this.assets));
     this.visuals = new EntityVisuals(this.scene, this.assets);

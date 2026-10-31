@@ -34,6 +34,8 @@ export interface AppSnapshot {
   readonly dialog: DemoDialog | null;
   readonly debug: boolean;
   readonly coordinates: string;
+  readonly capture: 'idle' | 'requesting' | 'locked' | 'error';
+  readonly captureError: string | null;
 }
 
 /** Composition root; all UI/input commands cross this facade. */
@@ -59,6 +61,7 @@ export class GameApp {
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
       debug: config.debug, coordinates: '',
+      capture: 'idle', captureError: null,
     });
   }
 
@@ -93,12 +96,22 @@ export class GameApp {
           move: (direction) => { this.session?.send({ type: 'move', direction }); },
           interact: () => this.interact(),
           menu: () => this.toggleMenu(),
+          captured: () => {
+            this.patch({ capture: 'locked', captureError: null, screen: 'playing' });
+            if (this.host) this.start(this.host);
+            this.updateHud(true);
+          },
+          interrupted: () => {
+            this.patch({ capture: 'idle', captureError: null });
+            if (!this.snapshot.dialog && this.snapshot.screen === 'playing') this.stop();
+          },
+          captureFailed: (captureError) => this.patch({ capture: 'error', captureError }),
           look: (dx, dy) => {
-            this.camera = { ...this.camera, yaw: this.camera.yaw - dx * 0.006, pitch: Math.max(0.3, Math.min(1.2, this.camera.pitch + dy * 0.004)) };
+            this.camera = { ...this.camera, yaw: this.camera.yaw - dx * 0.004, pitch: Math.max(0.5, Math.min(1.05, this.camera.pitch + dy * 0.003)) };
             this.renderer?.setCamera(this.camera);
           },
           zoom: (delta) => {
-            this.camera = { ...this.camera, distance: Math.max(7, Math.min(25, this.camera.distance + delta * 0.01)) };
+            this.camera = { ...this.camera, distance: Math.max(9, Math.min(22, this.camera.distance + delta * 0.01)) };
             this.renderer?.setCamera(this.camera);
           },
         });
@@ -133,14 +146,25 @@ export class GameApp {
 
   enterWorld(): void {
     if (this.snapshot.phase !== 'running') return;
-    this.patch({ screen: 'playing' });
-    this.updateHud(true);
+    this.requestPlay();
+  }
+
+  resume(): void {
+    if (this.snapshot.phase === 'stopped' && this.host) this.requestPlay();
+  }
+
+  private requestPlay(): void {
+    if (!this.input || this.snapshot.capture === 'requesting') return;
+    this.patch({ capture: 'requesting', captureError: null });
+    this.input.requestCapture();
   }
 
   stop(): void {
     if (this.snapshot.phase !== 'running') return;
-    this.input?.reset();
+    this.input?.stop();
+    this.patch({ capture: 'idle', captureError: null });
     this.detach();
+    this.updateHud(true);
     this.setState('stopped');
   }
 
@@ -148,7 +172,6 @@ export class GameApp {
     if (this.snapshot.dialog) { this.closeDialog(); return; }
     if (this.snapshot.screen !== 'playing' || !this.host) return;
     if (this.snapshot.phase === 'running') this.stop();
-    else if (this.snapshot.phase === 'stopped') this.start(this.host);
   }
 
   restart(host: HTMLElement): void {
@@ -157,9 +180,10 @@ export class GameApp {
     this.detach();
     this.releaseResources();
     this.camera = { yaw: 0, pitch: 0.7, distance: 15 };
-    this.patch({ screen, dialog: null, nearby: null, coordinates: '' });
+    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null });
     this.setState('idle');
     this.start(host);
+    if (screen === 'playing' && this.snapshot.phase === 'running') this.requestPlay();
   }
 
   leaveWorld(): void {
@@ -175,8 +199,9 @@ export class GameApp {
   }
 
   closeDialog(): void {
-    this.input?.reset();
+    this.input?.stop();
     this.patch({ dialog: null });
+    this.stop();
   }
 
   submitDialog(text: string): void {
@@ -205,14 +230,14 @@ export class GameApp {
   }
 
   private canControl(): boolean {
-    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && !this.snapshot.dialog;
+    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && !this.snapshot.dialog;
   }
 
   private readonly onSessionEvents = (events: readonly WorldEvent[]): void => {
     for (const event of events) {
       if (event.type !== 'interacted' || event.actorId !== this.session?.playerId) continue;
       const dialog = openDemoDialog(event.targetId);
-      if (dialog) { this.input?.reset(); this.patch({ dialog }); }
+      if (dialog) { this.input?.stop(); this.patch({ dialog, capture: 'idle', captureError: null }); }
     }
   };
 
@@ -245,7 +270,9 @@ export class GameApp {
     for (const listener of this.listeners) listener(this.snapshot);
   }
 
-  private setState(phase: AppSnapshot['phase'], message: string | null = null): void { this.patch({ phase, message }); }
+  private setState(phase: AppSnapshot['phase'], message: string | null = null): void {
+    this.patch({ phase, message, ...(['disposed', 'error', 'unavailable'].includes(phase) ? { capture: 'idle' as const, captureError: null } : {}) });
+  }
 
   private readonly resize = (): void => {
     if (!this.host) return;

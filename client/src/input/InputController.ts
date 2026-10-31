@@ -8,49 +8,83 @@ export interface InputActions {
   zoom(delta: number): void;
   interact(): void;
   menu(): void;
+  captured(): void;
+  interrupted(): void;
+  captureFailed(message: string): void;
 }
 
 const movementKeys = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight']);
 function textEntry(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
 }
+const captureError = 'Не удалось захватить мышь. Разрешите захват в браузере и нажмите «Повторить захват» или вернитесь в меню.';
 
-/** DOM events become intentions; no renderer or network objects are imported here. */
+/** DOM/pointer-lock adapter. Gameplay listeners exist only while capture is confirmed. */
 export class InputController {
   private readonly keys = new Set<string>();
-  private readonly abort = new AbortController();
+  private readonly ownerAbort = new AbortController();
+  private playAbort: AbortController | null = null;
   private last: Direction = { x: 0, z: 0 };
-  private dragging = false;
-  private pointer = { x: 0, y: 0 };
+  private desired = false;
+  private held = false;
+  private pending = false;
+  private legacyPending = false;
+  private disposed = false;
+  private requestId = 0;
+  private readonly target: HTMLElement;
 
   constructor(surface: HTMLElement, private readonly actions: InputActions) {
-    const options = { signal: this.abort.signal };
-    window.addEventListener('keydown', this.keyDown, options);
-    window.addEventListener('keyup', this.keyUp, options);
-    window.addEventListener('blur', this.reset, options);
-    window.addEventListener('pointerup', () => { this.dragging = false; }, options);
-    window.addEventListener('pointermove', (event) => {
-      if (this.dragging && actions.canControl()) {
-        actions.look(event.clientX - this.pointer.x, event.clientY - this.pointer.y);
-        this.pointer = { x: event.clientX, y: event.clientY };
+    this.target = surface.querySelector('canvas') ?? surface;
+    const options = { signal: this.ownerAbort.signal };
+    document.addEventListener('pointerlockchange', this.captureChange, options);
+    // Promise APIs already correlate failures with a request ID. Event-only failures
+    // belong to legacy void APIs; a stale global error must not cancel a new grant.
+    document.addEventListener('pointerlockerror', () => { if (this.legacyPending) this.captureFailure(); }, options);
+    window.addEventListener('blur', this.interrupt, options);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.interrupt(); }, options);
+    document.addEventListener('focusin', (event) => {
+      if (textEntry(event.target) && (this.held || this.desired)) this.interrupt();
+    }, options);
+  }
+
+  get hasCapture(): boolean { return !this.disposed && this.held && document.pointerLockElement === this.target; }
+
+  /** Must be called directly from the user's click, before any await. */
+  requestCapture(): void {
+    if (this.disposed || this.pending) return;
+    if (typeof this.target.requestPointerLock !== 'function') {
+      this.actions.captureFailed('Этот браузер не поддерживает захват мыши. Откройте демо в браузере с Pointer Lock или вернитесь в меню.');
+      return;
+    }
+    this.reset();
+    this.desired = true;
+    this.pending = true;
+    const id = ++this.requestId;
+    try {
+      const request = this.target.requestPointerLock as () => Promise<void> | void;
+      const result = request.call(this.target);
+      this.legacyPending = result === undefined;
+      if (result) {
+        void result.then(() => {
+          if (this.disposed || !this.desired) { this.releaseOwnedCapture(); return; }
+          if (id === this.requestId) this.captureChange();
+        }, () => { if (!this.disposed && id === this.requestId && this.desired) this.captureFailure(); });
       }
-    }, options);
-    surface.addEventListener('pointerdown', (event) => {
-      if (event.button !== 2 || !actions.canControl()) return;
-      event.preventDefault();
-      this.dragging = true;
-      this.pointer = { x: event.clientX, y: event.clientY };
-    }, options);
-    surface.addEventListener('contextmenu', (event) => { if (actions.canControl()) event.preventDefault(); }, options);
-    surface.addEventListener('wheel', (event) => {
-      if (!actions.canControl()) return;
-      event.preventDefault();
-      actions.zoom(event.deltaY);
-    }, { ...options, passive: false });
+    } catch { this.captureFailure(); }
+  }
+
+  /** A pending browser request cannot be cancelled; late grants are immediately released. */
+  stop(): void {
+    this.desired = false;
+    this.pending = false;
+    this.held = false;
+    this.requestId++;
+    this.detachGameplay();
+    this.releaseOwnedCapture();
   }
 
   sample(): void {
-    if (!this.actions.canControl()) { this.reset(); return; }
+    if (!this.hasCapture || !this.actions.canControl()) { this.reset(); return; }
     const x = Number(this.keys.has('KeyD') || this.keys.has('ArrowRight')) - Number(this.keys.has('KeyA') || this.keys.has('ArrowLeft'));
     const z = Number(this.keys.has('KeyS') || this.keys.has('ArrowDown')) - Number(this.keys.has('KeyW') || this.keys.has('ArrowUp'));
     const yaw = this.actions.cameraYaw();
@@ -63,12 +97,81 @@ export class InputController {
 
   readonly reset = (): void => {
     this.keys.clear();
-    this.dragging = false;
     if (this.last.x !== 0 || this.last.z !== 0) this.actions.move({ x: 0, z: 0 });
     this.last = { x: 0, z: 0 };
   };
 
-  dispose(): void { this.reset(); this.abort.abort(); }
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.stop();
+    // Legacy void APIs report completion only through change/error events.
+    // Retain only that cleanup guard until an outstanding result is delivered.
+    if (!this.legacyPending) this.ownerAbort.abort();
+  }
+
+  private releaseOwnedCapture(): void {
+    if (document.pointerLockElement === this.target) document.exitPointerLock();
+  }
+
+  private detachGameplay(): void {
+    this.reset();
+    this.playAbort?.abort();
+    this.playAbort = null;
+  }
+
+  private readonly captureChange = (): void => {
+    const owned = document.pointerLockElement === this.target;
+    if (owned && (!this.desired || this.disposed)) {
+      this.legacyPending = false;
+      this.releaseOwnedCapture();
+      if (this.disposed) this.ownerAbort.abort();
+      return;
+    }
+    if (owned) {
+      this.pending = false;
+      this.legacyPending = false;
+      if (!this.held) {
+        this.held = true;
+        this.attachGameplay();
+        this.actions.captured();
+      }
+    } else if (this.held) {
+      this.stop();
+      if (!this.disposed) this.actions.interrupted();
+    }
+  };
+
+  private readonly captureFailure = (): void => {
+    this.legacyPending = false;
+    if (this.disposed) { this.ownerAbort.abort(); return; }
+    if (!this.desired) return;
+    this.stop();
+    this.actions.captureFailed(captureError);
+  };
+
+  private readonly interrupt = (): void => {
+    if (!this.desired && !this.held) return;
+    this.stop();
+    if (!this.disposed) this.actions.interrupted();
+  };
+
+  private attachGameplay(): void {
+    this.detachGameplay();
+    this.playAbort = new AbortController();
+    const options = { signal: this.playAbort.signal };
+    window.addEventListener('keydown', this.keyDown, options);
+    window.addEventListener('keyup', this.keyUp, options);
+    document.addEventListener('mousemove', (event) => {
+      if (this.hasCapture && this.actions.canControl()) this.actions.look(event.movementX, event.movementY);
+    }, options);
+    this.target.addEventListener('contextmenu', (event) => event.preventDefault(), options);
+    this.target.addEventListener('wheel', (event) => {
+      if (!this.hasCapture || !this.actions.canControl()) return;
+      event.preventDefault();
+      this.actions.zoom(event.deltaY);
+    }, { ...options, passive: false });
+  }
 
   private readonly keyDown = (event: KeyboardEvent): void => {
     if (event.code === 'Escape') {
@@ -76,7 +179,7 @@ export class InputController {
       if (!event.repeat) this.actions.menu();
       return;
     }
-    if (textEntry(event.target) || event.ctrlKey || event.metaKey || event.altKey || !this.actions.canControl()) return;
+    if (textEntry(event.target) || event.ctrlKey || event.metaKey || event.altKey || !this.hasCapture || !this.actions.canControl()) return;
     if (movementKeys.has(event.code)) { event.preventDefault(); this.keys.add(event.code); }
     if (event.code === 'KeyE' && !event.repeat) { event.preventDefault(); this.actions.interact(); }
   };

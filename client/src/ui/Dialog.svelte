@@ -24,5 +24,5 @@
     <label class="sr-only" for="question-input">Ваш вопрос</label>
     <div class="input-row"><input id="question-input" bind:this={input} bind:value={text} maxlength="240" placeholder="Напишите вопрос…" autocomplete="off" /><button type="submit" disabled={!text.trim()}>Отправить</button></div>
   </form>
-  <p class="small subtle">Esc — вернуться к прогулке</p>
+  <p class="small subtle">Esc — закрыть диалог. Затем нажмите «Продолжить», чтобы захватить мышь.</p>
 </dialog>

@@ -2,7 +2,7 @@
 id: client-local-demo
 type: module-design
 status: ready
-implementation: partial
+implementation: complete
 parent: architecture
 summary: Управляемая локальная демо-площадь для ручной проверки в браузере.
 related:

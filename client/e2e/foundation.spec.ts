@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { expectCapture, resume } from './helpers';
 
 test('local build renders with external access blocked and handles resize, pause and restart', async ({ page }) => {
   const requests: string[] = [];
@@ -22,14 +23,17 @@ test('local build renders with external access blocked and handles resize, pause
   await expect(canvas).toHaveJSProperty('height', 844);
   await page.screenshot({ path: 'test-results/foundation-mobile.png' });
   await page.getByRole('button', { name: 'Начать прогулку' }).click();
+  await expectCapture(page, true);
   await page.keyboard.press('Escape');
+  await expectCapture(page, false);
   await expect(page.getByRole('status')).toHaveText('Просмотр приостановлен');
-  await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
+  await resume(page);
   await expect(page.getByRole('status')).toHaveText('Сцена открыта');
   for (let cycle = 0; cycle < 5; cycle++) {
     const previous = await canvas.elementHandle();
     await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
+    await expectCapture(page, true);
     await expect(canvas).toHaveCount(1);
     expect(await previous?.evaluate((element) => element.isConnected)).toBe(false);
     // The old native context is deliberately lost, not merely detached from DOM.
