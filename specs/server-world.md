@@ -2,7 +2,7 @@
 id: server-world
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Статический мир сервера — реестр карт, проверка manifest, bootstrap, защищённая выдача файлов и коллизии.
 related:

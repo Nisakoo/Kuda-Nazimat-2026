@@ -99,7 +99,7 @@ export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
   for (const npc of npcs) {
     const map = maps.get(npc.mapId);
     if (!map) throw new Error(`NPC ${npc.id}: неизвестная карта ${npc.mapId}`);
-    if (!map.isWalkable(npc.position.x, npc.position.z)) throw new Error(`NPC ${npc.id}: позиция непроходима`);
+    if (!map.footprintChunkIds(npc.position.x, npc.position.z)) throw new Error(`NPC ${npc.id}: позиция вне чанков карты`);
   }
 
   const index = new Map<string, WorldFile>();

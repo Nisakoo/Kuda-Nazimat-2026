@@ -1,7 +1,7 @@
 ---
 id: TASK-014
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/server-realtime.md
 requirements: [REALTIME-001–009]
 related:
@@ -34,6 +34,6 @@ scheduling_note: часть A (мир и сеть); SessionVerifier/PlayerStore/
 - [ ] `make server-test` и `npm run check` проходят.
 
 ## Результат
-- Файлы: —
-- Проверки: не выполнялись; реализация не начата.
-- Отклонения: —
+- Файлы: server/src/game/{World,AoiStream,GameService,index,ports}.ts, server/src/realtime/{gateway,TokenBucket}.ts; тесты server/test/a-realtime.test.ts (реальный socket.io-client), a-world.test.ts.
+- Проверки: `npm --prefix server test` — 4 файла, 26 тестов, все прошли; `npm --prefix server run check` — tsc server + shared без ошибок, dependency-cruiser без нарушений; `node -e "import('./src/game/index.ts')"` в Node 24.15.0 — модуль грузится без сборки. Среда: Windows 11, Node 24.15.0, npm 11.12.1. Проверено: handshake UNAUTHORIZED/VERSION/UNAVAILABLE; join с валидным snapshot и bootstrap; delta второму игроку с revision+1 и без пустых пакетов; стена, скольжение, preparedChunks, сброс намерения через 250 ms, старый sequence; interact/npc-question (FORBIDDEN вдали, ответ через NpcQuestions с персоной и trim); чат обоим с requestId отправителя, HTML как текст, управляющие символы → INVALID; NOT_READY до join, повтор requestId и лишнее поле → INVALID, resync → snapshot; перехват второй вкладкой (error server UNAUTHORIZED, тот же playerId, отмена NPC первой вкладки); освобождение слота и сохранение позиции после grace. Все входящие пакеты тестов проходят parseServerMessage.
+- Отклонения и остаток: Не проверены: истечение сессии по таймеру (AUTH S3), переподключение внутри grace без remove у наблюдателя (S5, первая часть), remove при выходе из aoiRadius (S4, вторая часть), лимиты input 30/с и чата 1/с, отключение после 10 неверных пакетов, нагрузка 4 игроков с замером шага (S7). Ручная проверка с браузерным клиентом не выполнялась — нужен вызов mock-входа в клиенте и сборка части B. Статус in-progress, пока непроверенные пункты приёмки не закрыты.

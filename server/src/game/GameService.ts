@@ -2,11 +2,12 @@ import type { ServerMessage } from '../../../shared/protocol/types.ts';
 import type { Direction } from '../../../shared/world/types.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
+import type { PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
 import type { PlayerLocation } from '../world/access.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
 import { AoiStream } from './AoiStream.ts';
-import type { Channel, PlayerIdentity, PlayerStore } from './ports.ts';
-import type { World } from './World.ts';
+import type { Channel } from './ports.ts';
+import type { PlacedPlayer, World } from './World.ts';
 
 export interface GameSettings { readonly maxPlayers: number; readonly disconnectGraceMs: number; readonly broadcastEvery: number }
 
@@ -29,15 +30,15 @@ export class GameService {
   private readonly seats = new Map<string, Seat>();
   private readonly startedAt: string;
   private chatCounter = 0;
+  private readonly world: World;
+  private readonly players: PlayerStore;
+  private readonly clock: Clock;
+  private readonly scheduler: Scheduler;
+  private readonly settings: GameSettings;
+  private readonly log: Logger;
 
-  constructor(
-    private readonly world: World,
-    private readonly players: PlayerStore,
-    private readonly clock: Clock,
-    private readonly scheduler: Scheduler,
-    private readonly settings: GameSettings,
-    private readonly log: Logger,
-  ) {
+  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger) {
+    this.world = world; this.players = players; this.clock = clock; this.scheduler = scheduler; this.settings = settings; this.log = log;
     this.startedAt = clock.now().toString(36);
   }
 
@@ -46,8 +47,9 @@ export class GameService {
     return this.seats.has(accountId) || this.seats.size < this.settings.maxPlayers;
   }
 
-  /** AUTH-005: the newest connection takes control; the previous one is closed. */
-  attach(identity: PlayerIdentity, channel: Channel): void {
+  /** AUTH-005: the newest connection takes control; the previous one is closed. False when no slot is free. */
+  attach(identity: PlayerIdentity, channel: Channel): boolean {
+    if (!this.canAdmit(identity.accountId)) return false;
     let seat = this.seats.get(identity.accountId);
     if (!seat) { seat = { identity, channel: null, stream: null, grace: null }; this.seats.set(identity.accountId, seat); }
     if (seat.grace) { this.scheduler.clearTimeout(seat.grace); seat.grace = null; }
@@ -56,6 +58,7 @@ export class GameService {
     seat.stream = null;
     this.world.resetInput(identity.playerId);
     if (previous) previous.close(TAKEOVER_REASON);
+    return true;
   }
 
   isControlling(channel: Channel): boolean { return this.seatOf(channel) !== undefined; }
@@ -71,6 +74,7 @@ export class GameService {
   }
 
   private release(seat: Seat): void {
+    seat.grace = null;
     if (seat.channel) return;
     const placed = this.world.locate(seat.identity.playerId);
     if (placed) this.persist([placed]);
@@ -88,8 +92,8 @@ export class GameService {
     const current = this.world.locate(playerId);
     if (!current || current.mapId !== mapId) {
       if (current) this.world.remove(playerId);
-      const saved = this.players.load(playerId);
-      const usable = saved && saved.mapId === mapId && map.isWalkable(saved.position.x, saved.position.z);
+      const saved = this.loadSaved(playerId);
+      const usable = saved !== null && saved.mapId === mapId && map.isWalkable(saved.position.x, saved.position.z);
       this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : map.spawn, rotationY: usable ? saved.rotationY : Math.PI });
     }
     const stream = new AoiStream();
@@ -131,7 +135,7 @@ export class GameService {
     return true;
   }
 
-  /** Who is asking, for services that act on behalf of a controlling connection. */
+  /** Who is asking, for services that act on behalf of a joined controlling connection. */
   identityOf(channel: Channel): PlayerIdentity | null { return this.joinedSeat(channel)?.identity ?? null; }
 
   locate(accountId: string): PlayerLocation | null {
@@ -156,18 +160,25 @@ export class GameService {
 
   /** Shutdown: save everyone still in the world and close connections. */
   shutdown(reason: string): void {
-    const placed = [...this.seats.values()].map((seat) => this.world.locate(seat.identity.playerId)).filter((p) => p !== undefined);
+    const placed: PlacedPlayer[] = [];
+    for (const seat of this.seats.values()) { const p = this.world.locate(seat.identity.playerId); if (p) placed.push(p); }
     this.persist(placed);
     for (const seat of this.seats.values()) {
       if (seat.grace) this.scheduler.clearTimeout(seat.grace);
-      seat.channel?.close(reason);
+      const channel = seat.channel; seat.channel = null;
+      channel?.close(reason);
     }
     this.seats.clear();
   }
 
   get activePlayers(): number { return this.seats.size; }
 
-  private persist(placed: readonly { id: string; mapId: string; position: { x: number; y: number; z: number }; rotationY: number }[]): void {
+  private loadSaved(playerId: string): SavedPosition | null {
+    try { return this.players.load(playerId); }
+    catch (error) { this.log.error('Не удалось прочитать позицию игрока', { playerId, error: error instanceof Error ? error.message : String(error) }); return null; }
+  }
+
+  private persist(placed: readonly PlacedPlayer[]): void {
     if (placed.length === 0) return;
     try { this.players.save(placed.map(({ id, mapId, position, rotationY }) => ({ id, mapId, position, rotationY }))); }
     catch (error) { this.log.error('Не удалось сохранить позиции игроков', { count: placed.length, error: error instanceof Error ? error.message : String(error) }); }

@@ -33,8 +33,12 @@ export class World {
   private readonly players = new Map<string, Player>();
   private readonly npcs: ReadonlyMap<string, NpcDefinition>;
   private ticks = 0;
+  private readonly maps: ReadonlyMap<string, GameMap>;
+  private readonly settings: WorldSettings;
 
-  constructor(private readonly maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[], private readonly settings: WorldSettings = DEFAULT_WORLD_SETTINGS) {
+  constructor(maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[], settings: WorldSettings = DEFAULT_WORLD_SETTINGS) {
+    this.maps = maps;
+    this.settings = settings;
     this.npcs = new Map(npcs.map((npc) => [npc.id, npc]));
   }
 
@@ -148,13 +152,14 @@ export class World {
   }
 }
 
+/** Market NPCs have no assetId: their figures are drawn by the chunk GLB, so no renderable (SERVER-WORLD-008). */
 function npcEntity(npc: NpcDefinition): Entity {
   return {
     id: npc.id,
     character: { kind: 'npc', name: npc.name },
     transform: { position: npc.position, rotationY: npc.rotationY },
     interactable: { radius: npc.interactionRadius, label: npc.topic },
-    renderable: { assetId: npc.assetId },
+    ...(npc.assetId ? { renderable: { assetId: npc.assetId } } : {}),
     animationState: { name: 'idle' },
   };
 }

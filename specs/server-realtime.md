@@ -2,7 +2,7 @@
 id: server-realtime
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Socket.IO-сессия PROTO v1 и авторитетная симуляция — вход в мир, движение, AOI/delta, взаимодействие, чат, присутствие.
 related:

@@ -2,7 +2,7 @@
 id: shared-contracts
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Общий исполняемый TypeScript-контракт клиента и сервера — протокол, сущности, формат карты и проходимость.
 related:
