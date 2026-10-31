@@ -16,11 +16,12 @@
     visualLoading: false, visualError: null, modelStats: '',
     worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
     authRequired: false, authPending: false, authError: null, authName: '',
-    mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
+    mapId: 'demo', mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
     performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
   });
   const networkLabels = { unauthorized: 'Не авторизован', connecting: 'Подключение…', connected: 'Подключён', lost: 'Связь потеряна', error: 'Ошибка связи', disconnected: 'Отключён' };
+  const marketMap = $derived(state.mapId === 'market');
   const error = $derived(startupError ?? state.message);
 
   onMount(() => {
@@ -53,8 +54,8 @@
   {#if !error && game && state.screen === 'welcome' && !state.authRequired}
     <section class="welcome glass" aria-labelledby="scene-title">
       <p class="eyebrow">Добро пожаловать в Вавилон</p>
-      <h1 id="scene-title">{#if state.market}Рынок<br />Вавилона.{:else}Город<br />открытий.{/if}</h1>
-      <p class="description">{state.market ? 'Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.' : 'Кирпичные башни, тёплый песчаник и тень пальм. Познакомьтесь с Леей и Марком на площади древнего города.'}</p>
+      <h1 id="scene-title">{#if marketMap}Рынок<br />Вавилона.{:else}Город<br />открытий.{/if}</h1>
+      <p class="description">{marketMap ? 'Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.' : 'Кирпичные башни, тёплый песчаник и тень пальм. Познакомьтесь с Леей и Марком на площади древнего города.'}</p>
       {#if state.captureError}<p class="capture-error" role="alert">{state.captureError}</p>{/if}
       {#if state.networkError}<p class="capture-error" role="alert">{state.networkError}</p>{/if}
       {#if state.mode !== 'local'}<p class="small subtle">{state.mode === 'mock' ? 'Тестовый участник и сетевые ответы имитируются; это проверка клиента без сервера.' : 'Сетевая игра использует локальный сервер.'}</p><button class="secondary" onclick={() => game.reconnect()}>Повторить подключение</button>{/if}
@@ -71,7 +72,7 @@
   {/if}
 
   {#if !error && state.screen === 'playing'}
-    <div class="hud-top"><aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>{state.market ? `Козы пастуха · ${state.market.fed.length}/4` : 'Лея — история · Марк — наука'}</p></aside>
+    <div class="hud-top"><aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>{state.market ? `Козы пастуха · ${state.market.fed.length}/4` : marketMap ? 'Торговцы рынка · пастух' : 'Лея — история · Марк — наука'}</p></aside>
     {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p><p aria-label="Производительность">{state.performance}</p><p aria-label="Ресурсы сцены">{state.renderStats}</p></div>{/if}
     </div>
     {#if state.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}

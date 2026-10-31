@@ -23,9 +23,11 @@ scheduling_note: часть B (платформа и данные); createGame �
 - [x] SERVER-001–004, 007–008: runtime Node 24, HTTP/config/health и правила импортов проверены компонентно.
 - [x] SERVER-003 / S2: traversal, неизвестные ресурсы, maps/models и symlink закрыты; /world без токена — 401.
 - [x] SERVER-005 / S3: ошибки подготовки не открывают порт; SIGTERM с контрактным GameRuntime сохраняет позицию и завершает процесс за <10 с.
-- [ ] SERVER S1/S3/S5: реальный runtime A, LAN-игра, сохранение полного мира и отсутствие текстов чата в логах — после TASK-014.
+- [ ] SERVER S1/S3/S5: завершающая проверка запуска через make demo, сохранения двух игроков и безопасных логов; физическая LAN остаётся TASK-016.
 - [x] make server-test, check:platform проходят.
-- [ ] Полный npm run check: ошибки A из main, см. evidence.
+- [x] Полный npm run check проходит после объединения A.
 
 ## Результат
 Реализованы app/http/common и конфиги. SERVER-006 принадлежит A и исключён из реализации B. Production требует настоящий createGame; его отсутствие даёт явную ошибку, не подменяется пустым миром. Проверки и блокеры — [evidence](evidence/backend-platform-data-2026-10-31.md).
+
+Дополнительная проверка после merge A: [evidence интеграции](evidence/backend-integration-2026-10-31.md).

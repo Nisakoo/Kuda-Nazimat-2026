@@ -10,8 +10,8 @@
 </script>
 
 <dialog use:modal class="dialog-panel" aria-labelledby="chat-title" oncancel={(event) => { event.preventDefault(); close(); }}>
-  <div class="panel-top"><div><p class="eyebrow">Участники рядом</p><h2 id="chat-title">Общение</h2></div><button class="icon-button" onclick={close} aria-label="Закрыть общение">✕</button></div>
-  <p class="small subtle">Сообщения видны игрокам в окружающей области текущей карты.</p>
+  <div class="panel-top"><div><p class="eyebrow">Игроки на карте</p><h2 id="chat-title">Общение</h2></div><button class="icon-button" onclick={close} aria-label="Закрыть общение">✕</button></div>
+  <p class="small subtle">Сообщения видны всем подключённым игрокам на текущей карте.</p>
   <div class="messages" aria-live="polite" bind:this={history}>{#each messages as message (message.id)}<p class="message"><span>{message.name}</span>{message.text}</p>{/each}</div>
   {#if error}<p class="capture-error" role="alert">{error}</p>{/if}
   <form onsubmit={(event) => { event.preventDefault(); if (send(text)) text = ''; input.focus(); }}>

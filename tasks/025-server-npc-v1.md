@@ -1,7 +1,7 @@
 ---
 id: TASK-025
 type: implementation-task
-status: in-progress
+status: done
 spec: ../specs/server-npc-dialogue.md
 requirements: [NPC-002–007]
 related:
@@ -22,15 +22,17 @@ scheduling_note: часть B (платформа и данные); реализ
 - [x] NpcQuestions: квоты, FIFO, общий deadline, AbortSignal, удержание зависшего слота, нормализация, запись до ответа.
 - [x] NpcResponder, реестр, scripted с темами/памятью, общий контрактный набор тестов.
 - [x] Отмена через cancelConnection/stop и статус health; граница frozen contracts.ts.
-- [ ] Подключение к реальному realtime и проверка управляющего соединения при доставке — A.
+- [x] Подключены реальный realtime A и проверка управляющего соединения; takeover отменяет ответ до записи.
 
 ## Приёмка
 - [x] NPC-002–007: FIFO/квоты/deadline, queued/running abort, задержанное освобождение, unavailable, нормализация, private history; scripted проходит контрактный набор.
 - [x] STORE-011: реальный SQLite + сервис сохраняют ответ до результата, restart сохраняет память; ошибка store не выдаёт npc-answer.
-- [ ] NPC S1–S4 через Socket.IO: NPC-001 (карта/расстояние/управление) и доставка/отмена A после merge.
-- [ ] Сравнение tick под очередью с REALTIME S7 — после A.
+- [x] NPC S1–S4 через настоящий Socket.IO: a-realtime/integration и браузерный NPC-сценарий; карта/расстояние, доставка и отмена проверены.
+- [x] REALTIME S7: 61 с, 4 игрока, NPC delay 5 с; p95 шага 0,977 мс, p95 рассылки 101,2 мс. SQLite и очередь не останавливают мир.
 - [x] make server-test, check:platform проходят.
-- [ ] Полный npm run check: ошибки A из main.
+- [x] Полный npm run check проходит после объединения A.
 
 ## Результат
 Реализованы npc, scripted и контрактные тесты. Тексты строятся из профиля и истории; реальная LLM, PROTO v2 и AI не реализованы и не засчитаны. [Evidence](evidence/backend-platform-data-2026-10-31.md).
+
+Дополнительная проверка после merge A: [evidence интеграции](evidence/backend-integration-2026-10-31.md).

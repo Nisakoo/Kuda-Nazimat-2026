@@ -70,6 +70,7 @@ export interface AppSnapshot {
   readonly cacheStats: string;
   readonly chunkRadius: number;
   readonly mode: ClientMode;
+  readonly mapId: string;
   readonly settingsOpen: boolean;
   readonly settingsError: string | null;
   readonly authRequired: boolean;
@@ -139,7 +140,7 @@ export class GameApp {
       visualLoading: false, visualError: null, modelStats: '',
       worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
       authRequired: config.session === 'online', authPending: false, authError: null, authName: '',
-      mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
+      mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
       performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
     });
@@ -383,7 +384,7 @@ export class GameApp {
       this.cancelLogin();
       if (config.serverUrl !== this.config.serverUrl || mode !== 'online') { this.serverSession = null; this.patch({ authName: '' }); }
       this.mock = mode === 'mock'; this.config = config;
-      this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
+      this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mapId: config.mapId, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
       if (this.host) this.restart(this.host);
       return true;
     } catch (error) { this.patch({ settingsError: error instanceof Error ? error.message : 'Некорректные настройки.' }); return false; }

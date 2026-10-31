@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
   const { pending, error, initialName, login }: { pending: boolean; error: string | null; initialName: string; login: (name: string) => Promise<void> } = $props();
-  let name = $state(untrack(() => initialName));
+  let name = $state('');
+  $effect(() => { name = initialName; });
 </script>
 
 <section class="welcome glass login-panel" aria-labelledby="login-title">

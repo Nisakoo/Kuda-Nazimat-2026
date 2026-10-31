@@ -7,7 +7,7 @@ CLIENT_TEST_CMD ?= npm --prefix client test
 .PHONY: help client client-test
 
 help:
-	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the LAN server (requires part A)' 'make server-test  Run server/shared tests' 'make demo         Prepare client/world and start server' 'See README.md for installation, type checks, build and browser checks.'
+	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the LAN server' 'make server-test  Run server/shared tests' 'make demo         Prepare client/world and start server' 'See README.md for installation, type checks, build and browser checks.'
 
 client:
 ifeq ($(strip $(CLIENT_RUN_CMD)),)

@@ -22,8 +22,16 @@ describe('PROTO v1 fixtures (SHARED-004)', () => {
   });
 });
 
-describe('compatibility with the client copy (SHARED-006)', () => {
-  it.runIf(existsSync(fileURLToPath(clientUrl)))('client fixtures give the same outcome', () => {
-    for (const fixture of load(clientUrl)) expect(outcome(fixture) === 'valid', JSON.stringify(fixture.packet)).toBe(fixture.valid);
-  });
+describe('client/shared source (SHARED-006)', () => {
+  if (existsSync(fileURLToPath(clientUrl))) {
+    it('client fixtures give the same outcome', () => {
+      for (const fixture of load(clientUrl)) expect(outcome(fixture) === 'valid', JSON.stringify(fixture.packet)).toBe(fixture.valid);
+    });
+  } else {
+    it('the migrated client imports shared directly and has no duplicate parser', () => {
+      expect(existsSync(new URL('../../client/src/shared/protocol/validate.ts', import.meta.url))).toBe(false);
+      const adapter = readFileSync(new URL('../../client/src/multiplayer/SocketIOAdapter.ts', import.meta.url), 'utf8');
+      expect(adapter).toContain("from '../../../shared/protocol/validate.ts'");
+    });
+  }
 });

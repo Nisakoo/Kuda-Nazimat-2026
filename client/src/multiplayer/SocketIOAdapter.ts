@@ -35,7 +35,7 @@ export class SocketIOAdapter implements NetworkAdapter {
     });
     const socket = this.socket;
     socket.on('connect', () => { if (this.socket !== socket) return; this.cancelRetry(); this.attempts = 0; this.set('connected'); });
-    socket.on('disconnect', () => { if (this.socket === socket) this.scheduleRetry(); });
+    socket.on('disconnect', () => { socket.sendBuffer.length = 0; if (this.socket === socket) this.scheduleRetry(); });
     socket.on('connect_error', (error: Error & { data?: { code?: string } }) => {
       if (this.socket !== socket) return;
       if (error.data?.code === 'UNAUTHORIZED') this.unauthorized();
@@ -77,14 +77,20 @@ export class SocketIOAdapter implements NetworkAdapter {
     if (this.expiry !== null) this.clock.clear(this.expiry); this.expiry = null;
     this.session = null;
     const socket = this.socket; this.socket = null;
+    if (socket) socket.sendBuffer.length = 0;
     socket?.removeAllListeners(); socket?.disconnect();
   }
   send(message: ClientMessage): boolean {
     if (this.disposed || this.value.status !== 'connected' || !this.session) return false;
     if (this.clock.now() >= this.session.expiresAt) { this.unauthorized(); return false; }
     if (!this.socket?.connected) return false;
-    // No transport backlog is replayed after a drop; important actions use correlated receipts.
-    this.socket.volatile.emit('game', parseClientMessage(message)); return true;
+    const packet = parseClientMessage(message);
+    // Movement can be dropped, but join/chat/NPC must survive a polling → WebSocket upgrade.
+    if (packet.type === 'input') this.socket.volatile.emit('game', packet);
+    else this.socket.emit('game', packet);
+    // Socket.IO may detect a ping timeout during emit: never retain that offline backlog.
+    if (this.socket.sendBuffer.length) { this.socket.sendBuffer.length = 0; return false; }
+    return true;
   }
   disconnect(): void { this.close(); if (!this.disposed) this.set('disconnected'); }
   subscribe(listener: (message: ServerMessage) => void): () => void { if (this.disposed) return () => {}; this.messages.add(listener); return () => { this.messages.delete(listener); }; }

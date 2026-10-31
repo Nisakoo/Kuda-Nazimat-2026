@@ -49,5 +49,5 @@ related:
 ## Ограничения и вне scope
 
 - Пароли, регистрация, logout с отзывом, rate limit входа, внешние провайдеры — следующий этап. Тогда добавится `POST /api/auth/login` с тем же форматом ответа.
-- Клиенту нужна минимальная интеграция (клиентская задача по NET-007): при старте в режиме `online` запросить имя, вызвать `POST <serverUrl>/api/auth/guest` и передать ответ в `GameApp.provideServerSession()`.
+- Клиентская интеграция по NET-007: при старте в режиме `online` запросить имя, вызвать `POST <serverUrl>/api/auth/guest` и передать ответ в `GameApp.provideServerSession()`.
 - HTTP без TLS в LAN — принятый риск офлайн-демо.

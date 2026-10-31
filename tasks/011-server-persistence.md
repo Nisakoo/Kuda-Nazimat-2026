@@ -25,7 +25,9 @@ scheduling_note: часть B (платформа и данные)
 - [ ] STORE-003 / S3: окно потери при игровом saveInterval и отсутствие IO внутри tick проверяются с A; тест writer не заменяет этот сценарий.
 - [x] STORE-011 / S7: лимит 50 и ошибка записи → unavailable без ответа.
 - [x] make server-test, check:platform проходят.
-- [ ] Полный npm run check: ошибки A из main.
+- [x] Полный npm run check проходит после объединения A.
 
 ## Результат
 Реализованы persistence, миграция, CLI backup и документация восстановления. STORE-006–010 не реализованы. Периодический save/grace реализует A через PlayerStore; B не вводит второй таймер игрового сохранения. [Evidence](evidence/backend-platform-data-2026-10-31.md).
+
+Дополнительная проверка после merge A: [evidence интеграции](evidence/backend-integration-2026-10-31.md).
