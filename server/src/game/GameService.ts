@@ -97,8 +97,8 @@ export class GameService {
     if (!current || current.mapId !== mapId || force) {
       if (current) this.world.remove(playerId);
       const saved = this.loadSaved(playerId);
-      const usable = !force && saved !== null && saved.mapId === mapId && map.isWalkable(saved.position.x, saved.position.z);
-      const spawn = initial?.mapId === mapId && map.isWalkable(initial.position.x, initial.position.z) ? initial.position : map.spawn;
+      const usable = !force && saved !== null && saved.mapId === mapId && map.isSafeSupport(saved.position.x, saved.position.z);
+      const spawn = initial?.mapId === mapId && map.isSafeSupport(initial.position.x, initial.position.z) ? initial.position : map.spawn;
       this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : spawn, rotationY: usable ? saved.rotationY : Math.PI });
     }
     if (force) {
@@ -112,12 +112,12 @@ export class GameService {
     stream.reset(entities);
     seat.stream = stream;
     const snapshot = { tick: this.world.tick, entities };
-    return { ok: true, message: (requestId) => ({ v: 1, type: 'joined', requestId, playerId, revision: stream.revision, snapshot, world: map.bootstrap }) };
+    return { ok: true, message: (requestId) => ({ v: 3, type: 'joined', requestId, playerId, revision: stream.revision, snapshot, world: map.bootstrap }) };
   }
 
-  input(channel: Channel, sequence: number, direction: Direction, preparedChunks: readonly string[]): void {
+  input(channel: Channel, sequence: number, direction: Direction, preparedChunks: readonly string[], sprint = false, jumpId = 0): void {
     const seat = this.joinedSeat(channel);
-    if (seat) this.world.setIntent(seat.identity.playerId, sequence, direction, preparedChunks, this.clock.now());
+    if (seat) this.world.setIntent(seat.identity.playerId, sequence, direction, preparedChunks, this.clock.now(), sprint, jumpId);
   }
 
   resync(channel: Channel): ServerMessage | null {
@@ -125,7 +125,7 @@ export class GameService {
     if (!seat?.stream) return null;
     const entities = this.world.aoi(seat.identity.playerId);
     seat.stream.reset(entities);
-    return { v: 1, type: 'snapshot', revision: seat.stream.revision, snapshot: { tick: this.world.tick, entities } };
+    return { v: 3, type: 'snapshot', revision: seat.stream.revision, snapshot: { tick: this.world.tick, entities } };
   }
 
   interact(channel: Channel, targetId: string): InteractResult {
@@ -139,7 +139,7 @@ export class GameService {
     const seat = this.joinedSeat(channel);
     if (!seat) return false;
     const mapId = this.world.locate(seat.identity.playerId)!.mapId;
-    const message: ServerMessage = { v: 1, type: 'chat', requestId, messageId: `m${this.startedAt}_${++this.chatCounter}`, playerId: seat.identity.playerId, name: seat.identity.displayName, text };
+    const message: ServerMessage = { v: 3, type: 'chat', requestId, messageId: `m${this.startedAt}_${++this.chatCounter}`, playerId: seat.identity.playerId, name: seat.identity.displayName, text };
     for (const other of this.seats.values()) {
       if (other.channel && other.stream && this.world.locate(other.identity.playerId)?.mapId === mapId) other.channel.send(message);
     }
@@ -162,7 +162,7 @@ export class GameService {
     for (const seat of this.seats.values()) {
       if (!seat.channel || !seat.stream) continue;
       const delta = seat.stream.diff(this.world.aoi(seat.identity.playerId));
-      if (delta) seat.channel.send({ v: 1, type: 'delta', tick: this.world.tick, ...delta });
+      if (delta) seat.channel.send({ v: 3, type: 'delta', tick: this.world.tick, ...delta });
     }
   }
 
@@ -191,7 +191,7 @@ export class GameService {
 
   private persist(placed: readonly PlacedPlayer[]): void {
     if (placed.length === 0) return;
-    try { this.players.save(placed.map(({ id, mapId, position, rotationY }) => ({ id, mapId, position, rotationY }))); }
+    try { this.players.save(placed.map((entry) => this.world.savedLocation(entry.id) ?? entry).map(({ id, mapId, position, rotationY }) => ({ id, mapId, position, rotationY }))); }
     catch (error) { this.log.error('Не удалось сохранить позиции игроков', { count: placed.length, error: error instanceof Error ? error.message : String(error) }); }
   }
 

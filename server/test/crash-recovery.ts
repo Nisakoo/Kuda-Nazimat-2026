@@ -33,10 +33,10 @@ async function stop(signal: NodeJS.Signals) {
 }
 async function connect() {
   const session = await (await fetch(`${origin}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Crash test' }) })).json() as { token: string };
-  const socket = io(`${origin}/game`, { auth: { version: 1, token: session.token }, transports: ['websocket'], reconnection: false, autoConnect: false }); sockets.push(socket);
+  const socket = io(`${origin}/game`, { auth: { version: 3, token: session.token }, transports: ['websocket'], reconnection: false, autoConnect: false }); sockets.push(socket);
   const packets: ServerMessage[] = []; let request = 0; let sequence = 0; socket.on('game', (raw) => packets.push(parseServerMessage(raw)));
   const connected = new Promise<void>((resolve, reject) => { socket.once('connect', resolve); socket.once('connect_error', reject); }); socket.connect(); await connected;
-  const send = (type: string, fields = {}) => { socket.emit('game', { v: 1, type, requestId: `r${++request}`, ...fields }); };
+  const send = (type: string, fields = {}) => { socket.emit('game', { v: 3, type, requestId: `r${++request}`, ...(type === 'input' ? { sprint: false, jumpId: 0 } : {}), ...fields }); };
   send('join', { mapId: 'test' }); await until(() => packets.some((p) => p.type === 'joined'));
   const joined = packets.find((p) => p.type === 'joined'); assert(joined?.type === 'joined'); const playerId = joined.playerId;
   async function move(x: number, z: number, ms: number) {

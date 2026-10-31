@@ -1,15 +1,17 @@
 import { Group } from 'three';
 import type { SceneAssets } from './SceneAssets';
 import { footTarget, legAngles } from './CharacterMotion';
+import type { MovementPose } from './CharacterMotion';
 
 export interface CharacterRig {
   readonly root: Group;
-  pose(phase: number, weight: number, elapsed: number, turn: number): void;
+  pose(phase: number, weight: number, elapsed: number, turn: number, movement?: MovementPose): void;
 }
 
 /** Original Babylonian traveller. All attachments share their parent's joint transform. */
 export function createCharacter(assets: SceneAssets, color: string, market: boolean, seed: number): CharacterRig {
   const root = new Group(); root.name = 'character-rig';
+
   const torso = new Group(); torso.name = 'torso'; torso.position.y = .85; root.add(torso);
   const skin = market ? '#c9926d' : '#e4b78d';
   const cloth = market ? '#eee0bd' : '#ebcf9d';
@@ -57,22 +59,28 @@ export function createCharacter(assets: SceneAssets, color: string, market: bool
   });
   return {
     root,
-    pose: (phase, weight, elapsed, turn) => {
+    pose: (phase, weight, elapsed, turn, movement = { sprint: 0, air: 0, falling: 0, takeoff: 0, landing: 0 }) => {
+      const { sprint, air, falling, takeoff, landing } = movement;
+      const compression = landing * .11 + takeoff * .06;
+      const gaitDrop = .06 + .1 * sprint;
+      weight *= 1 - air;
       const breath = Math.sin(elapsed*1.8+seed)*.008*(1-weight);
-      torso.position.y = .85 - weight*.06 + breath;
-      torso.rotation.x = weight*.035;
+      torso.position.y = .85 - weight*gaitDrop + breath - compression;
+      torso.rotation.x = weight*(.035 + sprint*.12) + compression*.7 + air*.04;
       torso.rotation.z = Math.sin(phase)*weight*.025 - Math.max(-.07,Math.min(.07,turn*.035));
       head.rotation.y = Math.sin(elapsed*.7+seed)*.035*(1-weight);
       for (const { shoulder, elbow, side } of arms) {
-        shoulder.rotation.x = Math.sin(phase+(side<0?0:Math.PI))*.42*weight;
-        shoulder.rotation.z = side*(.10+Math.sin(elapsed*1.8+seed)*.012*(1-weight));
-        elbow.rotation.x = -.12 - weight*.20;
+        shoulder.rotation.x = Math.sin(phase+(side<0?0:Math.PI))*(.42+sprint*.28)*weight - air*(.65-falling*.25) - takeoff*.5;
+        shoulder.rotation.z = side*(.10+Math.sin(elapsed*1.8+seed)*.012*(1-weight)+air*.2);
+        elbow.rotation.x = -.12 - weight*(.20+sprint*.45) - air*.35;
       }
       for (const { hip, knee, ankle, side } of legs) {
-        const foot = footTarget(phase+(side<0?0:Math.PI),weight);
-        hip.position.y = .85 - weight*.06;
-        const angles = legAngles(foot.forward,.75-weight*.06-foot.lift);
-        hip.rotation.x = angles.hip; knee.rotation.x = angles.knee; ankle.rotation.x = angles.ankle;
+        const foot = footTarget(phase+(side<0?0:Math.PI),weight,sprint);
+        hip.position.y = .85 - weight*gaitDrop - compression;
+        const angles = legAngles(foot.forward,.75-weight*gaitDrop-foot.lift-compression);
+        hip.rotation.x = angles.hip*(1-air) + (-.45+falling*.5)*air;
+        knee.rotation.x = angles.knee*(1-air) + (1.05-falling*.65)*air;
+        ankle.rotation.x = angles.ankle*(1-air) - .2*air;
       }
     },
   };

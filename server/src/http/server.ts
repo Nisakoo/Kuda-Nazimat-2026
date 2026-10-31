@@ -76,7 +76,7 @@ export function createHttpServer(config: Config, deps: { auth: SessionVerifier &
       return;
     }
     if (!['GET', 'HEAD'].includes(req.method ?? '')) { res.writeHead(404); res.end(); return; }
-    if (path === '/api/health') { json(res, 200, { status: 'ok', protocol: 1, npc: deps.npcReady() ? 'ready' : 'unavailable' }); return; }
+    if (path === '/api/health') { json(res, 200, { status: 'ok', protocol: 3, npc: deps.npcReady() ? 'ready' : 'unavailable' }); return; }
     if (path === '/config.json') { json(res, 200, { session: 'online', serverUrl: null, mapId: config.defaultMap, chunkRadius: null, debug: false }); return; }
     if (path.startsWith('/world/')) {
       const bearer = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.headers.authorization ?? '');

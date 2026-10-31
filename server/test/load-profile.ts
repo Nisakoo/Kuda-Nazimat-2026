@@ -24,9 +24,9 @@ const intervals: number[] = []; let last = 0; let answers = 0; let timeouts = 0;
 try {
   for (let i = 0; i < 4; i++) {
     const session = await (await fetch(`${origin}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: `Load ${i}` }) })).json() as { token: string };
-    const socket = io(`${origin}/game`, { auth: { version: 1, token: session.token }, transports: ['websocket'], reconnection: false, autoConnect: false }); sockets.push(socket);
+    const socket = io(`${origin}/game`, { auth: { version: 3, token: session.token }, transports: ['websocket'], reconnection: false, autoConnect: false }); sockets.push(socket);
     let request = 0; let sequence = 0; const began = performance.now();
-    const send = (type: string, fields = {}) => socket.emit('game', { v: 1, type, requestId: `r${++request}`, ...fields });
+    const send = (type: string, fields = {}) => socket.emit('game', { v: 3, type, requestId: `r${++request}`, ...(type === 'input' ? { sprint: false, jumpId: 0 } : {}), ...fields });
     socket.on('game', (raw) => {
       const packet = parseServerMessage(raw);
       if (packet.type === 'npc-answer') answers++;
@@ -40,7 +40,7 @@ try {
     timers.push(setInterval(() => send('chat-send', { text: 'Нагрузка' }), 1100));
   }
   let round = 0;
-  const questions = () => { for (const socket of sockets) socket.emit('game', { v: 1, type: 'npc-question', requestId: `q${round}`, targetId: 'guide', text: 'История' }); round++; };
+  const questions = () => { for (const socket of sockets) socket.emit('game', { v: 3, type: 'npc-question', requestId: `q${round}`, targetId: 'guide', text: 'История' }); round++; };
   questions(); timers.push(setInterval(questions, 10000));
   await new Promise<void>((resolve) => setTimeout(resolve, 61000));
   const sorted = intervals.sort((a, b) => a - b); const p95 = sorted[Math.floor(sorted.length * .95)];

@@ -4,7 +4,7 @@ type: module-design
 status: ready
 implementation: partial
 parent: architecture
-summary: Версионируемый игровой контракт v1 клиента и сервера; потоковый NPC-подконтракт — черновик v2.
+summary: Игровой Socket.IO v3 с движением MOVE; HTTP BABEL v2 и прежняя пара NPC, потоковый NPC остаётся черновиком.
 related:
   - shared-contracts.md
   - server-realtime.md
@@ -59,7 +59,17 @@ related:
 
 Ошибка `{v:2, requestId, error:{code,message}}`; до разбора запроса допускается общий `{error}` без requestId. HTTP: INVALID 400, UNAUTHORIZED 401, FORBIDDEN 403, CONFLICT/NOT_READY 409, RATE_LIMIT 429, UNAVAILABLE 503. Ошибка не подменяется исходным текстом или клиентским успехом. На карте market участник BABEL не может обойти этот контракт через старые chat-send/npc-question.
 
-## Контракт v1
+## Игровое движение v3 (MOVE-013)
+
+Текущая согласованная поставка использует `auth.version: 3` и `v: 3` во всех игровых пакетах. Версии 1/2 отклоняются с VERSION; параллельная поддержка не требуется. Формы и лимиты прежнего контракта ниже сохраняются, кроме явно перечисленного:
+
+- `input`: обязательные `sprint: boolean`, `jumpId: safe integer ≥0` дополнительно к sequence/direction/preparedChunks. Клиент не отправляет физическое состояние. jumpId монотонен в соединении; 0 — нет запроса; увеличенный ID обрабатывается один раз, даже при отказе в воздухе. Повтор ID не прыгает повторно. После join нового соединения счётчик и подтверждение обнуляются.
+- Сущность игрока содержит `motion: {grounded,phase,verticalVelocity,locomotion,stamina,sprintBlocked,jumpAck}`. grounded/sprintBlocked — boolean; phase — grounded/rising/falling; locomotion — idle/walk/sprint; stamina ∈[0,100], verticalVelocity ∈[-100,100], jumpAck — safe integer ≥0. grounded согласован с phase и нулевой вертикальной скоростью. Поля обязательны для character.kind=player, NPC их не получает.
+- При пропуске delta запрашивается snapshot. Resync не сбрасывает jumpAck или запас; новое соединение сбрасывает только ввод/ID. Никакого replay ввода.
+- Авторитетные параметры и алгоритм — MOVE и SHARED. Сервер проверяет весь путь и след с preparedChunks; клиент передаёт исходное намерение, разрешённое скольжение не теряется.
+- Подконтракт NPC остаётся npc-question/npc-answer; черновик потокового NPC ниже не реализуется этим переходом. HTTP BABEL сохраняет v2.
+
+## Базовый контракт v1 (история форм, v3 наследует с изменениями выше)
 
 Это клиентский контракт из ветки `feat-base-client`; исполняемая версия — `shared/protocol/`. Вход (mock по имени) описан в [AUTH](server-auth.md). Готовая серверная сессия передаётся приложению как `{token, expiresAt}` и хранится в памяти, без localStorage/URL/логов. Токен — непрозрачная строка 16–512 символов без пробельных и управляющих символов, `expiresAt` — Unix ms.
 

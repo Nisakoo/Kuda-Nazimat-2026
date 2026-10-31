@@ -5,6 +5,9 @@ export interface MovementBounds { readonly minX: number; readonly maxX: number; 
 /** Client-side intentions, not the still-undecided network protocol. */
 export type GameCommand =
   | { readonly type: 'move'; readonly direction: Direction }
+  | { readonly type: 'sprint'; readonly held: boolean }
+  | { readonly type: 'jump' }
+  | { readonly type: 'clear-input' }
   | { readonly type: 'interact'; readonly targetId: EntityId };
 
 export type RejectionReason = 'missing-entity' | 'missing-component' | 'invalid-direction'

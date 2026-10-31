@@ -90,3 +90,7 @@ npm --prefix server run backup -- /absolute/path/backup.sqlite --config /absolut
 `POST /api/babylon` защищён Bearer-сессией, игровые действия требуют управляющего Socket.IO-соединения. Контракт — [PROTO-009](../specs/protocol.md). По умолчанию явно выбран TestLanguagePort: известные тестовые переводы и подготовленные NPC-ответы, произвольные фразы возвращают ошибку. Этот режим не доказывает качество реальной LLM.
 
 Реальный адаптер подключается через `LanguagePort` из `src/babylon/ports.ts`, четвёртый аргумент `startApplication`. Он предоставляет `mode: local`, список квалифицированных языков, translate и answer с AbortSignal. Используется существующая общая GenerationQueue (4 unfinished, 1/player, базовая concurrency 1); не создавайте независимый лимит/вторую модель. Lifecycle inference собирается в app. Реализация Ollama находится вне этой задачи. Политика данных BABEL и лимиты — [BABEL](../specs/game-babylon.md), SQLite — STORE-012.
+
+## Движение MOVE
+
+Игровой Socket.IO использует v3; клиент и сервер поставляются вместе, v1/v2 получают VERSION. Формы NPC npc-question/npc-answer и HTTP BABEL v2 сохраняются. Space — однократный прыжок, удержание Shift — спринт с авторитетной выносливостью. Общая симуляция в shared/movement; перекрытия берутся из подготовленного manifest без импорта client/. Новую карту нужно подготовить командой сборки клиента до запуска сервера. SQLite получает безопасную опору; после рестарта незавершённый прыжок не воспроизводится.

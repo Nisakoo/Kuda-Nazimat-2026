@@ -28,12 +28,12 @@ async function setup(overrides: Record<string, unknown> = {}, language?: Languag
     return await response.json() as { token: string; expiresAt: number };
   };
   async function connect(token: string) {
-    const socket = io(`${origin}/game`, { auth: { version: 1, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
+    const socket = io(`${origin}/game`, { auth: { version: 3, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
     cleanups.push(async () => { socket.disconnect(); });
     const packets: ServerMessage[] = []; socket.on('game', (raw) => packets.push(parseServerMessage(raw)));
     const connected = new Promise<void>((resolve, reject) => { socket.once('connect', resolve); socket.once('connect_error', reject); }); socket.connect(); await connected;
     let count = 0;
-    const command = (type: string, fields = {}) => { const requestId = `r${++count}`; socket.emit('game', { v: 1, type, requestId, ...fields }); return requestId; };
+    const command = (type: string, fields = {}) => { const requestId = `r${++count}`; socket.emit('game', { v: 3, type, requestId, ...(type === 'input' ? { sprint: false, jumpId: 0 } : {}), ...fields }); return requestId; };
     const wait = async (predicate: (p: ServerMessage) => boolean) => { await expect.poll(() => packets.find(predicate), { timeout: 3000 }).toBeDefined(); return packets.find(predicate)!; };
     return { socket, packets, command, wait };
   }
@@ -59,6 +59,30 @@ it('real HTTP auth, join, private world, periodic/grace save and NPC commit work
   const again = await connect((await guest('аня')).token); again.command('join', { mapId: 'test' });
   const restored = await again.wait((p) => p.type === 'joined'); if (restored.type !== 'joined') throw new Error();
   expect(restored.playerId).toBe(joined.playerId); expect(restored.snapshot.entities.find((e) => e.id === joined.playerId)?.transform?.position.x).toBe(savedX);
+});
+
+it('v3 jump/sprint are authoritative over a real socket; takeover and a released seat preserve stamina and SQLite saves support', async () => {
+  const { config, guest, connect } = await setup(); const session = await guest('Движение');
+  const first = await connect(session.token); first.command('join', { mapId: 'test' });
+  const joined = await first.wait(p => p.type === 'joined'); if (joined.type !== 'joined') throw new Error();
+  const entity = (p: ServerMessage) => (p.type === 'delta' ? p.upsert : p.type === 'snapshot' || p.type === 'joined' ? p.snapshot.entities : []).find(e => e.id === joined.playerId);
+  first.command('input', { sequence: 1, direction: { x: -1, z: 0 }, preparedChunks: ['0_0'], sprint: true, jumpId: 1 });
+  const airborne = await first.wait(p => entity(p)?.motion?.phase === 'rising');
+  expect(entity(airborne)!.motion).toMatchObject({ jumpAck: 1, locomotion: 'sprint' });
+  const stock = entity(airborne)!.motion!.stamina; expect(stock).toBeLessThan(100);
+  first.command('input', { sequence: 2, direction: { x: 0, z: 0 }, preparedChunks: ['0_0'], sprint: false, jumpId: 2 });
+  await first.wait(p => entity(p)?.motion?.jumpAck === 2);
+  const db = new DatabaseSync(config.dbPath, { readOnly: true }); cleanups.push(async () => { db.close(); });
+  await expect.poll(() => Number(db.prepare('SELECT y FROM players WHERE id = ?').get(joined.playerId)!.y)).toBe(0);
+  const next = await connect(session.token); next.command('join', { mapId: 'test' });
+  const takeover = await next.wait(p => p.type === 'joined');
+  expect(entity(takeover)!.motion!.stamina).toBeLessThanOrEqual(stock);
+  expect(entity(takeover)!.motion!.jumpAck).toBe(0);
+  next.socket.disconnect(); await new Promise(resolve => setTimeout(resolve, 180));
+  const returned = await connect(session.token); returned.command('join', { mapId: 'test' });
+  const restored = await returned.wait(p => p.type === 'joined');
+  expect(entity(restored)!.motion).toMatchObject({ grounded: true, phase: 'grounded', jumpAck: 0 });
+  expect(entity(restored)!.motion!.stamina).toBeLessThan(100);
 });
 
 it('BABEL HTTP requires auth and the controlling seat, rejects forged ownership and cannot commit after takeover', async () => {
@@ -90,7 +114,7 @@ it('session expiry closes the real socket and rejects protected HTTP and old tok
   const client = await connect(session.token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
   await client.wait((p) => p.type === 'error' && p.code === 'UNAUTHORIZED'); expect(client.socket.connected).toBe(false);
   expect((await fetch(`${origin}/world/maps/test/manifest.json`, { headers: { Authorization: `Bearer ${session.token}` } })).status).toBe(401);
-  const rejected: Socket = io(`${origin}/game`, { auth: { version: 1, token: session.token }, reconnection: false, autoConnect: false });
+  const rejected: Socket = io(`${origin}/game`, { auth: { version: 3, token: session.token }, reconnection: false, autoConnect: false });
   try { const failed = new Promise<Error & { data?: { code: string } }>((resolve) => rejected.once('connect_error', resolve)); rejected.connect(); const error = await failed; expect(error.data?.code).toBe('UNAUTHORIZED'); }
   finally { rejected.disconnect(); }
 });
@@ -112,7 +136,7 @@ it('failed responder startup leaves real movement and chat available with a degr
   let server: Awaited<ReturnType<typeof setup>>;
   try { server = await setup(); } finally { factory.mockRestore(); }
   const { origin, config, guest, connect } = server;
-  expect(await (await fetch(`${origin}/api/health`)).json()).toEqual({ status: 'ok', protocol: 1, npc: 'unavailable' });
+  expect(await (await fetch(`${origin}/api/health`)).json()).toEqual({ status: 'ok', protocol: 3, npc: 'unavailable' });
   const client = await connect((await guest('Без модели')).token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
   const chatId = client.command('chat-send', { text: 'Чат работает' }); await client.wait((p) => p.type === 'chat' && p.requestId === chatId);
   client.command('input', { sequence: 1, direction: { x: 1, z: 0 }, preparedChunks: ['0_0'] });

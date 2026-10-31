@@ -1,7 +1,8 @@
 /** Original low-poly assets; generated offline with Three.js, no downloaded content. */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { Group, Mesh, MeshStandardMaterial, BoxGeometry, SphereGeometry, CylinderGeometry, IcosahedronGeometry, LatheGeometry, BufferAttribute, BufferGeometry, Float32BufferAttribute, PlaneGeometry, Shape, ExtrudeGeometry, Vector2, Color, AnimationClip, QuaternionKeyframeTrack } from 'three';
+import { Box3, Group, Mesh, MeshStandardMaterial, BoxGeometry, SphereGeometry, CylinderGeometry, IcosahedronGeometry, LatheGeometry, BufferAttribute, BufferGeometry, Float32BufferAttribute, PlaneGeometry, Shape, ExtrudeGeometry, Vector2, Color, AnimationClip, QuaternionKeyframeTrack } from 'three';
+import { volumeFromBox } from './ceiling-volumes.mjs';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 // GLTFExporter uses FileReader for binary Blob conversion, also in Node.
@@ -213,7 +214,7 @@ function mainBuilding(){
    for(const side of [-1,1])box(C.sand,9+side*1.25,y+.38,z,.35,.76,.5);
   }
   box(C.cream,9,1.5,-4.25,2,3,2.5);
-  for(const side of [-1,1]){box(C.sand,9+side*1.25,3.38,-4.25,.35,.76,2.5);obstacle(9+side*1.25,1,.35,13);}
+  for(const side of [-1,1]){box(C.sand,9+side*1.25,3.38,-4.25,.35,.76,2.5);obstacle(9+side*1.25,1,.54,13);}
   box(C.sand,9,3.4,-5.55,2.8,.8,.35);obstacle(9,-5.55,2.8,.35);
   for(const z of [7,-3,-5.4])for(const side of [-1,1]){const y=z===7?0:3;box(C.cream,9+side*1.25,y+.55,z,.5,1.1,.5);box(C.teal,9+side*1.25,y+.95,z,.54,.18,.54);}
   vessel(10.8,3,-4.4,.6);vessel(7.4,0,7,.65);
@@ -236,4 +237,13 @@ function mainBuilding(){
 function batch(group){for(const child of [...group.children])if(child.isGroup)batch(child);
 const geometries=[];for(const child of [...group.children]){if(!child.isMesh)continue;child.updateMatrix();const g=child.geometry.index?child.geometry.toNonIndexed():child.geometry.clone();g.applyMatrix4(child.matrix);g.deleteAttribute('uv');const count=g.attributes.position.count;const color=child.material.color;const colors=new Uint8Array(count*3);for(let i=0;i<count;i++)colors.set([Math.round(color.r*255),Math.round(color.g*255),Math.round(color.b*255)],i*3);g.setAttribute('color',new BufferAttribute(colors,3,true));geometries.push(g);group.remove(child);child.geometry.dispose();child.material.dispose();}
 if(geometries.length){const joined=mergeGeometries(geometries);const merged=mergeVertices(joined);joined.dispose();const hash=createHash('sha256');for(const key of Object.keys(merged.attributes).sort()){const attribute=merged.attributes[key];hash.update(key);hash.update(Buffer.from(attribute.array.buffer,attribute.array.byteOffset,attribute.array.byteLength));}if(merged.index)hash.update(Buffer.from(merged.index.array.buffer,merged.index.array.byteOffset,merged.index.array.byteLength));const key=hash.digest('hex');let shared=geometryPool.get(key);if(shared)merged.dispose();else{shared=merged;geometryPool.set(key,shared);}const mesh=new Mesh(shared,batchedMaterial);mesh.name=group.name+'-surface';group.add(mesh);for(const g of geometries)g.dispose();}}
-for(const [name,make] of [['market',market],['pasture',pasture],['main-building',mainBuilding]]){make();root.userData.collisions=collisions;batch(root);const tracks=clips.flatMap(clip=>clip.tracks);const data=await new GLTFExporter().parseAsync(root,{binary:true,animations:[new AnimationClip('idle',5,tracks)]});const bytes=Buffer.from(data);const target=new URL(name+'.glb',rootUrl);const previous=await readFile(target).catch(()=>null);if(!previous?.equals(bytes))await writeFile(target,bytes);console.log(`${name}: ${bytes.length} bytes; ${collisions.length} collision rectangles`);}
+for(const [name,make] of [['market',market],['pasture',pasture],['main-building',mainBuilding]]){make();root.userData.collisions=collisions;
+root.updateMatrixWorld(true);
+const ceilings=[];
+root.traverse(node=>{if(!node.isMesh)return;node.geometry.computeBoundingBox();const box=node.geometry.boundingBox.clone().applyMatrix4(node.matrixWorld);
+ if(box.min.y<1.8||box.min.y>6.2)return;
+ if(collisions.some(([x0,z0,x1,z1])=>box.min.x>=x0&&box.max.x<=x1&&box.min.z>=z0&&box.max.z<=z1))return;
+ ceilings.push(volumeFromBox(box));
+});
+root.userData.ceilingVolumes=ceilings;
+batch(root);const tracks=clips.flatMap(clip=>clip.tracks);const data=await new GLTFExporter().parseAsync(root,{binary:true,animations:[new AnimationClip('idle',5,tracks)]});const bytes=Buffer.from(data);const target=new URL(name+'.glb',rootUrl);const previous=await readFile(target).catch(()=>null);if(!previous?.equals(bytes))await writeFile(target,bytes);console.log(`${name}: ${bytes.length} bytes; ${collisions.length} collision rectangles; ${ceilings.length} ceiling volumes`);}

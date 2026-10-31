@@ -1,4 +1,6 @@
-import { isWalkable, footprintCells } from '../../../shared/map/walkability.ts';
+import { isWalkable, isPathWalkable, footprintCells } from '../../../shared/map/walkability.ts';
+import { ceilingsNear } from '../../../shared/map/ceilings.ts';
+import type { CeilingVolume } from '../../../shared/map/manifest.ts';
 import type { Vector3 } from '../core/types';
 import type { VisualChunk } from '../render/RenderAdapter';
 import type { ChunkData, ChunkEntry, MapSource, WorldManifest } from './types';
@@ -146,6 +148,16 @@ export class ChunkManager {
       const state = this.stateAt(x, z);
       return state?.status === 'ready' ? state.data?.collision : undefined;
     }, position.x, position.z);
+  }
+  canTraverse(from: Vector3, to: Vector3): boolean {
+    const manifest = this.manifestValue;
+    return !!manifest && isPathWalkable(manifest, ({ x, z }) => {
+      const state = this.stateAt(x, z);
+      return state?.status === 'ready' ? state.data?.collision : undefined;
+    }, from, to);
+  }
+  ceilingsFor(from: Vector3, to: Vector3): readonly CeilingVolume[] {
+    return this.manifestValue ? ceilingsNear(this.manifestValue, ({ x, z }) => this.cells.get(`${x},${z}`)?.ceilingVolumes, from, to) : [];
   }
   isPrepared(position: Vector3): boolean {
     const manifest = this.manifestValue;

@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import './generate-market-models.mjs';
+import { ceilingVolumesFromGlb, compactVolumes, distributeVolumes, placeVolumes } from './ceiling-volumes.mjs';
 const publicRoot=new URL('../public/',import.meta.url);
 const base=JSON.parse(await readFile(new URL('maps/demo/manifest.json',publicRoot),'utf8'));
 const root=new URL('maps/market/',publicRoot);await mkdir(root,{recursive:true});
@@ -8,6 +9,7 @@ async function writeChanged(path,data){const bytes=Buffer.from(data);const old=a
 const assets={...base.assets}; delete assets['assets/models/demo/courtyard.glb'];
 const models={...base.models};delete models.courtyard;
 const chunks=base.chunks.map(entry=>({...entry}));
+const authoredCeilings=[];
 for(const [name,id] of [['market','0_0'],['pasture','0_-1'],['main-building','-1_0']]){
  const path=`assets/models/market/${name}.glb`;const bytes=await readFile(new URL(path,publicRoot));
  assets[path]={bytes:bytes.length,memory:name==='market'?8*1024*1024:6*1024*1024};models[name]=`market/${name}.glb`;
@@ -15,11 +17,17 @@ for(const [name,id] of [['market','0_0'],['pasture','0_-1'],['main-building','-1
  const rectangles=gltf.nodes.find(node=>node.extras?.collisions)?.extras.collisions;if(!rectangles)throw new Error('Missing authored collision data');
  const collision=Buffer.alloc(base.collisionResolution**2);const res=base.collisionResolution;
  for(const [minX,minZ,maxX,maxZ] of rectangles){const left=Math.max(0,Math.floor((minX+16)*res/32)),right=Math.min(res-1,Math.floor((maxX+16)*res/32));const top=Math.max(0,Math.floor((minZ+16)*res/32)),bottom=Math.min(res-1,Math.floor((maxZ+16)*res/32));for(let z=top;z<=bottom;z++)collision.fill(1,z*res+left,z*res+right+1);}
- const entry=chunks.find(c=>c.id===id);const json=JSON.stringify({id,objects:[{id:name,assetId:name,transform:{position:{x:entry.x*32,y:0,z:entry.z*32},rotationY:0},animation:'idle'}]});
+ const entry=chunks.find(c=>c.id===id);
+ const ceilings=compactVolumes(ceilingVolumesFromGlb(gltf).filter(v=>v.bottomY<=3.1 || name==='main-building' && v.minX<=10.25 && v.maxX>=7.75 && v.minZ<=7.25 && v.maxZ>=-5.65));
+ if(ceilings.length>128)throw new Error(`Too many ceilings in ${name}: ${ceilings.length}`);
+ entry.ceilingVolumes=[];
+ authoredCeilings.push(...placeVolumes(ceilings,entry.x*32,entry.z*32));
+ const json=JSON.stringify({id,objects:[{id:name,assetId:name,transform:{position:{x:entry.x*32,y:0,z:entry.z*32},rotationY:0},animation:'idle'}]});
  entry.url=`maps/market/${name}.json`;entry.bytes=Buffer.byteLength(json);entry.assets=[name];entry.region=name==='market'?'Рынок Вавилона':name==='pasture'?'Пастбище у рынка':'Двор Вавилонской башни';
  entry.collisionUrl=`maps/market/collision-${createHash('sha256').update(collision).digest('hex')}.bin`;entry.collisionBytes=collision.length;
  await writeChanged(new URL(entry.url,publicRoot),json);await writeChanged(new URL(entry.collisionUrl,publicRoot),collision);
 }
+distributeVolumes(chunks,authoredCeilings,base.chunkSize,base.origin);
 // Count the actual unique files reachable from this manifest, including reused city districts.
 const files=new Set(Object.keys(assets));for(const chunk of chunks){files.add(chunk.url);files.add(chunk.collisionUrl);}
 let resourceBytes=0;for(const path of files)resourceBytes+=(await readFile(new URL(path,publicRoot))).length;

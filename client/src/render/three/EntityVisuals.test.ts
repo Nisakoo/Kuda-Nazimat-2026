@@ -4,6 +4,7 @@ import type { Entity, WorldSnapshot } from '../../core/types';
 import { EntityVisuals } from './EntityVisuals';
 import { SceneAssets } from './SceneAssets';
 import { ResourcePool } from './ResourcePool';
+import type { MotionStatus } from '../../../../shared/world/types.ts';
 
 const entity = (id: string, x = 0): Entity => ({ id, renderable: { assetId: 'demo-player' }, transform: { position: { x, y: 0, z: 0 }, rotationY: 0 } });
 const snapshot = (...entities: Entity[]): WorldSnapshot => ({ tick: 0, entities });
@@ -68,4 +69,30 @@ it('animates observed movement with idle network states, stops at a wall, and re
   expect(visuals.position('a')!.x).toBe(20);
   expect(hip.rotation.x).toBeCloseTo(original,3);
   visuals.dispose();assets.dispose();
+});
+
+it.each([30, 60])('responds to confirmed sprint/air/landing at %i FPS and suppresses a correction landing', fps => {
+  const assets = new SceneAssets(); vi.spyOn(assets, 'label').mockImplementation(() => new Sprite());
+  const scene = new Scene(); const visuals = new EntityVisuals(scene, assets);
+  let tick = 0;
+  const sample = (z: number, y: number, phase: MotionStatus['phase'], locomotion: MotionStatus['locomotion']): WorldSnapshot => ({ tick: ++tick, entities: [{ ...entity('a'),
+    character: { kind: 'player', name: 'A' }, transform: { position: { x: 0, y, z }, rotationY: 0 },
+    motion: { grounded: phase === 'grounded', phase, verticalVelocity: phase === 'rising' ? 4 : phase === 'falling' ? -2 : 0, locomotion, stamina: 80, sprintBlocked: false, jumpAck: 1 } }] });
+  let current = sample(0, 0, 'grounded', 'idle'); visuals.sync(current, current, 'a'); visuals.animate(1, 0, 1 / fps);
+  const torso = scene.getObjectByName('torso')!; const knee = scene.getObjectByName('knee')!;
+  const advance = (next: WorldSnapshot) => { visuals.sync(current, next, 'a'); visuals.animate(1, tick / fps, 1 / fps); current = next; };
+  for (let i = 1; i <= fps / 5; i++) advance(sample(i * 3 / fps, 0, 'grounded', 'walk'));
+  const walkingLean = torso.rotation.x;
+  for (let i = 1; i <= fps / 5; i++) advance(sample(.6 + i * 5 / fps, 0, 'grounded', 'sprint'));
+  expect(torso.rotation.x).toBeGreaterThan(walkingLean + .04);
+  const beforeJump = knee.rotation.x;
+  advance(sample(1.6, .2, 'rising', 'idle'));
+  expect(Math.abs(knee.rotation.x - beforeJump)).toBeGreaterThan(.001);
+  expect(visuals.position('a')!.y).toBe(.2); // pose never changes the authoritative root
+  for (let i = 0; i < fps / 5; i++) advance(sample(1.6, .4, 'falling', 'idle'));
+  advance(sample(1.6, 0, 'grounded', 'idle')); expect(torso.position.y).toBeLessThan(.84);
+  advance(sample(1.6, .1, 'rising', 'idle')); expect(visuals.position('a')!.y).toBe(.1);
+  const correction = sample(1.6, 0, 'grounded', 'idle'); visuals.sync(correction, correction, 'a'); visuals.animate(1, tick / fps, 1 / fps);
+  expect(torso.position.y).toBeGreaterThan(.84);
+  visuals.dispose(); assets.dispose();
 });

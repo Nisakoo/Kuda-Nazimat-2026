@@ -101,7 +101,7 @@ it('serves public UI/config, strict guest login, protected world and allowlisted
   try {
     expect(await (await fetch(url)).text()).toBe('UI');
     expect(await (await fetch(`${url}/config.json`)).json()).toEqual({ session: 'online', serverUrl: null, mapId: 'market', chunkRadius: null, debug: false });
-    expect(await (await fetch(`${url}/api/health`)).json()).toEqual({ status: 'ok', protocol: 1, npc: 'ready' });
+    expect(await (await fetch(`${url}/api/health`)).json()).toEqual({ status: 'ok', protocol: 3, npc: 'ready' });
     for (const path of ['/maps/private.json', '/assets/models/x', '//config.json', '/alias', '/%2e%2e%2fsecret', '/missing']) expect((await fetch(url + path)).status).toBe(404);
     expect((await fetch(`${url}/world/near`)).status).toBe(401);
     for (const name of ['', 'x'.repeat(33), 'x\n']) expect((await fetch(`${url}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) })).status).toBe(400);

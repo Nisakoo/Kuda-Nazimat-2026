@@ -19,15 +19,15 @@ it('never constructs a real transport before valid server authorization', () => 
   s.adapter.connect({ ...s.context, session: { ...s.context.session, expiresAt: 0 } });
   expect(s.factory).not.toHaveBeenCalled();
   s.adapter.connect(s.context);
-  expect(s.factory).toHaveBeenCalledWith('http://school.local/game', expect.objectContaining({ path: '/app/socket.io', autoConnect: false, reconnection: false, auth: { version: 1, token: s.context.session.token } }));
+  expect(s.factory).toHaveBeenCalledWith('http://school.local/game', expect.objectContaining({ path: '/app/socket.io', autoConnect: false, reconnection: false, auth: { version: 3, token: s.context.session.token } }));
   s.trigger('connect');
   expect(s.adapter.state.status).toBe('connected');
-  s.adapter.send({ v: 1, type: 'join', requestId: 'r1', mapId: 'demo' });
+  s.adapter.send({ v: 3, type: 'join', requestId: 'r1', mapId: 'demo' });
   expect(s.socket.emit).toHaveBeenCalledOnce();
-  s.adapter.send({ v: 1, type: 'input', requestId: 'i1', sequence: 1, direction: { x: 0, z: 0 }, preparedChunks: [] });
+  s.adapter.send({ v: 3, type: 'input', sprint: false, jumpId: 0, requestId: 'i1', sequence: 1, direction: { x: 0, z: 0 }, preparedChunks: [] });
   expect(s.socket.volatile.emit).toHaveBeenCalledOnce();
   s.socket.connected = false;
-  expect(s.adapter.send({ v: 1, type: 'join', requestId: 'r2', mapId: 'demo' })).toBe(false);
+  expect(s.adapter.send({ v: 3, type: 'join', requestId: 'r2', mapId: 'demo' })).toBe(false);
   s.adapter.dispose(); expect(s.clock.pending).toBe(0);
 });
 it('bounds retry frequency and stops timers and subscribers on disposal', () => {
@@ -60,7 +60,7 @@ it('treats authorization rejection, expiry and incompatible packets as terminal'
 
 it('preserves the takeover reason and never retries a rejected session', () => {
   const s = setup(); s.adapter.connect(s.context); s.trigger('connect');
-  s.trigger('game', { v: 1, type: 'error', requestId: 'server', code: 'UNAUTHORIZED', message: 'Игра открыта в другом окне.' });
+  s.trigger('game', { v: 3, type: 'error', requestId: 'server', code: 'UNAUTHORIZED', message: 'Игра открыта в другом окне.' });
   expect(s.adapter.state).toEqual({ status: 'unauthorized', error: 'Игра открыта в другом окне.' });
   s.clock.advance(10000); expect(s.socket.connect).toHaveBeenCalledOnce(); s.adapter.dispose();
 });
@@ -68,6 +68,6 @@ it('preserves the takeover reason and never retries a rejected session', () => {
 it('drops a packet queued by Socket.IO after ping expiry instead of replaying it', () => {
   const s = setup(); s.adapter.connect(s.context); s.trigger('connect');
   s.socket.emit.mockImplementation(() => { s.socket.sendBuffer.push({ type: 'chat-send' }); });
-  expect(s.adapter.send({ v: 1, type: 'chat-send', requestId: 'r', text: 'Не повторять' })).toBe(false);
+  expect(s.adapter.send({ v: 3, type: 'chat-send', requestId: 'r', text: 'Не повторять' })).toBe(false);
   expect(s.socket.sendBuffer).toEqual([]); s.adapter.dispose();
 });

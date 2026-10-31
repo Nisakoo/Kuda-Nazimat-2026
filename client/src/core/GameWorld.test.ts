@@ -1,9 +1,10 @@
+import { initialMotion, motionStatus } from '../../../shared/movement/simulation.ts';
 import { describe, expect, it } from 'vitest';
 import { GameWorld } from './GameWorld';
 import type { Entity } from './types';
 
 const player: Entity = {
-  id: 'player', transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 },
+  id: 'player', motion: motionStatus(initialMotion({ x: 0, y: 0, z: 0 })), transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 },
   movement: { direction: { x: 0, z: 0 }, speed: 3 },
   character: { kind: 'player', name: 'Player' }, animationState: { name: 'idle' },
 };
@@ -13,6 +14,13 @@ const npc: Entity = {
 };
 
 describe('headless game world', () => {
+  it('MOVE-001: keeps the free component when diagonal movement meets a wall', () => {
+    const world = new GameWorld('local', [player]);
+    world.setMovementGuard((position) => position.x < .1);
+    world.execute('player', { type: 'move', direction: { x: 1, z: 1 } });
+    world.step(.05);
+    expect(world.getSnapshot().entities[0]!.transform!.position.z).toBeCloseTo(3 * .05 * Math.SQRT1_2);
+  });
   it('clamps a bounded local demo area and never changes replica positions locally', () => {
     const bounds = { minX: -1, maxX: 1, minZ: -1, maxZ: 1 };
     const world = new GameWorld('local', [player], bounds);
@@ -75,7 +83,7 @@ describe('headless game world', () => {
     expect(world.getSnapshot().entities).toEqual([player]);
   });
 
-  it.each([0, -1, NaN, Infinity])('rejects invalid simulation steps (%s)', (delta) => {
+  it.each([0, -1, NaN, Infinity, 2])('rejects invalid simulation steps (%s)', (delta) => {
     const world = new GameWorld('local', [player]);
     expect(() => world.step(delta)).toThrow();
     expect(world.getSnapshot().tick).toBe(0);

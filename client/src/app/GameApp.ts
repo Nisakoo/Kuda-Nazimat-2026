@@ -101,6 +101,8 @@ export interface AppSnapshot {
   readonly marketTarget: string | null;
   readonly performance: string;
   readonly renderStats: string;
+  readonly stamina: number;
+  readonly sprintBlocked: boolean;
 }
 
 /** Composition root; all UI/input commands cross this facade. */
@@ -156,7 +158,7 @@ export class GameApp {
       authRequired: config.session === 'online', authPending: false, authError: null, authName: '',
       mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
-      performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null,
+      performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
     });
   }
 
@@ -231,13 +233,16 @@ export class GameApp {
           this.session.setMovementGuard((position) => {
             this.waitingForWorld = !this.world?.isPrepared(position);
             return this.world?.canWalk(position) ?? false;
-          });
+          }, (from, to) => this.world?.canTraverse(from, to) ?? false);
           this.startWorld();
         }
         this.input = new InputController(host, {
           canControl: () => this.canControl(),
           cameraYaw: () => this.camera.yaw,
           move: (direction) => { this.session?.send({ type: 'move', direction }); },
+          sprint: (held) => { this.session?.send({ type: 'sprint', held }); },
+          jump: () => { this.session?.send({ type: 'jump' }); },
+          clearInput: () => { this.session?.send({ type: 'clear-input' }); },
           interact: () => this.interact(),
           menu: () => this.toggleMenu(),
           captured: () => {
@@ -268,6 +273,8 @@ export class GameApp {
           update: (delta) => {
             if (this.snapshot.phase !== 'running') return;
             if (this.world && !this.world.manifest) return;
+            const localPosition = this.current?.entities.find(entity => entity.id === this.session?.playerId)?.transform?.position;
+            if (this.world && this.session instanceof LocalSession && localPosition && !this.world.isPrepared(localPosition)) return;
             this.previous = this.current;
             if (this.session instanceof OnlineSession) this.session.setPreparedChunks(this.world?.preparedChunks ?? []);
             this.session?.update(delta);
@@ -529,6 +536,7 @@ export class GameApp {
       if (this.session instanceof LocalSession) {
         this.session.initializeSpawn(manifest.spawn);
         this.session.setSurfaceHeight((x, z) => surfaceHeight(manifest.heightSurfaces, x, z));
+        this.session.setCeilings(manifest.ceilingVolumes ?? [], (from, to) => world.ceilingsFor(from, to));
       }
     }).catch((error: unknown) => {
       if (this.world === world) this.worldFailure = error instanceof Error ? error.message : 'World load failed';
@@ -692,6 +700,8 @@ export class GameApp {
       if (candidate <= 2.7 && candidate < distance) { nearby = { id: goat.id, name: goat.name }; distance = candidate; }
     }
     const changes: Partial<AppSnapshot> = {};
+    const motion = this.current.entities.find(entity => entity.id === this.session?.playerId)?.motion;
+    if (motion && (motion.stamina !== this.snapshot.stamina || motion.sprintBlocked !== this.snapshot.sprintBlocked)) Object.assign(changes, { stamina: motion.stamina, sprintBlocked: motion.sprintBlocked });
     if (nearby?.id !== this.snapshot.nearby?.id) Object.assign(changes, { nearby });
     if (this.snapshot.debug && (force || this.current.tick % 6 === 0)) {
       const coordinates = 'X ' + player.x.toFixed(1) + ' · Z ' + player.z.toFixed(1) + ' · Y ' + player.y.toFixed(1);

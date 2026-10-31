@@ -1,6 +1,8 @@
 import type { Direction, Entity, Vector3 } from '../../../shared/world/types.ts';
 import type { GameMap } from '../world/GameMap.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
+import { MOVEMENT, initialMotion, motionStatus, recoverMotion, stepMotion } from '../../../shared/movement/simulation.ts';
+import type { MotionState, MovementEnvironment } from '../../../shared/movement/simulation.ts';
 
 export interface WorldSettings {
   readonly speed: number;            // m/s
@@ -8,7 +10,7 @@ export interface WorldSettings {
   readonly aoiRadius: number;        // m
   readonly interactTolerance: number;
 }
-export const DEFAULT_WORLD_SETTINGS: WorldSettings = { speed: 3, intentTimeoutMs: 250, aoiRadius: 64, interactTolerance: 0.5 };
+export const DEFAULT_WORLD_SETTINGS: WorldSettings = { speed: MOVEMENT.walkSpeed, intentTimeoutMs: 250, aoiRadius: 64, interactTolerance: 0.5 };
 const MAX_AOI = 256;
 const ZERO: Direction = { x: 0, z: 0 };
 
@@ -24,6 +26,9 @@ interface Player {
   prepared: ReadonlySet<string>;
   lastSequence: number;
   dirty: boolean;
+  motion: MotionState;
+  sprint: boolean;
+  jumpId: number;
 }
 export interface PlacedPlayer { readonly id: string; readonly name: string; readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
 export type InteractionCheck = { readonly ok: true; readonly npc: NpcDefinition } | { readonly ok: false; readonly reason: 'not-found' | 'too-far' };
@@ -31,6 +36,7 @@ export type InteractionCheck = { readonly ok: true; readonly npc: NpcDefinition 
 /** Authoritative headless world: players, NPCs, movement and visibility. Time arrives as arguments. */
 export class World {
   private readonly players = new Map<string, Player>();
+  private readonly resting = new Map<string, Pick<MotionState, 'stamina' | 'recoveryWait' | 'sprintBlocked' | 'releasedAfterExhaustion'>>();
   private readonly npcs: ReadonlyMap<string, NpcDefinition>;
   private ticks = 0;
   private readonly maps: ReadonlyMap<string, GameMap>;
@@ -48,9 +54,20 @@ export class World {
   has(playerId: string): boolean { return this.players.has(playerId); }
 
   add(player: PlacedPlayer): void {
-    this.players.set(player.id, { ...player, intent: ZERO, intentAt: 0, applied: ZERO, prepared: new Set(), lastSequence: 0, dirty: false });
+    const map = this.maps.get(player.mapId)!;
+    const position = { ...player.position, y: map.heightAt(player.position.x, player.position.z) };
+    const motion = { ...initialMotion(position), ...this.resting.get(player.id) };
+    this.resting.delete(player.id);
+    const p = { ...player, position, motion: { ...motion, safePosition: map.isSafeSupport(position.x, position.z) ? position : map.spawn }, sprint: false, jumpId: 0, intent: ZERO, intentAt: 0, applied: ZERO, prepared: new Set<string>(), lastSequence: 0, dirty: false };
+    p.motion = recoverMotion(p.motion, this.environment(p));
+    p.position = p.motion.position;
+    this.players.set(player.id, p);
   }
-  remove(playerId: string): void { this.players.delete(playerId); }
+  remove(playerId: string): void {
+    const state = this.players.get(playerId)?.motion;
+    if (state && state.stamina < 100) this.resting.set(playerId, { stamina: state.stamina, recoveryWait: state.recoveryWait, sprintBlocked: state.sprintBlocked, releasedAfterExhaustion: true });
+    this.players.delete(playerId);
+  }
 
   /** Where the player is now, or undefined if not in the world. */
   locate(playerId: string): PlacedPlayer | undefined {
@@ -58,56 +75,62 @@ export class World {
     return p && { id: p.id, name: p.name, mapId: p.mapId, position: p.position, rotationY: p.rotationY };
   }
 
-  /** A new connection restarts sequence numbering and readiness (PROTO v1). */
+  /** A new connection restarts sequence numbering and readiness (PROTO v3). */
   resetInput(playerId: string): void {
     const p = this.players.get(playerId);
-    if (p) { p.intent = ZERO; p.applied = ZERO; p.prepared = new Set(); p.lastSequence = 0; }
+    if (p) { p.intent = ZERO; p.sprint = false; p.jumpId = 0; p.motion = { ...p.motion, jumpAck: 0 }; p.applied = ZERO; p.prepared = new Set(); p.lastSequence = 0; }
   }
 
   /** Latest-intent input; stale sequences and unknown chunk IDs are ignored. */
-  setIntent(playerId: string, sequence: number, direction: Direction, preparedChunks: readonly string[], now: number): void {
+  setIntent(playerId: string, sequence: number, direction: Direction, preparedChunks: readonly string[], now: number, sprint = false, jumpId = 0): void {
     const p = this.players.get(playerId);
     if (!p || sequence <= p.lastSequence) return;
     const map = this.maps.get(p.mapId)!;
     p.lastSequence = sequence;
     p.intent = direction;
     p.intentAt = now;
+    p.sprint = sprint;
+    p.jumpId = jumpId === 0 ? p.motion.jumpAck : Math.max(p.jumpId, jumpId);
     p.prepared = new Set(preparedChunks.filter((id) => map.hasChunk(id)));
   }
 
   step(deltaSeconds: number, now: number): void {
+    if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0 || deltaSeconds > 1) throw new Error('Invalid world step');
     this.ticks++;
     for (const p of this.players.values()) this.move(p, deltaSeconds, now);
+    // Released seats retain only stamina debt, for at most the remaining recovery interval.
+    for (const [id, state] of this.resting) {
+      const stamina = Math.min(MOVEMENT.staminaMax, state.stamina + Math.max(0, deltaSeconds - state.recoveryWait) * MOVEMENT.recovery);
+      if (stamina === 100) this.resting.delete(id);
+      else this.resting.set(id, { ...state, stamina, recoveryWait: Math.max(0, state.recoveryWait - deltaSeconds) });
+    }
   }
 
   private move(p: Player, dt: number, now: number): void {
-    const intent = now - p.intentAt > this.settings.intentTimeoutMs ? ZERO : p.intent;
-    const length = Math.hypot(intent.x, intent.z);
-    if (length === 0) { p.applied = ZERO; return; }
-    const scale = Math.min(1, length) / length;
-    const step = this.settings.speed * dt;
-    const dx = intent.x * scale * step;
-    const dz = intent.z * scale * step;
-    // Full step, then slide along one axis (REALTIME-003).
-    for (const [mx, mz] of [[dx, dz], [dx, 0], [0, dz]] as const) {
-      if (mx === 0 && mz === 0) continue;
-      const x = p.position.x + mx; const z = p.position.z + mz;
-      if (!this.canStand(p, x, z)) continue;
-      p.position = { x, y: this.maps.get(p.mapId)!.heightAt(x, z), z };
-      p.rotationY = Math.atan2(mx, mz);
-      p.applied = { x: mx / step, z: mz / step };
-      p.dirty = true;
-      return;
-    }
-    p.applied = ZERO;
+    const stale = now - p.intentAt > this.settings.intentTimeoutMs;
+    const previous = p.position;
+    p.motion = stepMotion(p.motion, { direction: stale ? ZERO : p.intent, sprint: !stale && p.sprint, jumpId: stale ? p.motion.jumpAck : p.jumpId }, dt, this.environment(p), this.settings.speed);
+    p.position = p.motion.position;
+    const dx = p.position.x - previous.x; const dz = p.position.z - previous.z;
+    const speed = p.motion.locomotion === 'sprint' ? MOVEMENT.sprintSpeed : this.settings.speed;
+    const divisor = Math.max(speed * dt, Math.hypot(dx, dz));
+    p.applied = { x: dx / divisor, z: dz / divisor };
+    if (dx !== 0 || dz !== 0) p.rotationY = Math.atan2(dx, dz);
+    if (dx !== 0 || dz !== 0 || p.position.y !== previous.y) p.dirty = true;
   }
 
-  private canStand(p: Player, x: number, z: number): boolean {
+  private environment(p: Player): MovementEnvironment {
     const map = this.maps.get(p.mapId)!;
-    if (!map.isWalkable(x, z)) return false;
-    if (Math.abs(map.heightAt(x, z) - p.position.y) > .35) return false;
-    const chunks = map.footprintChunkIds(x, z);
-    return chunks !== null && chunks.every((id) => p.prepared.has(id));
+    return { canTraverse: (a, b) => map.canTraverse(a, b, p.prepared), canOccupy: (v) => map.isWalkable(v.x, v.z),
+      canRecover: (a, b) => map.canTraverse(a, b), heightAt: (x, z) => map.heightAt(x, z), ceilings: map.manifest.ceilingVolumes ?? [], ceilingsFor: (a, b) => map.ceilingsFor(a, b), spawn: map.spawn };
+  }
+
+  movementDiagnostic(playerId: string): MotionState['recoveryReason'] { return this.players.get(playerId)?.motion.recoveryReason ?? null; }
+
+  /** Persist a verified support, never an unfinished airborne Y. */
+  savedLocation(playerId: string): PlacedPlayer | undefined {
+    const p = this.players.get(playerId); const placed = this.locate(playerId);
+    return p && placed ? { ...placed, position: p.motion.safePosition } : undefined;
   }
 
   /** In v1 only NPCs are interactable. */
@@ -146,9 +169,10 @@ export class World {
       id: p.id,
       character: { kind: 'player', name: p.name },
       transform: { position: p.position, rotationY: p.rotationY },
-      movement: { direction: p.applied, speed: this.settings.speed },
+      movement: { direction: p.applied, speed: p.motion.locomotion === 'sprint' ? MOVEMENT.sprintSpeed : this.settings.speed },
+      motion: motionStatus(p.motion),
       renderable: { assetId: 'demo-player' },
-      animationState: { name: 'idle' },
+      animationState: { name: p.motion.grounded ? p.motion.locomotion : p.motion.phase },
     };
   }
 }

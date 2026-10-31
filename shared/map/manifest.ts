@@ -4,11 +4,13 @@ import type { Vector3 } from '../world/types.ts';
 export interface AssetSize { readonly bytes: number; readonly memory: number }
 export interface MapBootstrap { readonly manifestUrl: string; readonly worldBytes: number; readonly manifestBytes: number; readonly assets: Readonly<Record<string, AssetSize>> }
 export interface ChunkEntry {
+  readonly ceilingVolumes?: readonly CeilingVolume[];
   readonly id: string; readonly x: number; readonly z: number; readonly region: string;
   readonly url: string; readonly bytes: number; readonly collisionUrl: string; readonly collisionBytes: number;
   readonly assets: readonly string[];
 }
 export interface WorldManifest {
+  readonly ceilingVolumes?: readonly CeilingVolume[];
   readonly heightSurfaces?: readonly HeightSurface[];
   readonly mapId: string; readonly version: number; readonly worldBytes: number;
   readonly chunkSize: number; readonly spawn: Vector3; readonly origin: { readonly x: number; readonly z: number };
@@ -17,6 +19,7 @@ export interface WorldManifest {
 }
 /** Bounded linear ramps along Z, including level landings. No overlapping floors. */
 export interface HeightSurface { readonly minX: number; readonly maxX: number; readonly minZ: number; readonly maxZ: number; readonly startY: number; readonly endY: number }
+export interface CeilingVolume { readonly minX: number; readonly maxX: number; readonly minZ: number; readonly maxZ: number; readonly bottomY: number; readonly topY: number }
 export function surfaceHeight(surfaces: readonly HeightSurface[] | undefined, x: number, z: number): number {
   const surface = surfaces?.find((s) => x >= s.minX && x <= s.maxX && z >= s.minZ && z <= s.maxZ);
   return surface ? surface.startY + (surface.endY - surface.startY) * (z - surface.minZ) / (surface.maxZ - surface.minZ) : 0;
@@ -31,6 +34,17 @@ function object(value: unknown): Record<string, unknown> {
 function integer(value: unknown, min = 0): number { if (!Number.isSafeInteger(value) || (value as number) < min) throw new Error('Invalid map integer'); return value as number; }
 function text(value: unknown): string { if (typeof value !== 'string' || !value || value.length > 512) throw new Error('Invalid map text'); return value; }
 function vector(value: unknown): Vector3 { const v = object(value); if (![v.x, v.y, v.z].every((n) => typeof n === 'number' && Number.isFinite(n))) throw new Error('Invalid map position'); return { x: v.x as number, y: v.y as number, z: v.z as number }; }
+function parseCeilings(value: unknown): CeilingVolume[] {
+  if (!Array.isArray(value) || value.length > 128) throw new Error('Invalid ceiling volumes');
+  return value.map((rawVolume) => {
+    const volume = object(rawVolume);
+    const fields = ['minX', 'maxX', 'minZ', 'maxZ', 'bottomY', 'topY'];
+    if (Object.keys(volume).length !== fields.length || fields.some((key) => typeof volume[key] !== 'number' || !Number.isFinite(volume[key]) || Math.abs(volume[key] as number) > 100000)) throw new Error('Invalid ceiling coordinates');
+    const result = Object.fromEntries(fields.map((key) => [key, volume[key]])) as unknown as CeilingVolume;
+    if (result.minX >= result.maxX || result.minZ >= result.maxZ || result.bottomY >= result.topY) throw new Error('Invalid ceiling dimensions');
+    return result;
+  });
+}
 
 export function parseManifest(raw: unknown, bootstrap: MapBootstrap): WorldManifest {
   const value = object(raw);
@@ -39,7 +53,7 @@ export function parseManifest(raw: unknown, bootstrap: MapBootstrap): WorldManif
   const chunks: ChunkEntry[] = value.chunks.map((rawEntry) => {
     const entry = object(rawEntry);
     if (!Array.isArray(entry.assets) || entry.assets.some((id) => typeof id !== 'string')) throw new Error('Invalid chunk asset references');
-    return { id: text(entry.id), x: integer(entry.x, -100_000), z: integer(entry.z, -100_000), region: text(entry.region), url: text(entry.url), bytes: integer(entry.bytes, 1), collisionUrl: text(entry.collisionUrl), collisionBytes: integer(entry.collisionBytes, 1), assets: entry.assets as string[] };
+    return { id: text(entry.id), x: integer(entry.x, -100_000), z: integer(entry.z, -100_000), region: text(entry.region), url: text(entry.url), bytes: integer(entry.bytes, 1), collisionUrl: text(entry.collisionUrl), collisionBytes: integer(entry.collisionBytes, 1), assets: entry.assets as string[], ...(entry.ceilingVolumes !== undefined && { ceilingVolumes: parseCeilings(entry.ceilingVolumes) }) };
   });
   if (new Set(chunks.map((entry) => entry.id)).size !== chunks.length || new Set(chunks.map((entry) => `${entry.x}:${entry.z}`)).size !== chunks.length) throw new Error('Duplicate chunk');
   const models: Record<string, string> = {};
@@ -70,7 +84,12 @@ export function parseManifest(raw: unknown, bootstrap: MapBootstrap): WorldManif
       if (a.minX < b.maxX && b.minX < a.maxX && a.minZ < b.maxZ && b.minZ < a.maxZ) throw new Error('Overlapping height surfaces');
     }
   }
-  return { mapId: text(value.mapId), version: 1, worldBytes: bootstrap.worldBytes, chunkSize: integer(value.chunkSize, 1), collisionResolution: integer(value.collisionResolution, 1), spawn: vector(value.spawn), origin: { x: integer(origin.x, -100_000), z: integer(origin.z, -100_000) }, chunks, models, assets, ...(heightSurfaces && { heightSurfaces }) };
+  const ceilingVolumes = value.ceilingVolumes === undefined ? undefined : parseCeilings(value.ceilingVolumes);
+  for (const chunk of chunks) for (const volume of chunk.ceilingVolumes ?? []) {
+    const minX = (origin.x as number) + chunk.x * (value.chunkSize as number); const minZ = (origin.z as number) + chunk.z * (value.chunkSize as number);
+    if (volume.minX < minX || volume.maxX > minX + (value.chunkSize as number) || volume.minZ < minZ || volume.maxZ > minZ + (value.chunkSize as number)) throw new Error('Ceiling outside owning chunk');
+  }
+  return { mapId: text(value.mapId), version: 1, worldBytes: bootstrap.worldBytes, chunkSize: integer(value.chunkSize, 1), collisionResolution: integer(value.collisionResolution, 1), spawn: vector(value.spawn), origin: { x: integer(origin.x, -100_000), z: integer(origin.z, -100_000) }, chunks, models, assets, ...(heightSurfaces && { heightSurfaces }), ...(ceilingVolumes && { ceilingVolumes }) };
 }
 
 /** Bootstrap a server derives from its own manifest; the client later checks the manifest against it. */

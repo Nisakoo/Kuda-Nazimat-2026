@@ -34,7 +34,7 @@ class HandshakeError extends Error {
   constructor(code: ErrorCode, message: string) { super(message); this.data = { code, message }; }
 }
 
-/** REALTIME-001…009: Socket.IO namespace /game speaking PROTO v1. Thin: parse → service → serialize. */
+/** REALTIME-001…009: Socket.IO namespace /game speaking PROTO v3. Thin: parse → service → serialize. */
 export function attachGateway(server: HttpServer, deps: GatewayDeps): { close(): Promise<void> } {
   const io = new Server(server, {
     path: '/socket.io',
@@ -47,7 +47,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
 
   nsp.use((socket, next) => {
     const auth = socket.handshake.auth as { version?: unknown; token?: unknown } | undefined;
-    if (auth?.version !== 1) { next(new HandshakeError('VERSION', 'Несовместимая версия игрового протокола.')); return; }
+    if (auth?.version !== 3) { next(new HandshakeError('VERSION', 'Несовместимая версия игрового протокола.')); return; }
     if (typeof auth.token !== 'string' || auth.token.length > 512) { next(new HandshakeError('UNAUTHORIZED', 'Нужна серверная сессия.')); return; }
     deps.sessions.verify(auth.token).then((check) => {
       if (!check.ok) { next(new HandshakeError('UNAUTHORIZED', 'Сессия отсутствует или истекла.')); return; }
@@ -101,7 +101,7 @@ class Connection implements Channel {
 
   private fail(code: ErrorCode, message: string): void {
     if (this.closed) return;
-    this.send({ v: 1, type: 'error', requestId: SERVER_REQUEST_ID, code, message });
+    this.send({ v: 3, type: 'error', requestId: SERVER_REQUEST_ID, code, message });
     this.closed = true;
     this.socket.disconnect(true);
   }
@@ -120,7 +120,7 @@ class Connection implements Channel {
   }
 
   private error(requestId: string, code: ErrorCode, message: string): void {
-    this.send({ v: 1, type: 'error', requestId, code, message });
+    this.send({ v: 3, type: 'error', requestId, code, message });
   }
 
   private receive(raw: unknown): void {
@@ -159,7 +159,7 @@ class Connection implements Channel {
     if ((message.type === 'chat-send' || message.type === 'npc-question') && this.deps.babylon?.enrolled(this.identity.playerId) && this.deps.game.locate(this.identity.accountId)?.mapId === 'market') { this.error(message.requestId, 'FORBIDDEN', 'Используйте общение BABEL с выбранным языком.'); return; }
     switch (message.type) {
       case 'input':
-        if (this.inputBucket.take()) game.input(this, message.sequence, message.direction, message.preparedChunks);
+        if (this.inputBucket.take()) game.input(this, message.sequence, message.direction, message.preparedChunks, message.sprint, message.jumpId);
         return;
       case 'resync': {
         const snapshot = game.resync(this);
@@ -168,7 +168,7 @@ class Connection implements Channel {
       }
       case 'interact': {
         const result = game.interact(this, message.targetId);
-        if (result.ok) this.send({ v: 1, type: 'interacted', requestId: message.requestId, targetId: message.targetId });
+        if (result.ok) this.send({ v: 3, type: 'interacted', requestId: message.requestId, targetId: message.targetId });
         else this.error(message.requestId, 'FORBIDDEN', result.reason === 'too-far' ? 'Слишком далеко.' : 'Объект недоступен.');
         return;
       }
@@ -196,7 +196,7 @@ class Connection implements Channel {
 
   private deliver(requestId: string, targetId: string, answer: NpcAnswer): void {
     if (this.closed || !this.deps.game.isControlling(this)) return;
-    if (answer.ok) { this.send({ v: 1, type: 'npc-answer', requestId, targetId, text: answer.text }); return; }
+    if (answer.ok) { this.send({ v: 3, type: 'npc-answer', requestId, targetId, text: answer.text }); return; }
     switch (answer.reason) {
       case 'cancelled': return;
       case 'player-busy': this.error(requestId, 'RATE_LIMIT', 'Дождитесь ответа на предыдущий вопрос.'); return;

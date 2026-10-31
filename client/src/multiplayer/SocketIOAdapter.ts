@@ -31,7 +31,7 @@ export class SocketIOAdapter implements NetworkAdapter {
     if (!['http:', 'https:'].includes(address.protocol) || address.username || address.password || address.search || address.hash) { this.set('error', 'Некорректный адрес сервера.'); this.session = null; return; }
     this.socket = this.factory(`${address.origin}/game`, {
       path: `${address.pathname.replace(/\/$/, '')}/socket.io`, autoConnect: false, reconnection: false,
-      timeout: 5000, forceNew: true, multiplex: false, auth: { version: 1, token: this.session.token },
+      timeout: 5000, forceNew: true, multiplex: false, auth: { version: 3, token: this.session.token },
     });
     const socket = this.socket;
     socket.on('connect', () => { if (this.socket !== socket) return; this.cancelRetry(); this.attempts = 0; this.set('connected'); });

@@ -44,7 +44,7 @@ beforeAll(async () => {
 afterAll(async () => { for (const s of sockets) s.disconnect(); await game.stop('test'); server.close(); });
 
 /** Client with a validated inbox: every packet must pass the shared parser (PROTO v1). */
-function client(token: string, version = 1) {
+function client(token: string, version = 3) {
   const socket = io(url, { path: '/socket.io', auth: { version, token }, transports: ['websocket'], reconnection: false, forceNew: true });
   sockets.push(socket);
   const inbox: ServerMessage[] = [];
@@ -62,8 +62,8 @@ function client(token: string, version = 1) {
       const timer = setTimeout(() => reject(new Error('timeout waiting for message')), ms);
       waiters.push({ match, resolve: (m) => { clearTimeout(timer); resolve(m); } });
     }),
-    send: (message: Record<string, unknown>) => { const requestId = `r${++req}`; socket.emit('game', { v: 1, requestId, ...message }); return requestId; },
-    input: (direction: { x: number; z: number }, preparedChunks = ['0_0', '1_0', '0_1', '-1_0', '0_-1']) => api.send({ type: 'input', sequence: ++seq, direction, preparedChunks }),
+    send: (message: Record<string, unknown>) => { const requestId = `r${++req}`; socket.emit('game', { v: 3, requestId, ...message }); return requestId; },
+    input: (direction: { x: number; z: number }, preparedChunks = ['0_0', '1_0', '0_1', '-1_0', '0_-1']) => api.send({ type: 'input', sprint: false, jumpId: 0, sequence: ++seq, direction, preparedChunks }),
     connected: () => new Promise<void>((resolve, reject) => { socket.on('connect', () => resolve()); socket.on('connect_error', reject); }),
     refused: () => new Promise<string | undefined>((resolve) => socket.on('connect_error', (e: Error & { data?: { code?: string } }) => resolve(e.data?.code))),
   };
@@ -84,6 +84,7 @@ describe('handshake (AUTH-003, PROTO-008 §1)', () => {
   it('rejects a missing token and a wrong protocol version', async () => {
     expect(await client('nope').refused()).toBe('UNAUTHORIZED');
     expect(await client('token-anya-000000000001', 2).refused()).toBe('VERSION');
+    expect(await client('token-anya-000000000001', 1).refused()).toBe('VERSION');
   });
 });
 
@@ -157,13 +158,13 @@ describe('protocol hygiene (REALTIME-001, PROTO-008 §5)', () => {
     await vera.connected();
     const early = vera.send({ type: 'interact', targetId: 'near' });
     expect(await vera.next((m) => m.type === 'error' && m.requestId === early)).toMatchObject({ code: 'NOT_READY' });
-    vera.socket.emit('game', { v: 1, type: 'join', requestId: 'dup', mapId: 'test' });
+    vera.socket.emit('game', { v: 3, type: 'join', requestId: 'dup', mapId: 'test' });
     await vera.next((m) => m.type === 'joined');
-    vera.socket.emit('game', { v: 1, type: 'join', requestId: 'dup', mapId: 'test' });
+    vera.socket.emit('game', { v: 3, type: 'join', requestId: 'dup', mapId: 'test' });
     expect(await vera.next((m) => m.type === 'error' && m.requestId === 'dup')).toMatchObject({ code: 'INVALID' });
     const forged = vera.send({ type: 'input', sequence: 1, direction: { x: 0, z: 0 }, preparedChunks: [], position: { x: 99, y: 0, z: 0 } });
     expect(await vera.next((m) => m.type === 'error' && m.requestId === forged)).toMatchObject({ code: 'INVALID' });
-    vera.socket.emit('game', { v: 1, type: 'resync', requestId: 'rs', revision: 0 });
+    vera.socket.emit('game', { v: 3, type: 'resync', requestId: 'rs', revision: 0 });
     expect(await vera.next((m) => m.type === 'snapshot')).toMatchObject({ type: 'snapshot' });
   });
 });
