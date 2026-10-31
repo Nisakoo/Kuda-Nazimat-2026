@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest';
 import type { Entity } from '../core/types';
-import type { ClientMessage } from '../shared/protocol/types';
+import type { ClientMessage } from '../../../shared/protocol/types.ts';
 import { MockNetworkAdapter } from '../multiplayer/MockNetworkAdapter';
 import { TestClock } from '../multiplayer/testClock';
 import { OnlineSession } from './OnlineSession';

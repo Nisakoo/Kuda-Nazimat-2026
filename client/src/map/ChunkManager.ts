@@ -1,3 +1,4 @@
+import { isWalkable, footprintCells } from '../../../shared/map/walkability.ts';
 import type { Vector3 } from '../core/types';
 import type { VisualChunk } from '../render/RenderAdapter';
 import type { ChunkData, ChunkEntry, MapSource, WorldManifest } from './types';
@@ -104,26 +105,15 @@ export class ChunkManager {
   canWalk(position: Vector3): boolean {
     const manifest = this.manifestValue;
     if (!manifest) return false;
-    for (const dx of [-0.25, 0.25]) for (const dz of [-0.25, 0.25]) {
-      const x = Math.floor((position.x + dx - manifest.origin.x) / manifest.chunkSize);
-      const z = Math.floor((position.z + dz - manifest.origin.z) / manifest.chunkSize);
+    return isWalkable(manifest, ({ x, z }) => {
       const state = [...this.states.values()].find((item) => item.entry.x === x && item.entry.z === z);
-      if (state?.status !== 'ready' || !state.data) return false;
-      const cx = Math.floor((position.x + dx - manifest.origin.x - x * manifest.chunkSize) / manifest.chunkSize * manifest.collisionResolution);
-      const cz = Math.floor((position.z + dz - manifest.origin.z - z * manifest.chunkSize) / manifest.chunkSize * manifest.collisionResolution);
-      if (state.data.collision[cz * manifest.collisionResolution + cx] !== 0) return false;
-    }
-    return true;
+      return state?.status === 'ready' ? state.data?.collision : undefined;
+    }, position.x, position.z);
   }
   isPrepared(position: Vector3): boolean {
     const manifest = this.manifestValue;
-    if (!manifest) return false;
-    for (const dx of [-0.25, 0.25]) for (const dz of [-0.25, 0.25]) {
-      const x = Math.floor((position.x + dx - manifest.origin.x) / manifest.chunkSize);
-      const z = Math.floor((position.z + dz - manifest.origin.z) / manifest.chunkSize);
-      if (![...this.states.values()].some((state) => state.entry.x === x && state.entry.z === z && state.status === 'ready')) return false;
-    }
-    return true;
+    return !!manifest && footprintCells(manifest, position.x, position.z).every(({ x, z }) =>
+      [...this.states.values()].some((state) => state.entry.x === x && state.entry.z === z && state.status === 'ready'));
   }
   region(position: Vector3): string {
     const manifest = this.manifestValue;

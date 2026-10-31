@@ -1,8 +1,8 @@
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import type { AccessContext, Clock, NetworkAdapter } from './NetworkAdapter';
-import type { ClientMessage, NetworkState, ServerMessage, ServerSession } from '../shared/protocol/types';
-import { parseClientMessage, parseServerMessage, parseServerSession, ProtocolError } from '../shared/protocol/validate';
+import type { ClientMessage, NetworkState, ServerMessage, ServerSession } from '../../../shared/protocol/types.ts';
+import { parseClientMessage, parseServerMessage, parseServerSession, ProtocolError } from '../../../shared/protocol/validate.ts';
 
 export type SocketFactory = (url: string, options: Parameters<typeof io>[1]) => Socket;
 

@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import fixtures from './fixtures.json';
-import { parseClientMessage, parseServerMessage, parseServerSession, ProtocolError } from './validate';
+import fixtures from '../../../../shared/protocol/fixtures.json';
+import { parseClientMessage, parseServerMessage, parseServerSession, ProtocolError } from '../../../../shared/protocol/validate.ts';
 
 it.each(fixtures)('validates portable $direction fixtures (valid=$valid)', ({ direction, valid, packet }) => {
   const parse = direction === 'client' ? parseClientMessage : parseServerMessage;

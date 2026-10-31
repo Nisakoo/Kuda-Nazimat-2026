@@ -25,8 +25,8 @@ import { SocketIOAdapter } from '../multiplayer/SocketIOAdapter';
 import { createMockDemo } from '../multiplayer/mockDemo';
 import { MockNetworkAdapter } from '../multiplayer/MockNetworkAdapter';
 import type { Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
-import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../shared/protocol/types';
-import { parseServerSession } from '../shared/protocol/validate';
+import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../../../shared/protocol/types.ts';
+import { parseServerSession } from '../../../shared/protocol/validate.ts';
 import { FrameMetrics } from './FrameMetrics';
 
 const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };

@@ -1,6 +1,6 @@
 import type { AccessContext, Clock, NetworkAdapter } from './NetworkAdapter';
-import type { ClientMessage, NetworkState, ServerMessage } from '../shared/protocol/types';
-import { parseClientMessage, parseServerMessage } from '../shared/protocol/validate';
+import type { ClientMessage, NetworkState, ServerMessage } from '../../../shared/protocol/types.ts';
+import { parseClientMessage, parseServerMessage } from '../../../shared/protocol/validate.ts';
 
 /** Controlled test transport. No Socket.IO or real authentication is used here. */
 export class MockNetworkAdapter implements NetworkAdapter {

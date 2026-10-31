@@ -2,8 +2,8 @@ import { GameWorld } from '../core/GameWorld';
 import type { Direction, GameCommand, Vector3, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from './GameSession';
 import type { AccessContext, Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
-import type { ClientMessage, NetworkState, ServerMessage, WorldDescriptor } from '../shared/protocol/types';
-import { LIMITS } from '../shared/protocol/types';
+import type { ClientMessage, NetworkState, ServerMessage, WorldDescriptor } from '../../../shared/protocol/types.ts';
+import { LIMITS } from '../../../shared/protocol/types.ts';
 
 export type ChatMessage = Extract<ServerMessage, { type: 'chat' }>;
 export type OnlineNotice =
