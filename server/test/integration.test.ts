@@ -1,4 +1,5 @@
-import { afterEach, expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
+import * as responders from '../src/npc/adapters/index.ts';
 import { writeFile, rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -77,4 +78,20 @@ it('takeover cancels a running NPC answer before SQLite commit and preserves the
   await new Promise((resolve) => setTimeout(resolve, 850));
   const db = new DatabaseSync(config.dbPath, { readOnly: true }); try { expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue').get()!.n).toBe(0); } finally { db.close(); }
   expect(first.packets.some((p) => p.type === 'npc-answer')).toBe(false); expect(next.packets.some((p) => p.type === 'npc-answer')).toBe(false);
+});
+
+it('failed responder startup leaves real movement and chat available with a degraded health status', async () => {
+  const factory = vi.spyOn(responders, 'createResponder').mockReturnValue({ async start() { throw new Error('private adapter failure'); }, async stop() {}, async answer() { throw new Error('must not run'); } });
+  let server: Awaited<ReturnType<typeof setup>>;
+  try { server = await setup(); } finally { factory.mockRestore(); }
+  const { origin, config, guest, connect } = server;
+  expect(await (await fetch(`${origin}/api/health`)).json()).toEqual({ status: 'ok', protocol: 1, npc: 'unavailable' });
+  const client = await connect((await guest('Без модели')).token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
+  const chatId = client.command('chat-send', { text: 'Чат работает' }); await client.wait((p) => p.type === 'chat' && p.requestId === chatId);
+  client.command('input', { sequence: 1, direction: { x: 1, z: 0 }, preparedChunks: ['0_0'] });
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try { await expect.poll(() => Number(db.prepare('SELECT x FROM players').get()!.x)).toBeGreaterThan(0); } finally { db.close(); }
+  const npcId = client.command('npc-question', { targetId: 'guide', text: 'История' });
+  const error = await client.wait((p) => p.type === 'error' && p.requestId === npcId);
+  expect(error.type === 'error' && error.code).toBe('UNAVAILABLE'); expect(JSON.stringify(error)).not.toContain('private adapter failure');
 });

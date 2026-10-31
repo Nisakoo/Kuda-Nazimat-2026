@@ -1,7 +1,7 @@
 ---
 id: TASK-011
 type: implementation-task
-status: in-progress
+status: done
 spec: ../specs/server-persistence.md
 requirements: [STORE-001–005, STORE-011]
 depends_on: [TASK-010]
@@ -22,7 +22,7 @@ scheduling_note: часть B (платформа и данные)
 - [x] STORE-001–003, 011 / S1: восстановление идентичности, позиции и истории через порты после restart.
 - [x] STORE-002, 004 / S2: rollback первого account+player, пакетной позиции и отказ dialogue, ошибка возвращается вызывающему.
 - [x] STORE-003, 005: SIGKILL после commit и отдельный VACUUM INTO, integrity_check=ok, копия читается.
-- [ ] STORE-003 / S3: окно потери при игровом saveInterval и отсутствие IO внутри tick проверяются с A; тест writer не заменяет этот сценарий.
+- [x] STORE-003 / S3: настоящий процесс A+B, saveInterval 10 с, SIGKILL через ~5 с после нового движения: восстановлена committed-позиция, окно 5159 мс, integrity_check и VACUUM-копия ok. Сохранение в game/index.ts вынесено в отдельный таймер; tick не вызывает SQLite.
 - [x] STORE-011 / S7: лимит 50 и ошибка записи → unavailable без ответа.
 - [x] make server-test, check:platform проходят.
 - [x] Полный npm run check проходит после объединения A.

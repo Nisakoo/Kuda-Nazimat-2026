@@ -1,0 +1,14 @@
+{
+  "commit": "8cf3e76",
+  "makeDemoRuns": 2,
+  "preparedDependencies": "symlinks to installed client/server node_modules",
+  "npmOffline": true,
+  "players": 2,
+  "dialogueBeforeRestart": 1,
+  "dialogueAfterRestart": 2,
+  "integrity": "ok",
+  "firstStopMs": 15,
+  "secondStopMs": 11,
+  "safeLogs": true,
+  "printedLocalhostAndLan": true
+}

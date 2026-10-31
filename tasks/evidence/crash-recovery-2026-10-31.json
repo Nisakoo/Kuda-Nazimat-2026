@@ -1,0 +1,9 @@
+{
+  "node": "v24.15.0",
+  "saveIntervalMs": 10000,
+  "lostWindowMs": 5159,
+  "samePlayer": true,
+  "restoredCommittedPosition": true,
+  "integrity": "ok",
+  "backupIntegrity": "ok"
+}
