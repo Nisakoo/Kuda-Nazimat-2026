@@ -1,11 +1,11 @@
 ---
 id: TASK-010
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/server-foundation.md
-requirements: [SERVER-001–008]
+requirements: [SERVER-001–005, SERVER-007–008]
 depends_on: []
-scheduling_note: часть B (платформа и данные); createGame части A подключается по contracts.ts, до готовности — заглушка
+scheduling_note: часть B (платформа и данные); createGame части A подключается по contracts.ts, до готовности — тестовый GameRuntime, production требует A
 ---
 
 # Сервер: каркас
@@ -14,19 +14,18 @@ scheduling_note: часть B (платформа и данные); createGame �
 Создать `server/` — каркас модульного монолита с composition root, конфигурацией, HTTP и жизненным циклом. Изменены SERVER-001–006: выбраны расположение в репозитории, Node 24/TypeScript, node:http, правила чистой архитектуры и лимит слотов. Добавлены SERVER-007–008. Остальные модули подключаются своими задачами; до них здесь есть только пустые точки сборки.
 
 ## Реализация
-- [ ] `server/package.json` (engines Node 24, socket.io, dev: typescript, vitest, socket.io-client, @types/node, проверка импортов), `tsconfig.json`, запуск через удаление типов Node; закрепить версию Node и проверить работу; при необходимости зафиксировать запасной путь сборки.
-- [ ] `app`: загрузка и строгая проверка config (SERVER-004), сборка модулей, запуск только после проверок, штатная остановка по SIGINT/SIGTERM.
-- [ ] `http`: раздача `clientDir` без `maps/` и `assets/models/`, `GET /config.json`, `GET /api/health`, CORS по `corsOrigins`, 404 по умолчанию; логгер без секретов.
-- [ ] Правила зависимостей SERVER-002 в автоматической проверке; `make server`, `make server-test`; README сервера.
+- [x] Node 24.15.0, package/lockfile, HTTP без web-фреймворка, strict TypeScript, make server/server-test.
+- [x] app: строгий config, композиция через CreateGame из contracts.ts, fail-fast, SIGINT/SIGTERM с лимитом остановки 10 с.
+- [x] Публичные UI/config/health, закрытые world-каталоги, Bearer и CORS, безопасные логи.
+- [x] Проверка импортов, включая отрицательный пример IO в домене; server/README.md.
 
 ## Приёмка
-- [ ] SERVER-001–004, 008 / S1: сервер стартует на loopback и LAN-адресе, отдаёт клиент и `/config.json` с `session: "online"`; `npm run check` проходит, нарушения направления зависимостей ловятся тестовым примером.
-- [ ] SERVER-003 / S2: `/maps/...`, выход за корень и неизвестные пути — 404.
-- [ ] SERVER-005 / S3: неверная конфигурация и отсутствующие каталоги дают понятную ошибку без открытия порта; остановка ≤10 с (полное сохранение проверяется после TASK-011/014).
-- [ ] SERVER-006 / S4 и SERVER-007 / S5 проверяются после TASK-014 и TASK-025; до этого отмечены непроверенными.
-- [ ] `make server-test` и `npm run check` проходят.
+- [x] SERVER-001–004, 007–008: runtime Node 24, HTTP/config/health и правила импортов проверены компонентно.
+- [x] SERVER-003 / S2: traversal, неизвестные ресурсы, maps/models и symlink закрыты; /world без токена — 401.
+- [x] SERVER-005 / S3: ошибки подготовки не открывают порт; SIGTERM с контрактным GameRuntime сохраняет позицию и завершает процесс за <10 с.
+- [ ] SERVER S1/S3/S5: реальный runtime A, LAN-игра, сохранение полного мира и отсутствие текстов чата в логах — после TASK-014.
+- [x] make server-test, check:platform проходят.
+- [ ] Полный npm run check: ошибки A из main, см. evidence.
 
 ## Результат
-- Файлы: —
-- Проверки: не выполнялись; реализация не начата.
-- Отклонения: —
+Реализованы app/http/common и конфиги. SERVER-006 принадлежит A и исключён из реализации B. Production требует настоящий createGame; его отсутствие даёт явную ошибку, не подменяется пустым миром. Проверки и блокеры — [evidence](evidence/backend-platform-data-2026-10-31.md).

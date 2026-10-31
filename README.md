@@ -82,7 +82,7 @@ PLAYWRIGHT_CHANNEL=chrome npm --prefix client run test:render
 | `client/src/render/` | RenderAdapter, ThreeRenderer, GLB/glTF, EntityVisuals, VisualChunks, общие GPU-ресурсы |
 | `client/src/map/` | HttpMapSource, ChunkManager, AssetManager, WorldBudget |
 | `client/src/multiplayer/` | SocketIOAdapter, MockNetworkAdapter, тестовый обмен |
-| `client/src/shared/protocol/` | PROTO v1, runtime-валидация и JSON fixtures |
+| `shared/` | Общие PROTO v1, runtime-валидация, JSON fixtures, типы мира, парсеры карты и проходимость |
 | `client/src/input/`, `ui/` | Управление и Svelte-экраны через фасад |
 
 Демо — 1024 чанка по 32 м, общие авторские GLB, тематические районы и уникальные видимые таблички. Collision bitmap получается из GLB, одинаковые BIN адресуются по SHA. Генерируемые JSON/BIN/bootstrap исключены из git; исходные модели и генератор сохранены. Небольшой bootstrap входит в JS, полный мир — нет. `models:generate` воспроизводит таблички GLB/glTF; экспорт окружения — `client/scripts/export-demo-scene.mjs` с локальным dev-сервером и Chrome.
@@ -122,6 +122,9 @@ PROTO v1: namespace `/game`, событие `game`, auth `{version:1, token}`. �
 | 015 | [Сервер: локальные NPC (v2)](tasks/015-server-ai.md) | [AI](specs/server-ai.md) | 011, 014, 017, 025 |
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
+
+Платформа B реализована и проверяется отдельно: [server/README.md](server/README.md). В текущей базе нет `server/src/game/index.ts` и готового realtime набора A; `make server` завершается с объяснением, TASK-026 заблокирован до слияния A. Полный `npm --prefix server run check` пока выявляет ошибки кода A; `check:platform` проверяет B и общие границы отдельно. Клиент переведён на корневой `shared/` по TASK-027, форма mock-входа остаётся TASK-028. Результаты — [evidence набора B](tasks/evidence/backend-platform-data-2026-10-31.md).
+
 
 ## Локальные NPC и LLM
 

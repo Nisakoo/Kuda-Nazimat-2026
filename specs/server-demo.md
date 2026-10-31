@@ -2,7 +2,7 @@
 id: server-demo
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Что бэкенд обязан обеспечить для 6-минутной защиты — запуск одной командой, два игрока, память NPC, показ данных и схемы.
 related:

@@ -2,7 +2,7 @@
 id: server-foundation
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Каркас единственного локального сервера — расположение, runtime, конфигурация, HTTP, жизненный цикл и лимит игроков.
 related:

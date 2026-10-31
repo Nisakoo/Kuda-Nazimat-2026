@@ -2,7 +2,7 @@
 id: server-auth
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Mock-вход по имени (гостевая сессия), проверка токена в handshake и /world, одно управляющее соединение на игрока.
 related:

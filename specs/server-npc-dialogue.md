@@ -2,7 +2,7 @@
 id: server-npc-dialogue
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Ответы NPC в PROTO v1 — NpcDialogueService, планировщик и порт NpcResponder с заглушкой; адаптер модели подключается отдельно.
 related:

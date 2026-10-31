@@ -1,12 +1,14 @@
 ---
 id: TASK-012
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/server-auth.md
-requirements: [AUTH-001–006]
+requirements: [AUTH-001–002, AUTH-004, AUTH-006]
 related:
   - spec: ../specs/protocol.md
     requirements: [PROTO-008]
+  - spec: ../specs/server-auth.md
+    requirements: [AUTH-003]
 depends_on: [TASK-011]
 scheduling_note: часть B (платформа и данные); handshake и перехват (AUTH-003/005 на стороне сокета) делает часть A в TASK-014
 ---
@@ -17,18 +19,16 @@ scheduling_note: часть B (платформа и данные); handshake и
 Реализовать mock-вход по имени, сессии и проверку доступа. Изменены AUTH-001–005: mock-вход вместо паролей, формат токена и TTL, перехват управления; добавлен AUTH-006 (`POST /api/auth/guest`).
 
 ## Реализация
-- [ ] AuthService: mock-вход по имени, проверка токена; порты `AccountStore`, `SessionStore`, `Clock`.
-- [ ] HTTP-маршрут `POST /api/auth/guest` с точным форматом ответа; Socket.IO-middleware handshake (`VERSION`/`UNAUTHORIZED`); Bearer-проверка для `/world/*`.
-- [ ] Закрытие соединения в момент `expiresAt`.
+- [x] AuthService, AccountStore/SessionStore, проверка токена и TTL, случайный токен 32 байта и SHA-256.
+- [x] POST /api/auth/guest, JSON ≤1 KiB, точное тело успеха, валидация имени и Bearer /world.
+- [ ] Handshake/expiry/takeover — A/TASK-014; B предоставляет SessionVerifier.
 
 ## Приёмка
-- [ ] AUTH-001, 003, 006 / S1, S2, S5: тестовые клиенты с действующим, отсутствующим и битым токеном; повторный вход под тем же именем; формат и коды ответа.
-- [ ] AUTH-002–003 / S3: истечение закрывает соединение, старый токен отклоняется.
-- [ ] AUTH-004 / S5: в БД только хеш токена, в логах токена нет.
-- [ ] AUTH-005 / S4: проверяется в TASK-014; до этого отмечен непроверенным.
-- [ ] `make server-test` и `npm run check` проходят.
+- [x] AUTH-001–002, 004, 006: одна идентичность при разном регистре, новое значение токена, имя первого входа, hash-only store, точный формат и 400.
+- [x] AUTH-003 (HTTP/верификация): без токена 401; истёкший/битый токен отклоняется, boundary expiresAt проверен.
+- [ ] AUTH S1/S3/S4: настоящий Socket.IO-handshake, закрытие по TTL и перехват — после A.
+- [x] make server-test, check:platform проходят.
+- [ ] Полный npm run check: ошибки A из main.
 
 ## Результат
-- Файлы: —
-- Проверки: не выполнялись; реализация не начата.
-- Отклонения: —
+Реализованы auth и HTTP-вход; нет паролей, logout или API v2. Клиентская форма входа описана в TASK-028 и не реализована в B. [Evidence](evidence/backend-platform-data-2026-10-31.md).

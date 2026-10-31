@@ -2,7 +2,7 @@
 id: server-persistence
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: SQLite сервера — аккаунты, сессии, игроки и история NPC v1; расширенный NPC-ledger и память — этап v2.
 related:
