@@ -96,6 +96,26 @@ it('delivers one text message to two independent sessions over a controlled test
   for (const session of sessions) session.dispose(); expect(clock.pending).toBe(0);
 });
 
+it('smooths the camera-followed player between network updates without changing authority or extrapolating', () => {
+  const s = setup();
+  s.clock.advance(40);
+  s.adapter.receive({ v: 1, type: 'delta', baseRevision: 0, revision: 1, tick: 2, upsert: [player('p1', 0.5)], remove: [] });
+  s.clock.advance(0); s.session.update(1 / 60);
+  const renderedX = () => {
+    const { previous, current, alpha } = s.session.getRenderState();
+    const x = (snapshot: typeof current) => snapshot.entities.find((entity) => entity.id === 'p1')!.transform!.position.x;
+    return x(previous) + (x(current) - x(previous)) * alpha;
+  };
+  expect(renderedX()).toBe(0);
+  const samples = [];
+  for (let frame = 0; frame < 6; frame++) { s.clock.advance(100 / 6); samples.push(renderedX()); }
+  for (let frame = 0; frame < samples.length; frame++) expect(samples[frame]).toBeCloseTo((frame + 1) / 12);
+  expect(s.session.getSnapshot().entities.find((entity) => entity.id === 'p1')!.transform!.position.x).toBe(0.5);
+  s.clock.advance(1000); expect(renderedX()).toBe(0.5);
+  s.adapter.drop(); expect(renderedX()).toBe(0.5);
+  s.session.dispose();
+});
+
 it('smooths the local avatar with the same history while keeping authoritative position current',()=>{
   const s=setup();
   s.adapter.receive({v:1,type:'delta',baseRevision:0,revision:1,tick:1,upsert:[player('p1',.3)],remove:[]});
