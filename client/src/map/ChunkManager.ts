@@ -19,6 +19,7 @@ export class ChunkManager {
   private budgetEpoch = 0;
   constructor(private readonly source: MapSource, private readonly view: ChunkView, private readonly concurrency = 2) {}
   get manifest(): WorldManifest | null { return this.manifestValue; }
+  get preparedChunks(): readonly string[] { return [...this.states.values()].filter((state) => state.status === 'ready').map((state) => state.entry.id); }
   get stats() { return { ready: [...this.states.values()].filter((state) => state.status === 'ready').length, loading: this.loading, deferred: [...this.states.values()].filter((state) => state.status === 'deferred').length, errors: [...this.states.values()].flatMap((state) => state.error ? [state.error] : []) }; }
 
   async start(position?: Vector3, prepare: (manifest: WorldManifest) => void = () => {}): Promise<WorldManifest> {

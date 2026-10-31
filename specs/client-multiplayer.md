@@ -1,8 +1,8 @@
 ---
 id: client-multiplayer
 type: module-design
-status: draft
-implementation: not-started
+status: ready
+implementation: partial
 parent: architecture
 summary: Подготовить клиент к отдельному серверу и проверить сетевые сценарии без него.
 ---
@@ -38,4 +38,4 @@ Prediction/reconciliation — будущая возможность, не обя
 
 ## Открытые вопросы
 
-Реальный handshake зависит от PROTO и AUTH. Пока они draft, реализуемы интерфейсы и mock; реальное end-to-end подключение не считается проверенным.
+Handshake и ограничения определены в PROTO v1. Способ получения сессии от реального локального входа и серверная проверка остаются в AUTH/TASK-016; реальное end-to-end подключение не считается проверенным по mock.

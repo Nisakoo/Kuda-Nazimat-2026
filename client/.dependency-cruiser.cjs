@@ -10,7 +10,12 @@ module.exports = {
     {
       name: 'session-through-core', severity: 'error',
       from: { path: '^src/session/', pathNot: '\\.test\\.ts$' },
-      to: { pathNot: '^src/(session|core|shared)/' },
+      to: { pathNot: '^src/(session|core|shared)/|^src/multiplayer/NetworkAdapter\\.ts$' },
+    },
+    {
+      name: 'socketio-inside-adapter', severity: 'error',
+      from: { pathNot: '^src/multiplayer/SocketIOAdapter(\\.test)?\\.ts$' },
+      to: { path: 'node_modules/socket.io-client/' },
     },
     {
       name: 'ui-through-app', severity: 'error',

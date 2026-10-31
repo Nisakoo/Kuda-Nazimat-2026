@@ -8,6 +8,8 @@ export class WorldBudget {
   private peakBytes = 0;
   private peakMemory = 0;
   private releases = 0;
+  private readonly emptyListeners = new Set<() => void>();
+  whenEmpty(): Promise<void> { return this.allocations.size === 0 ? Promise.resolve() : new Promise((resolve) => this.emptyListeners.add(resolve)); }
   get epoch(): number { return this.releases; }
   constructor(readonly worldBytes: number, readonly memoryLimit = 32 * 1024 * 1024) {
     if (!Number.isSafeInteger(worldBytes) || worldBytes <= 0 || !Number.isSafeInteger(memoryLimit) || memoryLimit <= 0) throw new Error('Invalid world budget');
@@ -34,7 +36,10 @@ export class WorldBudget {
     return { release: () => {
       if (!active) return;
       active = false;
-      if (--allocation.owners === 0) { this.allocations.delete(key); this.releases++; }
+      if (--allocation.owners === 0) {
+        this.allocations.delete(key); this.releases++;
+        if (this.allocations.size === 0) { for (const listener of this.emptyListeners) listener(); this.emptyListeners.clear(); }
+      }
     } };
   }
   reserveAll(resources: readonly { key: string; bytes: number; memory: number }[]): BudgetLease {

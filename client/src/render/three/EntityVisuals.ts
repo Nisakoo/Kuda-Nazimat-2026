@@ -29,7 +29,7 @@ export class EntityVisuals {
     for (const entity of current.entities) {
       if (!entity.transform || !entity.renderable) continue;
       live.add(entity.id);
-      const token = `${entity.renderable.assetId}:${entity.character?.name ?? ''}:${entity.id === playerId}`;
+      const token = `${entity.renderable.assetId}:${entity.character?.name ?? ''}:${entity.id === playerId}:${this.library?.has(entity.renderable.assetId) ?? false}`;
       let visual = this.visuals.get(entity.id);
       if (visual && visual.token !== token) { this.remove(entity.id); visual = undefined; }
       if (!visual) {

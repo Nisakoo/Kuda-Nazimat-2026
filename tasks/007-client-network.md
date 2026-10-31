@@ -1,7 +1,7 @@
 ---
 id: TASK-007
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/client-multiplayer.md
 requirements: [NET-001–006]
 related:

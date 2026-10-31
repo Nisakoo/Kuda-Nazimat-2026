@@ -1,7 +1,7 @@
 ---
 id: TASK-009
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/protocol.md
 requirements: [PROTO-001–007]
 depends_on: []
@@ -14,6 +14,7 @@ scheduling_note: до реальной сетевой реализации
 Реализовать PROTO-001–007. Уточнён PROTO-007: NPC request/cancel/partial/result, terminal после commit и идемпотентное восстановление. Остальные открытые решения согласовать до реального транспорта.
 
 ## Реализация
+- Пользователь поручил 2026-10-31 завершать клиент без промежуточных согласований; PROTO v1 выбран в пределах клиентского scope. Серверная реализация/приёмка отдельно.
 - [ ] Согласовать handshake, версии и payload; описать схемы и fixtures для обоих проектов, ошибки и правила восстановления. Включить NPC-подконтракт: права dialogueId, накопительные best-effort `partial` с монотонным seq, безопасные пропуски и игнорирование дублей, полный durable completed/result вместо partial, result_expired и cancel. Исключить `npc.dialogue.ack` и replay фрагментов; disconnect отменяет активную generation, reconnect получает статус/результат.
 - [ ] Обновить документацию по фактическому результату.
 

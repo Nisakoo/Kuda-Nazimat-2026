@@ -8,13 +8,25 @@ import type { DemoDialog } from '../session/demoDialogue';
 import { InputController } from '../input/InputController';
 import { DEMO_NPCS, DEMO_SPAWN } from '../shared/demo';
 import { GameLoop } from './GameLoop';
+import { parseConfig } from './config';
 import type { ClientConfig } from './config';
 import { AssetManager, HttpAssetSource } from '../map/AssetManager';
 import { WorldBudget } from '../map/WorldBudget';
 import { HttpMapSource } from '../map/HttpMapSource';
 import { ChunkManager } from '../map/ChunkManager';
 import type { MapSource } from '../map/types';
-import { DEMO_WORLD } from '../shared/demoWorld.generated';
+import { DEMO_WORLD, SCIENCE_WORLD } from '../shared/demoWorld.generated';
+import { OnlineSession } from '../session/OnlineSession';
+import type { OnlineNotice } from '../session/OnlineSession';
+import { SocketIOAdapter } from '../multiplayer/SocketIOAdapter';
+import { createMockDemo } from '../multiplayer/mockDemo';
+import { MockNetworkAdapter } from '../multiplayer/MockNetworkAdapter';
+import type { Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
+import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../shared/protocol/types';
+import { parseServerSession } from '../shared/protocol/validate';
+
+const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };
+export type ClientMode = 'local' | 'mock' | 'online';
 
 const localEntities: readonly Entity[] = [
   {
@@ -51,6 +63,16 @@ export interface AppSnapshot {
   readonly region: string;
   readonly cacheStats: string;
   readonly chunkRadius: number;
+  readonly mode: ClientMode;
+  readonly settingsOpen: boolean;
+  readonly settingsError: string | null;
+  readonly networkStatus: ConnectionStatus;
+  readonly networkError: string | null;
+  readonly chatOpen: boolean;
+  readonly chatMessages: readonly { readonly id: string; readonly name: string; readonly text: string }[];
+  readonly chatError: string | null;
+  readonly dialogPending: boolean;
+  readonly dialogError: string | null;
 }
 
 /** Composition root; all UI/input commands cross this facade. */
@@ -58,7 +80,15 @@ export class GameApp {
   private renderer: RenderAdapter | null = null;
   private modelAssets: AssetManager | null = null;
   private world: ChunkManager | null = null;
-  private readonly worldBudget = new WorldBudget(DEMO_WORLD.worldBytes);
+  private worldBudget = new WorldBudget(DEMO_WORLD.worldBytes);
+  private activeBootstrap: WorldDescriptor | null = null;
+  private waitingBudget = false;
+  private generation = 0;
+  private mock = false;
+  private serverSession: ServerSession | null = null;
+  private network: NetworkAdapter | null = null;
+  private unsubscribeOnline: (() => void) | null = null;
+  private npcRequest: string | null = null;
   private worldStarting = false;
   private worldFailure: string | null = null;
   private waitingForWorld = false;
@@ -75,10 +105,10 @@ export class GameApp {
   private readonly listeners = new Set<(snapshot: AppSnapshot) => void>();
 
   constructor(
-    readonly config: ClientConfig,
+    public config: ClientConfig,
     private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false),
     private readonly createSession: () => GameSession = () => new LocalSession('local-player', localEntities),
-    private readonly createMap: ((budget: WorldBudget) => MapSource) | null = (budget) => new HttpMapSource(DEMO_WORLD, budget, new URL(import.meta.env.BASE_URL, window.location.href).href),
+    private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
   ) {
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
@@ -86,6 +116,8 @@ export class GameApp {
       capture: 'idle', captureError: null,
       visualLoading: false, visualError: null, modelStats: '',
       worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
+      mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
+      chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
     });
   }
 
@@ -98,28 +130,49 @@ export class GameApp {
 
   start(host: HTMLElement): void {
     if (this.snapshot.phase === 'disposed') throw new Error('Приложение уже завершено.');
-    if (this.snapshot.phase === 'running') return;
-    if (this.config.session === 'online') {
-      this.setState('unavailable', 'Сетевой режим будет доступен после подключения сервера.');
-      return;
-    }
+    if (this.snapshot.phase === 'running' && this.renderer) return;
     try {
       if (this.host && this.host !== host) this.releaseResources();
       this.host = host;
+      if (this.config.session === 'online' && !this.session) {
+        if (!this.mock && !this.serverSession) { this.setState('unavailable', 'Сетевой режим требует входа на локальном сервере. Серверная сессия пока не предоставлена. В настройках доступен тестовый транспорт.'); return; }
+        this.network = this.mock ? createMockDemo(browserClock) : new SocketIOAdapter(this.config.serverUrl, browserClock);
+        const online = new OnlineSession(this.network, this.config.mapId, browserClock);
+        this.session = online;
+        online.setMovementGuard(() => false);
+        this.unsubscribeSession = online.subscribe(this.onSessionEvents);
+        this.unsubscribeOnline = online.subscribeNotices(this.onOnlineNotice);
+        online.connect(this.mock ? { kind: 'mock' } : this.serverSession ? { kind: 'server', session: this.serverSession } : undefined);
+        return;
+      }
+      if (this.config.session === 'online' && !this.activeBootstrap) return;
+      if (!this.activeBootstrap) {
+        if (!['demo', 'science'].includes(this.config.mapId)) throw new Error('Unknown local map');
+        this.activeBootstrap = this.config.mapId === 'science' ? SCIENCE_WORLD : DEMO_WORLD;
+      }
+      if (!this.renderer && this.worldBudget.stats.resources > 0) {
+        if (!this.waitingBudget) {
+          this.waitingBudget = true;
+          const generation = this.generation;
+          void this.worldBudget.whenEmpty().then(() => { if (this.generation === generation) { this.waitingBudget = false; this.start(host); } });
+        }
+        return;
+      }
       if (!this.renderer) {
-        this.session = this.createSession();
-        const origin = new URL(import.meta.env.BASE_URL, window.location.href);
-        const sizes = new Map(Object.entries(DEMO_WORLD.assets).map(([path, size]) => [new URL(path, origin).href, size]));
-        this.modelAssets = new AssetManager(new HttpAssetSource(new URL('assets/models/', origin).href), this.createMap ? this.worldBudget : undefined, (url) => sizes.get(url));
+        this.session ??= this.createSession();
+        this.worldBudget = new WorldBudget(this.activeBootstrap.worldBytes);
+        const origin = this.worldRoot();
+        const sizes = new Map(Object.entries(this.activeBootstrap.assets).map(([path, size]) => [new URL(path, origin).href, size]));
+        this.modelAssets = new AssetManager(new HttpAssetSource(new URL('assets/models/', origin).href, this.httpAccess()), this.createMap !== null ? this.worldBudget : undefined, (url) => sizes.get(url));
         this.renderer = this.createRenderer(this.modelAssets);
         this.renderer.mount(host);
-        this.renderer.registerModels({ 'demo-tablet': 'demo/tablet.glb', 'demo-tablet-json': 'demo/tablet.gltf' });
+        if (this.config.session === 'local' || this.mock) this.renderer.registerModels({ 'demo-tablet': 'demo/tablet.glb', 'demo-tablet-json': 'demo/tablet.gltf' });
         this.previous = this.current = this.session.getSnapshot();
         this.renderer.syncWorld(this.previous, this.current, this.session.playerId);
         this.renderer.setCamera(this.camera);
-        this.unsubscribeSession = this.session.subscribe(this.onSessionEvents);
-        if (this.createMap) {
-          this.world = new ChunkManager(this.createMap(this.worldBudget), this.renderer);
+        this.unsubscribeSession ??= this.session.subscribe(this.onSessionEvents);
+        if (this.createMap !== null) {
+          this.world = new ChunkManager(this.createMap?.(this.worldBudget) ?? new HttpMapSource(this.activeBootstrap, this.worldBudget, origin.href, this.httpAccess()), this.renderer);
           this.world.setRadius(this.snapshot.chunkRadius);
           this.session.setMovementGuard((position) => {
             this.waitingForWorld = !this.world?.isPrepared(position);
@@ -161,6 +214,7 @@ export class GameApp {
             if (this.snapshot.phase !== 'running') return;
             if (this.world && !this.world.manifest) return;
             this.previous = this.current;
+            if (this.session instanceof OnlineSession) this.session.setPreparedChunks(this.world?.preparedChunks ?? []);
             this.session?.update(delta);
             this.current = this.session?.getSnapshot() ?? null;
             if (this.previous && this.current) this.renderer?.syncWorld(this.previous, this.current, this.session?.playerId ?? null);
@@ -169,12 +223,17 @@ export class GameApp {
             if (player) this.world?.plan(player);
           },
           render: (alpha, elapsed) => {
-            this.renderer?.render(elapsed, alpha); this.updateVisualStatus();
+            if (this.session instanceof OnlineSession) {
+              const presentation = this.session.getRenderState();
+              this.renderer?.syncWorld(presentation.previous, presentation.current, this.session.playerId);
+              this.renderer?.render(elapsed, presentation.alpha);
+            } else this.renderer?.render(elapsed, alpha);
+            this.updateVisualStatus();
             if (this.snapshot.phase === 'stopped' && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
           },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
         });
-        this.loadDemoDecorations();
+        if (this.config.session === 'local' || this.mock) this.loadDemoDecorations();
       }
       this.resize();
       this.observer = new ResizeObserver(this.resize);
@@ -226,7 +285,7 @@ export class GameApp {
     this.detach();
     this.releaseResources();
     this.camera = { yaw: 0, pitch: 0.7, distance: 15 };
-    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null });
+    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null });
     this.setState('idle');
     this.start(host);
   }
@@ -245,15 +304,22 @@ export class GameApp {
 
   closeDialog(): void {
     this.input?.stop();
-    this.patch({ dialog: null });
+    this.npcRequest = null;
+    this.patch({ dialog: null, dialogPending: false, dialogError: null });
     this.stop();
   }
 
   submitDialog(text: string): void {
-    if (this.snapshot.dialog && text.trim()) this.patch({ dialog: answerDemoDialog(this.snapshot.dialog, text) });
+    const dialog = this.snapshot.dialog;
+    if (!dialog || !text.trim() || this.snapshot.dialogPending) return;
+    if (this.session instanceof OnlineSession) {
+      this.npcRequest = this.session.askNpc(dialog.npcId, text);
+      if (this.npcRequest) this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-18), { author: 'player', text: text.trim() }] }, dialogPending: true, dialogError: null });
+    } else this.patch({ dialog: answerDemoDialog(dialog, text) });
   }
 
   setDebug(debug: boolean): void {
+    this.config = Object.freeze({ ...this.config, debug });
     this.patch({ debug });
     this.updateHud(true);
   }
@@ -261,21 +327,108 @@ export class GameApp {
   retryVisuals(): void {
     this.renderer?.retryFailedModels();
     if (this.current) this.renderer?.syncWorld(this.current, this.current, this.session?.playerId ?? null);
-    this.loadDemoDecorations();
+    if (this.config.session === 'local' || this.mock) this.loadDemoDecorations();
     if (this.world?.manifest) this.world.retry(); else this.startWorld();
     // The same frame loop drains asynchronous model work while simulation stays paused.
     if (this.snapshot.phase === 'stopped') this.loop?.start();
     this.updateVisualStatus();
   }
 
-  setChunkRadius(radius: number): void { this.world?.setRadius(radius); this.patch({ chunkRadius: radius }); }
+  setChunkRadius(radius: number): void {
+    if (!Number.isSafeInteger(radius) || radius < 0 || radius > 2) throw new Error('Invalid radius');
+    this.world?.setRadius(radius); this.config = Object.freeze({ ...this.config, chunkRadius: radius }); this.patch({ chunkRadius: radius });
+  }
+
+  openSettings(): void { this.input?.stop(); this.stop(); this.patch({ settingsOpen: true, settingsError: null }); }
+  closeSettings(): void { this.patch({ settingsOpen: false }); if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host); }
+  applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean): boolean {
+    try {
+      const config = parseConfig({ session: mode === 'local' ? 'local' : 'online', serverUrl, mapId, chunkRadius, debug }, window.location.origin);
+      if ((mode === 'local' || mode === 'mock') && !['demo', 'science'].includes(mapId)) throw new Error('Для демо доступны карты demo и science.');
+      if (config.serverUrl !== this.config.serverUrl || mode !== 'online') this.serverSession = null;
+      this.mock = mode === 'mock'; this.config = config;
+      this.patch({ mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
+      if (this.host) this.restart(this.host);
+      return true;
+    } catch (error) { this.patch({ settingsError: error instanceof Error ? error.message : 'Некорректные настройки.' }); return false; }
+  }
+
+  /** Integration boundary: only the local server's login flow supplies this context. */
+  provideServerSession(raw: unknown): void {
+    const session = parseServerSession(raw, browserClock.now());
+    this.serverSession = session; this.mock = false; this.config = Object.freeze({ ...this.config, session: 'online' });
+    this.patch({ mode: 'online', networkError: null, networkStatus: 'unauthorized' });
+    if (this.host) this.restart(this.host);
+  }
+  logout(): void {
+    this.serverSession = null;
+    if (this.mock) { this.mock = false; this.config = Object.freeze({ ...this.config, session: 'local' }); this.patch({ mode: 'local' }); }
+    if (this.host) this.restart(this.host);
+  }
+  reconnect(): void { if (this.session instanceof OnlineSession) { this.patch({ networkError: null }); this.session.reconnect(); } }
+  simulateNetworkLoss(): void { if (this.network instanceof MockNetworkAdapter) this.network.drop(); }
+  openChat(): void {
+    this.input?.stop(); this.stop();
+    this.patch({ chatOpen: true, chatError: this.session instanceof OnlineSession ? null : 'Общение игроков доступно в сетевом или тестовом режиме.' });
+  }
+  closeChat(): void { this.patch({ chatOpen: false }); }
+  sendChat(text: string): boolean {
+    if (!(this.session instanceof OnlineSession)) return false;
+    const requestId = this.session.chat(text);
+    if (requestId) this.patch({ chatError: null });
+    return requestId !== null;
+  }
+  private worldRoot(): URL { return this.config.session === 'online' && !this.mock ? new URL(`${this.config.serverUrl.replace(/\/$/, '')}/world/`) : new URL(import.meta.env.BASE_URL, window.location.href); }
+  private httpAccess() {
+    return this.config.session === 'online' && !this.mock ? {
+      token: () => this.serverSession && this.serverSession.expiresAt > browserClock.now() ? this.serverSession.token : null,
+      unauthorized: () => this.expireServerSession(),
+    } : undefined;
+  }
+  private expireServerSession(): void {
+    const host = this.host;
+    this.serverSession = null;
+    this.detach(); this.releaseResources();
+    this.host = host;
+    this.patch({ screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, networkStatus: 'unauthorized', networkError: 'Серверная сессия истекла. Выполните вход на локальном сервере.' });
+    this.setState('unavailable', 'Сетевой режим требует повторного входа на локальном сервере.');
+  }
+  private readonly onOnlineNotice = (notice: OnlineNotice): void => {
+    if (notice.type === 'status') {
+      this.patch({ networkStatus: notice.state.status, networkError: notice.state.error });
+      if (notice.state.status !== 'connected') {
+        this.input?.stop(); this.stop(); this.patch({ worldReady: false });
+        if (notice.state.status === 'unauthorized' && notice.state.error && !this.mock) this.expireServerSession();
+      }
+    } else if (notice.type === 'joined') {
+      const host = this.host;
+      this.detach(); this.releaseScene();
+      this.activeBootstrap = notice.world;
+      this.patch({ screen: 'welcome', worldReady: false, capture: 'idle', captureError: null, dialog: null, chatOpen: false });
+      this.setState('idle'); if (host) this.start(host);
+    } else if (notice.type === 'chat') {
+      this.patch({ chatMessages: [...this.snapshot.chatMessages.slice(-49), { id: notice.message.messageId, name: notice.message.name, text: notice.message.text }] });
+    } else if (notice.type === 'npc') {
+      const dialog = this.snapshot.dialog;
+      if (dialog?.npcId === notice.targetId && this.npcRequest === notice.requestId) {
+        this.npcRequest = null;
+        this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-19), { author: 'npc', text: notice.text }] }, dialogPending: false, dialogError: null });
+      }
+    } else if (notice.type === 'request-error') {
+      if (this.npcRequest === notice.requestId) { this.npcRequest = null; this.patch({ dialogPending: false, dialogError: notice.message }); }
+      else if (this.snapshot.chatOpen) this.patch({ chatError: notice.message });
+      else this.patch({ networkError: notice.message });
+    }
+  };
 
   private startWorld(): void {
     const world = this.world;
     if (!world || this.worldStarting) return;
     this.worldStarting = true;
     this.worldFailure = null;
-    void world.start(undefined, (manifest) => {
+    const position = this.session instanceof OnlineSession ? this.session.getSnapshot().entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position : undefined;
+    void world.start(position, (manifest) => {
+      if (manifest.mapId !== this.config.mapId) throw new Error('Map ID mismatch');
       this.renderer?.registerModels(manifest.models);
       if (this.session instanceof LocalSession) this.session.initializeSpawn(manifest.spawn);
     }).catch((error: unknown) => {
@@ -299,7 +452,7 @@ export class GameApp {
     const visualError = this.worldFailure || worldStats?.errors.length ? 'Не удалось загрузить участок мира. Повторите загрузку в меню.' : diagnostics.errors.length ? 'Не удалось загрузить часть оформления. Откройте меню, чтобы повторить загрузку.' : null;
     const modelStats = `Модели: ${diagnostics.models} · Экземпляры: ${diagnostics.instances}`;
     const position = this.current?.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
-    const worldReady = this.world ? Boolean(position && this.world.isPrepared(position)) : true;
+    const worldReady = (this.world ? Boolean(position && this.world.isPrepared(position)) : this.createMap === null) && (!(this.session instanceof OnlineSession) || this.session.state.status === 'connected');
     const worldWaiting = this.waitingForWorld && Boolean(worldStats?.loading || worldStats?.deferred);
     const region = position ? this.world?.region(position) || 'Площадь открытий' : 'Площадь открытий';
     const budget = this.worldBudget.stats;
@@ -326,13 +479,16 @@ export class GameApp {
   }
 
   private canControl(): boolean {
-    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog;
+    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen;
   }
 
   private readonly onSessionEvents = (events: readonly WorldEvent[]): void => {
     for (const event of events) {
       if (event.type !== 'interacted' || event.actorId !== this.session?.playerId) continue;
-      const dialog = openDemoDialog(event.targetId);
+      const target = this.session?.getSnapshot().entities.find((entity) => entity.id === event.targetId);
+      const dialog: DemoDialog | null = this.session instanceof OnlineSession
+        ? target?.character?.kind === 'npc' ? { source: this.mock ? 'mock' : 'server', npcId: target.id, name: target.character.name, topic: target.interactable?.label ?? 'Разговор', questions: [], messages: [] } : null
+        : openDemoDialog(event.targetId);
       if (dialog) { this.input?.stop(); this.patch({ dialog, capture: 'idle', captureError: null }); }
     }
   };
@@ -390,25 +546,31 @@ export class GameApp {
   }
 
   private releaseResources(): void {
+    this.generation++;
+    this.waitingBudget = false;
+    this.releaseScene();
+    this.unsubscribeOnline?.(); this.unsubscribeOnline = null;
+    this.unsubscribeSession?.(); this.unsubscribeSession = null;
+    this.session?.dispose(); this.session = null;
+    this.network = null; this.activeBootstrap = null; this.npcRequest = null;
+    this.host = null;
+  }
+
+  private releaseScene(): void {
     this.loop?.dispose();
     this.loop = null;
     this.input?.dispose();
     this.input = null;
-    this.unsubscribeSession?.();
-    this.unsubscribeSession = null;
     this.world?.dispose();
     this.world = null;
     this.worldStarting = false;
     this.worldFailure = null;
     this.waitingForWorld = false;
-    this.session?.dispose();
-    this.session = null;
     this.previous = this.current = null;
     this.renderer?.dispose();
     this.modelAssets?.dispose();
     this.modelAssets = null;
     this.renderer = null;
-    this.host = null;
   }
 
   private fail(message = 'Не удалось открыть 3D-сцену. Проверьте поддержку WebGL 2 и аппаратное ускорение браузера.'): void {

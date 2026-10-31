@@ -2,6 +2,7 @@ import { DEMO_NPCS } from '../shared/demo';
 
 export interface DialogMessage { readonly author: 'player' | 'npc'; readonly text: string }
 export interface DemoDialog {
+  readonly source?: 'local' | 'server' | 'mock';
   readonly npcId: string;
   readonly name: string;
   readonly topic: string;

@@ -1,7 +1,7 @@
 ---
 id: client-input-ui
 type: module-design
-status: draft
+status: ready
 implementation: partial
 parent: architecture
 summary: Управлять игроком и взаимодействиями через InputController и Svelte 5.
@@ -42,4 +42,4 @@ summary: Управлять игроком и взаимодействиями �
 
 ## Открытые вопросы
 
-Текстовое общение — предложенный минимум исходного требования взаимодействия игроков; область доставки и payload согласуются в REALTIME/PROTO.
+Текстовое общение доставляется в AOI текущей карты по PROTO v1. Тестовый сетевой режим явно обозначен и не подтверждает серверную приёмку.

@@ -87,3 +87,9 @@ button.question { font-weight: 500; background: #fffefa; border: 1px solid #cfdd
   .modal-backdrop { padding: 14px; }
   .dialog-panel { padding: 20px; }
 }
+.settings-form { display: grid; gap: 14px; }
+.settings-form label:not(.debug-toggle) { display: grid; gap: 6px; text-align: left; }
+.settings-form input:not([type=checkbox]), select { width: 100%; padding: 10px; border: 1px solid #c9c7b6; border-radius: 10px; background: #fffcf4; color: #293d38; font: inherit; }
+.settings-panel { max-height: 85vh; overflow-y: auto; }
+.chat-button { position: fixed; bottom: 85px; right: 28px; }
+.header-actions { flex-wrap: wrap; }
