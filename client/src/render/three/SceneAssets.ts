@@ -15,7 +15,7 @@ export class SceneAssets {
     const geometry = this.geometry.acquire(shape, () => {
       switch (shape) {
         case 'facet': return new IcosahedronGeometry(1, 1);
-        case 'robe': return new CylinderGeometry(.25, .42, 1.1, 10);
+        case 'robe': return new CylinderGeometry(.31, .39, 1.1, 24);
         case 'box': return new BoxGeometry(1, 1, 1);
         case 'roundedBox': return new RoundedBoxGeometry(1, 1, 1, 2, 0.08);
         case 'sphere': return new SphereGeometry(1, 16, 12);

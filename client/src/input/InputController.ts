@@ -4,6 +4,9 @@ export interface InputActions {
   canControl(): boolean;
   cameraYaw(): number;
   move(direction: Direction): void;
+  sprint(held: boolean): void;
+  jump(): void;
+  clearInput(): void;
   look(dx: number, dy: number): void;
   zoom(delta: number): void;
   interact(): void;
@@ -25,6 +28,8 @@ export class InputController {
   private readonly ownerAbort = new AbortController();
   private playAbort: AbortController | null = null;
   private last: Direction = { x: 0, z: 0 };
+  private sprintHeld = false;
+  private dirty = false;
   private desired = false;
   private held = false;
   private pending = false;
@@ -89,6 +94,9 @@ export class InputController {
     const z = Number(this.keys.has('KeyS') || this.keys.has('ArrowDown')) - Number(this.keys.has('KeyW') || this.keys.has('ArrowUp'));
     const yaw = this.actions.cameraYaw();
     const direction = { x: x * Math.cos(yaw) + z * Math.sin(yaw), z: -x * Math.sin(yaw) + z * Math.cos(yaw) };
+    const divisor = Math.max(1, Math.hypot(direction.x, direction.z)); direction.x /= divisor; direction.z /= divisor;
+    const sprint = this.keys.has('ShiftLeft') || this.keys.has('ShiftRight');
+    if (sprint !== this.sprintHeld) { this.sprintHeld = sprint; this.actions.sprint(sprint); }
     if (Math.abs(direction.x - this.last.x) + Math.abs(direction.z - this.last.z) > 1e-8) {
       this.actions.move(direction);
       this.last = direction;
@@ -97,6 +105,9 @@ export class InputController {
 
   readonly reset = (): void => {
     this.keys.clear();
+    this.sprintHeld = false;
+    if (this.dirty) this.actions.clearInput();
+    this.dirty = false;
     if (this.last.x !== 0 || this.last.z !== 0) this.actions.move({ x: 0, z: 0 });
     this.last = { x: 0, z: 0 };
   };
@@ -180,7 +191,9 @@ export class InputController {
       return;
     }
     if (textEntry(event.target) || event.ctrlKey || event.metaKey || event.altKey || !this.hasCapture || !this.actions.canControl()) return;
-    if (movementKeys.has(event.code)) { event.preventDefault(); this.keys.add(event.code); }
+    if (movementKeys.has(event.code)) { event.preventDefault(); this.keys.add(event.code); this.dirty = true; }
+    if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') { event.preventDefault(); this.keys.add(event.code); this.dirty = true; }
+    if (event.code === 'Space') { event.preventDefault(); if (!event.repeat && !this.keys.has('Space')) this.actions.jump(); this.keys.add('Space'); this.dirty = true; }
     if (event.code === 'KeyE' && !event.repeat) { event.preventDefault(); this.actions.interact(); }
   };
 

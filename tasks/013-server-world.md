@@ -1,7 +1,7 @@
 ---
 id: TASK-013
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/server-world.md
 requirements: [SERVER-WORLD-001–008]
 depends_on: [TASK-024]
@@ -27,6 +27,6 @@ scheduling_note: часть A (мир и сеть); сессии/позиции 
 - [ ] `make server-test` и `npm run check` проходят.
 
 ## Результат
-- Файлы: —
-- Проверки: не выполнялись; реализация не начата.
-- Отклонения: —
+- Файлы: server/src/world/{GameMap,access,loader,npcContent}.ts, server/content/npcs.json (рынок: 4 NPC без renderable; demo: Лея, Марк); тесты server/test/a-world.test.ts, a-real-world.test.ts.
+- Проверки: `npm --prefix server test` — 4 файла, 26 тестов, все прошли; `npm --prefix server run check` — tsc server + shared без ошибок, dependency-cruiser без нарушений; `node -e "import('./src/game/index.ts')"` в Node 24.15.0 — модуль грузится без сборки. Среда: Windows 11, Node 24.15.0, npm 11.12.1. Настоящие миры market/demo/science из client/public (после `node client/scripts/generate-demo-world.mjs`) загружаются с серверным npcs.json; bootstrap market и demo совпадают с MARKET_WORLD/DEMO_WORLD клиента; spawn рынка проходим. Доступ к файлам по staticChunkRadius, 404 для неизвестного пути и чужого аккаунта — в a-realtime.test.ts.
+- Отклонения и остаток: Не проверены отдельными тестами: отказ запуска при испорченном файле (S1, вторая часть), независимый пересчёт worldBytes (S2). HTTP-маршрут /world/* и статусы 401/404 — часть B (TASK-010/012). Статус in-progress, пока непроверенные пункты приёмки не закрыты.

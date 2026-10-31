@@ -1,0 +1,13 @@
+{
+  "host": "0.0.0.0",
+  "port": 8080,
+  "defaultMap": "market",
+  "logWorldAccess": false,
+  "npc": {
+    "adapter": "scripted",
+    "maxConcurrent": 1,
+    "maxUnfinished": 4,
+    "timeoutMs": 8000,
+    "options": {}
+  }
+}

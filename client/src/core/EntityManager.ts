@@ -21,6 +21,7 @@ function copyEntity(entity: Entity): Entity {
     finite(entity.interactable.radius);
     if (entity.interactable.radius < 0) throw new Error('Interaction radius must be nonnegative.');
   }
+  if (entity.motion) finite(entity.motion.stamina, entity.motion.verticalVelocity, entity.motion.jumpAck);
   return Object.freeze({
     id: entity.id,
     ...(entity.transform && { transform: Object.freeze({
@@ -33,6 +34,7 @@ function copyEntity(entity: Entity): Entity {
     ...(entity.interactable && { interactable: Object.freeze({ ...entity.interactable }) }),
     ...(entity.character && { character: Object.freeze({ ...entity.character }) }),
     ...(entity.animationState && { animationState: Object.freeze({ ...entity.animationState }) }),
+    ...(entity.motion && { motion: Object.freeze({ ...entity.motion }) }),
   });
 }
 

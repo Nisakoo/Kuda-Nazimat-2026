@@ -1,6 +1,9 @@
 import { EntityManager } from './EntityManager';
 import type { CommandResult, Entity, EntityId, GameCommand, MovementBounds, RejectionReason, WorldEvent, WorldSnapshot } from './types';
 import type { Vector3 } from './types';
+import { MOVEMENT, initialMotion, motionStatus, stepMotion } from '../../../shared/movement/simulation.ts';
+import type { MotionState } from '../../../shared/movement/simulation.ts';
+import type { CeilingVolume } from '../../../shared/map/manifest.ts';
 
 export class GameWorld {
   private entities: EntityManager;
@@ -9,13 +12,22 @@ export class GameWorld {
 
   private readonly bounds: MovementBounds | null;
   private movementGuard: ((position: Vector3) => boolean) | null = null;
-  setMovementGuard(guard: (position: Vector3) => boolean): void { this.movementGuard = guard; }
+  private surfaceHeight: ((x: number, z: number) => number) | null = null;
+  private pathGuard: ((from: Vector3, to: Vector3) => boolean) | null = null;
+  private ceilings: readonly CeilingVolume[] = [];
+  private ceilingsFor: ((from: Vector3, to: Vector3) => readonly CeilingVolume[]) | undefined;
+  private readonly motion = new Map<EntityId, MotionState>();
+  private readonly controls = new Map<EntityId, { sprint: boolean; jumpId: number }>();
+  setCeilings(ceilings: readonly CeilingVolume[], query?: (from: Vector3, to: Vector3) => readonly CeilingVolume[]): void { this.ceilings = ceilings; this.ceilingsFor = query; }
+  setSurfaceHeight(height: (x: number, z: number) => number): void { this.surfaceHeight = height; }
+  setMovementGuard(guard: (position: Vector3) => boolean, path?: (from: Vector3, to: Vector3) => boolean): void { this.movementGuard = guard; this.pathGuard = path ?? null; }
   initializePosition(id: EntityId, position: Vector3): void {
     this.assertLocal();
     if (this.tick !== 0) throw new Error('Initial position must be set before simulation');
     const entity = this.entities.get(id);
     if (!entity?.transform) throw new Error('Missing player transform');
     this.entities.replace({ ...entity, transform: { ...entity.transform, position } });
+    this.motion.set(id, initialMotion(position));
   }
 
   constructor(readonly authority: 'local' | 'replica', entities: readonly Entity[] = [], bounds: MovementBounds | null = null) {
@@ -24,6 +36,10 @@ export class GameWorld {
     }
     this.bounds = bounds ? Object.freeze({ ...bounds }) : null;
     this.entities = new EntityManager(entities);
+    if (authority === 'local') for (const entity of entities) if (entity.transform && entity.character?.kind === 'player') {
+      const motion = initialMotion(entity.transform.position); this.motion.set(entity.id, motion);
+      this.entities.replace({ ...entity, motion: motionStatus(motion) });
+    }
   }
 
   getSnapshot(): WorldSnapshot {
@@ -39,6 +55,7 @@ export class GameWorld {
   remove(id: EntityId): boolean {
     this.assertLocal();
     if (!this.entities.remove(id)) return false;
+    this.motion.delete(id); this.controls.delete(id);
     this.events.push(Object.freeze({ type: 'entity-removed', entityId: id }));
     return true;
   }
@@ -47,7 +64,14 @@ export class GameWorld {
     if (this.authority !== 'local') return this.reject(actorId, 'not-authoritative');
     const actor = this.entities.get(actorId);
     if (!actor) return this.reject(actorId, 'missing-entity');
-    if (command.type === 'move') {
+    if (command.type === 'clear-input') {
+      this.controls.set(actorId, { sprint: false, jumpId: this.motion.get(actorId)?.jumpAck ?? 0 });
+      if (actor.movement) this.entities.replace({ ...actor, movement: { ...actor.movement, direction: { x: 0, z: 0 } } });
+    } else if (command.type === 'sprint' || command.type === 'jump') {
+      if (!actor.movement || !actor.transform) return this.reject(actorId, 'missing-component');
+      const controls = this.controls.get(actorId) ?? { sprint: false, jumpId: 0 };
+      this.controls.set(actorId, command.type === 'sprint' ? { ...controls, sprint: command.held } : { ...controls, jumpId: controls.jumpId + 1 });
+    } else if (command.type === 'move') {
       if (!actor.movement || !actor.transform) return this.reject(actorId, 'missing-component');
       const { x, z } = command.direction;
       if (!Number.isFinite(x) || !Number.isFinite(z)) return this.reject(actorId, 'invalid-direction');
@@ -69,33 +93,32 @@ export class GameWorld {
   }
 
   step(deltaSeconds: number): void {
-    if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0) throw new Error('Step must be finite and positive.');
+    if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0 || deltaSeconds > MOVEMENT.maxDelta) throw new Error('Step must be in (0, 1].');
     // A replica never integrates player intentions or advances the authoritative tick locally.
     if (this.authority !== 'local') return;
     for (const entity of this.entities.all()) {
       if (!entity.transform || !entity.movement) continue;
       const { direction, speed } = entity.movement;
-      const attempting = speed > 0 && (direction.x !== 0 || direction.z !== 0);
       const previous = entity.transform.position;
-      const position = attempting ? {
-        x: previous.x + direction.x * speed * deltaSeconds,
-        y: previous.y,
-        z: previous.z + direction.z * speed * deltaSeconds,
-      } : { ...previous };
-      if (attempting && this.bounds) {
-        position.x = Math.max(this.bounds.minX, Math.min(this.bounds.maxX, position.x));
-        position.z = Math.max(this.bounds.minZ, Math.min(this.bounds.maxZ, position.z));
-      }
-      if (attempting && this.movementGuard && !this.movementGuard(position)) { position.x = previous.x; position.z = previous.z; }
-      const moving = position.x !== previous.x || position.z !== previous.z;
-      const animationName = moving ? 'walk' : 'idle';
-      if (!moving && (!entity.animationState || entity.animationState.name === animationName)) continue;
+      const state = this.motion.get(entity.id) ?? initialMotion(previous);
+      const controls = this.controls.get(entity.id) ?? { sprint: false, jumpId: 0 };
+      const canOccupy = (p: Vector3) => (!this.bounds || (p.x >= this.bounds.minX - 1e-8 && p.x <= this.bounds.maxX + 1e-8 && p.z >= this.bounds.minZ - 1e-8 && p.z <= this.bounds.maxZ + 1e-8)) && (!this.movementGuard || this.movementGuard(p));
+      const trace = (a: Vector3, b: Vector3) => canOccupy(b) && (!this.pathGuard || this.pathGuard(a, b));
+      const next = stepMotion(state, { direction, sprint: controls.sprint, jumpId: controls.jumpId }, deltaSeconds, {
+        canTraverse: trace, canOccupy, canRecover: trace,
+        heightAt: this.surfaceHeight ?? (() => state.safePosition.y), ceilings: this.ceilings, ...(this.ceilingsFor && { ceilingsFor: this.ceilingsFor }), spawn: state.safePosition,
+      }, speed);
+      let position = next.position;
+      if (this.bounds) position = { ...position, x: Math.max(this.bounds.minX, Math.min(this.bounds.maxX, position.x)), z: Math.max(this.bounds.minZ, Math.min(this.bounds.maxZ, position.z)) };
+      this.motion.set(entity.id, { ...next, position });
+      const dx = position.x - previous.x; const dz = position.z - previous.z;
+      const moving = dx !== 0 || dz !== 0;
       this.entities.replace({
-        ...entity,
-        transform: { position, rotationY: moving ? Math.atan2(direction.x, direction.z) : entity.transform.rotationY },
-        ...(entity.animationState && { animationState: { name: animationName } }),
+        ...entity, transform: { position, rotationY: moving ? Math.atan2(dx, dz) : entity.transform.rotationY },
+        ...(entity.character?.kind === 'player' && { motion: motionStatus(next) }),
+        ...(entity.animationState && { animationState: { name: next.grounded ? next.locomotion : next.phase } }),
       });
-      if (moving) this.events.push(Object.freeze({ type: 'entity-moved', entityId: entity.id, position: Object.freeze(position) }));
+      if (moving || position.y !== previous.y) this.events.push(Object.freeze({ type: 'entity-moved', entityId: entity.id, position: Object.freeze(position) }));
     }
     this.tick++;
   }

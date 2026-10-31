@@ -1,4 +1,4 @@
-import { Raycaster, Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFSoftShadowMap } from 'three';
+import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFSoftShadowMap } from 'three';
 import type { CameraView, RenderAdapter, VisualChunk, RenderDiagnostics } from '../RenderAdapter';
 import type { EntityId, WorldSnapshot } from '../../core/types';
 import { SceneAssets } from './SceneAssets';
@@ -7,6 +7,8 @@ import { createDemoScenery } from './demoScenery';
 import type { AssetManager } from '../../map/AssetManager';
 import { GltfLibrary } from './GltfLibrary';
 import { VisualChunks } from './VisualChunks';
+import { CameraObstruction } from './CameraObstruction';
+import { damp } from './CharacterMotion';
 
 export class ThreeRenderer implements RenderAdapter {
   private renderer: WebGLRenderer | null = null;
@@ -17,11 +19,12 @@ export class ThreeRenderer implements RenderAdapter {
   private playerId: EntityId | null = null;
   private view: CameraView = { yaw: 0, pitch: 0.7, distance: 15 };
   private readonly target = new Vector3();
-  private readonly cameraRay = new Raycaster();
+  private obstruction = new CameraObstruction();
   private readonly cameraDirection = new Vector3();
   private library: GltfLibrary | null = null;
   private chunks: VisualChunks | null = null;
   private lastElapsed = 0;
+  private focusHeight = .8;
   private sun: DirectionalLight | null = null;
   private readonly errors = new Map<string, string>();
 
@@ -61,6 +64,7 @@ export class ThreeRenderer implements RenderAdapter {
   }
 
   setCamera(view: CameraView): void { this.view = { ...view }; }
+  setBuildingSymbols(visible: boolean): void { this.chunks?.setBuildingSymbols(visible); }
   registerModels(models: Readonly<Record<string, string>>): void { this.library?.register(models); }
   async loadChunk(chunk: VisualChunk): Promise<void> {
     if (!this.chunks) throw new Error('Renderer is not mounted');
@@ -99,22 +103,27 @@ export class ThreeRenderer implements RenderAdapter {
     if (position) this.target.copy(position);
     else this.target.set(0, 0, 0);
     if (this.sun) { this.sun.position.set(this.target.x + 18, 12, this.target.z - 12); this.sun.target.position.set(this.target.x, 0, this.target.z); }
-    this.target.y += 0.8;
+    this.focusHeight = damp(this.focusHeight, this.view.focusHeight ?? .8, 5, Math.min(delta, .1));
+    this.target.y += this.focusHeight;
+    const fov = this.view.fieldOfView ?? (this.camera.aspect < 1 ? 62 : 48);
+    if (Math.abs(this.camera.fov - fov) > .01) { this.camera.fov = damp(this.camera.fov, fov, 5, Math.min(delta, .1)); this.camera.updateProjectionMatrix(); }
     const { yaw, pitch, distance } = this.view;
     this.camera.position.set(
       this.target.x + Math.sin(yaw) * Math.cos(pitch) * distance,
       this.target.y + Math.sin(pitch) * distance,
       this.target.z + Math.cos(yaw) * Math.cos(pitch) * distance,
     );
-    if (this.marketStyle) {
-      this.scene.updateMatrixWorld(true);
-      this.cameraDirection.copy(this.camera.position).sub(this.target).normalize();
-      this.cameraRay.set(this.target, this.cameraDirection); this.cameraRay.near = .5; this.cameraRay.far = distance;
-      const hit = this.cameraRay.intersectObjects(this.scene.children.filter(child => child.name.startsWith('chunk:')), true)[0];
-      if (hit) this.camera.position.copy(this.target).addScaledVector(this.cameraDirection, Math.max(.7, hit.distance - .25));
-    }
+    // Update before camera probes; suppress only the renderer's duplicate scene traversal.
+    this.scene.updateMatrixWorld(true);
+    this.cameraDirection.copy(this.camera.position).sub(this.target).normalize();
+    const halfHeight = Math.tan(this.camera.fov*Math.PI/360)*this.camera.near+.08;
+    const allowed = this.obstruction.resolve(this.target,this.cameraDirection,distance,
+      halfHeight*this.camera.aspect,halfHeight,this.scene.children.filter(child=>child.name.startsWith('chunk:')),delta);
+    this.camera.position.copy(this.target).addScaledVector(this.cameraDirection,allowed);
     this.camera.lookAt(this.target);
-    this.renderer.render(this.scene, this.camera);
+    this.scene.matrixWorldAutoUpdate = false;
+    try { this.renderer.render(this.scene, this.camera); }
+    finally { this.scene.matrixWorldAutoUpdate = true; }
   }
 
   dispose(): void {
@@ -138,5 +147,6 @@ export class ThreeRenderer implements RenderAdapter {
     this.library = null;
     this.chunks = null;
     this.errors.clear();
+    this.obstruction = new CameraObstruction(); this.lastElapsed = 0;
   }
 }

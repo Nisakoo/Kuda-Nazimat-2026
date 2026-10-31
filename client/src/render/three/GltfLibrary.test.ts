@@ -39,3 +39,21 @@ describe('real embedded GLB parsing and animation', () => {
     library.dispose(); assets.dispose();
   });
 });
+
+it('blends from the current pose, preserves a repeated clip, and survives interrupted transitions', async()=>{
+  const {assets,library}=await setup();const model=await instantiate(library);
+  const tablet=model.root.getObjectByName('Tablet')!;
+  for(let i=0;i<8;i++)model.animate('idle',.1);
+  const height=tablet.position.y;
+  model.animate('walk',.01);
+  expect(tablet.position.y).toBeGreaterThan(1.05); // old stopAllAction snapped immediately to 1
+  expect(Math.abs(tablet.position.y-height)).toBeLessThan(.015);
+  for(let i=0;i<8;i++)model.animate('walk',.1);
+  expect(tablet.rotation.y).toBeGreaterThan(.3); // repeated walk did not reset the clip
+  const turn=tablet.rotation.y;
+  model.animate('idle',.01);model.animate('walk',.01);
+  expect(Math.abs(tablet.rotation.y-turn)).toBeLessThan(.1);
+  model.animate('missing',.1);model.animate('missing',.1);
+  expect(tablet.rotation.y).toBeCloseTo(0,4);
+  model.dispose();library.dispose();assets.dispose();
+});

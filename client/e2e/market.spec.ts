@@ -17,6 +17,40 @@ async function walk(page:Page,axis:'x'|'z',target:number) {
 async function closeAndResume(page:Page) {await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Продолжить',exact:true}).click();await expectCapture(page,true);}
 async function interact(page:Page,name:string){await page.keyboard.press('e');await page.clock.runFor(100);await expect(page.getByRole('dialog',{name,exact:true})).toBeVisible();await expectCapture(page,false);}
 
+test('default five-by-five streaming covers pasture and courtyard without idle request churn', async ({ page }) => {
+  test.setTimeout(120000);
+  const errors: string[] = [];
+  let worldRequests = 0;
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('request', request => { if (/\/(maps|assets)\//.test(request.url())) worldRequests++; });
+  await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'market', debug: true } }));
+  await page.clock.install(); await page.goto('/');
+  await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
+  await page.getByRole('button', { name: 'Начать прогулку', exact: true }).click(); await expectCapture(page, true);
+  const canvas = await page.locator('canvas').elementHandle();
+  const settle = async () => {
+    await expect.poll(async () => { await page.clock.runFor(200); return page.getByLabel('Кеш мира').textContent(); }).toContain('Чанки: 25 · Ожидание: 0');
+    const before = worldRequests;
+    await page.clock.runFor(1200);
+    expect(worldRequests).toBe(before);
+    const cache = (await page.getByLabel('Кеш мира').textContent())!.match(/^(\d+) \/ (\d+)/)!;
+    expect(Number(cache[1])).toBeLessThanOrEqual(Number(cache[2]));
+  };
+  await settle();
+  await expect(page.getByLabel('Кеш мира')).toContainText('Отложено: 0');
+  await walk(page, 'z', -26);
+  await expect(page.getByRole('heading', { name: 'Пастбище у рынка', exact: true })).toBeVisible();
+  await settle();
+  await walk(page, 'z', 9); await walk(page, 'x', -32);
+  await expect(page.getByRole('heading', { name: 'Двор Вавилонской башни', exact: true })).toBeVisible();
+  await settle();
+  await walk(page, 'x', 0);
+  await expect(page.getByRole('heading', { name: 'Рынок Вавилона', exact: true })).toBeVisible();
+  await settle();
+  expect(await canvas!.evaluate(element => element.isConnected)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
 test('market route buys goods, rejects wrong feed, streams pasture and finishes four goats',async({page})=>{
   test.setTimeout(120000);
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));

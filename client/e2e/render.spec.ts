@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { writeFile } from 'node:fs/promises';
 
 test.beforeEach(async ({ page }) => { await page.goto('/e2e/render-harness.html'); await page.waitForFunction(() => Boolean(window.renderHarness)); });
 
@@ -61,4 +62,21 @@ test('unloading while HTTP is pending prevents a late visual from appearing', as
   expect(await pending).toBe('AbortError');
   expect(await page.evaluate(() => window.renderHarness.stats().chunks)).toEqual([]);
   expect(await page.evaluate(() => window.renderHarness.stats().instances)).toBe(0);
+});
+
+test.describe('MOVE poses', () => {
+  for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player poses at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+    const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    const running = page.evaluate(({ fps, yaw }) => window.renderHarness.movement(fps, yaw), { fps, yaw: view === 'front' ? 0 : Math.PI / 2 });
+    await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+    await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+    const { video, ...profile } = await running;
+    const videoPath = testInfo.outputPath('movement.webm'); await writeFile(videoPath, Buffer.from(video, 'base64'));
+    await testInfo.attach('movement', { path: videoPath, contentType: 'video/webm' });
+    await testInfo.attach('cadence', { body: JSON.stringify(profile), contentType: 'application/json' });
+    expect(profile.actualFps).toBeGreaterThan(fps * .8);
+    expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+    expect((await page.evaluate(() => window.renderHarness.stats())).entities).toHaveLength(4);
+    expect(errors).toEqual([]);
+  });
 });

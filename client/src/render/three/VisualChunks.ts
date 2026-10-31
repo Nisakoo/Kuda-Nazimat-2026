@@ -7,6 +7,14 @@ import { abortError } from '../../shared/AsyncLeaseCache';
 interface ChunkState { readonly controller: AbortController; readonly root: Group; readonly models: ModelInstance[] }
 
 export class VisualChunks {
+  private symbolsVisible = true;
+  setBuildingSymbols(visible: boolean): void {
+    this.symbolsVisible = visible;
+    for (const state of this.chunks.values()) for (const model of state.models) {
+      const symbols = model.root.getObjectByName('babel-symbols');
+      if (symbols) symbols.visible = visible;
+    }
+  }
   private readonly chunks = new Map<string, ChunkState>();
   constructor(private readonly scene: Scene, private readonly library: GltfLibrary) {}
   get ids(): readonly string[] { return [...this.chunks.keys()]; }
@@ -27,6 +35,8 @@ export class VisualChunks {
         root.position.set(object.transform.position.x, object.transform.position.y, object.transform.position.z);
         root.rotation.y = object.transform.rotationY;
         root.add(model.root);
+        const symbols = model.root.getObjectByName('babel-symbols');
+        if (symbols) symbols.visible = this.symbolsVisible;
         state.models.push(model);
         model.animate(object.animation ?? 'idle', 0);
         root.userData.animation = object.animation ?? 'idle';

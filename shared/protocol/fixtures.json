@@ -1,16 +1,565 @@
 [
-  {"direction": "client", "valid": true, "packet": {"v": 1, "type": "join", "requestId": "c1_1", "mapId": "demo"}},
-  {"direction": "client", "valid": true, "packet": {"v": 1, "type": "input", "requestId": "c1_2", "sequence": 1, "direction": {"x": 0, "z": -1}, "preparedChunks": ["0_0", "0_-1"]}},
-  {"direction": "client", "valid": false, "packet": {"v": 2, "type": "join", "requestId": "c1_1", "mapId": "demo"}, "code": "VERSION"},
-  {"direction": "client", "valid": false, "packet": {"v": 1, "type": "input", "requestId": "c1_2", "sequence": 1, "direction": {"x": 1, "z": 0}, "preparedChunks": [], "playerId": "someone-else", "position": {"x": 999, "y": 0, "z": 0}}},
-  {"direction": "server", "valid": true, "packet": {"v": 1, "type": "joined", "requestId": "c1_1", "playerId": "p1", "revision": 0, "snapshot": {"tick": 0, "entities": [{"id": "p1", "character": {"kind": "player", "name": "Игрок"}, "transform": {"position": {"x": 0, "y": 0, "z": 6}, "rotationY": 0}}]}, "world": {"manifestUrl": "manifest.json", "manifestBytes": 100, "worldBytes": 1000000, "assets": {}}}},
-  {"direction": "server", "valid": true, "packet": {"v": 1, "type": "delta", "baseRevision": 0, "revision": 1, "tick": 2, "upsert": [{"id": "p2", "transform": {"position": {"x": 2, "y": 0, "z": 6}, "rotationY": 0}}], "remove": []}},
-  {"direction": "server", "valid": false, "packet": {"v": 1, "type": "delta", "baseRevision": 0, "revision": 1, "tick": 2, "upsert": [{"id": "p2", "health": 999}], "remove": []}},
-  {"direction": "server", "valid": false, "packet": {"v": 1, "type": "npc-answer", "requestId": "c1_8", "targetId": "guide", "text": 42}},
-  {"direction": "server", "valid": true, "note": "PROTO-008: unsolicited error", "packet": {"v": 1, "type": "error", "requestId": "server", "code": "UNAUTHORIZED", "message": "Игра открыта в другом окне."}},
-  {"direction": "server", "valid": true, "note": "PROTO-008: chat of another player carries the sender's requestId", "packet": {"v": 1, "type": "chat", "requestId": "c1_5", "messageId": "mlx2k3_7", "playerId": "p_other", "name": "Игрок 2", "text": "<b>привет</b>"}},
-  {"direction": "server", "valid": true, "note": "NPC v1 answer", "packet": {"v": 1, "type": "npc-answer", "requestId": "c1_8", "targetId": "history-guide", "text": "В прошлый раз ты спрашивал о башне."}},
-  {"direction": "server", "valid": true, "note": "full entity upsert", "packet": {"v": 1, "type": "delta", "baseRevision": 3, "revision": 4, "tick": 40, "upsert": [{"id": "p_a1", "character": {"kind": "player", "name": "Игрок 1"}, "transform": {"position": {"x": 1, "y": 0, "z": 6}, "rotationY": 0.5}, "movement": {"direction": {"x": 0.6, "z": 0.8}, "speed": 3}, "renderable": {"assetId": "demo-player"}, "animationState": {"name": "idle"}}], "remove": ["p_b2"]}},
-  {"direction": "server", "valid": false, "code": "INVALID", "note": "unknown error code", "packet": {"v": 1, "type": "error", "requestId": "server", "code": "SERVER_FULL", "message": "x"}},
-  {"direction": "client", "valid": false, "code": "INVALID", "note": "client may not set position", "packet": {"v": 1, "type": "join", "requestId": "c1_1", "mapId": "demo", "position": {"x": 0, "y": 0, "z": 0}}}
+  {
+    "direction": "client",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "join",
+      "requestId": "c1_1",
+      "mapId": "demo"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "c1_2",
+      "sequence": 1,
+      "direction": {
+        "x": 0,
+        "z": -1
+      },
+      "preparedChunks": [
+        "0_0",
+        "0_-1"
+      ],
+      "sprint": false,
+      "jumpId": 0
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 2,
+      "type": "join",
+      "requestId": "c1_1",
+      "mapId": "demo"
+    },
+    "code": "VERSION"
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "c1_2",
+      "sequence": 1,
+      "direction": {
+        "x": 1,
+        "z": 0
+      },
+      "preparedChunks": [],
+      "playerId": "someone-else",
+      "position": {
+        "x": 999,
+        "y": 0,
+        "z": 0
+      },
+      "sprint": false,
+      "jumpId": 0
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "joined",
+      "requestId": "c1_1",
+      "playerId": "p1",
+      "revision": 0,
+      "snapshot": {
+        "tick": 0,
+        "entities": [
+          {
+            "id": "p1",
+            "character": {
+              "kind": "player",
+              "name": "Игрок"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": 6
+              },
+              "rotationY": 0
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            }
+          }
+        ]
+      },
+      "world": {
+        "manifestUrl": "manifest.json",
+        "manifestBytes": 100,
+        "worldBytes": 1000000,
+        "assets": {}
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "delta",
+      "baseRevision": 0,
+      "revision": 1,
+      "tick": 2,
+      "upsert": [
+        {
+          "id": "p2",
+          "transform": {
+            "position": {
+              "x": 2,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          }
+        }
+      ],
+      "remove": []
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "delta",
+      "baseRevision": 0,
+      "revision": 1,
+      "tick": 2,
+      "upsert": [
+        {
+          "id": "p2",
+          "health": 999
+        }
+      ],
+      "remove": []
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "npc-answer",
+      "requestId": "c1_8",
+      "targetId": "guide",
+      "text": 42
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "note": "PROTO-008: unsolicited error",
+    "packet": {
+      "v": 3,
+      "type": "error",
+      "requestId": "server",
+      "code": "UNAUTHORIZED",
+      "message": "Игра открыта в другом окне."
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "note": "PROTO-008: chat of another player carries the sender's requestId",
+    "packet": {
+      "v": 3,
+      "type": "chat",
+      "requestId": "c1_5",
+      "messageId": "mlx2k3_7",
+      "playerId": "p_other",
+      "name": "Игрок 2",
+      "text": "<b>привет</b>"
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "note": "NPC v1 answer",
+    "packet": {
+      "v": 3,
+      "type": "npc-answer",
+      "requestId": "c1_8",
+      "targetId": "history-guide",
+      "text": "В прошлый раз ты спрашивал о башне."
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "note": "full entity upsert",
+    "packet": {
+      "v": 3,
+      "type": "delta",
+      "baseRevision": 3,
+      "revision": 4,
+      "tick": 40,
+      "upsert": [
+        {
+          "id": "p_a1",
+          "character": {
+            "kind": "player",
+            "name": "Игрок 1"
+          },
+          "transform": {
+            "position": {
+              "x": 1,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0.5
+          },
+          "movement": {
+            "direction": {
+              "x": 0.6,
+              "z": 0.8
+            },
+            "speed": 3
+          },
+          "renderable": {
+            "assetId": "demo-player"
+          },
+          "animationState": {
+            "name": "idle"
+          },
+          "motion": {
+            "grounded": true,
+            "phase": "grounded",
+            "verticalVelocity": 0,
+            "locomotion": "idle",
+            "stamina": 100,
+            "sprintBlocked": false,
+            "jumpAck": 0
+          }
+        }
+      ],
+      "remove": [
+        "p_b2"
+      ]
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "code": "INVALID",
+    "note": "unknown error code",
+    "packet": {
+      "v": 3,
+      "type": "error",
+      "requestId": "server",
+      "code": "SERVER_FULL",
+      "message": "x"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "code": "INVALID",
+    "note": "client may not set position",
+    "packet": {
+      "v": 3,
+      "type": "join",
+      "requestId": "c1_1",
+      "mapId": "demo",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "code": "VERSION",
+    "packet": {
+      "v": 1,
+      "type": "join",
+      "requestId": "old",
+      "mapId": "demo"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "code": "VERSION",
+    "packet": {
+      "v": 2,
+      "type": "join",
+      "requestId": "old",
+      "mapId": "demo"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "move",
+      "sequence": 1,
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "preparedChunks": [],
+      "sprint": false,
+      "jumpId": -1
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "move",
+      "sequence": 1,
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "preparedChunks": [],
+      "sprint": false,
+      "jumpId": 1.5
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "move",
+      "sequence": 1,
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "preparedChunks": [],
+      "sprint": false,
+      "jumpId": 9007199254740992
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "move",
+      "sequence": 1,
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "preparedChunks": [],
+      "sprint": "yes",
+      "jumpId": 0
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "move",
+      "sequence": 1,
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "preparedChunks": [],
+      "sprint": false,
+      "jumpId": 0,
+      "stamina": 100
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "input",
+      "requestId": "move",
+      "sequence": 1,
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "preparedChunks": [],
+      "sprint": false,
+      "jumpId": 0,
+      "speed": 20
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "snapshot",
+      "revision": 0,
+      "snapshot": {
+        "tick": 0,
+        "entities": [
+          {
+            "id": "p",
+            "character": {
+              "kind": "player",
+              "name": "P"
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 101,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "snapshot",
+      "revision": 0,
+      "snapshot": {
+        "tick": 0,
+        "entities": [
+          {
+            "id": "p",
+            "character": {
+              "kind": "player",
+              "name": "P"
+            },
+            "motion": {
+              "grounded": false,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "snapshot",
+      "revision": 0,
+      "snapshot": {
+        "tick": 0,
+        "entities": [
+          {
+            "id": "p",
+            "character": {
+              "kind": "player",
+              "name": "P"
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "rising",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "snapshot",
+      "revision": 0,
+      "snapshot": {
+        "tick": 0,
+        "entities": [
+          {
+            "id": "p",
+            "character": {
+              "kind": "player",
+              "name": "P"
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": -1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "snapshot",
+      "revision": 0,
+      "snapshot": {
+        "tick": 0,
+        "entities": [
+          {
+            "id": "p",
+            "character": {
+              "kind": "player",
+              "name": "P"
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0,
+              "extra": 0
+            }
+          }
+        ]
+      }
+    }
+  }
 ]

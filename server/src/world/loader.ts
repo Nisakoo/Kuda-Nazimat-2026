@@ -88,7 +88,7 @@ export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
 
     if (total !== manifest.worldBytes) throw new WorldError(mapId, manifestPath, `worldBytes ${manifest.worldBytes} ≠ сумме уникальных ресурсов ${total}`);
     const map = new GameMap(manifest, bootstrap, collisionByChunk);
-    if (!map.isWalkable(manifest.spawn.x, manifest.spawn.z)) throw new WorldError(mapId, manifestPath, 'spawn непроходим');
+    if (!map.isSafeSupport(manifest.spawn.x, manifest.spawn.z)) throw new WorldError(mapId, manifestPath, 'spawn непроходим');
     maps.set(mapId, map);
   }
 
@@ -99,7 +99,7 @@ export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
   for (const npc of npcs) {
     const map = maps.get(npc.mapId);
     if (!map) throw new Error(`NPC ${npc.id}: неизвестная карта ${npc.mapId}`);
-    if (!map.isWalkable(npc.position.x, npc.position.z)) throw new Error(`NPC ${npc.id}: позиция непроходима`);
+    if (!map.footprintChunkIds(npc.position.x, npc.position.z)) throw new Error(`NPC ${npc.id}: позиция вне чанков карты`);
   }
 
   const index = new Map<string, WorldFile>();

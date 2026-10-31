@@ -1,8 +1,5 @@
-/**
- * Frozen boundary between the two parallel parts of the server.
- *   Part A (world/network): shared/, src/world/, src/game/, src/realtime/, content/.
- *   Part B (platform/data): src/app/, src/http/, src/auth/, src/persistence/, src/npc/, src/cli/, src/common/.
- * Change this file only by agreement of both parts. Types only — no logic.
+/** Shared application boundaries for world/network, platform/data and BABEL.
+ * Types only; implementations are composed in app/application.ts.
  */
 import type { Server as HttpServer } from 'node:http';
 import type { Vector3 } from '../../shared/world/types.ts';
@@ -66,6 +63,7 @@ export interface GameConfig {
   readonly corsOrigins: readonly string[];
 }
 export interface GameDeps {
+  readonly babylon?: { enrolled(playerId: string): boolean; spawn(playerId: string): { mapId: string; position: Vector3; force: boolean } | null; entered(playerId: string): void };
   readonly sessions: SessionVerifier;
   readonly players: PlayerStore;
   readonly npc: NpcQuestions;
@@ -74,6 +72,8 @@ export interface GameDeps {
   readonly logger: Logger;
 }
 export interface GameRuntime {
+  canAct?(accountId: string, sessionKey: string): boolean;
+  location?(accountId: string): { mapId: string; position: Vector3 } | null;
   readonly maps: readonly MapSummary[];
   /** Access check by the account's authoritative position; B verifies the Bearer token first. */
   worldFile(path: string, accountId: string): WorldFileAccess;

@@ -1,4 +1,4 @@
-/** Wire-level entity shapes shared by client and server (PROTO v1). */
+/** Wire-level entity shapes shared by client and server (PROTO v3). */
 export type EntityId = string;
 
 export interface Vector3 { readonly x: number; readonly y: number; readonly z: number }
@@ -9,6 +9,15 @@ export interface Renderable { readonly assetId: string }
 export interface Interactable { readonly radius: number; readonly label: string }
 export interface Character { readonly kind: 'player' | 'npc'; readonly name: string }
 export interface AnimationState { readonly name: string }
+export interface MotionStatus {
+  readonly grounded: boolean;
+  readonly phase: 'grounded' | 'rising' | 'falling';
+  readonly verticalVelocity: number;
+  readonly locomotion: 'idle' | 'walk' | 'sprint';
+  readonly stamina: number;
+  readonly sprintBlocked: boolean;
+  readonly jumpAck: number;
+}
 
 export interface Entity {
   readonly id: EntityId;
@@ -18,6 +27,7 @@ export interface Entity {
   readonly interactable?: Interactable;
   readonly character?: Character;
   readonly animationState?: AnimationState;
+  readonly motion?: MotionStatus;
 }
 
 export interface WorldSnapshot {

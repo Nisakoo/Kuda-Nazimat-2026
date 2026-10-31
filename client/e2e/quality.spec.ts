@@ -11,13 +11,15 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
   await page.route('**/*', (route) => {
     const url = new URL(route.request().url());
     if (url.origin !== 'http://127.0.0.1:4173') { external.push(url.href); return route.abort(); }
-    if (url.pathname === '/config.json') return route.fulfill({ json: { mapId, debug: true, chunkRadius: 1 } });
+    if (url.pathname === '/config.json') return route.fulfill({ json: { mapId, debug: true } });
     return route.continue();
   });
   await page.goto('/');
   if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
-  await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 9');
+  // The normal map window fits within the emergency memory guard.
+  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBe(mapId === 'market' ? 25 : 9);
+  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
   await page.waitForTimeout(5000);
   const cdp = await page.context().newCDPSession(page);
   const heap = async () => { await cdp.send('HeapProfiler.collectGarbage'); return (await cdp.send('Runtime.getHeapUsage')).usedSize as number; };
@@ -31,13 +33,13 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
     const gl = document.querySelector('canvas')!.getContext('webgl2')!; const extension = gl.getExtension('WEBGL_debug_renderer_info');
     return { userAgent: navigator.userAgent, gpu: extension ? gl.getParameter(extension.UNMASKED_RENDERER_WEBGL) as string : 'unavailable', viewport: `${innerWidth}x${innerHeight}`, dpr: devicePixelRatio };
   });
-  const samples: { fps: number; p95: number; drawCalls: number; cacheBytes: number; cacheLimit: number }[] = [];
+  const samples: { fps: number; p95: number; cpuMs: number; drawCalls: number; worldMemoryBytes: number; worldMemoryLimit: number }[] = [];
   for (let step = 0; step < 12; step++) {
     const key = Math.floor(step / 3) % 2 === 0 ? 's' : 'w';
     await page.keyboard.down(key); await page.waitForTimeout(5000); await page.keyboard.up(key);
     const performance = (await page.getByLabel('Производительность').textContent())!;
     const cache = (await page.getByLabel('Кеш мира').textContent())!;
-    samples.push({ fps: Number(performance.match(/FPS ([\d.]+)/)![1]), p95: Number(performance.match(/P95 ([\d.]+)/)![1]), drawCalls: (await resources()).drawCalls, cacheBytes: Number(cache.match(/^(\d+)/)![1]), cacheLimit: Number(cache.match(/\/ (\d+)/)![1]) });
+    samples.push({ fps: Number(performance.match(/FPS ([\d.]+)/)![1]), p95: Number(performance.match(/P95 ([\d.]+)/)![1]), cpuMs: Number(performance.match(/CPU ([\d.]+)/)![1]), drawCalls: (await resources()).drawCalls, worldMemoryBytes: Number(cache.match(/^(\d+)/)![1]), worldMemoryLimit: Number(cache.match(/\/ (\d+)/)![1]) });
     if (step % 3 === 2) { await page.mouse.move(700, 400); await page.mouse.move(715, 400); }
   }
   const heaps: number[] = [];
@@ -48,7 +50,9 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
     await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
     if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
-    await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 9');
+    // The normal map window fits within the emergency memory guard.
+  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBe(mapId === 'market' ? 25 : 9);
+  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
     await page.waitForTimeout(1200);
     expect(await old!.evaluate((element) => (element as HTMLCanvasElement).getContext('webgl2')!.isContextLost())).toBe(true);
     await old!.dispose();
@@ -62,7 +66,7 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
   expect(Math.min(...samples.map((s) => s.fps))).toBeGreaterThanOrEqual(30);
   expect(Math.max(...samples.map((s) => s.p95))).toBeLessThanOrEqual(50);
   expect(Math.max(...samples.map((s) => s.drawCalls))).toBeLessThanOrEqual(500);
-  for (const sample of samples) expect(sample.cacheBytes).toBeLessThanOrEqual(sample.cacheLimit);
+  for (const sample of samples) expect(sample.worldMemoryBytes).toBeLessThanOrEqual(sample.worldMemoryLimit);
   expect(heaps.at(-1)! - baselineHeap).toBeLessThanOrEqual(8 * 1024 * 1024);
   expect(counts.every((count) => count.geometries === baselineResources.geometries && count.textures === baselineResources.textures)).toBe(true);
 });

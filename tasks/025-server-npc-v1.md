@@ -1,9 +1,9 @@
 ---
 id: TASK-025
 type: implementation-task
-status: todo
+status: done
 spec: ../specs/server-npc-dialogue.md
-requirements: [NPC-001–007]
+requirements: [NPC-002–007]
 related:
   - spec: ../specs/server-persistence.md
     requirements: [STORE-011]
@@ -19,17 +19,20 @@ scheduling_note: часть B (платформа и данные); реализ
 Реализовать ответы NPC для PROTO v1 через порт с заглушкой `scripted`. Добавлены NPC-001–007. Адаптер модели не входит в задачу: его реализует разработчик LLM-части по NPC-005 и контрактному тесту NPC-007.
 
 ## Реализация
-- [ ] NpcDialogueService: допуск, атомарная квота, FIFO-планировщик с `maxConcurrent`, дедлайн, отмена, нормализация, запись истории до ответа.
-- [ ] Порт `NpcResponder`, реестр адаптеров, адаптер `scripted`, контрактный набор тестов.
-- [ ] Подключение к realtime (REALTIME-009), отмена при разрыве/перехвате/истечении сессии/остановке, статус NPC в `/api/health`.
+- [x] NpcQuestions: квоты, FIFO, общий deadline, AbortSignal, удержание зависшего слота, нормализация, запись до ответа.
+- [x] NpcResponder, реестр, scripted с темами/памятью, общий контрактный набор тестов.
+- [x] Отмена через cancelConnection/stop и статус health; граница frozen contracts.ts.
+- [x] Подключены реальный realtime A и проверка управляющего соединения; takeover отменяет ответ до записи.
 
 ## Приёмка
-- [ ] NPC-001, 003, 006 / S1; NPC-001–002 / S2; NPC-004 / S3; NPC-003, 005 / S4; NPC-007 / S5 — интеграционные и unit-тесты.
-- [ ] STORE-011 через полный путь вопроса.
-- [ ] Шаг мира под нагрузкой S2 не задерживается (сравнение с REALTIME S7).
-- [ ] `make server-test` и `npm run check` проходят. Заглушка не засчитывается как приёмка AI/LLM.
+- [x] NPC-002–007: FIFO/квоты/deadline, queued/running abort, задержанное освобождение, unavailable, нормализация, private history; scripted проходит контрактный набор.
+- [x] STORE-011: реальный SQLite + сервис сохраняют ответ до результата, restart сохраняет память; ошибка store не выдаёт npc-answer.
+- [x] NPC S1–S4 через настоящий Socket.IO: a-realtime/integration и браузерный NPC-сценарий; карта/расстояние, доставка и отмена проверены.
+- [x] REALTIME S7: 61 с, 4 игрока, NPC delay 5 с; p95 шага 0,977 мс, p95 рассылки 101,2 мс. SQLite и очередь не останавливают мир.
+- [x] make server-test, check:platform проходят.
+- [x] Полный npm run check проходит после объединения A.
 
 ## Результат
-- Файлы: —
-- Проверки: не выполнялись; реализация не начата.
-- Отклонения: —
+Реализованы npc, scripted и контрактные тесты. Тексты строятся из профиля и истории; реальная LLM, PROTO v2 и AI не реализованы и не засчитаны. [Evidence](evidence/backend-platform-data-2026-10-31.md).
+
+Дополнительная проверка после merge A: [evidence интеграции](evidence/backend-integration-2026-10-31.md).

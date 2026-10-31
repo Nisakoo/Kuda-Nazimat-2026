@@ -1,7 +1,7 @@
 ---
 id: TASK-024
 type: implementation-task
-status: todo
+status: in-progress
 spec: ../specs/shared-contracts.md
 requirements: [SHARED-001–006]
 related:
@@ -28,6 +28,8 @@ scheduling_note: часть A (мир и сеть); контракт server/src/
 - [ ] SHARED-005 / S3: проходимость на demo-данных совпадает с клиентским guard в контрольных точках.
 
 ## Результат
-- Файлы: —
-- Проверки: не выполнялись; реализация не начата.
-- Отклонения: —
+- Файлы: shared/{protocol,world,map}/*.ts, shared/package.json, shared/tsconfig.json, shared/protocol/fixtures.json; тест server/test/a-shared-protocol.test.ts.
+- Проверки: `npm --prefix server test` — 4 файла, 26 тестов, все прошли; `npm --prefix server run check` — tsc server + shared без ошибок, dependency-cruiser без нарушений; `node -e "import('./src/game/index.ts')"` в Node 24.15.0 — модуль грузится без сборки. Среда: Windows 11, Node 24.15.0, npm 11.12.1. Все fixtures (клиентские + 6 серверных PROTO-008) дают ожидаемый результат; клиентские fixtures из client/src/shared/protocol совпадают по valid/invalid. Проходимость: стена, скольжение и граница чанка проверены на синтетическом мире (a-world.test.ts).
+- Отклонения и остаток: Тест shared перенесён в server/test: у shared/ нет своих зависимостей (vitest). Побайтное сравнение проходимости с клиентским ChunkManager не делалось — формула перенесена дословно, проверены контрольные точки. Клиент на shared/ ещё не переведён (клиентская задача). Статус in-progress, пока непроверенные пункты приёмки не закрыты.
+
+После TASK-027 клиент импортирует общий исходник напрямую; отдельные копии protocol/types/fixtures удалены. Проверка A обновлена: при отсутствии копии проверяет прямой импорт, а не молча пропускает сценарий. Общий headless-профиль и полный check проходят. Ранее непроверенная клиентская миграция закрыта TASK-027; исходные результаты A сохранены выше как история.

@@ -30,8 +30,10 @@ export function canAccess(file: WorldFile, location: PlayerLocation | null, maps
   const here = map.cellAt(location.position.x, location.position.z);
   return file.uses.some((use) => {
     if (use.mapId !== location.mapId) return false;
-    if (use.kind === 'manifest' || use.kind === 'model') return true;
-    if (use.kind === 'chunk') return near(use.cell, here, radius);
-    return use.cells.some((cell) => near(cell, here, radius));
+    switch (use.kind) {
+      case 'manifest': case 'model': return true;
+      case 'chunk': return near(use.cell, here, radius);
+      case 'collision': return use.cells.some((cell) => near(cell, here, radius));
+    }
   });
 }

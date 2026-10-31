@@ -127,3 +127,38 @@ button.question { font-weight: 500; background: #fffefa; border: 1px solid #cfdd
 .word-list li { margin-block: 16px; }
 .market-results { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
 .market-results dd { margin: 0; font-weight: 650; }
+
+.babel-panel label { display: grid; gap: .4rem; margin: .6rem 0; }
+.babel-panel form { display: grid; gap: .6rem; }
+.babel-panel textarea { min-height: 5rem; resize: vertical; }
+.babel-panel .chat-messages { max-height: 18rem; overflow-y: auto; padding-left: 1.4rem; }
+.babel-panel .chat-messages li { margin-bottom: .8rem; }
+.word-link { display: inline; padding: 0; margin: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; text-decoration: underline dotted; text-underline-offset: .2em; box-shadow: none; }
+.word-link:hover, .word-link:focus-visible { background: #ddede3; color: #214d49; }
+.babel-task { max-width: 28rem; white-space: normal; }
+.stamina { position: fixed; z-index: 3; left: 50%; bottom: 64px; transform: translateX(-50%); display: grid; justify-items: center; gap: 4px; pointer-events: none; color: #fff; font-size: 11px; line-height: 1.2; }
+.stamina-label, .stamina-recovery { padding: 3px 7px; border-radius: 8px; background: #182c32; white-space: nowrap; }
+.stamina-ring { position: relative; width: 56px; height: 56px; border-radius: 50%; background: #182c32; }
+.stamina-ring svg { display: block; overflow: visible; }
+.stamina-track, .stamina-arc { fill: none; stroke-width: 6px; }
+.stamina-track { stroke: #344852; }
+.stamina-arc { stroke: #8df0d9; transition: stroke-dashoffset 80ms linear; }
+.stamina.low .stamina-arc { stroke: #ffc567; }
+.stamina.empty .stamina-arc, .stamina.blocked .stamina-arc { transition: none; }
+.stamina-number { position: absolute; inset: 0; display: grid; place-content: center; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.world-actions { margin-bottom: 112px; }
+@media (max-width: 700px), (max-height: 420px) {
+  .hints { display: none; }
+  .world-actions { gap: 6px; margin-bottom: 116px; }
+  .world-actions button { padding: 8px 10px; font-size: 11px; }
+}
+@media (max-height: 420px) {
+  .hud-top { display: none; }
+  .world-actions { margin-top: 0; }
+  header { padding: 8px 12px; gap: 4px; }
+  .brand { font-size: 14px; gap: 4px; }
+  .brand-mark { font-size: 20px; }
+  .mode { display: none; }
+  .header-actions { gap: 4px; }
+  .compact { padding: 6px; font-size: 11px; }
+}

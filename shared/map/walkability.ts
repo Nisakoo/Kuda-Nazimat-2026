@@ -1,7 +1,7 @@
 import type { WorldManifest } from './manifest.ts';
 
-/** Footprint probes of the client movement guard (ChunkManager.canWalk). */
-const PROBES = [-0.25, 0.25] as const;
+export const FOOTPRINT_HALF = 0.25;
+const PROBES = [-FOOTPRINT_HALF, FOOTPRINT_HALF] as const;
 
 export interface ChunkCell { readonly x: number; readonly z: number }
 /** Looks up the collision bitmap of a ready chunk by grid cell; undefined means "not available". */
@@ -18,17 +18,49 @@ export function footprintCells(manifest: Pick<WorldManifest, 'origin' | 'chunkSi
   return cells;
 }
 
-/** True when every probe lands on an available chunk and a zero collision byte. */
+/** True when every cell under the entire footprint is available and empty. */
 export function isWalkable(manifest: Pick<WorldManifest, 'origin' | 'chunkSize' | 'collisionResolution'>, collision: CollisionLookup, x: number, z: number): boolean {
+  return isPathWalkable(manifest, collision, { x, z }, { x, z });
+}
+
+export interface PointXZ { readonly x: number; readonly z: number }
+export interface Rectangle { readonly minX: number; readonly maxX: number; readonly minZ: number; readonly maxZ: number }
+
+/** Exact segment against a half-open rectangle. A valid contact can move away or tangent. */
+export function intersectsRectangle(from: PointXZ, to: PointXZ, rect: Rectangle): boolean {
+  let entry = 0; let exit = 1;
+  for (const [a, b, min, max] of [[from.x, to.x, rect.minX, rect.maxX], [from.z, to.z, rect.minZ, rect.maxZ]] as const) {
+    const delta = b - a;
+    if (delta === 0) { if (a < min || a >= max) return false; }
+    else { const t1 = (min - a) / delta; const t2 = (max - a) / delta; entry = Math.max(entry, Math.min(t1, t2)); exit = Math.min(exit, Math.max(t1, t2)); }
+  }
+  if (entry < exit) return true;
+  if (entry > exit) return false;
+  const x = from.x + (to.x - from.x) * entry; const z = from.z + (to.z - from.z) * entry;
+  return x >= rect.minX && x < rect.maxX && z >= rect.minZ && z < rect.maxZ;
+}
+
+/** Swept square footprint; checks thin cells between endpoints and between footprint corners. */
+export function isPathWalkable(manifest: Pick<WorldManifest, 'origin' | 'chunkSize' | 'collisionResolution'>, collision: CollisionLookup, from: PointXZ, to: PointXZ): boolean {
+  if (![from.x, from.z, to.x, to.z].every(Number.isFinite)) return false;
   const { origin, chunkSize, collisionResolution: resolution } = manifest;
-  for (const dx of PROBES) for (const dz of PROBES) {
-    const px = x + dx; const pz = z + dz;
-    const cell = chunkCellOf(manifest, px, pz);
-    const data = collision(cell);
-    if (!data) return false;
-    const cx = Math.floor((px - origin.x - cell.x * chunkSize) / chunkSize * resolution);
-    const cz = Math.floor((pz - origin.z - cell.z * chunkSize) / chunkSize * resolution);
-    if (data[cz * resolution + cx] !== 0) return false;
+  const size = chunkSize / resolution;
+  const minX = Math.floor((Math.min(from.x, to.x) - FOOTPRINT_HALF - origin.x) / size);
+  const maxX = Math.floor((Math.max(from.x, to.x) + FOOTPRINT_HALF - origin.x) / size);
+  const minZ = Math.floor((Math.min(from.z, to.z) - FOOTPRINT_HALF - origin.z) / size);
+  const maxZ = Math.floor((Math.max(from.z, to.z) + FOOTPRINT_HALF - origin.z) / size);
+  // Fail closed on an invalid/unbounded trace; ordinary simulation traces are a few cells long.
+  if ((maxX - minX + 1) * (maxZ - minZ + 1) > 262144) return false;
+  let lastKey = ''; let data: Uint8Array | undefined;
+  for (let z = minZ; z <= maxZ; z++) for (let x = minX; x <= maxX; x++) {
+    const cx = Math.floor(x / resolution); const cz = Math.floor(z / resolution);
+    const key = `${cx}:${cz}`;
+    if (key !== lastKey) { data = collision({ x: cx, z: cz }); lastKey = key; }
+    if (data?.[(z - cz * resolution) * resolution + x - cx * resolution] === 0) continue;
+    if (intersectsRectangle(from, to, {
+      minX: origin.x + x * size - FOOTPRINT_HALF, maxX: origin.x + (x + 1) * size + FOOTPRINT_HALF,
+      minZ: origin.z + z * size - FOOTPRINT_HALF, maxZ: origin.z + (z + 1) * size + FOOTPRINT_HALF,
+    })) return false;
   }
   return true;
 }

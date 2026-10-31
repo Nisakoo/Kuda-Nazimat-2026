@@ -8,7 +8,7 @@ export interface GameSession {
   send(command: GameCommand): void;
   update(deltaSeconds: number): void;
   getSnapshot(): WorldSnapshot;
-  setMovementGuard(guard: (position: Vector3) => boolean): void;
+  setMovementGuard(guard: (position: Vector3) => boolean, path?: (from: Vector3, to: Vector3) => boolean): void;
   subscribe(listener: (events: readonly WorldEvent[]) => void): () => void;
   dispose(): void;
 }

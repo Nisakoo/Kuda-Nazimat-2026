@@ -1,4 +1,4 @@
-import type { ClientMessage, NetworkState, ServerMessage, ServerSession } from '../shared/protocol/types';
+import type { ClientMessage, NetworkState, ServerMessage, ServerSession } from '../../../shared/protocol/types.ts';
 
 export interface Clock {
   now(): number;

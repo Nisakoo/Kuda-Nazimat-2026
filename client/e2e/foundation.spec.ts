@@ -65,14 +65,15 @@ test('unavailable WebGL shows a useful error and no canvas', async ({ page }) =>
   await expect(page.getByRole('alert')).toContainText('WebGL 2');
 });
 
-test('runtime config can select the explicitly unavailable online mode', async ({ page }) => {
+test('runtime config selects guest login before opening online channels', async ({ page }) => {
   const connections: string[] = [];
   page.on('websocket', (socket) => connections.push(socket.url()));
   await page.route('**/config.json', (route) => route.fulfill({
     json: { session: 'online', serverUrl: 'http://school.local' },
   }));
   await page.goto('/');
-  await expect(page.getByRole('alert')).toContainText('Сетевой режим');
+  await expect(page.getByRole('heading', { name: 'Войти в мир' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Войти', exact: true })).toBeDisabled();
   await expect(page.locator('canvas')).toHaveCount(0);
   expect(connections).toEqual([]);
 });

@@ -36,7 +36,7 @@ describe('confirmed pointer lock and input intentions', () => {
     Object.defineProperty(surface, 'requestPointerLock', { configurable: true, value: vi.fn(() => { grant(); return Promise.resolve(); }) });
     actions = {
       canControl: () => allowed, cameraYaw: () => yaw,
-      move: vi.fn(), look: vi.fn(), zoom: vi.fn(), interact: vi.fn(), menu: vi.fn(),
+      move: vi.fn(), sprint: vi.fn(), jump: vi.fn(), clearInput: vi.fn(), look: vi.fn(), zoom: vi.fn(), interact: vi.fn(), menu: vi.fn(),
       captured: vi.fn(), interrupted: vi.fn(), captureFailed: vi.fn(),
     };
     input = new InputController(surface, actions);
@@ -82,6 +82,25 @@ describe('confirmed pointer lock and input intentions', () => {
     input.stop();
     moveMouse(100, -10);
     expect(actions.look).toHaveBeenCalledTimes(20);
+  });
+
+  it('jumps once on physical Space, tracks both Shifts, and clears unsent input on blur', () => {
+    input.requestCapture();
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', repeat: true }));
+    input.sample(); input.sample(); expect(actions.jump).toHaveBeenCalledTimes(1);
+    window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
+    expect(actions.jump).toHaveBeenCalledTimes(2);
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'ShiftLeft' })); input.sample();
+    expect(actions.sprint).toHaveBeenLastCalledWith(true);
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'ShiftRight' }));
+    window.dispatchEvent(new KeyboardEvent('keyup', { code: 'ShiftLeft' })); input.sample();
+    expect(actions.sprint).toHaveBeenCalledTimes(1);
+    window.dispatchEvent(new KeyboardEvent('keyup', { code: 'ShiftRight' })); input.sample();
+    expect(actions.sprint).toHaveBeenLastCalledWith(false);
+    window.dispatchEvent(new Event('blur')); expect(actions.clearInput).toHaveBeenCalled();
+    input.requestCapture(); input.sample(); expect(actions.jump).toHaveBeenCalledTimes(2);
   });
 
   it('does not enable movement or look while the request is pending', () => {

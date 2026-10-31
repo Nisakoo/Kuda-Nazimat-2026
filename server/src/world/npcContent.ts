@@ -10,7 +10,8 @@ export interface NpcDefinition {
   readonly position: Vector3;
   readonly rotationY: number;
   readonly interactionRadius: number;
-  readonly assetId: string;
+  /** Optional: market NPCs are drawn by the chunk GLB. */
+  readonly assetId?: string;
 }
 
 const ID = /^[A-Za-z0-9_-]{1,80}$/;
@@ -35,11 +36,12 @@ export function parseNpcContent(raw: unknown): NpcDefinition[] {
     const value = item as Record<string, unknown>;
     for (const key of Object.keys(value)) if (!FIELDS.includes(key)) fail(index, key);
     const id = text(value.id, index, 'id', 80); if (!ID.test(id) || seen.has(id)) fail(index, 'id'); seen.add(id);
-    const assetId = text(value.assetId, index, 'assetId', 80); if (!ID.test(assetId)) fail(index, 'assetId');
+    const assetId = value.assetId === undefined ? undefined : text(value.assetId, index, 'assetId', 80);
+    if (assetId !== undefined && !ID.test(assetId)) fail(index, 'assetId');
     const position = value.position as Record<string, unknown> | undefined;
     if (!position || typeof position !== 'object') fail(index, 'position');
     return {
-      id, assetId,
+      id, ...(assetId ? { assetId } : {}),
       mapId: text(value.mapId, index, 'mapId', 80),
       name: text(value.name, index, 'name', 80),
       topic: text(value.topic, index, 'topic', 80),

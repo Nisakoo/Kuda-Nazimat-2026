@@ -2,8 +2,9 @@ import { GameWorld } from '../core/GameWorld';
 import type { Direction, GameCommand, Vector3, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from './GameSession';
 import type { AccessContext, Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
-import type { ClientMessage, NetworkState, ServerMessage, WorldDescriptor } from '../shared/protocol/types';
-import { LIMITS } from '../shared/protocol/types';
+import type { ClientMessage, NetworkState, ServerMessage, WorldDescriptor } from '../../../shared/protocol/types.ts';
+import { LIMITS } from '../../../shared/protocol/types.ts';
+import { MOVEMENT } from '../../../shared/movement/simulation.ts';
 
 export type ChatMessage = Extract<ServerMessage, { type: 'chat' }>;
 export type OnlineNotice =
@@ -41,8 +42,12 @@ export class OnlineSession implements GameSession {
   private lastInputAt = -Infinity;
   private inputTimer: number | null = null;
   private direction: Direction = { x: 0, z: 0 };
+  private sprint = false;
+  private jumpId = 0;
+  private jumpCounter = 0;
   private prepared: readonly string[] = [];
   private guard: ((position: Vector3) => boolean) | null = null;
+  private pathGuard: ((from: Vector3, to: Vector3) => boolean) | null = null;
   private disposed = false;
   private readonly unsubscribe: readonly (() => void)[];
 
@@ -54,30 +59,36 @@ export class OnlineSession implements GameSession {
   private readonly connection = (state: NetworkState): void => {
     if (this.disposed) return;
     this.clearPending('Связь прервана. Действие не будет отправлено повторно.');
-    this.direction = { x: 0, z: 0 }; this.history = []; this.prepared = [];
+    this.direction = { x: 0, z: 0 }; this.sprint = false; this.jumpId = 0; this.jumpCounter = 0; this.history = []; this.prepared = [];
     this.updates = []; this.updateOverflow = false;
     this.joinId = null; this.resyncId = null; this.revision = -1; this.sequence = 0; this.elapsed = 0;
     if (this.inputTimer !== null) this.clock.clear(this.inputTimer); this.inputTimer = null; this.lastInputAt = -Infinity;
     if (state.status === 'connected') {
       this.epoch++; this.requestCount = 0;
       this.status({ status: 'connecting', error: null });
-      this.joinId = this.request('join', (requestId) => ({ v: 1, type: 'join', requestId, mapId: this.mapId }));
+      this.joinId = this.request('join', (requestId) => ({ v: 3, type: 'join', requestId, mapId: this.mapId }));
     } else { if (state.status === 'unauthorized') this.context = undefined; this.status(state); }
   };
   private status(state: NetworkState): void { this.value = Object.freeze({ ...state }); this.publish({ type: 'status', state: this.value }); }
 
   send(command: GameCommand): void {
     if (this.disposed || this.value.status !== 'connected' || !this.id || this.resyncId) return;
-    if (command.type === 'move') {
+    if (command.type === 'clear-input') {
+      this.direction = { x: 0, z: 0 }; this.sprint = false;
+      this.jumpId = 0;
+      this.flushInput();
+    } else if (command.type === 'jump') this.jumpId = ++this.jumpCounter;
+    else if (command.type === 'sprint') { this.sprint = command.held; this.flushInput(); }
+    else if (command.type === 'move') {
       const { x, z } = command.direction;
       if (!Number.isFinite(x) || !Number.isFinite(z)) return;
       const divisor = Math.max(1, Math.hypot(x, z)); this.direction = { x: x / divisor, z: z / divisor };
       if (x === 0 && z === 0) this.flushInput();
-    } else this.request('interact', (requestId) => ({ v: 1, type: 'interact', requestId, targetId: command.targetId }), command.targetId);
+    } else this.request('interact', (requestId) => ({ v: 3, type: 'interact', requestId, targetId: command.targetId }), command.targetId);
   }
-  chat(text: string): string | null { return this.request('chat-send', (requestId) => ({ v: 1, type: 'chat-send', requestId, text: text.trim() })); }
-  askNpc(targetId: string, text: string): string | null { return this.request('npc-question', (requestId) => ({ v: 1, type: 'npc-question', requestId, targetId, text: text.trim() }), targetId); }
-  setMovementGuard(guard: (position: Vector3) => boolean): void { this.guard = guard; }
+  chat(text: string): string | null { return this.request('chat-send', (requestId) => ({ v: 3, type: 'chat-send', requestId, text: text.trim() })); }
+  askNpc(targetId: string, text: string): string | null { return this.request('npc-question', (requestId) => ({ v: 3, type: 'npc-question', requestId, targetId, text: text.trim() }), targetId); }
+  setMovementGuard(guard: (position: Vector3) => boolean, path?: (from: Vector3, to: Vector3) => boolean): void { this.guard = guard; this.pathGuard = path ?? null; }
   setPreparedChunks(ids: readonly string[]): void { this.prepared = [...ids].slice(0, 25); }
   update(deltaSeconds: number): void {
     if (this.disposed || this.value.status !== 'connected' || !this.id) return;
@@ -102,8 +113,18 @@ export class OnlineSession implements GameSession {
     const player = this.getSnapshot().entities.find((entity) => entity.id === this.id);
     let direction = this.resyncId ? { x: 0, z: 0 } : this.direction;
     const position = player?.transform?.position;
-    if (!position || (this.guard && !this.guard({ x: position.x + direction.x * (player?.movement?.speed ?? 3) / LIMITS.inputHz, y: position.y, z: position.z + direction.z * (player?.movement?.speed ?? 3) / LIMITS.inputHz }))) direction = { x: 0, z: 0 };
-    this.network.send({ v: 1, type: 'input', requestId: this.nextId(), sequence: ++this.sequence, direction, preparedChunks: this.prepared });
+    if (!position) direction = { x: 0, z: 0 };
+    else if (this.guard || this.pathGuard) {
+      const step = (this.sprint ? MOVEMENT.sprintSpeed : MOVEMENT.walkSpeed) * MOVEMENT.substep;
+      const dx = direction.x * step; const dz = direction.z * step;
+      const available = [[dx, dz], [dx, 0], [0, dz]].some(([x, z]) => {
+        if (x === 0 && z === 0) return false;
+        const to = { x: position.x + x!, y: position.y, z: position.z + z! };
+        return (!this.guard || this.guard(to)) && (!this.pathGuard || this.pathGuard(position, to));
+      });
+      if (!available) direction = { x: 0, z: 0 };
+    }
+    this.network.send({ v: 3, type: 'input', sprint: !this.resyncId && this.sprint, jumpId: this.resyncId ? (player?.motion?.jumpAck ?? 0) : this.jumpId, requestId: this.nextId(), sequence: ++this.sequence, direction, preparedChunks: this.prepared });
   }
   getSnapshot(): WorldSnapshot { return this.world.getSnapshot(); }
   /** Presentation is delayed independently; the authoritative snapshot is never interpolated. */
@@ -113,9 +134,8 @@ export class OnlineSession implements GameSession {
     const current = (upper < 0 ? this.history.at(-1) : this.history[upper]) ?? { time: target, snapshot: this.getSnapshot() };
     const previous = upper > 0 ? this.history[upper - 1]! : current;
     const alpha = current.time === previous.time ? 1 : Math.max(0, Math.min(1, (target - previous.time) / (current.time - previous.time)));
-    const player = this.getSnapshot().entities.find((entity) => entity.id === this.id);
-    const withPlayer = (snapshot: WorldSnapshot): WorldSnapshot => player ? { tick: snapshot.tick, entities: [...snapshot.entities.filter((entity) => entity.id !== this.id), player] } : snapshot;
-    return { previous: withPlayer(previous.snapshot), current: withPlayer(current.snapshot), alpha };
+    // The camera follows the rendered player, so it needs the same interpolation as peers.
+    return { previous: previous.snapshot, current: current.snapshot, alpha };
   }
   private nextId(): string { return `c${this.epoch}_${++this.requestCount}`; }
   private request(type: RequestType, create: (requestId: string) => ClientMessage, targetId?: string): string | null {
@@ -138,9 +158,9 @@ export class OnlineSession implements GameSession {
   private clearPending(message: string): void { for (const [requestId, pending] of this.pending) { this.clock.clear(pending.timer); if (pending.type !== 'join' && pending.type !== 'resync') this.publish({ type: 'request-error', requestId, message }); } this.pending.clear(); }
   private resync(): void {
     if (this.resyncId) return;
-    this.history = []; this.direction = { x: 0, z: 0 };
+    this.history = []; this.direction = { x: 0, z: 0 }; this.sprint = false; this.jumpId = this.getSnapshot().entities.find(e => e.id === this.id)?.motion?.jumpAck ?? 0;
     this.flushInput();
-    this.resyncId = this.request('resync', (requestId) => ({ v: 1, type: 'resync', requestId, revision: Math.max(0, this.revision) }));
+    this.resyncId = this.request('resync', (requestId) => ({ v: 3, type: 'resync', requestId, revision: Math.max(0, this.revision) }));
   }
   private apply(snapshot: WorldSnapshot, revision: number): void {
     this.world.applySnapshot(snapshot); this.revision = revision;
@@ -191,7 +211,7 @@ export class OnlineSession implements GameSession {
       if (message.revision < this.revision || (message.revision === this.revision && !this.resyncId) || message.snapshot.tick < this.getSnapshot().tick) return;
       if (!message.snapshot.entities.some((entity) => entity.id === this.id && entity.transform)) { this.resync(); return; }
       if (this.resyncId) this.finish(this.resyncId); this.resyncId = null;
-      this.apply(message.snapshot, message.revision); return;
+      this.history = []; this.apply(message.snapshot, message.revision); return;
     }
     if (message.type === 'delta') {
       if (message.revision <= this.revision || this.resyncId) return;

@@ -9,21 +9,23 @@ describe('WorldBudget', () => {
     first.release(); await Promise.resolve(); expect(empty).toBe(false);
     second.release(); await waiting; expect(empty).toBe(true);
   });
-  it('counts shared resources once until the last owner and enforces both caps', () => {
-    const budget = new WorldBudget(1000, 200);
+  it('counts shared resources once until the last owner and enforces the memory guard', () => {
+    const budget = new WorldBudget(200);
     const a = budget.reserve('a', 60, 120);
     const b = budget.reserve('a', 60, 120);
     expect(budget.stats).toMatchObject({ bytes: 60, memory: 120, resources: 1 });
-    expect(() => budget.reserve('b', 41, 41)).toThrow(BudgetExhausted);
     expect(() => budget.reserve('b', 30, 81)).toThrow(BudgetExhausted);
+    const extra = budget.reserve('b', 70, 70);
+    expect(budget.stats).toMatchObject({ bytes: 130, memory: 190 });
+    extra.release();
     a.release(); a.release();
     expect(budget.stats.bytes).toBe(60);
     b.release();
     expect(budget.stats.bytes).toBe(0);
-    expect(budget.epoch).toBe(1);
+    expect(budget.epoch).toBe(2);
   });
   it('admits a whole chunk atomically and rejects conflicting metadata', () => {
-    const budget = new WorldBudget(1000);
+    const budget = new WorldBudget(100);
     const items = [{ key: 'a', bytes: 60, memory: 60 }, { key: 'b', bytes: 50, memory: 50 }];
     expect(() => budget.reserveAll(items)).toThrow(BudgetExhausted);
     expect(budget.stats).toMatchObject({ bytes: 0, peakBytes: 0 });

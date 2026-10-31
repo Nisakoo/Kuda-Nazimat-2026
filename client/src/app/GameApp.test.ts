@@ -1,3 +1,4 @@
+import { initialMotion, motionStatus } from '../../../shared/movement/simulation.ts';
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RenderAdapter } from '../render/RenderAdapter';
@@ -5,6 +6,7 @@ import { LocalSession } from '../session/LocalSession';
 import { GameApp } from './GameApp';
 import { parseConfig } from './config';
 import { MockNetworkAdapter } from '../multiplayer/MockNetworkAdapter';
+import type { ServerSession } from '../../../shared/protocol/types.ts';
 import type { NetworkAdapter } from '../multiplayer/NetworkAdapter';
 import type { MapSource, WorldManifest } from '../map/types';
 import { DEMO_WORLD } from '../shared/demoWorld.generated';
@@ -40,7 +42,7 @@ describe('application lifecycle', () => {
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
     host = document.createElement('div');
     host.getBoundingClientRect = () => new DOMRect(0, 0, 640, 480);
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     createRenderer = vi.fn(() => renderer);
     app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, null);
   });
@@ -88,7 +90,7 @@ describe('application lifecycle', () => {
     app.start(host);
     app.dispose();
     const previousRenderer = renderer;
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     app = new GameApp(parseConfig({}, 'http://school.local'), () => renderer, undefined, null);
     app.start(host);
     advance(100);
@@ -148,13 +150,13 @@ describe('application lifecycle', () => {
     expect(pending.size).toBe(0);
   });
 
-  it('does not create a renderer or connection for the unavailable online mode', () => {
+  it('shows login without creating a renderer or connection before authorization', () => {
     app.dispose();
     app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null);
     const listener = vi.fn();
     app.subscribe(listener);
     app.start(host);
-    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ phase: 'unavailable' }));
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ phase: 'idle', authRequired: true }));
     expect(createRenderer).not.toHaveBeenCalled();
     expect(pending.size).toBe(0);
   });
@@ -174,11 +176,11 @@ describe('application lifecycle', () => {
 
   it('prepares the authoritative saved position instead of the manifest spawn in an online session', async () => {
     app.dispose(); vi.useFakeTimers();
-    const manifest: WorldManifest = { mapId: 'demo', version: 1, worldBytes: DEMO_WORLD.worldBytes, chunkSize: 32, collisionResolution: 4, spawn: { x: 8, y: 0, z: 8 }, origin: { x: 0, z: 0 }, models: {}, assets: {}, chunks: Array.from({ length: 5 }, (_, x) => ({ id: String(x), x, z: 0, region: 'test', url: String(x), bytes: 1, collisionUrl: 'c', collisionBytes: 16, assets: [] })) };
+    const manifest: WorldManifest = { mapId: 'demo', version: 3, worldBytes: DEMO_WORLD.worldBytes, chunkSize: 32, collisionResolution: 4, spawn: { x: 8, y: 0, z: 8 }, origin: { x: 0, z: 0 }, models: {}, assets: {}, chunks: Array.from({ length: 5 }, (_, x) => ({ id: String(x), x, z: 0, region: 'test', url: String(x), bytes: 1, collisionUrl: 'c', collisionBytes: 16, assets: [] })) };
     const source: MapSource = { bootstrap: DEMO_WORLD, budgetEpoch: 0, manifest: async () => manifest, chunk: vi.fn(async (entry) => ({ entry, visual: { id: entry.id, objects: [] }, collision: new Uint8Array(16), release: vi.fn() })), dispose: vi.fn() };
     try {
       app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, () => source, (_mock, _url, clock) => new MockNetworkAdapter(clock, (message, transport) => {
-        if (message.type === 'join') transport.receive({ v: 1, type: 'joined', requestId: message.requestId, playerId: 'saved-player', revision: 0, snapshot: { tick: 0, entities: [{ id: 'saved-player', character: { kind: 'player', name: 'Saved' }, transform: { position: { x: 100, y: 0, z: 8 }, rotationY: 0 } }] }, world: DEMO_WORLD });
+        if (message.type === 'join') transport.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'saved-player', revision: 0, snapshot: { tick: 0, entities: [{ id: 'saved-player', motion: motionStatus(initialMotion({ x: 100, y: 0, z: 8 })), character: { kind: 'player', name: 'Saved' }, transform: { position: { x: 100, y: 0, z: 8 }, rotationY: 0 } }] }, world: DEMO_WORLD });
       }));
       app.start(host); await vi.advanceTimersByTimeAsync(0);
       app.applySettings('mock', 'http://school.local', 'demo', 1, false);
@@ -186,6 +188,50 @@ describe('application lifecycle', () => {
       const loaded = vi.mocked(source.chunk).mock.calls.map(([entry]) => entry.id);
       expect(loaded[0]).toBe('3'); expect(loaded).not.toContain('0');
       expect(app.getWorldSnapshot()?.entities[0]!.transform!.position.x).toBe(100);
+    } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
+  it('submits one login, passes the validated session to the transport and forgets it on logout', async () => {
+    let resolve!: (session: ServerSession) => void;
+    const login = vi.fn(() => new Promise<ServerSession>((done) => { resolve = done; }));
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    const factory = vi.fn(() => transport); app.dispose();
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory, login);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    await app.login('  '); expect(login).not.toHaveBeenCalled();
+    const pendingLogin = app.login(' Аня '); await app.login('Борис'); expect(login).toHaveBeenCalledOnce(); expect(factory).not.toHaveBeenCalled();
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authPending: true }));
+    const session = { token: 'x'.repeat(43), expiresAt: Date.now() + 10000 }; resolve(session); await pendingLogin;
+    expect(transport.connect).toHaveBeenCalledWith({ kind: 'server', session });
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: false, authPending: false }));
+    app.logout(); expect(transport.dispose).toHaveBeenCalledOnce();
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authName: '' }));
+  });
+
+  it.each(['settings', 'logout', 'restart', 'dispose'] as const)('cancels pending login on %s and ignores stale results', async (action) => {
+    let resolve!: (session: ServerSession) => void; let signal!: AbortSignal;
+    const login = vi.fn((_url: string, _name: string, requestSignal: AbortSignal) => { signal = requestSignal; return new Promise<ServerSession>((done) => { resolve = done; }); });
+    const network = vi.fn(); app.dispose();
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, network, login);
+    app.start(host); const pendingLogin = app.login('Аня');
+    if (action === 'settings') app.applySettings('online', 'http://another.local', 'demo', 1, false);
+    if (action === 'logout') app.logout(); if (action === 'restart') app.restart(host); if (action === 'dispose') app.dispose();
+    expect(signal.aborted).toBe(true);
+    resolve({ token: 'x'.repeat(43), expiresAt: Date.now() + 10000 }); await pendingLogin;
+    expect(network).not.toHaveBeenCalled();
+  });
+
+  it('times out login after ten seconds and allows retry without accepting the late response', async () => {
+    vi.useFakeTimers(); let resolve!: (session: ServerSession) => void; const login = vi.fn(() => new Promise<ServerSession>((done) => { resolve = done; }));
+    app.dispose(); const network = vi.fn();
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, network, login);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    try {
+      const pendingLogin = app.login('Аня'); await vi.advanceTimersByTimeAsync(10000);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authPending: false, authRequired: true, authError: expect.stringContaining('10 секунд') }));
+      resolve({ token: 'x'.repeat(43), expiresAt: Date.now() + 10000 }); await pendingLogin; expect(network).not.toHaveBeenCalled();
+      login.mockRejectedValueOnce(new Error('Сервер недоступен')); await app.login('Аня');
+      expect(login).toHaveBeenCalledTimes(2); expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authError: 'Сервер недоступен', authPending: false }));
     } finally { app.dispose(); vi.useRealTimers(); }
   });
 
@@ -263,7 +309,7 @@ describe('application lifecycle', () => {
       expect(position).toBeDefined();
       app.stop();
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({
-        phase: 'stopped', coordinates: `X ${position!.x.toFixed(1)} · Z ${position!.z.toFixed(1)}`,
+        phase: 'stopped', coordinates: `X ${position!.x.toFixed(1)} · Z ${position!.z.toFixed(1)} · Y ${position!.y.toFixed(1)}`,
       }));
       app.resume();
       advance(1000);

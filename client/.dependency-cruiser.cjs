@@ -1,16 +1,17 @@
 module.exports = {
   forbidden: [
+    { name: 'shared-is-pure', severity: 'error', from: { path: '^\\.\\./shared/' }, to: { pathNot: '^\\.\\./shared/' } },
     { name: 'no-cycles', severity: 'error', from: {}, to: { circular: true } },
     { name: 'no-unresolved', severity: 'error', from: {}, to: { couldNotResolve: true } },
     {
       name: 'core-has-no-external-dependencies', severity: 'error',
       from: { path: '^src/core/', pathNot: '\\.test\\.ts$' },
-      to: { pathNot: '^src/core/' },
+      to: { pathNot: '^src/core/|^\\.\\./shared/' },
     },
     {
       name: 'session-through-core', severity: 'error',
       from: { path: '^src/session/', pathNot: '\\.test\\.ts$' },
-      to: { pathNot: '^src/(session|core|shared)/|^src/multiplayer/NetworkAdapter\\.ts$' },
+      to: { pathNot: '^\\.\\./shared/|^src/(session|core|shared)/|^src/multiplayer/NetworkAdapter\\.ts$' },
     },
     {
       name: 'socketio-inside-adapter', severity: 'error',

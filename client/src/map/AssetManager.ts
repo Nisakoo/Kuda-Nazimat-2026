@@ -1,7 +1,8 @@
 import { AsyncLeaseCache } from '../shared/AsyncLeaseCache';
 import type { Lease } from '../shared/AsyncLeaseCache';
 import type { BudgetLease, WorldBudget } from './WorldBudget';
-export interface AssetSize { readonly bytes: number; readonly memory: number }
+export type { AssetSize } from '../../../shared/map/manifest.ts';
+import type { AssetSize } from '../../../shared/map/manifest.ts';
 export interface HttpAccess { token(): string | null; unauthorized(): void }
 
 export interface AssetSource {
