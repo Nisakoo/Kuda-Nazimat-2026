@@ -7,6 +7,7 @@ parent: architecture
 summary: Демо-сцена «Рынок Вавилона» — облик рыночной площади, пастбище и совместное задание «Козы пастуха».
 related:
   - game-babylon.md
+  - scene-main-building.md
   - client-render.md
   - client-world-streaming.md
   - server-world.md
