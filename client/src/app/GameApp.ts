@@ -218,7 +218,7 @@ export class GameApp {
             this.renderer?.setCamera(this.camera);
           },
           zoom: (delta) => {
-            this.camera = { ...this.camera, distance: Math.max(9, Math.min(22, this.camera.distance + delta * 0.01)) };
+            this.camera = { ...this.camera, distance: Math.max(3.5, Math.min(22, this.camera.distance + delta * 0.01)) };
             this.renderer?.setCamera(this.camera);
           },
         });

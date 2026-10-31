@@ -1,6 +1,7 @@
 /** Original low-poly assets; generated offline with Three.js, no downloaded content. */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { Group, Mesh, MeshStandardMaterial, BoxGeometry, CylinderGeometry, IcosahedronGeometry, LatheGeometry, BufferAttribute, Vector2, Color, AnimationClip, QuaternionKeyframeTrack } from 'three';
+import { createHash } from 'node:crypto';
+import { Group, Mesh, MeshStandardMaterial, BoxGeometry, SphereGeometry, CylinderGeometry, IcosahedronGeometry, LatheGeometry, BufferAttribute, Vector2, Color, AnimationClip, QuaternionKeyframeTrack } from 'three';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 // GLTFExporter uses FileReader for binary Blob conversion, also in Node.
@@ -9,8 +10,10 @@ const rootUrl = new URL('../public/assets/models/market/', import.meta.url);
 await mkdir(rootUrl, { recursive: true });
 const C = { sand:'#d7b989', cream:'#ecd3a7', light:'#f3dfb9', clay:'#b96c49', teal:'#478e88', dark:'#65503c', wood:'#8b603f', leaf:'#718253', olive:'#9a9d62', ochre:'#d6a64e', red:'#b54e3e', gold:'#e7bc57' };
 let root, collisions, clips;
+const geometryPool=new Map();
+const batchedMaterial=new MeshStandardMaterial({vertexColors:true,roughness:1});
 function rotationTrack(name,times,angles) { return new QuaternionKeyframeTrack(name+'.quaternion',times,angles.flatMap(a=>[Math.sin(a/2),0,0,Math.cos(a/2)])); }
-function begin(name) { root = new Group(); root.name = name; collisions=[]; clips=[]; }
+function begin(name) { root = new Group(); root.name = name; collisions=[]; clips=[]; geometryPool.clear(); }
 function part(geometry, color, x,y,z, sx=1,sy=1,sz=1, parent=root) {
   const mesh=new Mesh(geometry,new MeshStandardMaterial({color,roughness:1})); mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);parent.add(mesh);return mesh;
 }
@@ -47,14 +50,39 @@ for(let i=0;i<6;i++){const panel=box(i%2?color:C.cream,x-1.65+i*.66,3.1-Math.sin
 basket(x-1.5,2,z,.5);basket(x+1.5,2.1,z,.45);}
 function merchant(name,x,z,color=C.cream,action='idle'){
   const g=new Group();g.name=name;g.position.set(x,0,z);root.add(g);
-  cyl(color,0,.65,0,.4,1.25,.24,g);band(0,.35,.32,.6,g);
-  ball('#c69770',0,1.55,0,.3,.33,.28,g);ball(C.cream,0,1.83,0,.36,.18,.32,g);box(C.cream,0,1.55,-.21,.54,.6,.12,g);
-  for(const side of [-1,1]){ball(C.dark,side*.11,1.57,.25,.035,.04,.025,g);box(C.dark,side*.16,.07,.04,.2,.14,.35,g);}
-  const shawl=box(color===C.clay?C.cream:C.teal,-.18,1,.14,.24,.8,.35,g);shawl.rotation.z=-.15;
-  const hand=new Group();hand.name=name+'-hands';hand.position.set(0,1.05,.3);g.add(hand);
-  for(const side of [-1,1]){const arm=box(color,side*.35,0,0,.17,.55,.2,hand);arm.rotation.x=-.6;ball('#c69770',side*.34,-.15,.2,.1,.1,.1,hand);}
-  if(action==='pot')pot(0,-.3,.3,.43,C.clay,'jar',hand);
-  clips.push(new AnimationClip('idle',4,[rotationTrack(hand.name,[0,1,2,3,4],action==='fruit'?[0,-.3,0,-.15,0]:action==='pot'?[0,-.35,-.35,0,0]:[0,.07,0,-.07,0])]));
+  const skin='#c69770';
+  const rounded=(tint,x,y,z,sx,sy,sz,parent)=>part(new SphereGeometry(1,Math.max(sx,sy,sz)<.2?8:10,Math.max(sx,sy,sz)<.2?4:6),tint,x,y,z,sx,sy,sz,parent);
+  const torso=new Group();torso.name=name+'-torso';torso.position.y=.75;g.add(torso);
+  part(new CylinderGeometry(.28,.37,1.2,20),color,0,-.05,0,1,1,.8,torso);
+  part(new CylinderGeometry(.33,.34,.08,20),C.ochre,0,.10,0,1,1,.82,torso);
+  rounded(skin,0,.59,0,.11,.15,.10,torso);
+  const head=new Group();head.name=name+'-head';head.position.y=.88;torso.add(head);
+  rounded(skin,0,0,0,.30,.34,.28,head);
+  rounded(C.cream,0,.20,-.035,.32,.18,.29,head);
+  box(C.cream,0,-.09,-.24,.49,.51,.14,head);
+  part(new CylinderGeometry(.322,.322,.045,20),C.gold,0,.20,-.035,1,1,.96,head);
+  rounded(skin,0,-.04,.275,.045,.06,.05,head);
+  rounded('#9b6248',0,-.14,.25,.05,.012,.012,head);
+  for(const side of [-1,1]){
+    rounded(C.dark,side*.105,.025,.26,.025,.035,.018,head);
+    rounded(skin,side*.295,-.02,0,.05,.08,.06,head);
+    rounded(C.dark,side*.15,.075,.05,.105,.075,.19,g);
+    const shoulder=new Group();shoulder.name=name+(side<0?'-left-shoulder':'-right-shoulder');shoulder.position.set(side*.29,.48,0);torso.add(shoulder);
+    rounded(color,side*.035,0,0,.13,.14,.13,shoulder);
+    part(new CylinderGeometry(.105,.085,.28,12),color,0,-.14,0,1,1,1,shoulder);
+    const elbow=new Group();elbow.position.y=-.28;shoulder.add(elbow);
+    rounded(skin,0,0,0,.085,.085,.085,elbow);
+    part(new CylinderGeometry(.078,.065,.23,12),skin,0,-.115,0,1,1,1,elbow);
+    rounded(skin,0,-.255,0,.075,.09,.07,elbow);
+    shoulder.rotation.x=action==='pot'?-.65:action==='fruit'?-.25:-.08;
+    elbow.rotation.x=action==='pot'?-.8:-.18;
+    if(action==='fruit'&&side===1) clips.push(new AnimationClip('idle',5,[rotationTrack(shoulder.name,[0,1.25,2.5,3.75,5],[-.25,-.55,-.25,-.35,-.25])]));
+  }
+  // Both hands and the vessel share the moving torso. No floating hand group.
+  if(action==='pot')pot(0,-.015,.43,.46,C.clay,'jar',torso);
+  const phase=[...name].reduce((n,c)=>n+c.charCodeAt(0),0)%7;
+  const angles=Array.from({length:9},(_,i)=>Math.sin(i*Math.PI/4+phase)*.025);
+  clips.push(new AnimationClip('idle',5,[rotationTrack(torso.name,[0,.625,1.25,1.875,2.5,3.125,3.75,4.375,5],angles)]));
 }
 function goat(name,x,z,color,kind){const g=new Group();g.name=name;g.position.set(x,0,z);if(kind==='kid')g.scale.setScalar(.65);root.add(g);
 ball(color,0,.8,0,.4,.4,.65,g);for(const a of [-1,1])for(const b of [-1,1]){box(color,a*.23,.35,b*.4,.13,.7,.14,g);box(C.dark,a*.23,.07,b*.4,.15,.14,.18,g);}
@@ -103,5 +131,5 @@ box(C.wood,0,.25,-8,2.5,.5,.8);box('#759e9a',0,.5,-8,2.2,.03,.6);obstacle(0,-8,2
 // Merge static geometry with vertex colors, retaining named animated subgroups.
 function batch(group){for(const child of [...group.children])if(child.isGroup)batch(child);
 const geometries=[];for(const child of [...group.children]){if(!child.isMesh)continue;child.updateMatrix();const g=child.geometry.index?child.geometry.toNonIndexed():child.geometry.clone();g.applyMatrix4(child.matrix);g.deleteAttribute('uv');const count=g.attributes.position.count;const color=child.material.color;const colors=new Uint8Array(count*3);for(let i=0;i<count;i++)colors.set([Math.round(color.r*255),Math.round(color.g*255),Math.round(color.b*255)],i*3);g.setAttribute('color',new BufferAttribute(colors,3,true));geometries.push(g);group.remove(child);child.geometry.dispose();child.material.dispose();}
-if(geometries.length){const joined=mergeGeometries(geometries);const merged=mergeVertices(joined);joined.dispose();const mesh=new Mesh(merged,new MeshStandardMaterial({vertexColors:true,roughness:1}));mesh.name=group.name+'-surface';group.add(mesh);for(const g of geometries)g.dispose();}}
+if(geometries.length){const joined=mergeGeometries(geometries);const merged=mergeVertices(joined);joined.dispose();const hash=createHash('sha256');for(const key of Object.keys(merged.attributes).sort()){const attribute=merged.attributes[key];hash.update(key);hash.update(Buffer.from(attribute.array.buffer,attribute.array.byteOffset,attribute.array.byteLength));}if(merged.index)hash.update(Buffer.from(merged.index.array.buffer,merged.index.array.byteOffset,merged.index.array.byteLength));const key=hash.digest('hex');let shared=geometryPool.get(key);if(shared)merged.dispose();else{shared=merged;geometryPool.set(key,shared);}const mesh=new Mesh(shared,batchedMaterial);mesh.name=group.name+'-surface';group.add(mesh);for(const g of geometries)g.dispose();}}
 for(const [name,make] of [['market',market],['pasture',pasture]]){make();root.userData.collisions=collisions;batch(root);const tracks=clips.flatMap(clip=>clip.tracks);const data=await new GLTFExporter().parseAsync(root,{binary:true,animations:[new AnimationClip('idle',5,tracks)]});const bytes=Buffer.from(data);const target=new URL(name+'.glb',rootUrl);const previous=await readFile(target).catch(()=>null);if(!previous?.equals(bytes))await writeFile(target,bytes);console.log(`${name}: ${bytes.length} bytes; ${collisions.length} collision rectangles`);}

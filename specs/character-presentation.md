@@ -2,7 +2,7 @@
 id: character-presentation
 type: module-design
 status: ready
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Улучшить модели людей, связность анимаций и отзывчивость управления без изменения серверных полномочий.
 related:

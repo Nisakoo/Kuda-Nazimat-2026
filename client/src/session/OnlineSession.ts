@@ -113,9 +113,9 @@ export class OnlineSession implements GameSession {
     const current = (upper < 0 ? this.history.at(-1) : this.history[upper]) ?? { time: target, snapshot: this.getSnapshot() };
     const previous = upper > 0 ? this.history[upper - 1]! : current;
     const alpha = current.time === previous.time ? 1 : Math.max(0, Math.min(1, (target - previous.time) / (current.time - previous.time)));
-    const player = this.getSnapshot().entities.find((entity) => entity.id === this.id);
-    const withPlayer = (snapshot: WorldSnapshot): WorldSnapshot => player ? { tick: snapshot.tick, entities: [...snapshot.entities.filter((entity) => entity.id !== this.id), player] } : snapshot;
-    return { previous: withPlayer(previous.snapshot), current: withPlayer(current.snapshot), alpha };
+    // All visual positions use the same bounded history. Authority and interaction
+    // checks still read getSnapshot(); no prediction or client-owned position.
+    return { previous: previous.snapshot, current: current.snapshot, alpha };
   }
   private nextId(): string { return `c${this.epoch}_${++this.requestCount}`; }
   private request(type: RequestType, create: (requestId: string) => ClientMessage, targetId?: string): string | null {

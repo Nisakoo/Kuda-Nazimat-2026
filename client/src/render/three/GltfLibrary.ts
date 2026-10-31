@@ -1,5 +1,5 @@
 import { AnimationMixer, LoadingManager, LoopRepeat } from 'three';
-import type { AnimationClip, BufferGeometry, Material, Object3D, SkinnedMesh, Texture } from 'three';
+import type { AnimationAction, AnimationClip, BufferGeometry, Material, Object3D, SkinnedMesh, Texture } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import type { AssetManager } from '../../map/AssetManager';
@@ -9,7 +9,7 @@ import type { Lease } from '../../shared/AsyncLeaseCache';
 interface Template { readonly scene: Object3D; readonly animations: AnimationClip[]; readonly sources: readonly Lease<ArrayBuffer>[] }
 export interface ModelInstance {
   readonly root: Object3D;
-  animate(name: string, delta: number): void;
+  animate(name: string, delta: number, pace?: number): void;
   dispose(): void;
 }
 interface Job { run(): void; cancel(): void }
@@ -86,18 +86,39 @@ export class GltfLibrary {
     root.traverse(object => { if ('isMesh' in object) { object.castShadow = true; object.receiveShadow = true; } });
     const mixer = new AnimationMixer(root);
     let animation = '';
+    const actions = new Map<string, { action: AnimationAction; weight: number; from: number }>();
+    let transition = 0;
     let disposed = false;
     const instance: ModelInstance = {
       root,
-      animate: (name, delta) => {
+      animate: (name, delta, pace = 1) => {
         if (disposed) return;
-        if (name !== animation) {
-          animation = name;
-          mixer.stopAllAction();
-          const clip = lease.value.animations.find((item) => item.name === name) ?? lease.value.animations[0];
-          if (clip) mixer.clipAction(clip).setLoop(LoopRepeat, Infinity).reset().play();
+        const dt = Math.min(Math.max(delta, 0), 0.1);
+        const clip = lease.value.animations.find(item => item.name === name)
+          ?? lease.value.animations.find(item => item.name === 'idle');
+        if (clip && clip.name !== animation) {
+          const first = animation === '';
+          animation = clip.name;
+          transition = 0;
+          if (!actions.has(animation)) actions.set(animation, { action: mixer.clipAction(clip).setLoop(LoopRepeat, Infinity), weight: 0, from: 0 });
+          for (const [key, state] of actions) {
+            state.from = state.weight;
+            if (key === animation) {
+              if (state.weight === 0) state.action.reset();
+              state.action.play();
+              if (first) state.weight = state.from = 1;
+            }
+          }
         }
-        mixer.update(Math.min(Math.max(delta, 0), 0.1));
+        transition = Math.min(.14, transition + dt);
+        for (const [key, state] of actions) {
+          const target = key === animation ? 1 : 0;
+          state.weight = state.from + (target - state.from) * (transition / .14);
+          state.action.setEffectiveWeight(state.weight);
+          state.action.setEffectiveTimeScale(key === 'walk' ? Math.max(.2, Math.min(2, pace)) : 1);
+          if (state.weight === 0 && target === 0) state.action.stop();
+        }
+        mixer.update(dt);
       },
       dispose: () => {
         if (disposed) return;
