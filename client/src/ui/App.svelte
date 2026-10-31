@@ -62,14 +62,15 @@
   {/if}
 
   {#if !error && state.screen === 'playing'}
-    <aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>Лея — история · Марк — наука</p></aside>
+    <div class="hud-top"><aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>Лея — история · Марк — наука</p></aside>
     {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p><p aria-label="Производительность">{state.performance}</p><p aria-label="Ресурсы сцены">{state.renderStats}</p></div>{/if}
+    </div>
     {#if state.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
-    <button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
-    {#if state.visualError && state.phase === 'running' && !state.dialog}<p class="asset-warning glass" role="alert">{state.visualError}</p>{/if}
+    <div class="world-actions"><button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
     {#if state.nearby && !state.dialog && state.phase === 'running'}
       <button class="interaction glass" onclick={() => game?.interact()}><kbd>E</kbd><span>Поговорить<span class="interaction-name">{state.nearby.name}</span></span></button>
-    {/if}
+    {/if}</div>
+    {#if state.visualError && state.phase === 'running' && !state.dialog}<p class="asset-warning glass" role="alert">{state.visualError}</p>{/if}
   {/if}
 
   {#if error}
@@ -91,7 +92,7 @@
       <div class="menu-buttons"><button disabled={!state.worldReady} onclick={() => game.resume()}>{state.captureError ? 'Повторить захват' : 'Продолжить'}</button><button class="secondary" onclick={() => game.openChat()}>Общение</button><button class="secondary" onclick={() => game.restart(viewport)}>Перезапустить сцену</button><button class="secondary" onclick={() => game.leaveWorld()}>На главный экран</button></div>
       <label class="debug-toggle"><input type="checkbox" checked={state.debug} onchange={(event) => game.setDebug(event.currentTarget.checked)} /> Показывать координаты</label>
       <button class="secondary" onclick={() => game.openSettings()}>Настройки</button>
-      <label class="debug-toggle">Радиус загрузки <select aria-label="Радиус загрузки" value={state.chunkRadius} onchange={(event) => game.setChunkRadius(Number(event.currentTarget.value))}><option value="0">Текущая область</option><option value="1">Ближайшие области</option><option value="2">Расширенный обзор</option></select></label>
+      <label class="debug-toggle radius-setting">Радиус загрузки <select aria-label="Радиус загрузки" value={state.chunkRadius} onchange={(event) => game.setChunkRadius(Number(event.currentTarget.value))}><option value={0}>Текущая область</option><option value={1}>Ближайшие области</option><option value={2}>Расширенный обзор</option></select></label>
       <p class="small subtle">Мышь свободна. Нажмите «Продолжить», чтобы вернуть управление.<br />WASD — идти · мышь — обзор · E — поговорить</p>
     </dialog></div>
   {/if}
