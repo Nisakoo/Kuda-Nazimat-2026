@@ -7,23 +7,22 @@
     "node": ">=24.15.0 <25"
   },
   "scripts": {
-    "start": "node src/main.ts",
-    "dev": "node --watch src/main.ts",
+    "start": "node src/app/main.ts",
+    "dev": "node --watch src/app/main.ts",
     "test": "vitest run",
     "check": "tsc -p tsconfig.json && tsc -p ../shared/tsconfig.json && depcruise src --config .dependency-cruiser.cjs",
-    "accounts": "node src/cli/accounts.ts",
     "inspect": "node src/cli/inspect.ts",
-    "bot": "node src/cli/bot.ts",
-    "demo": "node src/cli/demo.ts"
+    "backup": "node src/cli/backup.ts",
+    "check:platform": "tsc -p tsconfig.platform.json && tsc -p ../shared/tsconfig.json && depcruise src --config .dependency-cruiser.cjs"
   },
   "dependencies": {
-    "socket.io": "4.8.4",
-    "socket.io-client": "4.8.4"
+    "socket.io": "4.8.4"
   },
   "devDependencies": {
     "@types/node": "24.19.2",
     "dependency-cruiser": "17.4.3",
     "typescript": "5.9.3",
-    "vitest": "4.1.12"
+    "vitest": "4.1.12",
+    "socket.io-client": "4.8.4"
   }
 }

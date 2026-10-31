@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/app/**/*.ts",
+    "src/auth/**/*.ts",
+    "src/cli/**/*.ts",
+    "src/common/**/*.ts",
+    "src/http/**/*.ts",
+    "src/npc/**/*.ts",
+    "src/persistence/**/*.ts",
+    "src/contracts.ts",
+    "test/**/*.ts"
+  ]
+}

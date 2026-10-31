@@ -50,7 +50,7 @@ npm --prefix client run preview -- --host 0.0.0.0 --port 4173 --strictPort
 7. Выберите **Тестовый сетевой режим**. После входа откройте меню → **Общение**, отправьте текст и увидите тестовую доставку. Ввод не двигает персонажа, HTML-подобные строки остаются текстом. NPC отвечают через тот же сетевой протокол с явной пометкой теста.
 8. Меню → **Проверить разрыв связи** → **Повторить подключение**. Дождитесь нового снимка и снова нажмите **Начать прогулку**. Старые действия не воспроизводятся. **Выйти из сессии** тестового режима возвращает локальную прогулку.
 
-Режим **Локальный сервер** требует готовой серверной сессии; без неё игровой канал не открывается. `GameApp.provideServerSession({token, expiresAt})` — граница будущей интеграции входа, не замена демонстрационной авторизации. Ручная вставка токена не считается приёмкой NET-007.
+Режим **Локальный сервер** показывает форму имени. Нажмите **Войти**: клиент получает сессию через `/api/auth/guest` и открывает защищённые `/game` и `/world`. То же имя восстанавливает игрока и историю; пароль не проверяется. **Выйти из сессии** доступно на главном экране и в меню, забывает токен в браузере. При истечении или перехвате другой вкладкой форма появляется снова. Токен не сохраняется между перезагрузками страницы.
 
 ## Проверки
 
@@ -82,7 +82,7 @@ PLAYWRIGHT_CHANNEL=chrome npm --prefix client run test:render
 | `client/src/render/` | RenderAdapter, ThreeRenderer, GLB/glTF, EntityVisuals, VisualChunks, общие GPU-ресурсы |
 | `client/src/map/` | HttpMapSource, ChunkManager, AssetManager, WorldBudget |
 | `client/src/multiplayer/` | SocketIOAdapter, MockNetworkAdapter, тестовый обмен |
-| `client/src/shared/protocol/` | PROTO v1, runtime-валидация и JSON fixtures |
+| `shared/` | Общие PROTO v1, runtime-валидация, JSON fixtures, типы мира, парсеры карты и проходимость |
 | `client/src/input/`, `ui/` | Управление и Svelte-экраны через фасад |
 
 Демо — 1024 чанка по 32 м, общие авторские GLB, тематические районы и уникальные видимые таблички. Collision bitmap получается из GLB, одинаковые BIN адресуются по SHA. Генерируемые JSON/BIN/bootstrap исключены из git; исходные модели и генератор сохранены. Небольшой bootstrap входит в JS, полный мир — нет. `models:generate` воспроизводит таблички GLB/glTF; экспорт окружения — `client/scripts/export-demo-scene.mjs` с локальным dev-сервером и Chrome.
@@ -105,7 +105,7 @@ PROTO v1: namespace `/game`, событие `game`, auth `{version:1, token}`. �
 
 ## Сервер
 
-Сервер — `server/` этого репозитория: **Node 24, TypeScript strict, Socket.IO, node:sqlite, Vitest**, модульный монолит с чистыми слоями (домен → сервисы → адаптеры, единственный composition root). Общий исполняемый контракт клиента и сервера (протокол v1, сущности, формат карты, проходимость) — корневой `shared/`. Сервер реализует PROTO v1, на котором уже работает клиент, и не меняет `client/`.
+Сервер — `server/` этого репозитория: **Node 24, TypeScript strict, Socket.IO, node:sqlite, Vitest**, модульный монолит с чистыми слоями (домен → сервисы → адаптеры, единственный composition root). Общий исполняемый контракт клиента и сервера (протокол v1, сущности, формат карты, проходимость) — корневой `shared/`. Сервер и клиент используют PROTO v1; UI входа и защищённые загрузки согласованы с сервером.
 
 Спеки: [SERVER](specs/server-foundation.md), [SHARED](specs/shared-contracts.md), [PROTO](specs/protocol.md), [AUTH](specs/server-auth.md), [SERVER-WORLD](specs/server-world.md), [REALTIME](specs/server-realtime.md), [STORE](specs/server-persistence.md), [NPC v1 и порт NpcResponder](specs/server-npc-dialogue.md), [защита проекта](specs/server-demo.md).
 
@@ -122,6 +122,9 @@ PROTO v1: namespace `/game`, событие `game`, auth `{version:1, token}`. �
 | 015 | [Сервер: локальные NPC (v2)](tasks/015-server-ai.md) | [AI](specs/server-ai.md) | 011, 014, 017, 025 |
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
+
+Наборы A и B объединены с `main` (`0d53eac`), полный серверный `check` проходит. Работают UI входа, SQLite, защищённая потоковая карта, чат и NPC с памятью через scripted. Запуск — `make demo`, подробности — [server/README.md](server/README.md). Клиент использует корневой shared. Результаты реальной браузерной интеграции — [TASK-028](tasks/028-client-guest-login.md); оставшиеся критерии защиты — [TASK-026](tasks/026-server-demo.md).
+
 
 ## Локальные NPC и LLM
 

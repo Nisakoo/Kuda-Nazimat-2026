@@ -2,8 +2,8 @@ import { GameWorld } from '../core/GameWorld';
 import type { Direction, GameCommand, Vector3, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from './GameSession';
 import type { AccessContext, Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
-import type { ClientMessage, NetworkState, ServerMessage, WorldDescriptor } from '../shared/protocol/types';
-import { LIMITS } from '../shared/protocol/types';
+import type { ClientMessage, NetworkState, ServerMessage, WorldDescriptor } from '../../../shared/protocol/types.ts';
+import { LIMITS } from '../../../shared/protocol/types.ts';
 
 export type ChatMessage = Extract<ServerMessage, { type: 'chat' }>;
 export type OnlineNotice =
@@ -113,8 +113,7 @@ export class OnlineSession implements GameSession {
     const current = (upper < 0 ? this.history.at(-1) : this.history[upper]) ?? { time: target, snapshot: this.getSnapshot() };
     const previous = upper > 0 ? this.history[upper - 1]! : current;
     const alpha = current.time === previous.time ? 1 : Math.max(0, Math.min(1, (target - previous.time) / (current.time - previous.time)));
-    // All visual positions use the same bounded history. Authority and interaction
-    // checks still read getSnapshot(); no prediction or client-owned position.
+    // The camera follows the rendered player, so it needs the same interpolation as peers.
     return { previous: previous.snapshot, current: current.snapshot, alpha };
   }
   private nextId(): string { return `c${this.epoch}_${++this.requestCount}`; }
