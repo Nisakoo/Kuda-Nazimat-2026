@@ -26,6 +26,8 @@ export class OnlineSession implements GameSession {
   private readonly pending = new Map<string, Pending>();
   private readonly seenChat = new Set<string>();
   private history: Buffered[] = [];
+  private updates: Extract<ServerMessage, { type: 'snapshot' | 'delta' }>[] = [];
+  private updateOverflow = false;
   private context: AccessContext | undefined;
   private value: NetworkState = { status: 'unauthorized', error: null };
   get state(): NetworkState { return this.value; }
@@ -53,6 +55,7 @@ export class OnlineSession implements GameSession {
     if (this.disposed) return;
     this.clearPending('Связь прервана. Действие не будет отправлено повторно.');
     this.direction = { x: 0, z: 0 }; this.history = []; this.prepared = [];
+    this.updates = []; this.updateOverflow = false;
     this.joinId = null; this.resyncId = null; this.revision = -1; this.sequence = 0; this.elapsed = 0;
     if (this.inputTimer !== null) this.clock.clear(this.inputTimer); this.inputTimer = null; this.lastInputAt = -Infinity;
     if (state.status === 'connected') {
@@ -77,14 +80,18 @@ export class OnlineSession implements GameSession {
   setMovementGuard(guard: (position: Vector3) => boolean): void { this.guard = guard; }
   setPreparedChunks(ids: readonly string[]): void { this.prepared = [...ids].slice(0, 25); }
   update(deltaSeconds: number): void {
-    if (this.disposed || this.value.status !== 'connected' || !this.id || this.resyncId) return;
+    if (this.disposed || this.value.status !== 'connected' || !this.id) return;
+    const updates = this.updates; this.updates = [];
+    if (this.updateOverflow) { this.updateOverflow = false; this.resync(); }
+    else for (const message of updates) this.applyUpdate(message);
+    if (this.resyncId) return;
     this.elapsed += deltaSeconds;
     if (this.elapsed < 1 / LIMITS.inputHz) return;
     this.elapsed %= 1 / LIMITS.inputHz;
     this.flushInput();
   }
   private flushInput(): void {
-    if (this.disposed || this.value.status !== 'connected' || !this.id || this.resyncId) return;
+    if (this.disposed || this.value.status !== 'connected' || !this.id) return;
     const remaining = 1000 / LIMITS.inputHz - (this.clock.now() - this.lastInputAt);
     if (remaining > 0) {
       if (this.inputTimer === null) this.inputTimer = this.clock.set(() => { this.inputTimer = null; this.flushInput(); }, remaining);
@@ -93,7 +100,7 @@ export class OnlineSession implements GameSession {
     if (this.inputTimer !== null) this.clock.clear(this.inputTimer); this.inputTimer = null;
     this.lastInputAt = this.clock.now();
     const player = this.getSnapshot().entities.find((entity) => entity.id === this.id);
-    let direction = this.direction;
+    let direction = this.resyncId ? { x: 0, z: 0 } : this.direction;
     const position = player?.transform?.position;
     if (!position || (this.guard && !this.guard({ x: position.x + direction.x * (player?.movement?.speed ?? 3) / LIMITS.inputHz, y: position.y, z: position.z + direction.z * (player?.movement?.speed ?? 3) / LIMITS.inputHz }))) direction = { x: 0, z: 0 };
     this.network.send({ v: 1, type: 'input', requestId: this.nextId(), sequence: ++this.sequence, direction, preparedChunks: this.prepared });
@@ -132,6 +139,7 @@ export class OnlineSession implements GameSession {
   private resync(): void {
     if (this.resyncId) return;
     this.history = []; this.direction = { x: 0, z: 0 };
+    this.flushInput();
     this.resyncId = this.request('resync', (requestId) => ({ v: 1, type: 'resync', requestId, revision: Math.max(0, this.revision) }));
   }
   private apply(snapshot: WorldSnapshot, revision: number): void {
@@ -155,20 +163,11 @@ export class OnlineSession implements GameSession {
       return;
     }
     if (this.value.status !== 'connected' || this.joinId || !this.id) return;
-    if (message.type === 'snapshot') {
-      if (message.revision < this.revision || (message.revision === this.revision && !this.resyncId) || message.snapshot.tick < this.getSnapshot().tick) return;
-      if (!message.snapshot.entities.some((entity) => entity.id === this.id && entity.transform)) { this.resync(); return; }
-      if (this.resyncId) this.finish(this.resyncId); this.resyncId = null;
-      this.apply(message.snapshot, message.revision); return;
-    }
-    if (message.type === 'delta') {
-      if (message.revision <= this.revision || this.resyncId) return;
-      if (message.baseRevision !== this.revision || message.revision !== this.revision + 1 || message.tick < this.getSnapshot().tick) { this.resync(); return; }
-      const entities = new Map(this.getSnapshot().entities.map((entity) => [entity.id, entity]));
-      for (const id of message.remove) entities.delete(id);
-      for (const entity of message.upsert) entities.set(entity.id, entity);
-      if (entities.size > LIMITS.entities || !entities.get(this.id)?.transform) { this.resync(); return; }
-      this.apply({ tick: message.tick, entities: [...entities.values()] }, message.revision); return;
+    if (message.type === 'snapshot' || message.type === 'delta') {
+      if (this.updateOverflow) return;
+      if (this.updates.length >= 8) { this.updates = []; this.updateOverflow = true; }
+      else this.updates.push(message);
+      return;
     }
     if (message.type === 'interacted') {
       const pending = this.pending.get(message.requestId);
@@ -186,6 +185,24 @@ export class OnlineSession implements GameSession {
       this.publish({ type: 'chat', message });
     }
   };
+  private applyUpdate(message: Extract<ServerMessage, { type: 'snapshot' | 'delta' }>): void {
+    if (!this.id) return;
+    if (message.type === 'snapshot') {
+      if (message.revision < this.revision || (message.revision === this.revision && !this.resyncId) || message.snapshot.tick < this.getSnapshot().tick) return;
+      if (!message.snapshot.entities.some((entity) => entity.id === this.id && entity.transform)) { this.resync(); return; }
+      if (this.resyncId) this.finish(this.resyncId); this.resyncId = null;
+      this.apply(message.snapshot, message.revision); return;
+    }
+    if (message.type === 'delta') {
+      if (message.revision <= this.revision || this.resyncId) return;
+      if (message.baseRevision !== this.revision || message.revision !== this.revision + 1 || message.tick < this.getSnapshot().tick) { this.resync(); return; }
+      const entities = new Map(this.getSnapshot().entities.map((entity) => [entity.id, entity]));
+      for (const id of message.remove) entities.delete(id);
+      for (const entity of message.upsert) entities.set(entity.id, entity);
+      if (entities.size > LIMITS.entities || !entities.get(this.id)?.transform) { this.resync(); return; }
+      this.apply({ tick: message.tick, entities: [...entities.values()] }, message.revision); return;
+    }
+  }
   subscribe(listener: (events: readonly WorldEvent[]) => void): () => void { if (this.disposed) return () => {}; this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   subscribeNotices(listener: (notice: OnlineNotice) => void): () => void { if (this.disposed) return () => {}; this.notices.add(listener); listener({ type: 'status', state: this.value }); return () => { this.notices.delete(listener); }; }
   private publish(notice: OnlineNotice): void { for (const listener of this.notices) listener(notice); }
@@ -194,6 +211,6 @@ export class OnlineSession implements GameSession {
     this.disposed = true; this.clearPending('Сессия завершена.');
     if (this.inputTimer !== null) this.clock.clear(this.inputTimer); this.inputTimer = null;
     for (const unsubscribe of this.unsubscribe) unsubscribe(); this.network.dispose();
-    this.context = undefined; this.listeners.clear(); this.notices.clear(); this.history = []; this.seenChat.clear(); this.direction = { x: 0, z: 0 };
+    this.context = undefined; this.listeners.clear(); this.notices.clear(); this.history = []; this.updates = []; this.seenChat.clear(); this.direction = { x: 0, z: 0 };
   }
 }

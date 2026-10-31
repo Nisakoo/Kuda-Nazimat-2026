@@ -5,7 +5,7 @@ import { TestClock } from './testClock';
 
 function setup() {
   const handlers = new Map<string, (...args: never[]) => void>();
-  const socket = { on: vi.fn((event: string, callback: (...args: never[]) => void) => handlers.set(event, callback)), removeAllListeners: vi.fn(() => handlers.clear()), disconnect: vi.fn(), connect: vi.fn(), emit: vi.fn() };
+  const socket = { connected: true, volatile: { emit: vi.fn() }, on: vi.fn((event: string, callback: (...args: never[]) => void) => handlers.set(event, callback)), removeAllListeners: vi.fn(() => handlers.clear()), disconnect: vi.fn(), connect: vi.fn(), emit: vi.fn() };
   const factory = vi.fn(() => socket as unknown as Socket);
   const clock = new TestClock();
   const adapter = new SocketIOAdapter('http://school.local/app', clock, factory);
@@ -22,6 +22,10 @@ it('never constructs a real transport before valid server authorization', () => 
   expect(s.factory).toHaveBeenCalledWith('http://school.local/game', expect.objectContaining({ path: '/app/socket.io', autoConnect: false, reconnection: false, auth: { version: 1, token: s.context.session.token } }));
   s.trigger('connect');
   expect(s.adapter.state.status).toBe('connected');
+  s.adapter.send({ v: 1, type: 'join', requestId: 'r1', mapId: 'demo' });
+  expect(s.socket.volatile.emit).toHaveBeenCalledOnce();
+  s.socket.connected = false;
+  expect(s.adapter.send({ v: 1, type: 'join', requestId: 'r2', mapId: 'demo' })).toBe(false);
   s.adapter.dispose(); expect(s.clock.pending).toBe(0);
 });
 it('bounds retry frequency and stops timers and subscribers on disposal', () => {

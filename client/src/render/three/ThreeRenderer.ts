@@ -65,7 +65,7 @@ export class ThreeRenderer implements RenderAdapter {
   getDiagnostics(): RenderDiagnostics {
     const stats = this.library?.stats;
     return { chunks: this.chunks?.ids ?? [], entities: this.visuals?.ids ?? [], models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
-      pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0 };
+      pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
   }
 
   resize(width: number, height: number, pixelRatio: number): void {

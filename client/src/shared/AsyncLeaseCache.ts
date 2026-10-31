@@ -15,7 +15,10 @@ export class AsyncLeaseCache<T> {
     if (!entry) {
       const controller = new AbortController();
       const created: Entry<T> = { controller, users: 0, promise: Promise.resolve(undefined as T) };
-      created.promise = Promise.resolve().then(() => this.load(key, controller.signal)).then((value) => {
+      created.promise = Promise.resolve().then(() => {
+        if (controller.signal.aborted || this.disposed || created.users === 0) throw abortError();
+        return this.load(key, controller.signal);
+      }).then((value) => {
         if (controller.signal.aborted || this.disposed || created.users === 0) { this.destroy(value); throw abortError(); }
         created.value = value;
         return value;

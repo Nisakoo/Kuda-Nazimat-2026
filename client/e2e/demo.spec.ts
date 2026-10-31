@@ -94,6 +94,25 @@ test('pauses, clears held keys on blur, restarts and returns to the welcome scre
   await resume(page);
   await page.clock.runFor(300);
   await expect(coords).toHaveText(stopped!);
+  // A controlled visibility change exercises the production DOM lifecycle in headless Chrome.
+  await page.keyboard.down('w');
+  await page.clock.runFor(200);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expectCapture(page, false);
+  const hiddenPosition = await coords.textContent();
+  await page.clock.runFor(5000);
+  await expect(coords).toHaveText(hiddenPosition!);
+  await page.evaluate(() => {
+    Reflect.deleteProperty(document, 'hidden');
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await resume(page);
+  await page.clock.runFor(300);
+  await expect(coords).toHaveText(hiddenPosition!);
+  await page.keyboard.up('w');
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click();

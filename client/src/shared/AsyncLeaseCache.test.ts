@@ -2,6 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { AsyncLeaseCache } from './AsyncLeaseCache';
 
 describe('asynchronous leases', () => {
+  it('does not start a queued load after its owner was already disposed', async () => {
+    const load = vi.fn(async () => 'data');
+    const cache = new AsyncLeaseCache(load, () => {});
+    const pending = cache.acquire('late');
+    const rejection = expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+    cache.dispose(); await rejection; await Promise.resolve();
+    expect(load).not.toHaveBeenCalled();
+  });
   it('deduplicates concurrent owners and frees only after the last release', async () => {
     const value = { dispose: vi.fn() };
     const load = vi.fn(async () => value);

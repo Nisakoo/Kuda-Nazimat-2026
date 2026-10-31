@@ -13,6 +13,7 @@ export interface RenderDiagnostics {
   readonly queued: number;
   readonly geometries: number;
   readonly textures: number;
+  readonly drawCalls: number;
   readonly pending: number;
   readonly errors: readonly string[];
 }

@@ -1,5 +1,5 @@
 ---
-id: TASK-018
+id: TASK-020
 type: implementation-task
 status: done
 spec: ../specs/client-local-demo.md
@@ -9,7 +9,7 @@ related:
     requirements: [UI-001–002, UI-004–006]
   - spec: ../specs/client-render.md
     requirements: [RENDER-002, RENDER-008]
-depends_on: [TASK-017]
+depends_on: [TASK-019]
 ---
 
 # Вавилон и постоянное управление мышью
@@ -28,7 +28,7 @@ depends_on: [TASK-017]
 - [x] LOCAL-DEMO / S1–S4, `make client-test`, типы, импорты и сборка проходят; непроверенное явно отмечено.
 
 ## Результат
-Изменения 1966f4d реализованы в локальном демо. Исторические доказательства TASK-017 сохранены отдельно; LOCAL-DEMO вновь имеет implementation complete. Полные RENDER/UI остаются partial из-за GLB/чанков/онлайн, которые не входят в этот этап.
+Изменения 1966f4d реализованы в локальном демо. Исторические доказательства TASK-019 сохранены отдельно; LOCAL-DEMO вновь имеет implementation complete. Полные RENDER/UI остаются partial из-за GLB/чанков/онлайн, которые не входят в этот этап.
 
 ### Реализация
 

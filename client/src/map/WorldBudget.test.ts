@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { BudgetExhausted, WorldBudget } from './WorldBudget';
 
 describe('WorldBudget', () => {
+  it('waits for pending decoder ownership before a new world starts reserving data', async () => {
+    const budget = new WorldBudget(1000);
+    const first = budget.reserve('a', 60, 100); const second = budget.reserve('a', 60, 100);
+    let empty = false; const waiting = budget.whenEmpty().then(() => { empty = true; });
+    first.release(); await Promise.resolve(); expect(empty).toBe(false);
+    second.release(); await waiting; expect(empty).toBe(true);
+  });
   it('counts shared resources once until the last owner and enforces both caps', () => {
     const budget = new WorldBudget(1000, 200);
     const a = budget.reserve('a', 60, 120);

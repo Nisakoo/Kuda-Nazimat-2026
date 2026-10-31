@@ -24,6 +24,7 @@ import { MockNetworkAdapter } from '../multiplayer/MockNetworkAdapter';
 import type { Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
 import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../shared/protocol/types';
 import { parseServerSession } from '../shared/protocol/validate';
+import { FrameMetrics } from './FrameMetrics';
 
 const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };
 export type ClientMode = 'local' | 'mock' | 'online';
@@ -73,6 +74,8 @@ export interface AppSnapshot {
   readonly chatError: string | null;
   readonly dialogPending: boolean;
   readonly dialogError: string | null;
+  readonly performance: string;
+  readonly renderStats: string;
 }
 
 /** Composition root; all UI/input commands cross this facade. */
@@ -89,6 +92,8 @@ export class GameApp {
   private network: NetworkAdapter | null = null;
   private unsubscribeOnline: (() => void) | null = null;
   private npcRequest: string | null = null;
+  private readonly frameMetrics = new FrameMetrics();
+  private lastMetrics = 0;
   private worldStarting = false;
   private worldFailure: string | null = null;
   private waitingForWorld = false;
@@ -109,6 +114,7 @@ export class GameApp {
     private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false),
     private readonly createSession: () => GameSession = () => new LocalSession('local-player', localEntities),
     private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
+    private readonly createNetwork: (mock: boolean, url: string, clock: Clock) => NetworkAdapter = (mock, url, clock) => mock ? createMockDemo(clock) : new SocketIOAdapter(url, clock),
   ) {
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
@@ -118,6 +124,7 @@ export class GameApp {
       worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? 1,
       mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
+      performance: '', renderStats: '',
     });
   }
 
@@ -136,7 +143,7 @@ export class GameApp {
       this.host = host;
       if (this.config.session === 'online' && !this.session) {
         if (!this.mock && !this.serverSession) { this.setState('unavailable', 'Сетевой режим требует входа на локальном сервере. Серверная сессия пока не предоставлена. В настройках доступен тестовый транспорт.'); return; }
-        this.network = this.mock ? createMockDemo(browserClock) : new SocketIOAdapter(this.config.serverUrl, browserClock);
+        this.network = this.createNetwork(this.mock, this.config.serverUrl, browserClock);
         const online = new OnlineSession(this.network, this.config.mapId, browserClock);
         this.session = online;
         online.setMovementGuard(() => false);
@@ -223,12 +230,14 @@ export class GameApp {
             if (player) this.world?.plan(player);
           },
           render: (alpha, elapsed) => {
+            const began = this.snapshot.debug ? performance.now() : 0;
             if (this.session instanceof OnlineSession) {
               const presentation = this.session.getRenderState();
               this.renderer?.syncWorld(presentation.previous, presentation.current, this.session.playerId);
               this.renderer?.render(elapsed, presentation.alpha);
             } else this.renderer?.render(elapsed, alpha);
             this.updateVisualStatus();
+            if (this.snapshot.debug) this.updateMetrics(began);
             if (this.snapshot.phase === 'stopped' && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
           },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
@@ -241,6 +250,7 @@ export class GameApp {
       document.addEventListener('visibilitychange', this.onVisibilityChange);
       window.addEventListener('resize', this.resize);
       this.setState('running');
+      this.frameMetrics.reset(); this.lastMetrics = performance.now();
       this.onVisibilityChange();
       this.loop?.start();
     } catch {
@@ -319,6 +329,7 @@ export class GameApp {
   }
 
   setDebug(debug: boolean): void {
+    this.frameMetrics.reset(); this.lastMetrics = performance.now();
     this.config = Object.freeze({ ...this.config, debug });
     this.patch({ debug });
     this.updateHud(true);
@@ -462,6 +473,16 @@ export class GameApp {
     }
   }
 
+  private updateMetrics(began: number): void {
+    const now = performance.now();
+    this.frameMetrics.record(began, now - began);
+    if (now - this.lastMetrics < 1000) return;
+    this.lastMetrics = now;
+    const stats = this.frameMetrics.stats; const render = this.renderer?.getDiagnostics(); const budget = this.worldBudget.stats;
+    this.patch({ performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms`,
+      renderStats: `Draw ${render?.drawCalls ?? 0} · Геометрии ${render?.geometries ?? 0} · Текстуры ${render?.textures ?? 0} · Ресурсы ${budget.resources} · Память ${budget.memory} / ${budget.memoryLimit} · Пик ${budget.peakBytes}` });
+  }
+
   dispose(): void {
     if (this.snapshot.phase === 'disposed') return;
     this.detach();
@@ -533,6 +554,7 @@ export class GameApp {
   };
 
   private readonly onVisibilityChange = (): void => {
+    this.frameMetrics.reset();
     if (document.hidden) this.input?.reset();
     this.loop?.setSuspended(document.hidden);
   };
@@ -574,8 +596,10 @@ export class GameApp {
   }
 
   private fail(message = 'Не удалось открыть 3D-сцену. Проверьте поддержку WebGL 2 и аппаратное ускорение браузера.'): void {
+    const host = this.host;
     this.detach();
     this.releaseResources();
+    this.host = host;
     this.setState('error', message);
   }
 }

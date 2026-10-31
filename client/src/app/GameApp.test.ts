@@ -4,6 +4,10 @@ import type { RenderAdapter } from '../render/RenderAdapter';
 import { LocalSession } from '../session/LocalSession';
 import { GameApp } from './GameApp';
 import { parseConfig } from './config';
+import { MockNetworkAdapter } from '../multiplayer/MockNetworkAdapter';
+import type { NetworkAdapter } from '../multiplayer/NetworkAdapter';
+import type { MapSource, WorldManifest } from '../map/types';
+import { DEMO_WORLD } from '../shared/demoWorld.generated';
 
 describe('application lifecycle', () => {
   const pending = new Map<number, FrameRequestCallback>();
@@ -36,7 +40,7 @@ describe('application lifecycle', () => {
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
     host = document.createElement('div');
     host.getBoundingClientRect = () => new DOMRect(0, 0, 640, 480);
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     createRenderer = vi.fn(() => renderer);
     app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, null);
   });
@@ -84,7 +88,7 @@ describe('application lifecycle', () => {
     app.start(host);
     app.dispose();
     const previousRenderer = renderer;
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     app = new GameApp(parseConfig({}, 'http://school.local'), () => renderer, undefined, null);
     app.start(host);
     advance(100);
@@ -153,6 +157,36 @@ describe('application lifecycle', () => {
     expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ phase: 'unavailable' }));
     expect(createRenderer).not.toHaveBeenCalled();
     expect(pending.size).toBe(0);
+  });
+
+  it('passes a supplied server session through the integration boundary and closes it on logout', () => {
+    app.dispose();
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn((listener) => { listener({ status: 'unauthorized', error: null }); return () => {}; }), dispose: vi.fn() };
+    const factory = vi.fn(() => transport);
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory);
+    app.start(host); expect(factory).not.toHaveBeenCalled();
+    const context = { token: 'test-server-session-opaque', expiresAt: Date.now() + 60000 };
+    app.provideServerSession(context);
+    expect(transport.connect).toHaveBeenCalledWith({ kind: 'server', session: context });
+    app.logout(); expect(transport.dispose).toHaveBeenCalledOnce();
+    expect(factory).toHaveBeenCalledOnce(); expect(pending.size).toBe(0);
+  });
+
+  it('prepares the authoritative saved position instead of the manifest spawn in an online session', async () => {
+    app.dispose(); vi.useFakeTimers();
+    const manifest: WorldManifest = { mapId: 'demo', version: 1, worldBytes: DEMO_WORLD.worldBytes, chunkSize: 32, collisionResolution: 4, spawn: { x: 8, y: 0, z: 8 }, origin: { x: 0, z: 0 }, models: {}, assets: {}, chunks: Array.from({ length: 5 }, (_, x) => ({ id: String(x), x, z: 0, region: 'test', url: String(x), bytes: 1, collisionUrl: 'c', collisionBytes: 16, assets: [] })) };
+    const source: MapSource = { bootstrap: DEMO_WORLD, budgetEpoch: 0, manifest: async () => manifest, chunk: vi.fn(async (entry) => ({ entry, visual: { id: entry.id, objects: [] }, collision: new Uint8Array(16), release: vi.fn() })), dispose: vi.fn() };
+    try {
+      app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, () => source, (_mock, _url, clock) => new MockNetworkAdapter(clock, (message, transport) => {
+        if (message.type === 'join') transport.receive({ v: 1, type: 'joined', requestId: message.requestId, playerId: 'saved-player', revision: 0, snapshot: { tick: 0, entities: [{ id: 'saved-player', character: { kind: 'player', name: 'Saved' }, transform: { position: { x: 100, y: 0, z: 8 }, rotationY: 0 } }] }, world: DEMO_WORLD });
+      }));
+      app.start(host); await vi.advanceTimersByTimeAsync(0);
+      app.applySettings('mock', 'http://school.local', 'demo', 1, false);
+      await vi.advanceTimersByTimeAsync(100);
+      const loaded = vi.mocked(source.chunk).mock.calls.map(([entry]) => entry.id);
+      expect(loaded[0]).toBe('3'); expect(loaded).not.toContain('0');
+      expect(app.getWorldSnapshot()?.entities[0]!.transform!.position.x).toBe(100);
+    } finally { app.dispose(); vi.useRealTimers(); }
   });
 
   it('supports unsubscribing and clears subscriptions on dispose', () => {

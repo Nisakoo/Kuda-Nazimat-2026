@@ -15,6 +15,7 @@
     worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
     mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
+    performance: '', renderStats: '',
   });
   const networkLabels = { unauthorized: 'Не авторизован', connecting: 'Подключение…', connected: 'Подключён', lost: 'Связь потеряна', error: 'Ошибка связи', disconnected: 'Отключён' };
   const error = $derived(startupError ?? state.message);
@@ -62,7 +63,7 @@
 
   {#if !error && state.screen === 'playing'}
     <aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>Лея — история · Марк — наука</p></aside>
-    {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p></div>{/if}
+    {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p><p aria-label="Производительность">{state.performance}</p><p aria-label="Ресурсы сцены">{state.renderStats}</p></div>{/if}
     {#if state.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
     <button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
     {#if state.visualError && state.phase === 'running' && !state.dialog}<p class="asset-warning glass" role="alert">{state.visualError}</p>{/if}
@@ -75,6 +76,7 @@
     <section class="modal-backdrop"><div class="panel" role="alert"><p class="eyebrow">Просмотр недоступен</p><h2>{state.phase === 'unavailable' ? 'Режим пока недоступен' : 'Не удалось запустить сцену'}</h2><p>{error}</p>
       {#if game && state.phase === 'error'}<button onclick={() => game.restart(viewport)}>Попробовать снова</button>
       {:else if startupError}<button onclick={() => window.location.reload()}>Повторить</button>{/if}
+      {#if game}<button class="secondary" onclick={() => game.openSettings()}>Настройки</button>{/if}
     </div></section>
   {/if}
 

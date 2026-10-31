@@ -1,7 +1,7 @@
 ---
 id: client-multiplayer
 type: module-design
-status: ready
+status: draft
 implementation: partial
 parent: architecture
 summary: Подготовить клиент к отдельному серверу и проверить сетевые сценарии без него.
