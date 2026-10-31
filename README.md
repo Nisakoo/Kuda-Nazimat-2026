@@ -111,15 +111,17 @@ PROTO v1: namespace `/game`, событие `game`, auth `{version:1, token}`. �
 
 | № | Задача | Спека | Зависит от |
 |---|---|---|---|
-| 024 | [Общий каталог shared/](tasks/024-shared-contracts.md) | [SHARED](specs/shared-contracts.md) | нет |
-| 010 | [Сервер: каркас](tasks/010-server-foundation.md) | [SERVER](specs/server-foundation.md) | 024 |
-| 011 | [Сервер: SQLite](tasks/011-server-persistence.md) | [STORE](specs/server-persistence.md) | 010 |
-| 012 | [Сервер: авторизация](tasks/012-server-auth.md) | [AUTH](specs/server-auth.md) | 011 |
-| 013 | [Сервер: статический мир](tasks/013-server-world.md) | [SERVER-WORLD](specs/server-world.md) | 010, 024 |
-| 014 | [Сервер: мультиплеер PROTO v1](tasks/014-server-realtime.md) | [REALTIME](specs/server-realtime.md) | 012, 013 |
-| 025 | [Сервер: NPC v1 через порт](tasks/025-server-npc-v1.md) | [NPC](specs/server-npc-dialogue.md) | 011, 014 |
-| 026 | [Сервер: готовность к защите](tasks/026-server-demo.md) | [SERVER-DEMO](specs/server-demo.md) | 025 |
+| 024 | [Общий каталог shared/](tasks/024-shared-contracts.md) | [SHARED](specs/shared-contracts.md) | нет · A |
+| 010 | [Сервер: каркас](tasks/010-server-foundation.md) | [SERVER](specs/server-foundation.md) | нет · B |
+| 011 | [Сервер: SQLite](tasks/011-server-persistence.md) | [STORE](specs/server-persistence.md) | 010 · B |
+| 012 | [Сервер: вход (mock)](tasks/012-server-auth.md) | [AUTH](specs/server-auth.md) | 011 · B |
+| 013 | [Сервер: статический мир](tasks/013-server-world.md) | [SERVER-WORLD](specs/server-world.md) | 024 · A |
+| 014 | [Сервер: мультиплеер PROTO v1](tasks/014-server-realtime.md) | [REALTIME](specs/server-realtime.md) | 013, 024 · A |
+| 025 | [Сервер: NPC v1 через порт](tasks/025-server-npc-v1.md) | [NPC](specs/server-npc-dialogue.md) | 011 · B |
+| 026 | [Сервер: готовность к защите](tasks/026-server-demo.md) | [SERVER-DEMO](specs/server-demo.md) | 010–012, 014, 025 · B, интеграция |
 | 015 | [Сервер: локальные NPC (v2)](tasks/015-server-ai.md) | [AI](specs/server-ai.md) | 011, 014, 017, 025 |
+
+Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
 
 ## Локальные NPC и LLM
 

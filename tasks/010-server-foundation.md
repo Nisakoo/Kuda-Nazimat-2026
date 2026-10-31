@@ -4,7 +4,8 @@ type: implementation-task
 status: todo
 spec: ../specs/server-foundation.md
 requirements: [SERVER-001–008]
-depends_on: [TASK-024]
+depends_on: []
+scheduling_note: часть B (платформа и данные); createGame части A подключается по contracts.ts, до готовности — заглушка
 ---
 
 # Сервер: каркас

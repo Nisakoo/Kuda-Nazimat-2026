@@ -11,7 +11,8 @@ related:
     requirements: [SERVER-006]
   - spec: ../specs/protocol.md
     requirements: [PROTO-008]
-depends_on: [TASK-012, TASK-013]
+depends_on: [TASK-013, TASK-024]
+scheduling_note: часть A (мир и сеть); SessionVerifier/PlayerStore/NpcQuestions из contracts.ts заменяются тестовыми реализациями
 ---
 
 # Сервер: мультиплеер PROTO v1

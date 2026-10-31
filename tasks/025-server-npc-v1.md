@@ -9,7 +9,8 @@ related:
     requirements: [STORE-011]
   - spec: ../specs/server-realtime.md
     requirements: [REALTIME-009]
-depends_on: [TASK-011, TASK-014]
+depends_on: [TASK-011]
+scheduling_note: часть B (платформа и данные); реализует NpcQuestions из contracts.ts, доставку делает часть A
 ---
 
 # Сервер: NPC v1 через порт NpcResponder

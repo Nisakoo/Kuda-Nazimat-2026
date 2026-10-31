@@ -8,7 +8,7 @@ related:
   - spec: ../specs/protocol.md
     requirements: [PROTO-001, PROTO-008]
 depends_on: []
-scheduling_note: первая серверная задача; client/ не меняется
+scheduling_note: часть A (мир и сеть); контракт server/src/contracts.ts
 ---
 
 # Общий каталог shared/

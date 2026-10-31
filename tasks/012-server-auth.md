@@ -8,7 +8,7 @@ related:
   - spec: ../specs/protocol.md
     requirements: [PROTO-008]
 depends_on: [TASK-011]
-scheduling_note: AUTH-005 (перехват) завершается в TASK-014
+scheduling_note: часть B (платформа и данные); handshake и перехват (AUTH-003/005 на стороне сокета) делает часть A в TASK-014
 ---
 
 # Сервер: авторизация

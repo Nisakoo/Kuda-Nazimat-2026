@@ -4,7 +4,8 @@ type: implementation-task
 status: todo
 spec: ../specs/server-demo.md
 requirements: [SERVER-DEMO-001–009]
-depends_on: [TASK-025]
+depends_on: [TASK-010, TASK-011, TASK-012, TASK-014, TASK-025]
+scheduling_note: часть B; финальная интеграция обеих частей
 ---
 
 # Сервер: готовность к защите

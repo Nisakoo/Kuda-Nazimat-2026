@@ -5,7 +5,7 @@ status: todo
 spec: ../specs/server-persistence.md
 requirements: [STORE-001–005, STORE-011]
 depends_on: [TASK-010]
-scheduling_note: STORE-006–010 реализуются в TASK-015 вместе с PROTO v2
+scheduling_note: часть B (платформа и данные)
 ---
 
 # Сервер: SQLite
