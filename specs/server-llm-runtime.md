@@ -89,6 +89,8 @@ related:
 - **LLM-020:** Приветствие по NPC-AI-014–015 использует общие очередь, deadline и дедупликацию; результат передаётся сервису как ход NPC без фиктивного ввода игрока.
 - **LLM-021:** Отказ обрабатывается локально по NPC-AI-018 без нового вызова недоступного backend и скрытых повторов; текст отказа не становится успешным ответом модели. Причина остаётся в безопасной диагностике.
 
+- **LLM-022:** Python 3.12 и зависимости MLX/Ollama подготавливаются через uv до игры. Для backend хранятся отдельные `pyproject.toml` и `uv.lock`; установка использует `--locked`, не меняет lock и не смешивает зависимости. Новая подготовка не перезаписывает legacy/чужое окружение, config, profiles, веса или БД. Повторная синхронизация разрешена только для окружения, созданного этой командой для того же backend. Offline-подготовка работает только с уже доступными Python/кешем и не подменяет отсутствие пакетов. Runtime продолжает запускать абсолютный Python из подготовленного окружения напрямую, без uv, install, sync или доступа к сети. Установочный скилл различает подготовку инструментов, весов, config и фактическую приёмку модели.
+
 ## Сценарии
 
 - **S1 · LLM-001–005, 013:** Given подготовленные Apple Silicon и Windows/Intel Mac; When каждый backend запускается с локальным snapshot без внешней сети; Then один и тот же логический запрос проходит общий порт, модель и версии известны, неподдерживаемая ОС и отсутствующий файл диагностируются без скачивания.
@@ -122,3 +124,5 @@ related:
 - [MLX LM](https://github.com/ml-explore/mlx-lm), [реализация Qwen3.5 в исследованной v0.32.2](https://github.com/ml-explore/mlx-lm/blob/v0.32.2/mlx_lm/models/qwen3_5.py), [карточка мультимодального MLX-пакета](https://huggingface.co/mlx-community/Qwen3.5-2B-4bit).
 - [Ollama macOS](https://docs.ollama.com/macos), [FAQ: автономность, очередь, память](https://docs.ollama.com/faq), [chat API](https://docs.ollama.com/api/chat).
 - [LFM2.5-2.6B](https://huggingface.co/LiquidAI/LFM2.5-2.6B), [LFM license](https://huggingface.co/LiquidAI/LFM2.5-2.6B/blob/main/LICENSE), [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it), [Ollama Gemma 4](https://ollama.com/library/gemma4/tags), [SmolLM3](https://huggingface.co/HuggingFaceTB/SmolLM3-3B).
+
+- **S7 · LLM-003, LLM-022:** Given новая установка или ранее подготовленное окружение; When оператор выполняет uv-подготовку выбранного backend; Then зависимости соответствуют lock, повторный запуск сохраняет модель/config/БД, существующее неизвестное окружение отклоняется, offline-промах диагностируется без сети; игра использует готовый Python без синхронизации.

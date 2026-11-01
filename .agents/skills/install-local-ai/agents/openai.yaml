@@ -1,0 +1,4 @@
+interface:
+  display_name: "Установка локального ИИ"
+  short_description: "Настройка игры, uv, MLX и Ollama на компьютере"
+  default_prompt: "Используй $install-local-ai для установки игры и выбранной локальной модели через uv."

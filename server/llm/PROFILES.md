@@ -28,7 +28,7 @@ make server
 make demo BACKEND=ollama MODEL=2b
 ```
 
-После синхронизации main `make demo` — alias `make start`: может установить отсутствующие npm dependencies, пересобирает client/world и запускает **production**. Production требует парольного входа, а существующий UI поддерживает пока только development guest (TASK-044). Для текущей локальной проверки используйте make server; подготовку dependencies выполняйте до offline-демонстрации. `make server` ничего не устанавливает, не собирает и не скачивает, а запускает сервер уже подготовленной игры. Node24 и dependencies должны быть доступны заранее. `NODE=/absolute/path/to/node` переопределяет Node для server/import; для npm/client build Node24 должен быть в PATH.
+После синхронизации main `make demo` — alias `make start`: может установить отсутствующие npm dependencies, пересобирает client/world и запускает **production**. Production требует парольного входа; UI поддерживает регистрацию, вход и logout, полная приёмка остаётся в TASK-044. Для текущей локальной проверки используйте make server; подготовку dependencies выполняйте до offline-демонстрации. `make server` ничего не устанавливает, не собирает и не скачивает, а запускает сервер уже подготовленной игры. Node24 и dependencies должны быть доступны заранее. `NODE=/absolute/path/to/node` переопределяет Node для server/import; для npm/client build Node24 должен быть в PATH.
 
 Путь каталога можно указать явно (в том числе с пробелами):
 

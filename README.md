@@ -201,6 +201,8 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 
 ## Локальные NPC и LLM
 
+Python-зависимости локального ИИ готовятся через **uv**: `uv python install 3.12`, затем `make llm-prepare BACKEND=mlx` (Apple Silicon) или `BACKEND=ollama`. Команда устанавливает пакеты по отдельному lock, но не скачивает веса и не включает ИИ автоматически. Полный маршрут с инструментами, моделями и конфигурацией — [скилл install-local-ai](.agents/skills/install-local-ai/SKILL.md). Node 24 остаётся под nvm/существующим менеджером, JS-зависимости — npm.
+
 **Установка на своём компьютере с нуля:** [server/llm/SETUP.md](server/llm/SETUP.md). [Справочник runtime](server/llm/README.md), [подготовленные профили](server/llm/PROFILES.md), [timeout в секундах](server/llm/TIMEOUT.md). На уже подготовленной машине не нужно повторять скачивание моделей, установку Python или импорт профилей.
 
 В `NpcResponder` зарегистрированы `scripted`, `ollama`, `mlx`. Реальные варианты: **Ollama Qwen3.5-2B Q4_K_M**, явный кандидат **0.8B Q8_0**, либо **MLX text-only Qwen3.5-2B 4-bit/group64** на Apple Silicon. Native supervisor работает для macOS/Linux POSIX; Windows-версия не реализована. Автоматического выбора, скачивания или fallback нет. `language.adapter: local` подключает BABEL к тому же responder/worker; `test` остаётся явной заглушкой по умолчанию. Один лишь выбор `npc.adapter: ollama` не меняет BABEL.

@@ -36,3 +36,19 @@ HOST=127.0.0.1 make server NPC_TIMEOUT=120
 `NPC_TIMEOUT=120` задаёт 120 секунд на запрос, включая очередь; клиент получает срок от сервера и ждёт дополнительно 2 секунды. На рынке `language.adapter: test` остаётся явным тестовым режимом. Явный `language.adapter: local` использует общий локальный NPC responder и очередь без второй модели; он не является автоматическим fallback. После сборки обновите вкладку и проверьте конфигурацию и готовность runtime.
 
 Качество, RAM, производительность и физические offline/LAN-проверки выполняются отдельно. Обновление не квалифицирует модель или оборудование.
+
+## Переход Python-окружения на uv
+
+Прежние pip/venv-установки продолжают работать: runtime использует абсолютный `options.python`. uv не нужен во время игры. Миграция не требует повторной загрузки модели/tokenizer или нового digest.
+
+При остановленной игре подготовить отдельное окружение (пример MLX):
+
+```sh
+uv python install 3.12
+node server/llm/prepare.mjs mlx --environment "$HOME/kuda-llm/mlx-uv-venv"
+"$HOME/kuda-llm/mlx-uv-venv/bin/python3" -c 'import importlib.metadata as m; print(m.version("mlx-lm"))'
+```
+
+Для Ollama: `node server/llm/prepare.mjs ollama --environment "$HOME/kuda-llm/ollama-uv-venv"`; проверять Transformers 4.57.6/Jinja2 3.1.6. Новые каталоги не должны существовать либо должны иметь marker команды для того же backend. Не добавлять marker вручную к старому venv; exact sync может удалить его дополнительные пакеты.
+
+Сохранить копию активного config/profiles, затем изменить **только `options.python`** выбранного профиля; без profiles — `npc.options.python` прямого config. Каталог profiles имеет приоритет. Сохранить все остальные paths/pins/timeout и старый venv для отката. Проверить startup/реальный ответ; успех установки зависимостей не равен приёмке модели. Перенос на другой компьютер требует заново подготовленного Python: venv может ссылаться на uv-managed interpreter вне своего каталога.
