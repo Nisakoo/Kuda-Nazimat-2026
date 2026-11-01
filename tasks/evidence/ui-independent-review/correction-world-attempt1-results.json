@@ -1,0 +1,2863 @@
+{
+  "startedAt": "2026-11-01T04:02:19.780Z",
+  "username": "indafter-mvxaqa5w",
+  "peerName": "indafterpeer-mvxb0dms",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "One actual rendered client and one real authenticated peer. Pending-only cases use 800ms CDP transport latency, never response/body/state replacement; not performance evidence.",
+  "steps": [
+    {
+      "label": "password-login-enroll-real-two-person-task",
+      "ok": false,
+      "ms": 10768,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n    - locator resolved to <button class=\"primary large\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is not enabled\n  - retrying click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 11889.199999988079,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\n\nЗагружаем оформление…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "R06-initial-I-immediate-and-delayed-natural-ACK",
+      "ok": false,
+      "ms": 12267,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Инвентарь', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Инвентарь', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Инвентарь', exact: true })\n",
+      "at": 32097.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "real-authenticated-protocol-peer",
+      "ok": true,
+      "ms": 385,
+      "at": 42402,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "R06-pending-ACK-focus-recovery-controlled-transport",
+      "ok": false,
+      "ms": 7265,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 50476.69999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "R06-user-focus-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 7535,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 67198.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "R06-new-map-modal-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 9212,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 85292.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "R06-Settings-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 7412,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 102162.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "CDP real transport latency",
+      "ms": 0,
+      "notPerformanceAcceptance": true
+    },
+    {
+      "label": "dictionary-create-note-example-learn-edit-search-delete",
+      "ok": false,
+      "ms": 6208,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })\n",
+      "at": 122726.19999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "real-peer-chat-translation-add-word-own-delivery-stone",
+      "ok": false,
+      "ms": 6338,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })\n",
+      "at": 138776.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "map-real-authority-zoom-center-and-live-peer-movement",
+      "ok": false,
+      "ms": 6218,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })\n",
+      "at": 154941.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "all-windows-1622x970",
+      "ok": false,
+      "ms": 6405,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 172896.19999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "all-windows-1280x800",
+      "ok": false,
+      "ms": 7111,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 195255.69999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "all-windows-390x844",
+      "ok": false,
+      "ms": 6398,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 210783.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "all-windows-640x480",
+      "ok": false,
+      "ms": 5589,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 220889.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "languages-real-ACK-new-message-old-message-preservation",
+      "ok": false,
+      "ms": 7104,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 232886.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "live-appearance-Dan-server-and-peer",
+      "ok": false,
+      "ms": 7903,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 250529.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "map-excludes-real-outsider-sequential-peer-socket",
+      "ok": false,
+      "ms": 6402,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })\n",
+      "at": 267015.6999999881,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "password-relogin-persistence",
+      "ok": false,
+      "ms": 9335,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 288920.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    }
+  ],
+  "screens": [
+    {
+      "label": "failure-password-login-enroll-real-two-person-task",
+      "file": "correction-world/failure-password-login-enroll-real-two-person-task.png",
+      "at": 12739.300000011921,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\n\nЗагружаем оформление…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-initial-I-immediate-and-delayed-natural-ACK",
+      "file": "correction-world/failure-R06-initial-I-immediate-and-delayed-natural-ACK.png",
+      "at": 33517.80000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\n\nЗагружаем оформление…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-pending-ACK-focus-recovery-controlled-transport",
+      "file": "correction-world/failure-R06-pending-ACK-focus-recovery-controlled-transport.png",
+      "at": 51612,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 11
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-R06-user-focus-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-user-focus-before-ACK-is-preserved.png",
+      "at": 68380.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 29
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-R06-new-map-modal-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-new-map-modal-before-ACK-is-preserved.png",
+      "at": 86421.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 46
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-R06-Settings-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-Settings-before-ACK-is-preserved.png",
+      "at": 103608.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 64
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-dictionary-create-note-example-learn-edit-search-delete",
+      "file": "correction-world/failure-dictionary-create-note-example-learn-edit-search-delete.png",
+      "at": 124042.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 85
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-real-peer-chat-translation-add-word-own-delivery-stone",
+      "file": "correction-world/failure-real-peer-chat-translation-add-word-own-delivery-stone.png",
+      "at": 140212.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 100
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-map-real-authority-zoom-center-and-live-peer-movement",
+      "file": "correction-world/failure-map-real-authority-zoom-center-and-live-peer-movement.png",
+      "at": 156163.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 116
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-1622x970",
+      "file": "correction-world/failure-all-windows-1622x970.png",
+      "at": 174836.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 136
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-1280x800",
+      "file": "correction-world/failure-all-windows-1280x800.png",
+      "at": 196397.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 156
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-390x844",
+      "file": "correction-world/failure-all-windows-390x844.png",
+      "at": 211349.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 171
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-640x480",
+      "file": "correction-world/failure-all-windows-640x480.png",
+      "at": 221652.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 180
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-languages-real-ACK-new-message-old-message-preservation",
+      "file": "correction-world/failure-languages-real-ACK-new-message-old-message-preservation.png",
+      "at": 234269.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 195
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-live-appearance-Dan-server-and-peer",
+      "file": "correction-world/failure-live-appearance-Dan-server-and-peer.png",
+      "at": 251685.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 209
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-map-excludes-real-outsider-sequential-peer-socket",
+      "file": "correction-world/failure-map-excludes-real-outsider-sequential-peer-socket.png",
+      "at": 268341.3000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 225
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-password-relogin-persistence",
+      "file": "correction-world/failure-password-relogin-persistence.png",
+      "at": 290385.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 251
+      },
+      "partyPositions": []
+    }
+  ],
+  "gates": [
+    {
+      "label": "initial world start enabled within5s after intro",
+      "pass": true,
+      "ms": 1789,
+      "deadline": 5000
+    }
+  ],
+  "errors": [],
+  "http": [
+    {
+      "at": 1793505743013,
+      "path": "/api/babylon",
+      "action": "enroll",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "2b60fdcd-8160-4d50-a0ba-6b357c8cb922",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": false,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "at": 1793505744877,
+      "path": "/api/babylon",
+      "action": "intro-seen",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "bd947245-9f59-4fcc-9949-07268c2488cd",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    }
+  ],
+  "peerEvents": [
+    {
+      "action": {
+        "type": "enroll",
+        "size": 2,
+        "native": "ru",
+        "learning": "en"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "b4382e99-fd0d-4f1d-a264-27c8d5fa1b30",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": false,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "kind": "joined",
+      "name": "indafterpeer-mvxb0dms",
+      "playerId": "p_yy2bt5jku8ez3lx0",
+      "world": {
+        "manifestUrl": "maps/market/manifest.json",
+        "worldBytes": 23648595,
+        "manifestBytes": 1415164,
+        "assets": {
+          "assets/models/demo/history.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/science.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/tablet.glb": {
+            "bytes": 46836,
+            "memory": 3145728
+          },
+          "assets/models/avatars/lukas.glb": {
+            "bytes": 883556,
+            "memory": 1767112
+          },
+          "assets/models/avatars/nic.glb": {
+            "bytes": 883560,
+            "memory": 1767120
+          },
+          "assets/models/avatars/dan.glb": {
+            "bytes": 883568,
+            "memory": 1767136
+          },
+          "assets/models/avatars/ksu.glb": {
+            "bytes": 720372,
+            "memory": 1440744
+          },
+          "assets/models/market/market.glb": {
+            "bytes": 808632,
+            "memory": 8388608
+          },
+          "assets/models/market/pasture.glb": {
+            "bytes": 409960,
+            "memory": 6291456
+          },
+          "assets/models/market/main-building.glb": {
+            "bytes": 453240,
+            "memory": 6291456
+          }
+        }
+      },
+      "snapshot": {
+        "tick": 25440,
+        "entities": [
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "character": {
+              "kind": "player",
+              "name": "indafterpeer-mvxb0dms"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": 8
+              },
+              "rotationY": 3.141592653589793
+            },
+            "movement": {
+              "direction": {
+                "x": 0,
+                "z": 0
+              },
+              "speed": 3
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            },
+            "renderable": {
+              "assetId": "demo-player"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fruit-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговец фруктами"
+            },
+            "transform": {
+              "position": {
+                "x": -4.5,
+                "y": 0,
+                "z": 0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Фрукты и финики"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "potter",
+            "character": {
+              "kind": "npc",
+              "name": "Гончар"
+            },
+            "transform": {
+              "position": {
+                "x": 4.6,
+                "y": 0,
+                "z": -0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Керамика"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fabric-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговка тканями"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -5.2
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Ткани и узоры"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "character": {
+              "kind": "player",
+              "name": "indafter-mvxaqa5w"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 3.141592653589793
+            },
+            "movement": {
+              "direction": {
+                "x": 0,
+                "z": 0
+              },
+              "speed": 3
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            },
+            "renderable": {
+              "assetId": "avatar-ksu"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "shepherd",
+            "character": {
+              "kind": "npc",
+              "name": "Пастух"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Козы и пастбище"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "action": {
+        "type": "intro-seen"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "96259e49-7d16-46d1-877a-f3016872d9e5",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "action": {
+        "type": "chat",
+        "text": "Купи финики"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 91
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    },
+    {
+      "action": {
+        "type": "enroll",
+        "size": 1,
+        "native": "ru",
+        "learning": "en"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "d3bb417e-a330-4125-be49-1bda409b7c02",
+        "state": {
+          "v": 2,
+          "playerId": "p_40amjtjl6obl17ar",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": false,
+          "party": {
+            "id": "b_ascv1i2x0iwkyiu3",
+            "size": 1,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_40amjtjl6obl17ar",
+                "name": "indoutside-mvxb5zdo",
+                "role": 1
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": null,
+          "partyPositions": [],
+          "task": "Ask the shepherd about food, buy supplies at the market and feed all four goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "kind": "joined",
+      "name": "indoutside-mvxb5zdo",
+      "playerId": "p_40amjtjl6obl17ar",
+      "world": {
+        "manifestUrl": "maps/market/manifest.json",
+        "worldBytes": 23648595,
+        "manifestBytes": 1415164,
+        "assets": {
+          "assets/models/demo/history.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/science.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/tablet.glb": {
+            "bytes": 46836,
+            "memory": 3145728
+          },
+          "assets/models/avatars/lukas.glb": {
+            "bytes": 883556,
+            "memory": 1767112
+          },
+          "assets/models/avatars/nic.glb": {
+            "bytes": 883560,
+            "memory": 1767120
+          },
+          "assets/models/avatars/dan.glb": {
+            "bytes": 883568,
+            "memory": 1767136
+          },
+          "assets/models/avatars/ksu.glb": {
+            "bytes": 720372,
+            "memory": 1440744
+          },
+          "assets/models/market/market.glb": {
+            "bytes": 808632,
+            "memory": 8388608
+          },
+          "assets/models/market/pasture.glb": {
+            "bytes": 409960,
+            "memory": 6291456
+          },
+          "assets/models/market/main-building.glb": {
+            "bytes": 453240,
+            "memory": 6291456
+          }
+        }
+      },
+      "snapshot": {
+        "tick": 29823,
+        "entities": [
+          {
+            "id": "p_40amjtjl6obl17ar",
+            "character": {
+              "kind": "player",
+              "name": "indoutside-mvxb5zdo"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": 8
+              },
+              "rotationY": 3.141592653589793
+            },
+            "movement": {
+              "direction": {
+                "x": 0,
+                "z": 0
+              },
+              "speed": 3
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            },
+            "renderable": {
+              "assetId": "demo-player"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fruit-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговец фруктами"
+            },
+            "transform": {
+              "position": {
+                "x": -4.5,
+                "y": 0,
+                "z": 0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Фрукты и финики"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "potter",
+            "character": {
+              "kind": "npc",
+              "name": "Гончар"
+            },
+            "transform": {
+              "position": {
+                "x": 4.6,
+                "y": 0,
+                "z": -0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Керамика"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fabric-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговка тканями"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -5.2
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Ткани и узоры"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "character": {
+              "kind": "player",
+              "name": "indafter-mvxaqa5w"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 3.141592653589793
+            },
+            "movement": {
+              "direction": {
+                "x": 0,
+                "z": 0
+              },
+              "speed": 3
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            },
+            "renderable": {
+              "assetId": "avatar-ksu"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "shepherd",
+            "character": {
+              "kind": "npc",
+              "name": "Пастух"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Козы и пастбище"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    }
+  ],
+  "focusTrace": [],
+  "peerId": "p_40amjtjl6obl17ar",
+  "peerSawKsuJug": {
+    "id": "p_d5w1o440fuyfxno4",
+    "character": {
+      "kind": "player",
+      "name": "indafter-mvxaqa5w"
+    },
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -26
+      },
+      "rotationY": 3.141592653589793
+    },
+    "movement": {
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "speed": 3
+    },
+    "motion": {
+      "grounded": true,
+      "phase": "grounded",
+      "verticalVelocity": 0,
+      "locomotion": "idle",
+      "stamina": 100,
+      "sprintBlocked": false,
+      "jumpAck": 0
+    },
+    "renderable": {
+      "assetId": "avatar-ksu"
+    },
+    "animationState": {
+      "name": "idle"
+    }
+  },
+  "outsiderName": "indoutside-mvxb5zdo",
+  "cleanupError": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+  "finishedAt": "2026-11-01T04:07:27.457Z"
+}

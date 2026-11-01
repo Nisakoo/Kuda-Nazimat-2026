@@ -41,7 +41,7 @@ async function login(page: Page, name: string, size?: string, learning?: string,
   } else if (size !== '1') {
     const friends = mode.getByRole('radio', { name: /^С друзьями/ });
     if (await friends.isEnabled()) {
-      await mode.locator('.entry-choice').filter({ has: friends }).click();
+      await mode.locator('.entry-choice').filter({ has: page.getByRole('radio', { name: /^С друзьями/ }) }).click();
       await expect(friends).toBeChecked();
       const count = mode.getByLabel('Число игроков');
       if (await count.isEnabled()) await count.selectOption(size);

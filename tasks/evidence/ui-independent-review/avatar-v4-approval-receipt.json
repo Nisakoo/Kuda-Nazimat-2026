@@ -1,0 +1,44 @@
+{
+  "decision": "approved-for-controlled-publication-and-strict-geometry-golden",
+  "scope": "Independent CPU art review of V4 only. V-02b hands and V-02c Ksu hair geometry sub-gates approved. Not deployed chooser, renderer, tool, hardware, or full acceptance.",
+  "captureImages": 13,
+  "captureErrors": [],
+  "records": [
+    {
+      "id": "lukas",
+      "bytes": 883556,
+      "sha256": "76dccb6dad65f3a00b86937841567f98c5e3f98078a3b97c38d584a27eaf8f71",
+      "geometrySha256": "346c5651c146122b82a13815666ad8e32fa18eaa32fdd3bbc458453b472066ba",
+      "receiptMatch": true,
+      "neutralReceiptMatch": true,
+      "neutralNodesExactV3": true
+    },
+    {
+      "id": "nic",
+      "bytes": 883560,
+      "sha256": "b452683fc4b402a6b0242879c095264e359493c564445f594f3c80e386cc8c3b",
+      "geometrySha256": "c3e764ff0659bbd34d3711b97d6e2008f04adccbfeae6e6a1d725f60268b7778",
+      "receiptMatch": true,
+      "neutralReceiptMatch": true,
+      "neutralNodesExactV3": true
+    },
+    {
+      "id": "dan",
+      "bytes": 883568,
+      "sha256": "c209d2f78e55b6424689b5e347d1de0423dc72bcce079b646a6cb5878a2a1039",
+      "geometrySha256": "58909019ebffa1d53739ceeeeef067cafc73598598f75c4ff5bcc964e74993f1",
+      "receiptMatch": true,
+      "neutralReceiptMatch": true,
+      "neutralNodesExactV3": true
+    },
+    {
+      "id": "ksu",
+      "bytes": 720372,
+      "sha256": "3f085325b1cf993f2947d65df7493422e394f5463c135374f96bc0132567483b",
+      "geometrySha256": "c3cf303473c29c586f40bdc8c95e9780dde469c8c3ff8c9b6ceb14df1934e3d8",
+      "receiptMatch": true,
+      "neutralReceiptMatch": true,
+      "neutralNodesExactV3": true
+    }
+  ]
+}

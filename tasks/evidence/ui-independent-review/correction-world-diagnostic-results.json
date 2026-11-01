@@ -1,0 +1,6353 @@
+{
+  "startedAt": "2026-11-01T04:26:25.261Z",
+  "username": "indafter-mvxaqa5w",
+  "peerName": "indafterpeer-mvxb0dms",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "DIAGNOSTIC alternative keyboard path after recorded 5s pointer/readiness failures. Not a replacement for those failures or canonical acceptance. One actual rendered client, one actual protocol peer. Controlled pending cases use real transport latency only.",
+  "steps": [
+    {
+      "label": "Saved party mode is correctly locked; not clicked"
+    },
+    {
+      "label": "Diagnostic actual Start retry only, not readiness acceptance",
+      "notAcceptance": true
+    },
+    {
+      "label": "password-login-enroll-real-two-person-task",
+      "ok": true,
+      "ms": 50575,
+      "at": 50530.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия вы",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-initial-I-immediate-and-delayed-natural-ACK",
+      "ok": false,
+      "ms": 18817,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Кувшин', exact: true })\n    - locator resolved to <button type=\"button\" aria-pressed=\"false\" class=\"babel-tool-card\">…</button>\n",
+      "at": 71519.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "real-authenticated-protocol-peer",
+      "ok": true,
+      "ms": 335,
+      "at": 82028.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-pending-ACK-focus-recovery-controlled-transport",
+      "ok": false,
+      "ms": 7744,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n    - locator resolved to <button>Продолжить</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n    - done scrolling\n",
+      "at": 90114.19999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-user-focus-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 7784,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n    - locator resolved to <button>Продолжить</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 109779.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-new-map-modal-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 7662,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n    - locator resolved to <button>Продолжить</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 127681.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-Settings-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 7372,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n    - locator resolved to <button>Продолжить</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 145729.69999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "CDP real transport latency",
+      "ms": 0,
+      "notPerformanceAcceptance": true
+    },
+    {
+      "label": "dictionary-create-note-example-learn-edit-search-delete",
+      "ok": false,
+      "ms": 6453,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 164087.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "real-peer-chat-translation-add-word-own-delivery-stone",
+      "ok": false,
+      "ms": 6164,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 179558.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "map-real-authority-zoom-center-and-live-peer-movement",
+      "ok": false,
+      "ms": 6071,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 195487.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Карта Вавилона",
+          "modal": true,
+          "rect": {
+            "x": 170,
+            "y": 128.203125,
+            "w": 940,
+            "h": 563.796875
+          },
+          "width": 936,
+          "scrollWidth": 936,
+          "height": 560,
+          "scrollHeight": 560
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nindafterpeer-mvxb0dms\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "all-windows-1622x970",
+      "ok": false,
+      "ms": 6361,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 211097.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 381,
+            "y": 178.328125,
+            "w": 860,
+            "h": 683.671875
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 680,
+          "scrollHeight": 680
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 680,
+          "scrollHeight": 680
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nОжидаем подтверждения сервера…\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "Tab inventory 1280",
+      "order": [
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Сумка",
+          "inTop": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Кувшин",
+          "inTop": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Взять в руки",
+          "inTop": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Закрыть",
+          "inTop": true
+        }
+      ],
+      "allInsideTop": true
+    },
+    {
+      "label": "all-windows-1280x800",
+      "ok": false,
+      "ms": 21292,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 238253.80000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "Tab inventory 390",
+      "order": [
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Словарь",
+          "inTop": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Чат",
+          "inTop": true
+        },
+        {
+          "tag": "BODY",
+          "label": null,
+          "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ",
+          "inTop": false
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Закрыть окно",
+          "text": "✕",
+          "inTop": true
+        }
+      ],
+      "allInsideTop": false
+    },
+    {
+      "label": "all-windows-390x844",
+      "ok": false,
+      "ms": 29800,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 279203.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 352,
+            "h": 654
+          },
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 650,
+          "scrollHeight": 650
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 650,
+          "scrollHeight": 865
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "width": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "Tab inventory 640",
+      "order": [
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Словарь",
+          "inTop": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Чат",
+          "inTop": true
+        },
+        {
+          "tag": "BODY",
+          "label": null,
+          "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ",
+          "inTop": false
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Закрыть окно",
+          "text": "✕",
+          "inTop": true
+        }
+      ],
+      "allInsideTop": false
+    },
+    {
+      "label": "all-windows-640x480",
+      "ok": false,
+      "ms": 25605,
+      "failure": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByText('В руках: Кувшин', { exact: true })\n",
+      "at": 314952.1999999881,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 602,
+            "h": 290
+          },
+          "width": 598,
+          "scrollWidth": 598,
+          "height": 286,
+          "scrollHeight": 286
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 598,
+          "scrollWidth": 598,
+          "height": 286,
+          "scrollHeight": 647
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 403,
+            "w": 620,
+            "h": 61
+          },
+          "width": 616,
+          "scrollWidth": 616
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "languages-real-ACK-new-message-old-message-preservation",
+      "ok": false,
+      "ms": 9402,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Языки', exact: true })\n    - locator resolved to <button class=\"secondary\">Языки</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 335694,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Ваши языки",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 196.171875,
+            "w": 860,
+            "h": 495.828125
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 492,
+          "scrollHeight": 492
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 492,
+          "scrollHeight": 492
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВаши языки\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nПишите на родном языке. Задания, сообщения других игроков и ответы NPC будут на изучаемом.\n\nРодной язык\nРусский\nEnglish\nEspañol\nИзучаемый язык\nРусский\nEnglish\nEspañol\nСохранить языки Закрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "live-appearance-Dan-server-and-peer",
+      "ok": false,
+      "ms": 10270,
+      "failure": "TimeoutError: locator.press: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Изменить облик персонажа', exact: true })\n    - locator resolved to <button type=\"button\" class=\"secondary\">Изменить облик персонажа</button>\n  - elementHandle.press(\"Enter\")\n",
+      "at": 356154.8000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\n\nЗагружаем модели…\n\nОблик персонажа\n◇\n✓\n◇\n◇\n◇\n\nВнешность можно изменить в настройках\n\nОжидаем подтверждения сервера…\n\n← Назад\nПодтвердить →"
+    },
+    {
+      "label": "map-excludes-real-outsider-sequential-peer-socket",
+      "ok": false,
+      "ms": 96,
+      "failure": "Error: {\"v\":2,\"requestId\":\"723de9fe-9c22-4292-9633-6a44bb46cbfc\",\"error\":{\"code\":\"CONFLICT\",\"message\":\"Режим группы уже выбран первым игроком\"}}",
+      "at": 369745.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\n\nЗагружаем модели…\n\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПодтвердить →"
+    },
+    {
+      "label": "password-relogin-persistence",
+      "ok": false,
+      "ms": 7726,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 388290.1999999881,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Настройки",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 35.109375,
+            "w": 400,
+            "h": 729.78125
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 726,
+          "scrollHeight": 726
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nНастройки\n✕\nРежим\nЛокальная прогулка\nТестовый сетевой режим\nЛокальный сервер\n\nПосле применения настроек войдите в аккаунт. Демонстрационный вход по имени доступен отдельно. При смене сервера потребуется новый вход.\n\nАдрес сервера\nКарта\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\nДиагностика\nИзменить облик персонажа\nПрименить и открыть карту\nОтмена\nПастбище у рынка\n\nПросмотр приостановлен"
+    }
+  ],
+  "screens": [
+    {
+      "label": "failure-R06-initial-I-immediate-and-delayed-natural-ACK",
+      "file": "correction-world-diagnostic/failure-R06-initial-I-immediate-and-delayed-natural-ACK.png",
+      "at": 73186.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1482
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-pending-ACK-focus-recovery-controlled-transport",
+      "file": "correction-world-diagnostic/failure-R06-pending-ACK-focus-recovery-controlled-transport.png",
+      "at": 91603.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1497
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-R06-user-focus-before-ACK-is-preserved",
+      "file": "correction-world-diagnostic/failure-R06-user-focus-before-ACK-is-preserved.png",
+      "at": 111543.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1518
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-R06-new-map-modal-before-ACK-is-preserved",
+      "file": "correction-world-diagnostic/failure-R06-new-map-modal-before-ACK-is-preserved.png",
+      "at": 129090.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1534
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-R06-Settings-before-ACK-is-preserved",
+      "file": "correction-world-diagnostic/failure-R06-Settings-before-ACK-is-preserved.png",
+      "at": 146868.69999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1553
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-dictionary-create-note-example-learn-edit-search-delete",
+      "file": "correction-world-diagnostic/failure-dictionary-create-note-example-learn-edit-search-delete.png",
+      "at": 165261.19999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1569
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-real-peer-chat-translation-add-word-own-delivery-stone",
+      "file": "correction-world-diagnostic/failure-real-peer-chat-translation-add-word-own-delivery-stone.png",
+      "at": 180672.19999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1585
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-map-real-authority-zoom-center-and-live-peer-movement",
+      "file": "correction-world-diagnostic/failure-map-real-authority-zoom-center-and-live-peer-movement.png",
+      "at": 196654.80000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Карта Вавилона",
+          "modal": true,
+          "rect": {
+            "x": 170,
+            "y": 128.203125,
+            "w": 940,
+            "h": 563.796875
+          },
+          "width": 936,
+          "scrollWidth": 936,
+          "height": 560,
+          "scrollHeight": 560
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nindafterpeer-mvxb0dms\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1605
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-1622x970",
+      "file": "correction-world-diagnostic/failure-all-windows-1622x970.png",
+      "at": 211141.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 381,
+            "y": 255.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1614
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "inventory-1280x800",
+      "file": "correction-world-diagnostic/inventory-1280x800.png",
+      "at": 219382,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1626
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-1280x800",
+      "file": "correction-world-diagnostic/failure-all-windows-1280x800.png",
+      "at": 239911.69999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1645
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "inventory-390x844",
+      "file": "correction-world-diagnostic/inventory-390x844.png",
+      "at": 255442.19999998808,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 352,
+            "h": 654
+          },
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 650,
+          "scrollHeight": 650
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 650,
+          "scrollHeight": 865
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "width": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1662
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-390x844",
+      "file": "correction-world-diagnostic/failure-all-windows-390x844.png",
+      "at": 280508.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 352,
+            "h": 654
+          },
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 650,
+          "scrollHeight": 650
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 650,
+          "scrollHeight": 865
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "width": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1691
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "inventory-640x480",
+      "file": "correction-world-diagnostic/inventory-640x480.png",
+      "at": 293728.8000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 602,
+            "h": 290
+          },
+          "width": 598,
+          "scrollWidth": 598,
+          "height": 286,
+          "scrollHeight": 286
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 598,
+          "scrollWidth": 598,
+          "height": 286,
+          "scrollHeight": 647
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 403,
+            "w": 620,
+            "h": 61
+          },
+          "width": 616,
+          "scrollWidth": 616
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1700
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-all-windows-640x480",
+      "file": "correction-world-diagnostic/failure-all-windows-640x480.png",
+      "at": 316550.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 602,
+            "h": 290
+          },
+          "width": 598,
+          "scrollWidth": 598,
+          "height": 286,
+          "scrollHeight": 286
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 598,
+          "scrollWidth": 598,
+          "height": 286,
+          "scrollHeight": 647
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 403,
+            "w": 620,
+            "h": 61
+          },
+          "width": 616,
+          "scrollWidth": 616
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1723
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-languages-real-ACK-new-message-old-message-preservation",
+      "file": "correction-world-diagnostic/failure-languages-real-ACK-new-message-old-message-preservation.png",
+      "at": 337035.8000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Ваши языки",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 196.171875,
+            "w": 860,
+            "h": 495.828125
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 492,
+          "scrollHeight": 492
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 492,
+          "scrollHeight": 492
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВаши языки\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nПишите на родном языке. Задания, сообщения других игроков и ответы NPC будут на изучаемом.\n\nРодной язык\nРусский\nEnglish\nEspañol\nИзучаемый язык\nРусский\nEnglish\nEspañol\nСохранить языки Закрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1744
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-live-appearance-Dan-server-and-peer",
+      "file": "correction-world-diagnostic/failure-live-appearance-Dan-server-and-peer.png",
+      "at": 357589.3000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\n\nЗагружаем модели…\n\nОблик персонажа\n◇\n✓\n◇\n◇\n◇\n\nВнешность можно изменить в настройках\n\n← Назад\nПодтвердить →",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1764
+      },
+      "partyPositions": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "failure-map-excludes-real-outsider-sequential-peer-socket",
+      "file": "correction-world-diagnostic/failure-map-excludes-real-outsider-sequential-peer-socket.png",
+      "at": 370980.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\n\nЗагружаем модели…\n\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПодтвердить →",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1778
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-password-relogin-persistence",
+      "file": "correction-world-diagnostic/failure-password-relogin-persistence.png",
+      "at": 389539.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Настройки",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 35.109375,
+            "w": 400,
+            "h": 729.78125
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 726,
+          "scrollHeight": 726
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nНастройки\n✕\nРежим\nЛокальная прогулка\nТестовый сетевой режим\nЛокальный сервер\n\nПосле применения настроек войдите в аккаунт. Демонстрационный вход по имени доступен отдельно. При смене сервера потребуется новый вход.\n\nАдрес сервера\nКарта\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\nДиагностика\nИзменить облик персонажа\nПрименить и открыть карту\nОтмена\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": {
+        "id": "p_d5w1o440fuyfxno4",
+        "character": {
+          "kind": "player",
+          "name": "indafter-mvxaqa5w"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1796
+      },
+      "partyPositions": []
+    }
+  ],
+  "gates": [
+    {
+      "label": "initial world start enabled within5s after entry",
+      "pass": true,
+      "ms": 4263,
+      "deadline": 5000
+    },
+    {
+      "label": "Start actionable click within5s",
+      "pass": false,
+      "ms": 5014,
+      "deadline": 5000,
+      "error": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n    - locator resolved to <button class=\"primary large\">…</button>\n"
+    },
+    {
+      "label": "Start captures within5s",
+      "pass": true,
+      "ms": 8,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 15,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 1414,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 1374,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 1221,
+      "deadline": 5000
+    }
+  ],
+  "errors": [],
+  "http": [
+    {
+      "at": 1793507190977,
+      "path": "/api/babylon",
+      "action": "languages",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "c25be84a-f555-4be1-9ca1-b4028d2be684",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1408
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Help your partners feed the goats: explain their features and food. Only you have the list.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "at": 1793507238299,
+      "path": "/api/equipment",
+      "status": 200,
+      "body": {
+        "tool": null
+      }
+    },
+    {
+      "at": 1793507398898,
+      "path": "/api/equipment",
+      "status": 200,
+      "body": {
+        "tool": null
+      }
+    },
+    {
+      "at": 1793507543963,
+      "path": "/api/avatar",
+      "status": 200,
+      "body": {
+        "avatarId": "ksu"
+      }
+    }
+  ],
+  "peerEvents": [
+    {
+      "action": {
+        "type": "state"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "4c3d0c42-f21c-43ec-9fef-5f8bbf86672d",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1486
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "kind": "joined",
+      "name": "indafterpeer-mvxb0dms",
+      "playerId": "p_yy2bt5jku8ez3lx0",
+      "world": {
+        "manifestUrl": "maps/market/manifest.json",
+        "worldBytes": 23648595,
+        "manifestBytes": 1415164,
+        "assets": {
+          "assets/models/demo/history.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/science.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/tablet.glb": {
+            "bytes": 46836,
+            "memory": 3145728
+          },
+          "assets/models/avatars/lukas.glb": {
+            "bytes": 883556,
+            "memory": 1767112
+          },
+          "assets/models/avatars/nic.glb": {
+            "bytes": 883560,
+            "memory": 1767120
+          },
+          "assets/models/avatars/dan.glb": {
+            "bytes": 883568,
+            "memory": 1767136
+          },
+          "assets/models/avatars/ksu.glb": {
+            "bytes": 720372,
+            "memory": 1440744
+          },
+          "assets/models/market/market.glb": {
+            "bytes": 808632,
+            "memory": 8388608
+          },
+          "assets/models/market/pasture.glb": {
+            "bytes": 409960,
+            "memory": 6291456
+          },
+          "assets/models/market/main-building.glb": {
+            "bytes": 453240,
+            "memory": 6291456
+          }
+        }
+      },
+      "snapshot": {
+        "tick": 55171,
+        "entities": [
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "character": {
+              "kind": "player",
+              "name": "indafterpeer-mvxb0dms"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": 8
+              },
+              "rotationY": 3.141592653589793
+            },
+            "movement": {
+              "direction": {
+                "x": 0,
+                "z": 0
+              },
+              "speed": 3
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            },
+            "renderable": {
+              "assetId": "demo-player"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fruit-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговец фруктами"
+            },
+            "transform": {
+              "position": {
+                "x": -4.5,
+                "y": 0,
+                "z": 0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Фрукты и финики"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "potter",
+            "character": {
+              "kind": "npc",
+              "name": "Гончар"
+            },
+            "transform": {
+              "position": {
+                "x": 4.6,
+                "y": 0,
+                "z": -0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Керамика"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fabric-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговка тканями"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -5.2
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Ткани и узоры"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "character": {
+              "kind": "player",
+              "name": "indafter-mvxaqa5w"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 3.141592653589793
+            },
+            "movement": {
+              "direction": {
+                "x": 0,
+                "z": 0
+              },
+              "speed": 3
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            },
+            "renderable": {
+              "assetId": "avatar-ksu"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "shepherd",
+            "character": {
+              "kind": "npc",
+              "name": "Пастух"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Козы и пастбище"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "action": {
+        "type": "intro-seen"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "10ea5fd7-9d4c-4e76-8cda-818076602e45",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1486
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "action": {
+        "type": "chat",
+        "text": "Купи финики"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1579
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    },
+    {
+      "action": {
+        "type": "state"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "dcd86cbb-3647-4204-aba3-8649b07f05c7",
+        "state": {
+          "v": 2,
+          "playerId": "p_j6n01tnfjtz17lvc",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": null,
+          "introSeen": false,
+          "party": null,
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "",
+          "taskTitle": "",
+          "taskTarget": null,
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "action": {
+        "type": "enroll",
+        "size": 1,
+        "native": "ru",
+        "learning": "en"
+      },
+      "status": 409,
+      "body": {
+        "v": 2,
+        "requestId": "723de9fe-9c22-4292-9633-6a44bb46cbfc",
+        "error": {
+          "code": "CONFLICT",
+          "message": "Режим группы уже выбран первым игроком"
+        }
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    }
+  ],
+  "focusTrace": [
+    {
+      "type": "focusin",
+      "at": 1543.199999988079,
+      "target": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "related": {},
+      "active": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 1702.199999988079,
+      "target": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "related": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 1707.800000011921,
+      "target": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "related": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 1846.800000011921,
+      "target": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Начать путешествие →"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 1851.800000011921,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Начать путешествие →"
+      },
+      "related": {
+        "tag": "INPUT",
+        "label": null,
+        "text": ""
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Начать путешествие →"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 1879.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Начать путешествие →"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Начать путешествие →"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 1923.9000000059605,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Связываемся с сервером…"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 2523.699999988079,
+      "target": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "related": {},
+      "active": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 2547,
+      "target": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n                  Вавилон   Вавилон Куд"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 2563,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →"
+      },
+      "related": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 2750.0999999940395,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 2765.9000000059605,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n                  Вавилон   Вавилон Куд"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 2792.0999999940395,
+      "target": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "related": {},
+      "active": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 2884.199999988079,
+      "target": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Войти в Вавилон →"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n                  Вавилон   Вавилон Ваш"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 2887.4000000059605,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Войти в Вавилон →"
+      },
+      "related": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Войти в Вавилон →"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 2916.300000011921,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Войти в Вавилон →"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Войти в Вавилон →"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 2991.5999999940395,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Войти в Вавилон →"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n                  Вавилон   Вавилон Ваш"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 46241.80000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Начать прогулку ↗"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Начать прогулку ↗"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 46333.69999998808,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Захватываем мышь… ↗"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": true
+    },
+    {
+      "type": "pointerlockchange",
+      "at": 47951.59999999404,
+      "target": {},
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": true
+    },
+    {
+      "type": "keydown",
+      "code": "KeyI",
+      "at": 48033.40000000596,
+      "target": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": true
+    },
+    {
+      "type": "focusin",
+      "at": 48136.69999998808,
+      "target": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "related": {},
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "locked": false
+    },
+    {
+      "type": "pointerlockchange",
+      "at": 50480,
+      "target": {},
+      "related": {},
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 50557.59999999404,
+      "target": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 50607.30000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Escape",
+      "at": 84698.59999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 84708.59999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 84730.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 164071.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 164076.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 179547.80000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 179554,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 193997.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 193998.69999998808,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 195416.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 195421.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 195458.80000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 209727.80000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Инвентарь"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 209729.69999998808,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Инвентарь"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Инвентарь"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 211027.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Инвентарь"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Инвентарь"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 211038.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Инвентарь"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 211068.30000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 229678.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 229679.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Сумка"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 229684.30000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Сумка"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Сумка"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 229732.59999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Сумка"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Сумка"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 229733.30000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Сумка"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Кувшин"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 229734.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Кувшин"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Сумка"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Кувшин"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 231024.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Кувшин"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Кувшин"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 231025.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Кувшин"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Взять в руки"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 231028.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Взять в руки"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Кувшин"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Взять в руки"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 232622.80000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Взять в руки"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Взять в руки"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 232624.09999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Взять в руки"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Закрыть"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 232625.19999998808,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Закрыть"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Взять в руки"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Закрыть"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 238250.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Закрыть"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 238252.59999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Закрыть"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 265670.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 265671.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 265672.59999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 268136.6999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 268137.3000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 268138.59999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 270850,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 270852.1999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 272258.59999999404,
+      "target": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 272277,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 279198.1999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 279201.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 303202.1999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 303205.1999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 303206.6999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Карта"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 304544.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 304545.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 304547.3000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 307020.6999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 307021.6999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Tab",
+      "at": 309554.8000000119,
+      "target": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 309561.3000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Escape",
+      "at": 329726.1999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 329738.8000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 329768,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 334035.6999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Языки"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 334041.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Языки"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Языки"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 335623.3000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Языки"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Языки"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 335625.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Языки"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 335670.6999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Escape",
+      "at": 347809.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 347814.3000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 347868.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 349102.09999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Настройки"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 349104.1999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Настройки"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Настройки"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 350527.09999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Настройки"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Настройки"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 350532.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Настройки"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 350555.1999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 354411.8000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Изменить облик персонажа"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 354412.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Изменить облик персонажа"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Изменить облик персонажа"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Enter",
+      "at": 355637.8000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Изменить облик персонажа"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Изменить облик персонажа"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 355641.6999999881,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Изменить облик персонажа"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n        ✓The Shepherd’s Goats· 0 / 4⌄  "
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 355694.59999999404,
+      "target": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "related": {},
+      "active": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 370999.90000000596,
+      "target": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "related": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "text": ""
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n        ✓The Shepherd’s Goats· 0 / 4⌄  "
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 371002.6999999881,
+      "target": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "text": ""
+      },
+      "related": {
+        "tag": "A",
+        "label": "Вавилон — главная",
+        "text": " Вавилон"
+      },
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "text": ""
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Escape",
+      "at": 383127.3000000119,
+      "target": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "text": ""
+      },
+      "related": {},
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "text": ""
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 383139.6999999881,
+      "target": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "text": ""
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 383171.8000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "keydown",
+      "code": "Escape",
+      "at": 403058.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 403063.59999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 403077.3000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 415664.90000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 415666.40000000596,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 415795.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город"
+      },
+      "locked": false
+    }
+  ],
+  "actualFirstCapture": {
+    "type": "pointerlockchange",
+    "at": 47951.59999999404,
+    "target": {},
+    "related": {},
+    "active": {
+      "tag": "BODY",
+      "label": null,
+      "text": "\n      Вавилон Изучаю English⌄ Локальный"
+    },
+    "locked": true
+  },
+  "startReturnedAt": 1793507238239,
+  "firstIAt": 1793507238354,
+  "firstIDelayAfterStartReturn": 115,
+  "initialIFocus": [
+    {
+      "delay": 0,
+      "at": 54773,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 100,
+      "at": 56951.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 500,
+      "at": 59575,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 1000,
+      "at": 61947,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 1000,
+      "at": 64384.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    }
+  ],
+  "peerId": "p_yy2bt5jku8ez3lx0",
+  "peerSameParty": true,
+  "peerSawKsuJug": {
+    "id": "p_d5w1o440fuyfxno4",
+    "character": {
+      "kind": "player",
+      "name": "indafter-mvxaqa5w"
+    },
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -26
+      },
+      "rotationY": 3.141592653589793
+    },
+    "movement": {
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "speed": 3
+    },
+    "motion": {
+      "grounded": true,
+      "phase": "grounded",
+      "verticalVelocity": 0,
+      "locomotion": "idle",
+      "stamina": 100,
+      "sprintBlocked": false,
+      "jumpAck": 0
+    },
+    "renderable": {
+      "assetId": "avatar-ksu"
+    },
+    "animationState": {
+      "name": "idle"
+    }
+  },
+  "outsiderName": "indoutside-mvxc3avv",
+  "cleanupLogout": 204,
+  "finishedAt": "2026-11-01T04:33:23.701Z"
+}

@@ -1,0 +1,60 @@
+CAPTURE lukas-1622x970
+locator.check: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('radio', { name: 'Облик 2', exact: true })
+    - locator resolved to <input value="nic" type="radio" name="avatar-choice" aria-label="Облик 2"/>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events
+    - retrying click action
+      - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-avatar.mjs:8:965 {
+  log: [
+    "  - waiting for getByRole('radio', { name: 'Облик 2', exact: true })",
+    '    - locator resolved to <input value="nic" type="radio" name="avatar-choice" aria-label="Облик 2"/>',
+    '  - attempting click action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events',
+    '    - retrying click action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events',
+    '    - retrying click action',
+    '      - waiting 100ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events',
+    '    - retrying click action',
+    '      - waiting 500ms',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure

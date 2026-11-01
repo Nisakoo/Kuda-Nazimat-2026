@@ -1,0 +1,578 @@
+{
+  "startedAt": "2026-11-01T03:52:34.169Z",
+  "origin": "http://127.0.0.1:4387",
+  "username": "indafter-mvxantrt",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "Fresh actual password registration and deployed V4 chooser. 5s gate recorded separately from any diagnostic wait.",
+  "screens": [
+    {
+      "label": "lukas-1622x970",
+      "file": "correction-avatar/lukas-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "lukas",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "failure",
+      "file": "correction-avatar/failure.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "lukas",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    }
+  ],
+  "steps": [
+    {
+      "label": "Settings during initial model load settings owns focus",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        },
+        {
+          "title": "Настройки",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": false,
+        "inModal": false,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "lukas",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "Settings during initial model load",
+      "before": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "A",
+          "label": "Вавилон — главная",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "lukas",
+        "angle": "0",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 0,
+            "width": 1622,
+            "scrollWidth": 1622,
+            "height": 798,
+            "scrollHeight": 815
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 773,
+            "scrollHeight": 773
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 524,
+            "scrollHeight": 524
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 524,
+            "scrollHeight": 524
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "after": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "lukas",
+        "angle": "0",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 0,
+            "width": 1622,
+            "scrollWidth": 1622,
+            "height": 798,
+            "scrollHeight": 815
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 773,
+            "scrollHeight": 773
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 524,
+            "scrollHeight": 524
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 524,
+            "scrollHeight": 524
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "selectionPreserved": true,
+      "anglePreserved": true
+    }
+  ],
+  "gates": [
+    {
+      "label": "initial chooser enabled within 5s of visible dialog",
+      "pass": true,
+      "ms": 1782,
+      "deadline": 5000
+    }
+  ],
+  "errors": [],
+  "models": [],
+  "portraits": [],
+  "initialFocus": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+    ],
+    "viewport": {
+      "width": 1622,
+      "height": 970,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "A",
+      "label": "Вавилон — главная",
+      "inModal": true
+    },
+    "dialogs": [
+      {
+        "title": "Выберите свой облик",
+        "modal": true
+      }
+    ],
+    "visibleGears": 1,
+    "visibleBrands": 1,
+    "gear": {
+      "hitIsGear": true,
+      "inModal": true,
+      "rect": {
+        "x": 1522,
+        "y": 878,
+        "w": 72,
+        "h": 72
+      }
+    },
+    "selected": "lukas",
+    "angle": "0",
+    "scroll": [
+      {
+        "class": "avatar-dialog-body",
+        "top": 0,
+        "width": 1622,
+        "scrollWidth": 1622,
+        "height": 798,
+        "scrollHeight": 815
+      },
+      {
+        "class": "avatar-tablet",
+        "top": 0,
+        "width": 1062,
+        "scrollWidth": 1062,
+        "height": 773,
+        "scrollHeight": 773
+      },
+      {
+        "class": "avatar-layout",
+        "top": 0,
+        "width": 986,
+        "scrollWidth": 986,
+        "height": 524,
+        "scrollHeight": 524
+      },
+      {
+        "class": "avatar-options",
+        "top": 0,
+        "width": 523,
+        "scrollWidth": 523,
+        "height": 524,
+        "scrollHeight": 524
+      }
+    ],
+    "portraits": [],
+    "alerts": []
+  },
+  "failure": "TimeoutError: locator.check: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('radio', { name: 'Облик 2', exact: true })\n    - locator resolved to <input value=\"nic\" type=\"radio\" name=\"avatar-choice\" aria-label=\"Облик 2\"/>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <img alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <img alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <img alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAAAQAElEQVR4Aez9CZgkyXUeCP5m7nFl5J11V3XdZ993N66uboA4CDQhUhQpagBQICmRhERK5A7J0ewOp7KWmlmuIM3wk2a/kYaQIIAQBpJISeSOKBIE0NUUiLPR931WV3WdWVV5XxHh7vP/5u4RHpGRWVndTaC70qP8uZk9e3Y9t/f7M7PIKIv8k2sg10CugTWqgRwA1+iDz4edayDXAJADYD4Lcg3kGlizGljTALhmn3o+8FwDuQacBnIAdGrIb7kGcg2sRQ3kALgWn3o+5lwDuQacBnIAdGpYg7d8yLkGcg3khyD5HMg1kGtg7Wog9wDX7rPPR55rYM1rIAfANT8F1qIC8jHnGog1kANgrIf8nmsg18Aa1EAOgGvwoedDzjWQayDWQA6AsR7ye66BtaKBfJwZDeQAmFFG…/> intercepts pointer events\n    - retrying click action\n      - waiting 500ms\n    - waiting for element to be visible, enabled and stable\n",
+  "cleanupLogout": 204,
+  "finishedAt": "2026-11-01T03:52:51.538Z"
+}

@@ -1,0 +1,348 @@
+{
+  "status": "complete",
+  "startedAt": "2026-11-01T03:10:30.956Z",
+  "candidates": {
+    "lukas": {
+      "sha256": "7c520f452cfbbc8880bec3a4b2855d027ecb5f48049423251f8d99b88c2e6ecd",
+      "bytes": 883556
+    },
+    "nic": {
+      "sha256": "d28c8a633e1c42f7171578caefe7cc388d0612aab5af867e7da5bbc30de97220",
+      "bytes": 883560
+    },
+    "dan": {
+      "sha256": "af745129f6f7727c118504503e6dd85e49682c240d2a6710a62c85f7f9e4741a",
+      "bytes": 883568
+    },
+    "ksu": {
+      "sha256": "fce030f72f71ef00685c435c201cd21655c3793fd3c4c431ff8a6d389737bef0",
+      "bytes": 756852
+    }
+  },
+  "images": [
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/lukas-preview-front-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/lukas-preview-side-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/lukas-preview-back-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-front-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-side-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-back-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/lukas-market-front-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/lukas-market-side-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/lukas-market-back-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/lukas-preview-front-walk.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/lukas-preview-side-walk.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/nic-preview-front-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/nic-preview-side-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/nic-preview-back-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/nic-neutral-front-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/nic-neutral-side-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/nic-neutral-back-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/nic-market-front-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/nic-market-side-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/nic-market-back-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/nic-preview-front-walk.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/nic-preview-side-walk.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/dan-preview-front-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/dan-preview-side-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/dan-preview-back-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/dan-neutral-front-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/dan-neutral-side-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/dan-neutral-back-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/dan-market-front-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/dan-market-side-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/dan-market-back-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/dan-preview-front-walk.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/dan-preview-side-walk.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/ksu-preview-front-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/ksu-preview-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/ksu-preview-back-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-front-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-back-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/ksu-market-front-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/ksu-market-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/ksu-market-back-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/ksu-preview-front-walk.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/ksu-preview-side-walk.png"
+    }
+  ],
+  "errors": [],
+  "shadowMap": "PCFShadowMap: explicit supported equivalent of the prior removed PCFSoftShadowMap fallback",
+  "limitations": [
+    "Private candidate GLBs only.",
+    "SwiftShader evidence is not hardware acceptance.",
+    "No tool attachment is rendered."
+  ],
+  "finishedAt": "2026-11-01T03:11:02.696Z"
+}

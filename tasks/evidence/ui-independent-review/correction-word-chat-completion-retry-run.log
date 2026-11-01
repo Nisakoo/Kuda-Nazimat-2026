@@ -1,0 +1,6 @@
+Error: peer rejected
+    at peer (file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-word-chat-completion-retry.mjs:1:3658)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-word-chat-completion-retry.mjs:2:1615
+CAPTURE failure
+WORD/CHAT COMPLETION CLOSED

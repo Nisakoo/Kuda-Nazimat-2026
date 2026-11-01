@@ -10,7 +10,9 @@ import { AVATAR_IDS, AVATAR_PROFILE, createAvatarModel, generateAvatarModels } f
 
 const temporary=[];
 afterEach(async()=>{await Promise.all(temporary.splice(0).map(path=>rm(path,{recursive:true,force:true})));});
-const file=id=>new URL('../public/assets/models/avatars/'+id+'.glb',import.meta.url);
+// Candidate validation is opt-in; production checks continue to read the shipped GLBs.
+const candidateDir=process.env.AVATAR_MODEL_TEST_DIR;
+const file=id=>candidateDir ? pathToFileURL(join(candidateDir,id+'.glb')) : new URL('../public/assets/models/avatars/'+id+'.glb',import.meta.url);
 const hierarchy=root=>{const result=[];root.traverse(n=>{if(n.isGroup)result.push([n.name,n.parent?.isGroup?n.parent.name:null]);});return result;};
 const bounds=root=>{root.updateMatrixWorld(true);return new Box3().setFromObject(root);};
 const parse=async id=>{const bytes=await readFile(file(id));return new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');};
@@ -66,9 +68,12 @@ describe('TASK-043 original local avatar models',()=>{
     }
   });
 
-  it('preserves pre-correction geometry and neutral transforms except the agreed 1.8 m Y normalization',async()=>{
-    const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-models-2026-07-02/geometry-neutral-before.json',import.meta.url),'utf8'));
+  it('matches the independently approved V4 GLB, full geometry and exact neutral transforms',async()=>{
+    // geometry-neutral-before.json remains unchanged as the historical pre-correction fixture.
+    const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-models-2026-07-02/geometry-neutral-approved-v4.json',import.meta.url),'utf8'));
     for(const id of AVATAR_IDS){
+      const bytes=await readFile(file(id));
+      expect(createHash('sha256').update(bytes).digest('hex')).toBe(baseline[id].candidateGlbSha256);
       const loaded=await parse(id),hash=createHash('sha256'),nodes=[];
       loaded.scene.traverse(node=>{
         nodes.push({name:node.name,type:node.type,position:node.position.toArray(),quaternion:node.quaternion.toArray(),scale:node.scale.toArray()});
@@ -79,9 +84,24 @@ describe('TASK-043 original local avatar models',()=>{
         if(node.geometry.index){const array=node.geometry.index.array;hash.update(Buffer.from(array.buffer,array.byteOffset,array.byteLength));}
       });
       expect(hash.digest('hex')).toBe(baseline[id].geometrySha256);
-      const expected=structuredClone(baseline[id].neutralNodes);expected.find(node=>node.name==='avatar').scale[1]*=1.8/1.95;
-      for(let i=0;i<nodes.length;i++)for(let axis=0;axis<3;axis++)expect(nodes[i].scale[axis]).toBeCloseTo(expected[i].scale[axis],12);
-      expect(nodes.map(node=>({...node,scale:undefined}))).toEqual(expected.map(node=>({...node,scale:undefined})));
+      expect(nodes).toEqual(baseline[id].neutralNodes);
+    }
+  });
+
+  it('preserves the original lower-body geometry, node transforms and avatar normalization exactly',async()=>{
+    const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-models-2026-07-02/visual-v2-candidate/lowerbody-baseline.json',import.meta.url),'utf8'));
+    for(const id of AVATAR_IDS){
+      const loaded=await parse(id),nodes=[];
+      loaded.scene.traverse(node=>{
+        if(!/^(hip|knee|ankle)-(left|right)(-surface)?$/.test(node.name))return;
+        const item={name:node.name,position:node.position.toArray(),quaternion:node.quaternion.toArray(),scale:node.scale.toArray()};
+        if(node.isMesh){const hash=createHash('sha256');for(const key of Object.keys(node.geometry.attributes).sort()){
+          const array=node.geometry.attributes[key].array;hash.update(key);hash.update(Buffer.from(array.buffer,array.byteOffset,array.byteLength));
+        }if(node.geometry.index){const array=node.geometry.index.array;hash.update(Buffer.from(array.buffer,array.byteOffset,array.byteLength));}item.geometrySha256=hash.digest('hex');}
+        nodes.push(item);
+      });
+      expect(loaded.scene.getObjectByName('avatar').scale.toArray()).toEqual(baseline[id].avatarScale);
+      expect(nodes).toEqual(baseline[id].nodes);
     }
   });
 

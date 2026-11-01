@@ -4,12 +4,23 @@
   import type { GameApp, BabylonView } from '../app/GameApp';
   import type { Language, PartySize } from '../../../shared/babylon/types';
   import { modal } from './modal';
+  import EntryChrome from './EntryChrome.svelte';
 
   const { game, view }: { game: GameApp; view: BabylonView } = $props();
   const gameState = $derived(view.state);
   const labels: Record<Language, string> = { ru: 'Русский', en: 'English', es: 'Español' };
   let stage = $state<'mode' | 'languages'>('mode');
   let dialog: HTMLDialogElement;
+  let initialFocusDone = false;
+  let interacted = false;
+  $effect(() => {
+    if (!gameState || initialFocusDone) return;
+    void tick().then(() => {
+      if (initialFocusDone || interacted || !dialog?.open || !dialog.contains(document.activeElement)) return;
+      const target = dialog.querySelector<HTMLElement>('.entry-setup-body input[type="radio"]:checked:not(:disabled), .entry-setup-body select:not(:disabled), .entry-setup-body button:not(:disabled)');
+      if (target) { initialFocusDone = true; target.focus(); }
+    });
+  });
   let size = $state<PartySize>(1);
   let native = $state<Language>('ru');
   let learning = $state<Language>('en');
@@ -27,15 +38,17 @@
   async function changeStage(next: 'mode' | 'languages') {
     stage = next;
     await tick();
-    if (stage !== next || !dialog?.open) return;
-    dialog.querySelector<HTMLElement>('input:checked:not(:disabled), select:not(:disabled), button:not(:disabled)')?.focus();
+    const active = document.activeElement;
+    if (stage !== next || !dialog?.open || (active instanceof Element && (active.closest('.entry-chrome') || (active.closest('dialog') && !dialog.contains(active))))) return;
+    dialog.querySelector<HTMLElement>('.entry-setup-body input:checked:not(:disabled), .entry-setup-body select:not(:disabled), .entry-setup-body button:not(:disabled)')?.focus();
   }
   function back() { if (view.busy) return; if (stage === 'languages') void changeStage('mode'); else game.logout(); }
 </script>
 
 <div class="entry-backdrop">
-  <dialog bind:this={dialog} use:modal class="entry-setup" aria-labelledby="entry-setup-title" onkeydown={event => { if (stage === 'mode' && gameState && !view.busy && event.code === 'Enter' && !event.repeat && !event.isComposing && event.target instanceof HTMLInputElement && event.target.type === 'radio') { event.preventDefault(); void changeStage('languages'); } }} oncancel={(event) => { event.preventDefault(); back(); }}>
-    <div class="entry-sign">
+  <dialog bind:this={dialog} use:modal class="entry-setup" aria-labelledby="entry-setup-title" onpointerdowncapture={() => { interacted = true; }} onkeydown={event => { interacted = true; if (stage === 'mode' && gameState && !view.busy && event.code === 'Enter' && !event.repeat && !event.isComposing && event.target instanceof HTMLInputElement && event.target.type === 'radio') { event.preventDefault(); void changeStage('languages'); } }} oncancel={(event) => { event.preventDefault(); back(); }}>
+    <EntryChrome openSettings={() => game.openSettings()} />
+    <div class="entry-setup-body"><div class="entry-sign">
       <div class="entry-sign-heading">
         <div class="entry-heading-gems" aria-hidden="true"><span class="entry-gem"></span><span class="entry-gem"></span></div>
         <p class="entry-eyebrow">Вавилон</p>
@@ -75,7 +88,7 @@
       {#if view.error}<p class="entry-error" role="alert">{view.error}</p>{/if}
       {#if view.canRetry}<button class="entry-back" disabled={view.busy} onclick={() => void game.completeEntrySetup(size, native, learning, true)}>Повторить запрос</button>{/if}
       <button class="entry-back" disabled={view.busy} onclick={back}>← Назад</button>
-    </div>
+    </div></div>
   </dialog>
 </div>
 

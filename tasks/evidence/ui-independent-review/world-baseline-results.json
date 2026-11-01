@@ -1,0 +1,3780 @@
+{
+  "startedAt": "2026-11-01T01:51:34.622Z",
+  "origin": "http://127.0.0.1:4387",
+  "username": "indbaseline-mvx54ukn",
+  "peerName": "indpeer-mvx6c89r",
+  "scope": "One actual rendered Chromium client plus one real authenticated Socket.IO protocol peer; not LAN/hardware. No fake fixtures, DOM/state injection, reduced DPR/content, or automatic Pointer Lock.",
+  "screens": [
+    {
+      "label": "welcome-loading-1280x800",
+      "file": "fresh-world-baseline/welcome-loading-1280x800.png",
+      "at": "2026-11-01T01:51:44.798Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавилон РынокВавилона. Золотистый к",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-real-headless-peer",
+      "file": "fresh-world-baseline/failure-real-headless-peer.png",
+      "at": "2026-11-01T01:51:55.543Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавилон РынокВавилона. Золотистый к",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "hud-1280x800",
+      "file": "fresh-world-baseline/hud-1280x800.png",
+      "at": "2026-11-01T01:52:18.527Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "inventory-after-equip-1280x800",
+      "file": "fresh-world-baseline/inventory-after-equip-1280x800.png",
+      "at": "2026-11-01T01:52:51.675Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 603,
+          "scrollHeight": 603,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "inventory-second-I-1280x800",
+      "file": "fresh-world-baseline/inventory-second-I-1280x800.png",
+      "at": "2026-11-01T01:53:02.160Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 603,
+          "scrollHeight": 603,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "world-ksu-jug-1280x800",
+      "file": "fresh-world-baseline/world-ksu-jug-1280x800.png",
+      "at": "2026-11-01T01:53:29.908Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "dictionary-empty-1280x800",
+      "file": "fresh-world-baseline/dictionary-empty-1280x800.png",
+      "at": "2026-11-01T01:53:47.209Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 210.5625,
+            "w": 860,
+            "h": 481.4375
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 477,
+          "scrollHeight": 477,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 0\nВыучено · 0\n\nЗдесь пока нет слов. Добавьте новое.\n\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "dictionary-learned-1280x800",
+      "file": "fresh-world-baseline/dictionary-learned-1280x800.png",
+      "at": "2026-11-01T01:56:18.007Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выучено · 1",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 82,
+            "w": 860,
+            "h": 610
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 606,
+          "scrollHeight": 606,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\nbasket\nкорзина\nСвежая заметка перед запоминанием\n›\nbasket\n\nкорзина\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nВернуть в «Учу»\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-chat-real-peer-and-stone",
+      "file": "fresh-world-baseline/failure-chat-real-peer-and-stone.png",
+      "at": "2026-11-01T01:57:54.419Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "TEXTAREA",
+        "label": "Сообщение группе",
+        "text": "",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 265.953125,
+            "w": 860,
+            "h": 426.046875
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 422,
+          "scrollHeight": 422,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-map-real-peer-and-zoom",
+      "file": "fresh-world-baseline/failure-map-real-peer-and-zoom.png",
+      "at": "2026-11-01T01:59:30.911Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Увеличить карту",
+        "text": "+",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "map-title",
+          "modal": true,
+          "rect": {
+            "x": 170,
+            "y": 130.203125,
+            "w": 940,
+            "h": 561.796875
+          },
+          "clientWidth": 936,
+          "scrollWidth": 936,
+          "clientHeight": 558,
+          "scrollHeight": 558,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "inventory-1622x970",
+      "file": "fresh-world-baseline/inventory-1622x970.png",
+      "at": "2026-11-01T02:00:14.552Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 381,
+            "y": 255.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 603,
+          "scrollHeight": 603,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "map-1622x970",
+      "file": "fresh-world-baseline/map-1622x970.png",
+      "at": "2026-11-01T02:00:46.546Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "map-title",
+          "modal": true,
+          "rect": {
+            "x": 341,
+            "y": 228.8125,
+            "w": 940,
+            "h": 633.1875
+          },
+          "clientWidth": 936,
+          "scrollWidth": 936,
+          "clientHeight": 629,
+          "scrollHeight": 629,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "dictionary-1622x970",
+      "file": "fresh-world-baseline/dictionary-1622x970.png",
+      "at": "2026-11-01T02:01:13.492Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Мой словарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Дл",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 381,
+            "y": 82,
+            "w": 860,
+            "h": 780
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 776,
+          "scrollHeight": 776,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "chat-1622x970",
+      "file": "fresh-world-baseline/chat-1622x970.png",
+      "at": "2026-11-01T02:01:31.416Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 381,
+            "y": 435.953125,
+            "w": 860,
+            "h": 426.046875
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 422,
+          "scrollHeight": 422,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "hud-1622x970",
+      "file": "fresh-world-baseline/hud-1622x970.png",
+      "at": "2026-11-01T02:01:57.307Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "inventory-1280x800",
+      "file": "fresh-world-baseline/inventory-1280x800.png",
+      "at": "2026-11-01T02:02:28.452Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 603,
+          "scrollHeight": 603,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "map-1280x800",
+      "file": "fresh-world-baseline/map-1280x800.png",
+      "at": "2026-11-01T02:03:05.287Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "map-title",
+          "modal": true,
+          "rect": {
+            "x": 170,
+            "y": 130.203125,
+            "w": 940,
+            "h": 561.796875
+          },
+          "clientWidth": 936,
+          "scrollWidth": 936,
+          "clientHeight": 558,
+          "scrollHeight": 558,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "dictionary-1280x800",
+      "file": "fresh-world-baseline/dictionary-1280x800.png",
+      "at": "2026-11-01T02:03:42.942Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Мой словарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Дл",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 82,
+            "w": 860,
+            "h": 610
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 606,
+          "scrollHeight": 606,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "chat-1280x800",
+      "file": "fresh-world-baseline/chat-1280x800.png",
+      "at": "2026-11-01T02:04:18.261Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 265.953125,
+            "w": 860,
+            "h": 426.046875
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 422,
+          "scrollHeight": 422,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "hud-1280x800",
+      "file": "fresh-world-baseline/hud-1280x800.png",
+      "at": "2026-11-01T02:04:56.293Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "inventory-390x844",
+      "file": "fresh-world-baseline/inventory-390x844.png",
+      "at": "2026-11-01T02:05:21.013Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для ",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 352,
+            "h": 654
+          },
+          "clientWidth": 348,
+          "scrollWidth": 348,
+          "clientHeight": 650,
+          "scrollHeight": 650,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "clientWidth": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "map-390x844",
+      "file": "fresh-world-baseline/map-390x844.png",
+      "at": "2026-11-01T02:05:44.082Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "map-title",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 97.9375,
+            "w": 352,
+            "h": 640.0625
+          },
+          "clientWidth": 348,
+          "scrollWidth": 348,
+          "clientHeight": 636,
+          "scrollHeight": 636,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "clientWidth": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "dictionary-390x844",
+      "file": "fresh-world-baseline/dictionary-390x844.png",
+      "at": "2026-11-01T02:06:02.385Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Мой словарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Дл",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 82,
+            "w": 352,
+            "h": 654
+          },
+          "clientWidth": 348,
+          "scrollWidth": 348,
+          "clientHeight": 650,
+          "scrollHeight": 650,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "clientWidth": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "chat-390x844",
+      "file": "fresh-world-baseline/chat-390x844.png",
+      "at": "2026-11-01T02:06:29.031Z",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 167.53125,
+            "w": 352,
+            "h": 568.46875
+          },
+          "clientWidth": 348,
+          "scrollWidth": 348,
+          "clientHeight": 564,
+          "scrollHeight": 564,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "clientWidth": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null,
+      "party": {
+        "id": "b_3smam1r0s3warajr",
+        "size": 2,
+        "count": 1,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_98prh4yfyia2wkox",
+            "name": "indbaseline-mvx54ukn",
+            "role": 1
+          }
+        ],
+        "started": false,
+        "completed": false,
+        "seconds": 0
+      },
+      "partyPositions": []
+    }
+  ],
+  "steps": [
+    {
+      "label": "login-enroll-two",
+      "ok": true,
+      "ms": 11209,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавилон РынокВавилона. Золотистый к",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\n\nЗагружаем оформление…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "self": null
+    },
+    {
+      "label": "real-headless-peer",
+      "ok": false,
+      "ms": 155,
+      "failure": "TypeError: auth.status is not a function",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавилон РынокВавилона. Золотистый к",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\n\nЗагружаем оформление…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    },
+    {
+      "label": "explicit-start-capture",
+      "ok": true,
+      "ms": 23043,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "self": null
+    },
+    {
+      "label": "inventory-equip-focus-second-I",
+      "ok": true,
+      "ms": 43952,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+        "inDialog": false
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 603,
+          "scrollHeight": 603,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null
+    },
+    {
+      "label": "Escape-explicit-resume",
+      "ok": true,
+      "ms": 26442,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "pause-title",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "clientWidth": 396,
+          "scrollWidth": 396,
+          "clientHeight": 764,
+          "scrollHeight": 1174,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null
+    },
+    {
+      "label": "dictionary-real-UI-populate",
+      "ok": true,
+      "ms": 178168,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Учу · 1",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 82,
+            "w": 860,
+            "h": 610
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 606,
+          "scrollHeight": 606,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null
+    },
+    {
+      "label": "chat-real-peer-and-stone",
+      "ok": false,
+      "ms": 75120,
+      "failure": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Отправить', exact: true })\n    - locator resolved to <button disabled>Отправить</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    18 × waiting for element to be visible, enabled and stable\n       - element is not enabled\n     - retrying click action\n       - waiting 500ms\n    - waiting for element to be visible, enabled and stable\n",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "TEXTAREA",
+        "label": "Сообщение группе",
+        "text": "",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "babel-title",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 265.953125,
+            "w": 860,
+            "h": 426.046875
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856,
+          "clientHeight": 422,
+          "scrollHeight": 422,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "map-real-peer-and-zoom",
+      "ok": false,
+      "ms": 86698,
+      "failure": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'К игроку', exact: true })\n",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Увеличить карту",
+        "text": "+",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "map-title",
+          "modal": true,
+          "rect": {
+            "x": 170,
+            "y": 130.203125,
+            "w": 940,
+            "h": 561.796875
+          },
+          "clientWidth": 936,
+          "scrollWidth": 936,
+          "clientHeight": 558,
+          "scrollHeight": 558,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "Tab containment inventory 1622",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Закрыть окно",
+          "text": "✕",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 381,
+              "y": 255.109375,
+              "w": 860,
+              "h": 606.890625
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 603,
+            "scrollHeight": 603,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end inventory 1622",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Закрыть окно",
+          "text": "✕",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 381,
+              "y": 255.109375,
+              "w": 860,
+              "h": 606.890625
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 603,
+            "scrollHeight": 603,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment map 1622",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Закрыть",
+          "text": "×",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "map-title",
+            "modal": true,
+            "rect": {
+              "x": 341,
+              "y": 228.8125,
+              "w": 940,
+              "h": 633.1875
+            },
+            "clientWidth": 936,
+            "scrollWidth": 936,
+            "clientHeight": 629,
+            "scrollHeight": 629,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end map 1622",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "⌖ К игроку",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "map-title",
+            "modal": true,
+            "rect": {
+              "x": 341,
+              "y": 228.8125,
+              "w": 940,
+              "h": 633.1875
+            },
+            "clientWidth": 936,
+            "scrollWidth": 936,
+            "clientHeight": 629,
+            "scrollHeight": 629,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment dictionary 1622",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Мой словарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Дл",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 381,
+              "y": 82,
+              "w": 860,
+              "h": 780
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 776,
+            "scrollHeight": 776,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end dictionary 1622",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Запомнил",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 381,
+              "y": 82,
+              "w": 860,
+              "h": 780
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 776,
+            "scrollHeight": 776,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment chat 1622",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Чат",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 381,
+              "y": 435.953125,
+              "w": 860,
+              "h": 426.046875
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 422,
+            "scrollHeight": 422,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end chat 1622",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BODY",
+          "label": null,
+          "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+          "inDialog": false
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 381,
+              "y": 435.953125,
+              "w": 860,
+              "h": 426.046875
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 422,
+            "scrollHeight": 422,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 381,
+              "y": 882,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "responsive-1622x970",
+      "ok": true,
+      "ms": 148139,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "pause-title",
+          "modal": true,
+          "rect": {
+            "x": 611,
+            "y": 16,
+            "w": 400,
+            "h": 938
+          },
+          "clientWidth": 396,
+          "scrollWidth": 396,
+          "clientHeight": 934,
+          "scrollHeight": 1174,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null
+    },
+    {
+      "label": "Tab containment inventory 1280",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BODY",
+          "label": null,
+          "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+          "inDialog": false
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 210,
+              "y": 85.109375,
+              "w": 860,
+              "h": 606.890625
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 603,
+            "scrollHeight": 603,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end inventory 1280",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BODY",
+          "label": null,
+          "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+          "inDialog": false
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 210,
+              "y": 85.109375,
+              "w": 860,
+              "h": 606.890625
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 603,
+            "scrollHeight": 603,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment map 1280",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Закрыть",
+          "text": "×",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "map-title",
+            "modal": true,
+            "rect": {
+              "x": 170,
+              "y": 130.203125,
+              "w": 940,
+              "h": 561.796875
+            },
+            "clientWidth": 936,
+            "scrollWidth": 936,
+            "clientHeight": 558,
+            "scrollHeight": 558,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end map 1280",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "⌖ К игроку",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "map-title",
+            "modal": true,
+            "rect": {
+              "x": 170,
+              "y": 130.203125,
+              "w": 940,
+              "h": 561.796875
+            },
+            "clientWidth": 936,
+            "scrollWidth": 936,
+            "clientHeight": 558,
+            "scrollHeight": 558,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment dictionary 1280",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Мой словарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Дл",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 210,
+              "y": 82,
+              "w": 860,
+              "h": 610
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 606,
+            "scrollHeight": 606,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end dictionary 1280",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Запомнил",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 210,
+              "y": 82,
+              "w": 860,
+              "h": 610
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 606,
+            "scrollHeight": 606,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment chat 1280",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Чат",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 210,
+              "y": 265.953125,
+              "w": 860,
+              "h": 426.046875
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 422,
+            "scrollHeight": 422,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end chat 1280",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BODY",
+          "label": null,
+          "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+          "inDialog": false
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 210,
+              "y": 265.953125,
+              "w": 860,
+              "h": 426.046875
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856,
+            "clientHeight": 422,
+            "scrollHeight": 422,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 210,
+              "y": 712,
+              "w": 860,
+              "h": 64
+            },
+            "clientWidth": 856,
+            "scrollWidth": 856
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nЧат с напарниками\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · вы\n\nНарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "responsive-1280x800",
+      "ok": true,
+      "ms": 177826,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "label": "pause-title",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "clientWidth": 396,
+          "scrollWidth": 396,
+          "clientHeight": 764,
+          "scrollHeight": 1174,
+          "bg": "rgb(251, 241, 223)"
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "clientWidth": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "self": null
+    },
+    {
+      "label": "Tab containment inventory 390",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Инвентарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для ",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 19,
+              "y": 82,
+              "w": 352,
+              "h": 654
+            },
+            "clientWidth": 348,
+            "scrollWidth": 348,
+            "clientHeight": 650,
+            "scrollHeight": 650,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 10,
+              "y": 756,
+              "w": 370,
+              "h": 64
+            },
+            "clientWidth": 366,
+            "scrollWidth": 366
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end inventory 390",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BODY",
+          "label": null,
+          "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+          "inDialog": false
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 19,
+              "y": 82,
+              "w": 352,
+              "h": 654
+            },
+            "clientWidth": 348,
+            "scrollWidth": 348,
+            "clientHeight": 650,
+            "scrollHeight": 650,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 10,
+              "y": 756,
+              "w": 370,
+              "h": 64
+            },
+            "clientWidth": 366,
+            "scrollWidth": 366
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment map 390",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Закрыть",
+          "text": "×",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "map-title",
+            "modal": true,
+            "rect": {
+              "x": 19,
+              "y": 97.9375,
+              "w": 352,
+              "h": 640.0625
+            },
+            "clientWidth": 348,
+            "scrollWidth": 348,
+            "clientHeight": 636,
+            "scrollHeight": 636,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 10,
+              "y": 756,
+              "w": 370,
+              "h": 64
+            },
+            "clientWidth": 366,
+            "scrollWidth": 366
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end map 390",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "⌖ К игроку",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "map-title",
+            "modal": true,
+            "rect": {
+              "x": 19,
+              "y": 97.9375,
+              "w": 352,
+              "h": 640.0625
+            },
+            "clientWidth": 348,
+            "scrollWidth": 348,
+            "clientHeight": 636,
+            "scrollHeight": 636,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 10,
+              "y": 756,
+              "w": 370,
+              "h": 64
+            },
+            "clientWidth": 366,
+            "scrollWidth": 366
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n⌖ К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment dictionary 390",
+      "start": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "DIV",
+          "label": null,
+          "text": "Мой словарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Дл",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 19,
+              "y": 82,
+              "w": 352,
+              "h": 654
+            },
+            "clientWidth": 348,
+            "scrollWidth": 348,
+            "clientHeight": 650,
+            "scrollHeight": 650,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 10,
+              "y": 756,
+              "w": 370,
+              "h": 64
+            },
+            "clientWidth": 366,
+            "scrollWidth": 366
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    },
+    {
+      "label": "Tab containment end dictionary 390",
+      "end": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": null,
+          "text": "Запомнил",
+          "inDialog": true
+        },
+        "dialogs": [
+          {
+            "label": "babel-title",
+            "modal": true,
+            "rect": {
+              "x": 19,
+              "y": 82,
+              "w": 352,
+              "h": 654
+            },
+            "clientWidth": 348,
+            "scrollWidth": 348,
+            "clientHeight": 650,
+            "scrollHeight": 650,
+            "bg": "rgb(251, 241, 223)"
+          }
+        ],
+        "dock": [
+          {
+            "rect": {
+              "x": 10,
+              "y": 756,
+              "w": 370,
+              "h": 64
+            },
+            "clientWidth": 366,
+            "scrollWidth": 366
+          }
+        ],
+        "alerts": [],
+        "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEnglish → Русский\n\nПоиск\n＋ Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nНужен для воды\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\nИзменить\nУдалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+      }
+    }
+  ],
+  "errors": [],
+  "http": [
+    {
+      "path": "/api/babylon",
+      "status": 200,
+      "action": "enroll",
+      "result": {
+        "v": 2,
+        "requestId": "740304cf-e023-4268-b6bf-2341a14a9d8b",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": false,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "status": 200,
+      "action": "intro-seen",
+      "result": {
+        "v": 2,
+        "requestId": "772a8232-08e7-41d4-ab53-dfaab2b96bf5",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "result": {
+        "tool": null
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "result": {
+        "tool": "jug"
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "status": 200,
+      "action": "word-save",
+      "result": {
+        "v": 2,
+        "requestId": "363695b0-6bda-4690-a0d1-4e6a1624c0e4",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Встретилось у торговца",
+              "learned": false,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Нужен для воды",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "status": 200,
+      "action": "word-save",
+      "result": {
+        "v": 2,
+        "requestId": "0ba5edda-14cd-421a-87b8-5491d5e6f9d0",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Свежая заметка перед запоминанием",
+              "learned": false,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Нужен для воды",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "status": 200,
+      "action": "word-learn",
+      "result": {
+        "v": 2,
+        "requestId": "1a292a26-b965-4e8e-b419-079bf94eb4ce",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Свежая заметка перед запоминанием",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Нужен для воды",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "result": {
+        "tool": "jug"
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "result": {
+        "tool": "jug"
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "result": {
+        "tool": "jug"
+      }
+    }
+  ],
+  "peerEvents": [],
+  "loadingStart": 1793497902298,
+  "initialLoadingMs": 15520,
+  "beforeEquip": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+    ],
+    "viewport": {
+      "width": 1280,
+      "height": 800,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "BODY",
+      "label": null,
+      "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+      "inDialog": false
+    },
+    "dialogs": [
+      {
+        "label": "babel-title",
+        "modal": true,
+        "rect": {
+          "x": 210,
+          "y": 85.109375,
+          "w": 860,
+          "h": 606.890625
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856,
+        "clientHeight": 603,
+        "scrollHeight": 603,
+        "bg": "rgb(251, 241, 223)"
+      }
+    ],
+    "dock": [
+      {
+        "rect": {
+          "x": 210,
+          "y": 712,
+          "w": 860,
+          "h": 64
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856
+      }
+    ],
+    "alerts": [],
+    "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+  },
+  "afterEquipClick": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+    ],
+    "viewport": {
+      "width": 1280,
+      "height": 800,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "BODY",
+      "label": null,
+      "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+      "inDialog": false
+    },
+    "dialogs": [
+      {
+        "label": "babel-title",
+        "modal": true,
+        "rect": {
+          "x": 210,
+          "y": 85.109375,
+          "w": 860,
+          "h": 606.890625
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856,
+        "clientHeight": 603,
+        "scrollHeight": 603,
+        "bg": "rgb(251, 241, 223)"
+      }
+    ],
+    "dock": [
+      {
+        "rect": {
+          "x": 210,
+          "y": 712,
+          "w": 860,
+          "h": 64
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856
+      }
+    ],
+    "alerts": [],
+    "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+  },
+  "equipStatus": 200,
+  "afterEquipAck": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+    ],
+    "viewport": {
+      "width": 1280,
+      "height": 800,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "BODY",
+      "label": null,
+      "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+      "inDialog": false
+    },
+    "dialogs": [
+      {
+        "label": "babel-title",
+        "modal": true,
+        "rect": {
+          "x": 210,
+          "y": 85.109375,
+          "w": 860,
+          "h": 606.890625
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856,
+        "clientHeight": 603,
+        "scrollHeight": 603,
+        "bg": "rgb(251, 241, 223)"
+      }
+    ],
+    "dock": [
+      {
+        "rect": {
+          "x": 210,
+          "y": 712,
+          "w": 860,
+          "h": 64
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856
+      }
+    ],
+    "alerts": [],
+    "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+  },
+  "afterSecondI": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+    ],
+    "viewport": {
+      "width": 1280,
+      "height": 800,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "BODY",
+      "label": null,
+      "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ✓The Shepherd’s Goats· 0 / 4⌄ ",
+      "inDialog": false
+    },
+    "dialogs": [
+      {
+        "label": "babel-title",
+        "modal": true,
+        "rect": {
+          "x": 210,
+          "y": 85.109375,
+          "w": 860,
+          "h": 606.890625
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856,
+        "clientHeight": 603,
+        "scrollHeight": 603,
+        "bg": "rgb(251, 241, 223)"
+      }
+    ],
+    "dock": [
+      {
+        "rect": {
+          "x": 210,
+          "y": 712,
+          "w": 860,
+          "h": 64
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856
+      }
+    ],
+    "alerts": [],
+    "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nКувшин\n\nДля переноски воды\n\nУбрать из рук\n\nВ руках: Кувшин\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+  },
+  "secondICloses": false,
+  "pauseWithoutCapture": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+    ],
+    "viewport": {
+      "width": 1280,
+      "height": 800,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "BUTTON",
+      "label": null,
+      "text": "Повторить подключение",
+      "inDialog": true
+    },
+    "dialogs": [
+      {
+        "label": "pause-title",
+        "modal": true,
+        "rect": {
+          "x": 440,
+          "y": 16,
+          "w": 400,
+          "h": 768
+        },
+        "clientWidth": 396,
+        "scrollWidth": 396,
+        "clientHeight": 764,
+        "scrollHeight": 1174,
+        "bg": "rgb(251, 241, 223)"
+      }
+    ],
+    "dock": [
+      {
+        "rect": {
+          "x": 210,
+          "y": 712,
+          "w": 860,
+          "h": 64
+        },
+        "clientWidth": 856,
+        "scrollWidth": 856
+      }
+    ],
+    "alerts": [],
+    "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+  },
+  "mapBeforeZoom": "-58.54 -49 124 74",
+  "mapAfterZoom": "-46.14 -41.6 99.2 59.2"
+}

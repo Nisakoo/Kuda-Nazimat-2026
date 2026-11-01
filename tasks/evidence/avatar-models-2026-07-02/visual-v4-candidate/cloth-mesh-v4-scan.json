@@ -1,0 +1,317 @@
+{
+  "description": "Read-only CPU scan of approved V4 GLBs; no GPU or renderer.",
+  "coplanarCriteria": "Parallel normal dot magnitude >= 1-1e-10, plane separation <= 1e-7 local units, projected overlap area > 1e-10 local square units.",
+  "limits": [
+    "Static neutral pose only.",
+    "Raycaster uses the material front side and samples parallel front rays only.",
+    "Mesh triangle pairs are compared within each named surface, not across different meshes.",
+    "The sampled intersection does not establish the cause of dots elsewhere on cloth."
+  ],
+  "models": {
+    "lukas": {
+      "sha256": "76dccb6dad65f3a00b86937841567f98c5e3f98078a3b97c38d584a27eaf8f71",
+      "bytes": 883556,
+      "meshes": {
+        "torso-surface": {
+          "triangles": 294,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-left-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-right-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        }
+      },
+      "wideGrid": {
+        "grid": {
+          "n": 51,
+          "x0": -0.32,
+          "width": 0.64,
+          "y0": 0.45,
+          "height": 0.75
+        },
+        "samples": 2601,
+        "hitSamples": 2110,
+        "nearPairsBelow1mm": []
+      },
+      "beltGrid": {
+        "grid": {
+          "n": 23,
+          "x0": -0.21,
+          "width": 0.42,
+          "y0": 0.54,
+          "height": 0.35
+        },
+        "samples": 529,
+        "hitSamples": 529,
+        "nearPairsBelow1mm": [
+          {
+            "x": 0.1437130434782609,
+            "y": 0.8353695652173914,
+            "gapMetres": 0.0004972967810434881,
+            "faces": [
+              285,
+              195
+            ]
+          },
+          {
+            "x": 0.1437130434782609,
+            "y": 0.8505869565217392,
+            "gapMetres": 0.000674709657206618,
+            "faces": [
+              195,
+              285
+            ]
+          }
+        ]
+      },
+      "material": {
+        "type": "MeshStandardMaterial",
+        "opacity": 1,
+        "transparent": false,
+        "map": false,
+        "roughness": 1,
+        "metalness": 0,
+        "side": 0
+      },
+      "beltIntersection": {
+        "x": 0.1437130434782609,
+        "y": 0.8418264919547367,
+        "faces": [
+          195,
+          285
+        ],
+        "signedDepthDifferenceMetres": 2.660094367001875e-13,
+        "interpretation": "Belt and hanging-strap faces cross along this static front ray."
+      }
+    },
+    "nic": {
+      "sha256": "b452683fc4b402a6b0242879c095264e359493c564445f594f3c80e386cc8c3b",
+      "bytes": 883560,
+      "meshes": {
+        "torso-surface": {
+          "triangles": 294,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-left-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-right-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        }
+      },
+      "wideGrid": {
+        "grid": {
+          "n": 51,
+          "x0": -0.32,
+          "width": 0.64,
+          "y0": 0.45,
+          "height": 0.75
+        },
+        "samples": 2601,
+        "hitSamples": 2205,
+        "nearPairsBelow1mm": []
+      },
+      "beltGrid": {
+        "grid": {
+          "n": 23,
+          "x0": -0.21,
+          "width": 0.42,
+          "y0": 0.54,
+          "height": 0.35
+        },
+        "samples": 529,
+        "hitSamples": 529,
+        "nearPairsBelow1mm": [
+          {
+            "x": 0.1437130434782609,
+            "y": 0.865804347826087,
+            "gapMetres": 0.0007888928568651199,
+            "faces": [
+              285,
+              194
+            ]
+          },
+          {
+            "x": 0.1437130434782609,
+            "y": 0.8810217391304348,
+            "gapMetres": 0.000324269384619047,
+            "faces": [
+              195,
+              285
+            ]
+          }
+        ]
+      },
+      "material": {
+        "type": "MeshStandardMaterial",
+        "opacity": 1,
+        "transparent": false,
+        "map": false,
+        "roughness": 1,
+        "metalness": 0,
+        "side": 0
+      }
+    },
+    "dan": {
+      "sha256": "c209d2f78e55b6424689b5e347d1de0423dc72bcce079b646a6cb5878a2a1039",
+      "bytes": 883568,
+      "meshes": {
+        "torso-surface": {
+          "triangles": 294,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-left-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-right-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        }
+      },
+      "wideGrid": {
+        "grid": {
+          "n": 51,
+          "x0": -0.32,
+          "width": 0.64,
+          "y0": 0.45,
+          "height": 0.75
+        },
+        "samples": 2601,
+        "hitSamples": 2154,
+        "nearPairsBelow1mm": []
+      },
+      "beltGrid": {
+        "grid": {
+          "n": 23,
+          "x0": -0.21,
+          "width": 0.42,
+          "y0": 0.54,
+          "height": 0.35
+        },
+        "samples": 529,
+        "hitSamples": 529,
+        "nearPairsBelow1mm": [
+          {
+            "x": 0.1437130434782609,
+            "y": 0.8505869565217392,
+            "gapMetres": 0.00012385284263172203,
+            "faces": [
+              285,
+              195
+            ]
+          }
+        ]
+      },
+      "material": {
+        "type": "MeshStandardMaterial",
+        "opacity": 1,
+        "transparent": false,
+        "map": false,
+        "roughness": 1,
+        "metalness": 0,
+        "side": 0
+      }
+    },
+    "ksu": {
+      "sha256": "3f085325b1cf993f2947d65df7493422e394f5463c135374f96bc0132567483b",
+      "bytes": 720372,
+      "meshes": {
+        "torso-surface": {
+          "triangles": 430,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-left-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        },
+        "shoulder-right-surface": {
+          "triangles": 140,
+          "exactDuplicateTriangles": 0,
+          "degenerateTriangles": 0,
+          "coplanarPositiveAreaPairs": 0
+        }
+      },
+      "wideGrid": {
+        "grid": {
+          "n": 51,
+          "x0": -0.32,
+          "width": 0.64,
+          "y0": 0.45,
+          "height": 0.75
+        },
+        "samples": 2601,
+        "hitSamples": 2205,
+        "nearPairsBelow1mm": []
+      },
+      "beltGrid": {
+        "grid": {
+          "n": 23,
+          "x0": -0.21,
+          "width": 0.42,
+          "y0": 0.54,
+          "height": 0.35
+        },
+        "samples": 529,
+        "hitSamples": 529,
+        "nearPairsBelow1mm": [
+          {
+            "x": 0.1437130434782609,
+            "y": 0.865804347826087,
+            "gapMetres": 0.0007872142638944979,
+            "faces": [
+              285,
+              194
+            ]
+          },
+          {
+            "x": 0.1437130434782609,
+            "y": 0.8810217391304348,
+            "gapMetres": 0.00032357940966920573,
+            "faces": [
+              195,
+              285
+            ]
+          }
+        ]
+      },
+      "material": {
+        "type": "MeshStandardMaterial",
+        "opacity": 1,
+        "transparent": false,
+        "map": false,
+        "roughness": 1,
+        "metalness": 0,
+        "side": 0
+      }
+    }
+  }
+}

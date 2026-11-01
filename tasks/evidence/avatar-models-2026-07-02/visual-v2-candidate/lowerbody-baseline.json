@@ -1,0 +1,978 @@
+{
+  "lukas": {
+    "sourceGlbSha256": "df28e3be7f6cbe3f188315edd69b7e4994dfd97980c158d8afd35013bfa66d69",
+    "avatarScale": [
+      1.209478073272781,
+      0.8752014910260286,
+      0.9489679881763339
+    ],
+    "nodes": [
+      {
+        "name": "hip-left",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      },
+      {
+        "name": "hip-right",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      }
+    ]
+  },
+  "nic": {
+    "sourceGlbSha256": "35dce034ea20f55a2658d1b508f8a232f9c91dafa5da0782a127b5ce61e2b79a",
+    "avatarScale": [
+      1.209478073272781,
+      0.911392411664594,
+      0.9489679881763339
+    ],
+    "nodes": [
+      {
+        "name": "hip-left",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      },
+      {
+        "name": "hip-right",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      }
+    ]
+  },
+  "dan": {
+    "sourceGlbSha256": "c30616282873678cdad3835ab7e62ef7b67ec8bfa1a1e83c4e53221cb4227038",
+    "avatarScale": [
+      1.209478073272781,
+      0.8860017705090936,
+      0.9489679881763339
+    ],
+    "nodes": [
+      {
+        "name": "hip-left",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      },
+      {
+        "name": "hip-right",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      }
+    ]
+  },
+  "ksu": {
+    "sourceGlbSha256": "efdb7e1384fb0cf535577246851ad5ec6663358b51c398a00a881b6b4a68f994",
+    "avatarScale": [
+      1.209478073272781,
+      0.911392411664594,
+      0.9469487900305531
+    ],
+    "nodes": [
+      {
+        "name": "hip-left",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-left-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      },
+      {
+        "name": "hip-right",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+      },
+      {
+        "name": "knee-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "1c3004430cefaec1fd089f7cd6960315176440b7fa13e8666884dd60e4519c1d"
+      },
+      {
+        "name": "hip-right-surface",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+      }
+    ]
+  }
+}

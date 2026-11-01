@@ -1,0 +1,2893 @@
+{
+  "startedAt": "2026-11-01T04:18:19.516Z",
+  "username": "indafter-mvxaqa5w",
+  "peerName": "indafterpeer-mvxb0dms",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "One actual rendered client and one real authenticated peer. Pending-only cases use 2500ms CDP transport latency, never response/body/state replacement; not performance evidence.",
+  "steps": [
+    {
+      "label": "Saved party mode is correctly locked; not clicked"
+    },
+    {
+      "label": "Diagnostic readiness only after initial world start enabled within5s after entry",
+      "notAcceptance": true,
+      "ms": 5600
+    },
+    {
+      "label": "Diagnostic actual Start retry only, not readiness acceptance",
+      "notAcceptance": true
+    },
+    {
+      "label": "password-login-enroll-real-two-person-task",
+      "ok": true,
+      "ms": 52653,
+      "at": 54833.70000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  Меню Esc   ",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта"
+    },
+    {
+      "label": "R06-initial-I-immediate-and-delayed-natural-ACK",
+      "ok": false,
+      "ms": 26859,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Кувшин', exact: true })\n    - locator resolved to <button type=\"button\" aria-pressed=\"false\" class=\"babel-tool-card\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 81835.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "real-authenticated-protocol-peer",
+      "ok": false,
+      "ms": 202,
+      "failure": "Error: {\"v\":2,\"requestId\":\"9031e289-0521-484f-a424-be63d7808678\",\"error\":{\"code\":\"CONFLICT\",\"message\":\"Вы уже участвуете в задании. Языки меняются из меню.\"}}",
+      "at": 92765.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-pending-ACK-focus-recovery-controlled-transport",
+      "ok": false,
+      "ms": 7817,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n    - locator resolved to <button>Продолжить</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 112813.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-user-focus-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 8697,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n    - locator resolved to <button>Продолжить</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 134323.80000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-new-map-modal-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 9006,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n    - locator resolved to <button>Продолжить</button>\n",
+      "at": 153377.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "R06-Settings-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 12190,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n",
+      "at": 180815.20000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "CDP real transport latency",
+      "ms": 0,
+      "notPerformanceAcceptance": true
+    },
+    {
+      "label": "dictionary-create-note-example-learn-edit-search-delete",
+      "ok": false,
+      "ms": 7578,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n",
+      "at": 208926.70000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "real-peer-chat-translation-add-word-own-delivery-stone",
+      "ok": false,
+      "ms": 52,
+      "failure": "Error: {\"error\":{\"code\":\"FORBIDDEN\",\"message\":\"Войдите в мир в этом окне, чтобы выполнить действие\"}}",
+      "at": 225960.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "map-real-authority-zoom-center-and-live-peer-movement",
+      "ok": false,
+      "ms": 7528,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n",
+      "at": 250398.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "all-windows-1622x970",
+      "ok": false,
+      "ms": 8008,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 283447.8000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 611,
+            "y": 16,
+            "w": 400,
+            "h": 938
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 934,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "all-windows-1280x800",
+      "ok": false,
+      "ms": 8851,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 307870.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "all-windows-390x844",
+      "ok": false,
+      "ms": 7434,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n",
+      "at": 326395.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 16,
+            "w": 352,
+            "h": 812
+          },
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 808,
+          "scrollHeight": 1154
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "width": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "all-windows-640x480",
+      "ok": false,
+      "ms": 7861,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n    - locator resolved to <button aria-pressed=\"false\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 344435.7000000179,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 120,
+            "y": 16,
+            "w": 400,
+            "h": 448
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 444,
+          "scrollHeight": 1154
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 403,
+            "w": 620,
+            "h": 61
+          },
+          "width": 616,
+          "scrollWidth": 616
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "languages-real-ACK-new-message-old-message-preservation",
+      "ok": false,
+      "ms": 8476,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Языки', exact: true })\n    - locator resolved to <button class=\"secondary\">Языки</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 363957.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "live-appearance-Dan-server-and-peer",
+      "ok": false,
+      "ms": 6490,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true }).getByRole('button', { name: 'Настройки', exact: true })\n    - locator resolved to <button class=\"secondary\">Настройки</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 382114.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "map-excludes-real-outsider-sequential-peer-socket",
+      "ok": false,
+      "ms": 92,
+      "failure": "Error: {\"v\":2,\"requestId\":\"ae6f1197-28cc-460c-b4a1-72e8392aa866\",\"error\":{\"code\":\"CONFLICT\",\"message\":\"Режим группы уже выбран первым игроком\"}}",
+      "at": 394269,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "password-relogin-persistence",
+      "ok": false,
+      "ms": 6598,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Выйти из сессии', exact: true })\n    - locator resolved to <button class=\"secondary\">Выйти из сессии</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n",
+      "at": 413022.2000000179,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    }
+  ],
+  "screens": [
+    {
+      "label": "failure-R06-initial-I-immediate-and-delayed-natural-ACK",
+      "file": "correction-world/failure-R06-initial-I-immediate-and-delayed-natural-ACK.png",
+      "at": 83013,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1003
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-real-authenticated-protocol-peer",
+      "file": "correction-world/failure-real-authenticated-protocol-peer.png",
+      "at": 94181.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1014
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-pending-ACK-focus-recovery-controlled-transport",
+      "file": "correction-world/failure-R06-pending-ACK-focus-recovery-controlled-transport.png",
+      "at": 114403.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1034
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-user-focus-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-user-focus-before-ACK-is-preserved.png",
+      "at": 135594.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1057
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-new-map-modal-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-new-map-modal-before-ACK-is-preserved.png",
+      "at": 154547,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1076
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-Settings-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-Settings-before-ACK-is-preserved.png",
+      "at": 183663.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1104
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-dictionary-create-note-example-learn-edit-search-delete",
+      "file": "correction-world/failure-dictionary-create-note-example-learn-edit-search-delete.png",
+      "at": 211758.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1130
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-real-peer-chat-translation-add-word-own-delivery-stone",
+      "file": "correction-world/failure-real-peer-chat-translation-add-word-own-delivery-stone.png",
+      "at": 228138.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1147
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-map-real-authority-zoom-center-and-live-peer-movement",
+      "file": "correction-world/failure-map-real-authority-zoom-center-and-live-peer-movement.png",
+      "at": 252431.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1171
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-1622x970",
+      "file": "correction-world/failure-all-windows-1622x970.png",
+      "at": 285745.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 611,
+            "y": 16,
+            "w": 400,
+            "h": 938
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 934,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 381,
+            "y": 882,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1206
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-1280x800",
+      "file": "correction-world/failure-all-windows-1280x800.png",
+      "at": 309335.7000000179,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1234
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-390x844",
+      "file": "correction-world/failure-all-windows-390x844.png",
+      "at": 327712.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 19,
+            "y": 16,
+            "w": 352,
+            "h": 812
+          },
+          "width": 348,
+          "scrollWidth": 348,
+          "height": 808,
+          "scrollHeight": 1154
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 756,
+            "w": 370,
+            "h": 64
+          },
+          "width": 366,
+          "scrollWidth": 366
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1249
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-640x480",
+      "file": "correction-world/failure-all-windows-640x480.png",
+      "at": 345964.7000000179,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 120,
+            "y": 16,
+            "w": 400,
+            "h": 448
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 444,
+          "scrollHeight": 1154
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 10,
+            "y": 403,
+            "w": 620,
+            "h": 61
+          },
+          "width": 616,
+          "scrollWidth": 616
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1268
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-languages-real-ACK-new-message-old-message-preservation",
+      "file": "correction-world/failure-languages-real-ACK-new-message-old-message-preservation.png",
+      "at": 365379,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1285
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-live-appearance-Dan-server-and-peer",
+      "file": "correction-world/failure-live-appearance-Dan-server-and-peer.png",
+      "at": 383485.3000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1302
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-map-excludes-real-outsider-sequential-peer-socket",
+      "file": "correction-world/failure-map-excludes-real-outsider-sequential-peer-socket.png",
+      "at": 395590.8000000119,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1319
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-password-relogin-persistence",
+      "file": "correction-world/failure-password-relogin-persistence.png",
+      "at": 414347.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true,
+          "rect": {
+            "x": 440,
+            "y": 16,
+            "w": 400,
+            "h": 768
+          },
+          "width": 396,
+          "scrollWidth": 396,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "scroll": [],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "н\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\n\nМОЖНО НЕ ТОРОПИТЬСЯ\n\nПауза\n\nПрогулка продолжится с этого места.\n\nПовторить подключение\nВыйти из сессии\nПродолжить\nОбщение\nПерезапустить сцену\nНа главный экран\nСимволы над башней\nЗадание\nСумка\nКамень\nСловарь\nЯзыки\nО мире и управлении\nПоказывать координаты\nНастройки\nРадиус загрузки\nТекущая область\nБлижайшие области\nРасширенный обзор\n\nМышь свободна. Нажмите «Продолжить», чтобы вернуть управление.\nWASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 1331
+      },
+      "partyPositions": []
+    }
+  ],
+  "gates": [
+    {
+      "label": "initial world start enabled within5s after entry",
+      "pass": false,
+      "ms": 5042,
+      "deadline": 5000,
+      "error": "Error: expect(locator).toBeEnabled() failed\n\nLocator:  getByRole('button', { name: 'Начать прогулку', exact: true })\nExpected: enabled\nReceived: disabled\nTimeout:  5000ms\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Начать прогулку', exact: true }) with timeout 5000ms\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n    5 × locator resolved to <button disabled class=\"primary large\">…</button>\n      - unexpected value \"disabled\"\n"
+    },
+    {
+      "label": "Start actionable click within5s",
+      "pass": false,
+      "ms": 5015,
+      "deadline": 5000,
+      "error": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n"
+    },
+    {
+      "label": "Start captures within5s",
+      "pass": true,
+      "ms": 3271,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 21,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 1831,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 2077,
+      "deadline": 5000
+    },
+    {
+      "label": "explicit resume enabled",
+      "pass": true,
+      "ms": 3291,
+      "deadline": 5000
+    }
+  ],
+  "errors": [
+    "Reviewer orphaned promise: TimeoutError: page.waitForResponse: Timeout 5000ms exceeded while waiting for event \"response\""
+  ],
+  "http": [
+    {
+      "at": 1793506704983,
+      "path": "/api/babylon",
+      "action": "languages",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "03477ee9-c924-4f72-bafe-7c709726cb90",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 922
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Help your partners feed the goats: explain their features and food. Only you have the list.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "at": 1793506771140,
+      "path": "/api/equipment",
+      "status": 200,
+      "body": {
+        "tool": null
+      }
+    }
+  ],
+  "peerEvents": [
+    {
+      "action": {
+        "type": "enroll",
+        "size": 2,
+        "native": "ru",
+        "learning": "en"
+      },
+      "status": 409,
+      "body": {
+        "v": 2,
+        "requestId": "9031e289-0521-484f-a424-be63d7808678",
+        "error": {
+          "code": "CONFLICT",
+          "message": "Вы уже участвуете в задании. Языки меняются из меню."
+        }
+      }
+    },
+    {
+      "action": {
+        "type": "chat",
+        "text": "Купи финики"
+      },
+      "status": 403,
+      "body": {
+        "error": {
+          "code": "FORBIDDEN",
+          "message": "Войдите в мир в этом окне, чтобы выполнить действие"
+        }
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    },
+    {
+      "action": {
+        "type": "enroll",
+        "size": 1,
+        "native": "ru",
+        "learning": "en"
+      },
+      "status": 409,
+      "body": {
+        "v": 2,
+        "requestId": "ae6f1197-28cc-460c-b4a1-72e8392aa866",
+        "error": {
+          "code": "CONFLICT",
+          "message": "Режим группы уже выбран первым игроком"
+        }
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    }
+  ],
+  "focusTrace": [
+    {
+      "type": "focusin",
+      "at": 70059.09999999404,
+      "target": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "related": {},
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "locked": false
+    },
+    {
+      "type": "pointerlockchange",
+      "at": 70172.59999999404,
+      "target": {},
+      "related": {},
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 71677.80000001192,
+      "target": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Со"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 71690.80000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 106917.5,
+      "target": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 106943.30000001192,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {},
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 440299.8000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusin",
+      "at": 440304.8000000119,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "related": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение"
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "locked": false
+    },
+    {
+      "type": "focusout",
+      "at": 440396,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Выйти из сессии"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город"
+      },
+      "locked": false
+    }
+  ],
+  "startReturnedAt": 1793506750296,
+  "firstIAt": 1793506769559,
+  "firstIDelayAfterStartReturn": 19263,
+  "initialIFocus": [
+    {
+      "delay": 0,
+      "at": 71673.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Сохранения и игровые действия вы",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 100,
+      "at": 72900.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 500,
+      "at": 74140.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 1000,
+      "at": 75589.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "wait": 1000,
+      "at": 76725.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть окно",
+        "text": "✕",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true,
+          "rect": {
+            "x": 210,
+            "y": 85.109375,
+            "w": 860,
+            "h": 606.890625
+          },
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "scroll": [
+        {
+          "class": "babel-content",
+          "top": 0,
+          "width": 856,
+          "scrollWidth": 856,
+          "height": 603,
+          "scrollHeight": 603
+        }
+      ],
+      "dock": [
+        {
+          "rect": {
+            "x": 210,
+            "y": 712,
+            "w": 860,
+            "h": 64
+          },
+          "width": 856,
+          "scrollWidth": 856
+        }
+      ],
+      "alerts": [],
+      "text": "Вавилон\nИзучаю English\n⌄\nПодключён\nМеню Esc\n✓\nThe Shepherd’s Goats· 0 / 4\n⌄\nИнвентарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nИнструменты\nСумка\nКувшин\nСумка\n\nДля переноски предметов задания\n\nВзять в руки\n\nВ руках: ничего\n\nПредметы внутри\n\nПока пусто\n\nЗакрыть\n\nI / Esc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    }
+  ],
+  "outsiderName": "indoutside-mvxbteaz",
+  "cleanupLogout": 204,
+  "finishedAt": "2026-11-01T04:25:41.398Z"
+}

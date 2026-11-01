@@ -1,0 +1,106 @@
+START saved-password-login-and-actual-Dan-Jug
+FAIL saved-password-login-and-actual-Dan-Jug Error: fresh actual server entity not Dan/Jug
+    at file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:4:1293
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:541:9)
+    at async step (file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:2:3095)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:4:345
+CAPTURE failure-saved-password-login-and-actual-Dan-Jug
+START actual-HUD-1622x970
+CAPTURE hud-1622x970
+PASS actual-HUD-1622x970
+START actual-HUD-1280x800
+CAPTURE hud-1280x800
+PASS actual-HUD-1280x800
+START actual-HUD-390x844
+CAPTURE hud-390x844
+PASS actual-HUD-390x844
+START actual-HUD-640x480
+CAPTURE hud-640x480
+PASS actual-HUD-640x480
+START narrow-map-center-and-real-horizontal-key-scroll
+CAPTURE map-centered-390x844
+PASS narrow-map-center-and-real-horizontal-key-scroll
+START persisted-learned-note-and-real-word-delete
+CAPTURE dictionary-persistence-1280x800
+FAIL persisted-learned-note-and-real-word-delete locator.press: Timeout 45000ms exceeded.
+Call log:
+  - waiting for locator('.word-list button').filter({ hasText: 'Buy dates' })
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:4:2880
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:2:3095)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:4:2266 {
+  log: [
+    "  - waiting for locator('.word-list button').filter({ hasText: 'Buy dates' })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-persisted-learned-note-and-real-word-delete
+START new-own-Spanish-message-and-old-records-unchanged
+FAIL new-own-Spanish-message-and-old-records-unchanged ExpectError: expect(locator).toContainText(expected) failed
+
+Locator: getByLabel('История общения')
+Expected substring: "Hola"
+Received string:    "Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓"
+Timeout: 5000ms
+
+Call log:
+  - Expect "toContainText" getByLabel('История общения') with timeout 5000ms
+  - waiting for getByLabel('История общения')
+    6 × locator resolved to <ol class="babel-chat" aria-label="История общения">…</ol>
+      - unexpected value "Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓"
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toContainText (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:4:3534
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:2:3095)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-final-observation.mjs:4:3162 {
+  matcherResult: {
+    name: 'toContainText',
+    expected: 'Hola',
+    message: 'expect(locator).toContainText(expected) failed\n' +
+      '\n' +
+      "Locator: getByLabel('История общения')\n" +
+      'Expected substring: "Hola"\n' +
+      'Received string:    "Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓"\n' +
+      'Timeout: 5000ms\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toContainText" getByLabel('История общения') with timeout 5000ms\n` +
+      "  - waiting for getByLabel('История общения')\n" +
+      '    6 × locator resolved to <ol class="babel-chat" aria-label="История общения">…</ol>\n' +
+      '      - unexpected value "Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓"\n',
+    pass: false,
+    actual: 'Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓',
+    log: [
+      `  - Expect "toContainText" getByLabel('История общения') with timeout 5000ms`,
+      "  - waiting for getByLabel('История общения')",
+      '    6 × locator resolved to <ol class="babel-chat" aria-label="История общения">…</ol>',
+      '      - unexpected value "Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓"'
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- list "История общения":\n' +
+      '  - listitem:\n' +
+      '    - strong: indafterpeer-mvxb0dms\n' +
+      '    - text: Buy dates Машинный перевод · Доставлено\n' +
+      '  - listitem:\n' +
+      '    - strong: indafterpeer-mvxb0dms\n' +
+      '    - text: Buy dates Машинный перевод · Доставлено\n' +
+      '  - listitem:\n' +
+      '    - strong: indafterpeer-mvxb0dms\n' +
+      '    - text: Buy dates Машинный перевод · Доставлено\n' +
+      '  - listitem:\n' +
+      '    - strong: Вы\n' +
+      '    - text: Привет Доставлено✓\n' +
+      '  - listitem:\n' +
+      '    - strong: Вы\n' +
+      '    - text: Рисунок на камне\n' +
+      '    - img "Камень от indafter-mvxaqa5w"\n' +
+      '  - listitem:\n' +
+      '    - strong: Вы\n' +
+      '    - text: Привет Доставлено✓'
+  }
+}
+CAPTURE failure-new-own-Spanish-message-and-old-records-unchanged
+FINAL OBSERVATION CLOSED

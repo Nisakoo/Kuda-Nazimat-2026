@@ -1,0 +1,69 @@
+{
+  "at": "2026-11-01T03:41:00.545Z",
+  "scope": "Static publication audit. Exact approved source/dist GLBs, refreshed static portraits, physical manifest/chunk/collision/asset byte equality and unchanged 64 MiB declared budget. Not actual JS/GPU/RSS measurement or runtime/LAN acceptance.",
+  "models": [
+    {
+      "id": "lukas",
+      "bytes": 883556,
+      "sha256": "76dccb6dad65f3a00b86937841567f98c5e3f98078a3b97c38d584a27eaf8f71",
+      "portraitBytes": 77069,
+      "portraitSha256": "8179b642178a5e7e197e8eacacc730c946908b27fba117773ce8930f94adda70"
+    },
+    {
+      "id": "nic",
+      "bytes": 883560,
+      "sha256": "b452683fc4b402a6b0242879c095264e359493c564445f594f3c80e386cc8c3b",
+      "portraitBytes": 78462,
+      "portraitSha256": "40444b260e77573fe7ee8f0dda6e304c97d49db6fe536ae8a37a69e204bce844"
+    },
+    {
+      "id": "dan",
+      "bytes": 883568,
+      "sha256": "c209d2f78e55b6424689b5e347d1de0423dc72bcce079b646a6cb5878a2a1039",
+      "portraitBytes": 76014,
+      "portraitSha256": "a1a71cce3271ca924ea6863a65e69507256222c12ff33a355539a9911b304d40"
+    },
+    {
+      "id": "ksu",
+      "bytes": 720372,
+      "sha256": "3f085325b1cf993f2947d65df7493422e394f5463c135374f96bc0132567483b",
+      "portraitBytes": 70707,
+      "portraitSha256": "f0631c470d8e17e8796d719938d9a939d5fad6201c45a9d49a2293b9544e4016"
+    }
+  ],
+  "worlds": [
+    {
+      "path": "maps/demo/manifest.json",
+      "worldBytes": 22068778,
+      "manifestBytes": 1403319,
+      "manifestMemory": 22453104,
+      "assetMemory": 28762208,
+      "largest25ChunkMemory": 6553600,
+      "conservativeMemory": 57768912,
+      "limit": 67108864,
+      "margin": 9339952
+    },
+    {
+      "path": "maps/demo/science.json",
+      "worldBytes": 22068782,
+      "manifestBytes": 1403323,
+      "manifestMemory": 22453168,
+      "assetMemory": 28762208,
+      "largest25ChunkMemory": 6553600,
+      "conservativeMemory": 57768976,
+      "limit": 67108864,
+      "margin": 9339888
+    },
+    {
+      "path": "maps/market/manifest.json",
+      "worldBytes": 23648595,
+      "manifestBytes": 1415164,
+      "manifestMemory": 22642624,
+      "assetMemory": 37150816,
+      "largest25ChunkMemory": 6553600,
+      "conservativeMemory": 66347040,
+      "limit": 67108864,
+      "margin": 761824
+    }
+  ]
+}

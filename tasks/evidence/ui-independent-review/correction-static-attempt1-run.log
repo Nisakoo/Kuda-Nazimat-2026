@@ -1,0 +1,52 @@
+1622 970 undefined Error: expect(locator).toBeChecked() failed
+
+Locator:  getByRole('radio', { name: /^С друзьями/ })
+Expected: checked
+Received: unchecked
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeChecked" getByRole('radio', { name: /^С друзьями/ }) with timeout 5000ms
+  - waiting for getByRole('radio', { name: /^С друзьями/ })
+    14 × locator resolved to <input type="radio" name="entry-mode"/>
+       - unexpected value "unchecked"
+ 8 captures []
+1280 800 undefined Error: expect(locator).toBeChecked() failed
+
+Locator:  getByRole('radio', { name: /^С друзьями/ })
+Expected: checked
+Received: unchecked
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeChecked" getByRole('radio', { name: /^С друзьями/ }) with timeout 5000ms
+  - waiting for getByRole('radio', { name: /^С друзьями/ })
+    13 × locator resolved to <input type="radio" name="entry-mode"/>
+       - unexpected value "unchecked"
+ 8 captures []
+390 844 undefined Error: expect(locator).toBeChecked() failed
+
+Locator:  getByRole('radio', { name: /^С друзьями/ })
+Expected: checked
+Received: unchecked
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeChecked" getByRole('radio', { name: /^С друзьями/ }) with timeout 5000ms
+  - waiting for getByRole('radio', { name: /^С друзьями/ })
+    14 × locator resolved to <input type="radio" name="entry-mode"/>
+       - unexpected value "unchecked"
+ 8 captures []
+640 480 undefined Error: expect(locator).toBeChecked() failed
+
+Locator:  getByRole('radio', { name: /^С друзьями/ })
+Expected: checked
+Received: unchecked
+Timeout:  5000ms
+
+Call log:
+  - Expect "toBeChecked" getByRole('radio', { name: /^С друзьями/ }) with timeout 5000ms
+  - waiting for getByRole('radio', { name: /^С друзьями/ })
+    14 × locator resolved to <input type="radio" name="entry-mode"/>
+       - unexpected value "unchecked"
+ 8 captures []

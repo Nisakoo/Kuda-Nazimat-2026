@@ -1,0 +1,25 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen (31.2s)
+
+
+  1) e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.evaluate: Target page, context or browser has been closed
+
+      83 |   await page.keyboard.down('w');
+      84 |   await page.clock.runFor(300);
+    > 85 |   await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+         |              ^
+      86 |   await expectCapture(page, false);
+      87 |   await expect(page.getByRole('dialog', { name: 'Пауза' })).toBeVisible();
+      88 |   await page.clock.runFor(150);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/demo.spec.ts:85:14
+
+    Error Context: test-results/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/error-context.md
+
+  1 failed
+    e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 

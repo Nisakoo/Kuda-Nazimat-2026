@@ -1,0 +1,20 @@
+{
+  "at": "2026-11-01T05:08:47.067Z",
+  "scope": "Read-only authenticated GET using the actual fresh browser login session. No application state writes; no response substitution.",
+  "results": [
+    {
+      "path": "/api/avatar",
+      "status": 200,
+      "body": {
+        "avatarId": "dan"
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "body": {
+        "tool": "jug"
+      }
+    }
+  ]
+}

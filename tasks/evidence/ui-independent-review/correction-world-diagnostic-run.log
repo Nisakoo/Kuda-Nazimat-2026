@@ -1,0 +1,375 @@
+START password-login-enroll-real-two-person-task
+ACTUAL WORLD CAPTURED; initial gates remain separately recorded
+PASS password-login-enroll-real-two-person-task
+START R06-initial-I-immediate-and-delayed-natural-ACK
+FAIL R06-initial-I-immediate-and-delayed-natural-ACK locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Кувшин', exact: true })
+    - locator resolved to <button type="button" aria-pressed="false" class="babel-tool-card">…</button>
+
+    at equip (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:13:77)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:18:670
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:18:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Кувшин', exact: true })",
+    '    - locator resolved to <button type="button" aria-pressed="false" class="babel-tool-card">…</button>'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-R06-initial-I-immediate-and-delayed-natural-ACK
+START real-authenticated-protocol-peer
+PASS real-authenticated-protocol-peer
+START R06-pending-ACK-focus-recovery-controlled-transport
+FAIL R06-pending-ACK-focus-recovery-controlled-transport locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+    - locator resolved to <button>Продолжить</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+
+    at resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:8:379)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:21:76
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:21:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })",
+    '    - locator resolved to <button>Продолжить</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed',
+    '    - done scrolling'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-R06-pending-ACK-focus-recovery-controlled-transport
+START R06-user-focus-before-ACK-is-preserved
+FAIL R06-user-focus-before-ACK-is-preserved locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+    - locator resolved to <button>Продолжить</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+
+    at resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:8:379)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:22:63
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:22:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })",
+    '    - locator resolved to <button>Продолжить</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-R06-user-focus-before-ACK-is-preserved
+START R06-new-map-modal-before-ACK-is-preserved
+FAIL R06-new-map-modal-before-ACK-is-preserved locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+    - locator resolved to <button>Продолжить</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+
+    at resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:8:379)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:23:66
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:23:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })",
+    '    - locator resolved to <button>Продолжить</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-R06-new-map-modal-before-ACK-is-preserved
+START R06-Settings-before-ACK-is-preserved
+FAIL R06-Settings-before-ACK-is-preserved locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+    - locator resolved to <button>Продолжить</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+
+    at resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:8:379)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:24:61
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:24:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })",
+    '    - locator resolved to <button>Продолжить</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-R06-Settings-before-ACK-is-preserved
+START dictionary-create-note-example-learn-edit-search-delete
+FAIL dictionary-create-note-example-learn-edit-search-delete locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })
+    - locator resolved to <button aria-pressed="false">…</button>
+  - elementHandle.press("Enter")
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:360)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:25:80
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:25:1 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })",
+    '    - locator resolved to <button aria-pressed="false">…</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-dictionary-create-note-example-learn-edit-search-delete
+START real-peer-chat-translation-add-word-own-delivery-stone
+FAIL real-peer-chat-translation-add-word-own-delivery-stone locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })
+    - locator resolved to <button aria-pressed="false">…</button>
+  - elementHandle.press("Enter")
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:360)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:26:130
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:26:1 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })",
+    '    - locator resolved to <button aria-pressed="false">…</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-real-peer-chat-translation-add-word-own-delivery-stone
+START map-real-authority-zoom-center-and-live-peer-movement
+FAIL map-real-authority-zoom-center-and-live-peer-movement locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })
+    - locator resolved to <button aria-pressed="false">…</button>
+  - elementHandle.press("Enter")
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:360)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:27:78
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:27:1 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })",
+    '    - locator resolved to <button aria-pressed="false">…</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-map-real-authority-zoom-center-and-live-peer-movement
+START all-windows-1622x970
+FAIL all-windows-1622x970 locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })
+    - locator resolved to <button aria-pressed="false">…</button>
+  - elementHandle.press("Enter")
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:360)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:274
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:70 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })",
+    '    - locator resolved to <button aria-pressed="false">…</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-1622x970
+START all-windows-1280x800
+CAPTURE inventory-1280x800
+FAIL all-windows-1280x800 locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })
+    - locator resolved to <button aria-pressed="false">…</button>
+  - elementHandle.press("Enter")
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:360)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:274
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:70 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })",
+    '    - locator resolved to <button aria-pressed="false">…</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-1280x800
+START all-windows-390x844
+CAPTURE inventory-390x844
+FAIL all-windows-390x844 locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })
+    - locator resolved to <button aria-pressed="false">…</button>
+  - elementHandle.press("Enter")
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:9:360)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:274
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:70 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })",
+    '    - locator resolved to <button aria-pressed="false">…</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-390x844
+START all-windows-640x480
+CAPTURE inventory-640x480
+FAIL all-windows-640x480 locator.scrollIntoViewIfNeeded: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByText('В руках: Кувшин', { exact: true })
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:802
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:28:70 {
+  log: [ "  - waiting for getByText('В руках: Кувшин', { exact: true })" ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-640x480
+START languages-real-ACK-new-message-old-message-preservation
+FAIL languages-real-ACK-new-message-old-message-preservation locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Языки', exact: true })
+    - locator resolved to <button class="secondary">Языки</button>
+  - elementHandle.press("Enter")
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:29:203
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:29:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Языки', exact: true })",
+    '    - locator resolved to <button class="secondary">Языки</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-languages-real-ACK-new-message-old-message-preservation
+START live-appearance-Dan-server-and-peer
+FAIL live-appearance-Dan-server-and-peer locator.press: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Изменить облик персонажа', exact: true })
+    - locator resolved to <button type="button" class="secondary">Изменить облик персонажа</button>
+  - elementHandle.press("Enter")
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:30:272
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:30:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Изменить облик персонажа', exact: true })",
+    '    - locator resolved to <button type="button" class="secondary">Изменить облик персонажа</button>',
+    '  - elementHandle.press("Enter")'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-live-appearance-Dan-server-and-peer
+START map-excludes-real-outsider-sequential-peer-socket
+FAIL map-excludes-real-outsider-sequential-peer-socket Error: {"v":2,"requestId":"723de9fe-9c22-4292-9633-6a44bb46cbfc","error":{"code":"CONFLICT","message":"Режим группы уже выбран первым игроком"}}
+    at peerAction (file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:10:327)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async connectPeer (file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:11:327)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:31:145
+    at async step (file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:31:1
+CAPTURE failure-map-excludes-real-outsider-sequential-peer-socket
+START password-relogin-persistence
+FAIL password-relogin-persistence ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:8:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:32:53
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-diagnostic.mjs:32:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - button "Изучаю English"\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - button "Меню Esc"\n' +
+      '  - complementary:\n' +
+      '    - button "The Shepherd’s Goats· 0 / 4"\n' +
+      '  - dialog "Настройки":\n' +
+      '    - heading "Настройки" [level=2]\n' +
+      '    - button "Закрыть настройки": ✕\n' +
+      '    - text: Режим\n' +
+      '    - combobox "Режим сессии":\n' +
+      '      - option "Локальная прогулка"\n' +
+      '      - option "Тестовый сетевой режим"\n' +
+      '      - option "Локальный сервер" [selected]\n' +
+      '    - paragraph: После применения настроек войдите в аккаунт. Демонстрационный вход по имени доступен отдельно. При смене сервера потребуется новый вход.\n' +
+      '    - text: Адрес сервера\n' +
+      '    - textbox "Адрес сервера": http://127.0.0.1:4387\n' +
+      '    - text: Карта\n' +
+      '    - combobox "Карта": market\n' +
+      '    - text: Радиус загрузки\n' +
+      '    - combobox "Радиус загрузки":\n' +
+      '      - option "Текущая область"\n' +
+      '      - option "Ближайшие области" [selected]\n' +
+      '      - option "Расширенный обзор"\n' +
+      '    - checkbox "Диагностика"\n' +
+      '    - text: Диагностика\n' +
+      '    - button "Изменить облик персонажа"\n' +
+      '    - button "Применить и открыть карту"\n' +
+      '    - button "Отмена"\n' +
+      '  - group "Текущая область": Пастбище у рынка\n' +
+      '  - status: Просмотр приостановлен'
+  }
+}
+CAPTURE failure-password-relogin-persistence
+CORRECTION WORLD CLOSED; GPU AVAILABLE AFTER EXPLICIT REVIEWER RELEASE

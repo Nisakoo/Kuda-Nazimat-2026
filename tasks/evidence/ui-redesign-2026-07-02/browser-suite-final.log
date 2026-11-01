@@ -1,0 +1,1101 @@
+
+> educational-world-client@0.1.0 test:browser
+> npm run build && playwright test
+
+
+> educational-world-client@0.1.0 prebuild
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 21668106 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 23247923 bytes.
+
+> educational-world-client@0.1.0 build
+> vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 223 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.49 kB │ gzip:   0.32 kB
+dist/assets/index-CD-AxrUr.css   39.74 kB │ gzip:   9.81 kB
+dist/assets/index-Bb8RXsDf.js   986.45 kB │ gzip: 270.30 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.91s
+
+Running 47 tests using 1 worker
+
+  ✘   1 e2e/babylon.spec.ts:79:1 › two real players enroll, translate, share stones and restore a private dictionary after restart (2.0m)
+  ✘   2 e2e/babylon.spec.ts:128:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task (2.6m)
+  ✘   3 e2e/babylon.spec.ts:149:1 › real server authorizes the default 25-chunk window at the market and tower (41.0s)
+  ✘   4 e2e/demo.spec.ts:14:1 › walks to both NPCs, opens local dialogue, blocks movement and changes camera (18.9s)
+  ✘   5 e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen (31.4s)
+  ✘   6 e2e/foundation.spec.ts:6:1 › local build renders with external access blocked and handles resize, pause and restart (32.6s)
+  ✓   7 e2e/foundation.spec.ts:53:1 › unavailable WebGL shows a useful error and no canvas (3.7s)
+  ✓   8 e2e/foundation.spec.ts:68:1 › runtime config selects guest login before opening online channels (2.7s)
+  ✓   9 e2e/foundation.spec.ts:82:1 › missing config remains visible in the interface (2.1s)
+  ✓  10 e2e/foundation.spec.ts:89:1 › invalid runtime config is rejected before creating the scene (1.6s)
+  ✘  11 e2e/layout.spec.ts:22:3 › controls remain reachable at 1280x800 (30.6s)
+  ✘  12 e2e/layout.spec.ts:22:3 › controls remain reachable at 1024x600 (31.3s)
+  ✘  13 e2e/layout.spec.ts:22:3 › controls remain reachable at 640x480 (31.7s)
+  ✘  14 e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session (2.1m)
+  ✘  15 e2e/main-building.spec.ts:54:1 › default streaming loads the landmark while the player is still on the market (31.8s)
+  ✘  16 e2e/market.spec.ts:20:1 › default five-by-five streaming covers pasture and courtyard without idle request churn (28.4s)
+  ✘  17 e2e/market.spec.ts:57:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats (2.0m)
+  ✘  18 e2e/market.spec.ts:92:1 › client stone draft survives closing and vocabulary can be edited without moving the player (31.8s)
+  ✓  19 e2e/models.spec.ts:6:1 › optional decoration failure is visible, retry succeeds, and the game remains playable (24.5s)
+  ✘  20 e2e/movement.spec.ts:15:52 › MOVE: demo supports jump, sprint, stamina HUD and interruption (14.0s)
+  ✓  21 e2e/movement.spec.ts:15:52 › MOVE: science supports jump, sprint, stamina HUD and interruption (26.3s)
+  ✘  22 e2e/movement.spec.ts:15:52 › MOVE: market supports jump, sprint, stamina HUD and interruption (32.3s)
+  ✘  23 e2e/movement.spec.ts:36:30 › MOVE HUD layout 1280x800 at 100% equivalent CSS viewport (14.1s)
+  ✓  24 e2e/movement.spec.ts:36:30 › MOVE HUD layout 1280x800 at 200% equivalent CSS viewport (22.9s)
+  ✓  25 e2e/movement.spec.ts:36:30 › MOVE HUD layout 1024x600 at 100% equivalent CSS viewport (19.5s)
+  ✓  26 e2e/movement.spec.ts:36:30 › MOVE HUD layout 1024x600 at 200% equivalent CSS viewport (18.6s)
+  ✓  27 e2e/movement.spec.ts:36:30 › MOVE HUD layout 640x480 at 100% equivalent CSS viewport (16.2s)
+  ✓  28 e2e/movement.spec.ts:36:30 › MOVE HUD layout 640x480 at 200% equivalent CSS viewport (13.9s)
+  ✘  29 e2e/network.spec.ts:6:1 › switches to a labelled mock session, exchanges text, handles loss and reconnects cleanly (21.1s)
+  ✘  30 e2e/network.spec.ts:45:1 › changes the map and restores local play after an unauthorized real session (31.2s)
+  ✘  31 e2e/network.spec.ts:72:1 › receives correlated NPC replies through the mock session (31.9s)
+  ✘  32 e2e/pointer-lock.spec.ts:6:1 › real pointer lock survives repeated relative movement, releases on loss and resumes with clean input (31.6s)
+  ✘  33 e2e/pointer-lock.spec.ts:44:1 › denied capture keeps controls blocked and a new user click can retry (19.9s)
+  ✘  34 e2e/pointer-lock.spec.ts:64:1 › missing pointer lock offers a clear error, retry and a route back to the main screen (17.6s)
+  ✘  35 e2e/quality.spec.ts:7:41 › profiles demo sixty seconds offline and checks retained resources after five complete restarts (20.8s)
+  ✘  36 e2e/quality.spec.ts:7:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts (39.4s)
+  ✘  37 e2e/server-auth.spec.ts:62:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token (17.4s)
+  ✘  38 e2e/server-auth.spec.ts:80:1 › real players exchange chat and NPC memory survives a server restart (8.1s)
+  ✓  39 e2e/server-auth.spec.ts:100:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits (3.2s)
+  ✓  40 e2e/server-auth.spec.ts:119:1 › a world 401 and client session expiry return to login without automatically posting again (10.1s)
+  ✘  41 e2e/server-auth.spec.ts:130:1 › switching to the server market enrolls BABEL and opens the authoritative inventory (32.5s)
+  ✘  42 e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug (1.6m)
+  ✓  43 e2e/ui-hud.spec.ts:63:1 › real guest entry preserves only the connection address and returns from mode with Escape (4.4s)
+  ✓  44 e2e/ui-hud.spec.ts:89:1 › real registration resumes mandatory appearance and uses password authentication (47.3s)
+  ✘  45 e2e/ui-hud.spec.ts:94:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (11.5s)
+  ✘  46 e2e/world.spec.ts:6:1 › streams a nearby region, blocks a slow boundary and stays within its reserved budget (31.9s)
+  ✘  47 e2e/world.spec.ts:39:1 › manifest failure leaves the loop responsive and an explicit retry prepares the world (20.2s)
+
+
+  1) e2e/babylon.spec.ts:79:1 › two real players enroll, translate, share stones and restore a private dictionary after restart 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: locator.click: Test timeout of 120000ms exceeded.
+    Call log:
+      - waiting for getByRole('dialog', { name: 'Куда отправимся?' }).locator('.entry-choice').filter({ has: getByRole('dialog', { name: 'Куда отправимся?' }).getByRole('radio', { name: /^С друзьями/ }) })
+
+
+      42 |     const friends = mode.getByRole('radio', { name: /^С друзьями/ });
+      43 |     if (await friends.isEnabled()) {
+    > 44 |       await mode.locator('.entry-choice').filter({ has: friends }).click();
+         |                                                                    ^
+      45 |       await expect(friends).toBeChecked();
+      46 |       const count = mode.getByLabel('Число игроков');
+      47 |       if (await count.isEnabled()) await count.selectOption(size);
+        at login (/data/worktrees/ui-hud-669eb5/client/e2e/babylon.spec.ts:44:68)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/babylon.spec.ts:82:3
+
+    Error Context: test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/error-context.md
+
+    Error Context: test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/babylon.spec.ts:128:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task 
+
+    Test timeout of 150000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  getByRole('status').filter({ hasText: 'Предмет добавлен' })
+    Expected: visible
+    Received: undefined
+
+
+      132 |   await page.getByLabel('Вопрос NPC').fill('Расскажи о финиках'); await page.getByRole('button', { name: 'Спросить', exact: true }).click();
+      133 |   await expect(page.locator('.dialog-history')).toContainText('test merchant reply');
+    > 134 |   for (const name of ['Финики', 'Красные плоды', 'Жёлтые фрукты']) { await page.getByRole('button', { name: `Купить: ${name}`, exact: true }).click(); await expect(page.getByRole('status').filter({ hasText: 'Предмет добавлен' })).toBeVisible(); }
+          |                                                                                                                                                                                                                                       ^
+      135 |   await resume(page); await walk(page, 'z', -1); await walk(page, 'x', 2.4); await interact(page, 'Гончар');
+      136 |   await page.getByRole('button', { name: 'Купить: Вода в кувшине', exact: true }).click(); await expect(page.getByRole('status').filter({ hasText: 'Предмет добавлен' })).toBeVisible();
+      137 |   await resume(page); await walk(page, 'x', 0); await walk(page, 'z', -31); await walk(page, 'x', 2);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/babylon.spec.ts:134:231
+
+    Error Context: test-results/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/error-context.md
+
+    Error Context: test-results/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) e2e/babylon.spec.ts:149:1 › real server authorizes the default 25-chunk window at the market and tower 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByLabel('Кеш мира')
+    Expected substring: "Чанки: 25 · Ожидание: 0 · Отложено: 0"
+    Received string:    "56721344 / 67108864 байт памяти · Чанки: 12 · Ожидание: 2 · Отложено: 0"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByLabel('Кеш мира') with timeout 5000ms
+      - waiting for getByLabel('Кеш мира')
+        3 × locator resolved to <p aria-label="Кеш мира">56197056 / 67108864 байт памяти · Чанки: 10 · Ожи…</p>
+          - unexpected value "56197056 / 67108864 байт памяти · Чанки: 10 · Ожидание: 2 · Отложено: 0"
+        2 × locator resolved to <p aria-label="Кеш мира">56721344 / 67108864 байт памяти · Чанки: 12 · Ожи…</p>
+          - unexpected value "56721344 / 67108864 байт памяти · Чанки: 12 · Ожидание: 2 · Отложено: 0"
+
+
+      155 |   await login(page, 'Обзор-тест', '1', 'en', null);
+      156 |   const cache = page.getByLabel('Кеш мира');
+    > 157 |   await expect(cache).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+          |                       ^
+      158 |   await walk(page, 'z', 9); await walk(page, 'x', -32);
+      159 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+      160 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Двор Вавилонской башни');
+        at /data/worktrees/ui-hud-669eb5/client/e2e/babylon.spec.ts:157:23
+
+    Error Context: test-results/babylon-real-server-author-6052c-dow-at-the-market-and-tower/error-context.md
+
+    Error Context: test-results/babylon-real-server-author-6052c-dow-at-the-market-and-tower/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/babylon-real-server-author-6052c-dow-at-the-market-and-tower/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/babylon-real-server-author-6052c-dow-at-the-market-and-tower/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) e2e/demo.spec.ts:14:1 › walks to both NPCs, opens local dialogue, blocks movement and changes camera 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/demo.spec.ts:28:9
+
+    Error Context: test-results/demo-walks-to-both-NPCs-op-ef066-movement-and-changes-camera/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/demo-walks-to-both-NPCs-op-ef066-movement-and-changes-camera/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/demo-walks-to-both-NPCs-op-ef066-movement-and-changes-camera/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Начать прогулку' })
+
+
+      118 |   await page.keyboard.press('Escape');
+      119 |   await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
+    > 120 |   await page.getByRole('button', { name: 'Начать прогулку' }).click();
+          |                                                               ^
+      121 |   await expectCapture(page, true);
+      122 |   await expect(coords).toContainText('Z 6.0');
+      123 |   await expect(page.locator('canvas')).toHaveCount(1);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/demo.spec.ts:120:63
+
+    Error Context: test-results/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) e2e/foundation.spec.ts:6:1 › local build renders with external access blocked and handles resize, pause and restart 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.screenshot: Test timeout of 30000ms exceeded.
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+
+
+      24 |   await expect(canvas).toHaveJSProperty('width', 390);
+      25 |   await expect(canvas).toHaveJSProperty('height', 844);
+    > 26 |   await page.screenshot({ path: 'test-results/foundation-mobile.png' });
+         |              ^
+      27 |   await page.getByRole('button', { name: 'Начать прогулку' }).click();
+      28 |   await expectCapture(page, true);
+      29 |   await page.keyboard.press('Escape');
+        at /data/worktrees/ui-hud-669eb5/client/e2e/foundation.spec.ts:26:14
+
+    Error Context: test-results/foundation-local-build-ren-5b7e5-es-resize-pause-and-restart/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/foundation-local-build-ren-5b7e5-es-resize-pause-and-restart/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/foundation-local-build-ren-5b7e5-es-resize-pause-and-restart/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) e2e/layout.spec.ts:22:3 › controls remain reachable at 1280x800 ───────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.scrollIntoViewIfNeeded: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('header').locator('button, input:not([type=hidden]), select').first()
+
+
+       7 |   const controls = panel.locator('button, input:not([type=hidden]), select');
+       8 |   for (const control of await controls.all()) {
+    >  9 |     await control.scrollIntoViewIfNeeded();
+         |                   ^
+      10 |     const geometry = await control.evaluate((element) => {
+      11 |       const r = element.getBoundingClientRect();
+      12 |       const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+        at usableControls (/data/worktrees/ui-hud-669eb5/client/e2e/layout.spec.ts:9:19)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/layout.spec.ts:39:5
+
+    Error Context: test-results/layout-controls-remain-reachable-at-1280x800/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/layout-controls-remain-reachable-at-1280x800/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/layout-controls-remain-reachable-at-1280x800/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) e2e/layout.spec.ts:22:3 › controls remain reachable at 1024x600 ───────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.evaluate: Test timeout of 30000ms exceeded.
+
+       8 |   for (const control of await controls.all()) {
+       9 |     await control.scrollIntoViewIfNeeded();
+    > 10 |     const geometry = await control.evaluate((element) => {
+         |                                    ^
+      11 |       const r = element.getBoundingClientRect();
+      12 |       const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      13 |       return { inside: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
+        at usableControls (/data/worktrees/ui-hud-669eb5/client/e2e/layout.spec.ts:10:36)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/layout.spec.ts:40:5
+
+    Error Context: test-results/layout-controls-remain-reachable-at-1024x600/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/layout-controls-remain-reachable-at-1024x600/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/layout-controls-remain-reachable-at-1024x600/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) e2e/layout.spec.ts:22:3 › controls remain reachable at 640x480 ────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.scrollIntoViewIfNeeded: Test timeout of 30000ms exceeded.
+    Call log:
+      - attempting scroll into view action
+        - waiting for element to be stable
+
+
+       7 |   const controls = panel.locator('button, input:not([type=hidden]), select');
+       8 |   for (const control of await controls.all()) {
+    >  9 |     await control.scrollIntoViewIfNeeded();
+         |                   ^
+      10 |     const geometry = await control.evaluate((element) => {
+      11 |       const r = element.getBoundingClientRect();
+      12 |       const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+        at usableControls (/data/worktrees/ui-hud-669eb5/client/e2e/layout.spec.ts:9:19)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/layout.spec.ts:40:5
+
+    Error Context: test-results/layout-controls-remain-reachable-at-640x480/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/layout-controls-remain-reachable-at-640x480/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/layout-controls-remain-reachable-at-640x480/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: keyboard.up: Target page, context or browser has been closed
+
+      14 |     await page.keyboard.down(key);
+      15 |     await page.clock.runFor(Math.min(200, Math.abs(here - target) / 3 * 1000));
+    > 16 |     await page.keyboard.up(key); await page.clock.runFor(100);
+         |                         ^
+      17 |   }
+      18 |   throw new Error(`Blocked: ${JSON.stringify(await position(page))}, ${axis}=${target}`);
+      19 | }
+        at walk (/data/worktrees/ui-hud-669eb5/client/e2e/main-building.spec.ts:16:25)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/main-building.spec.ts:38:57
+
+    Error Context: test-results/main-building-building-cou-81bcc-eturn-preserves-the-session/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/main-building-building-cou-81bcc-eturn-preserves-the-session/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/main-building-building-cou-81bcc-eturn-preserves-the-session/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) e2e/main-building.spec.ts:54:1 › default streaming loads the landmark while the player is still on the market 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: mouse.move: Test timeout of 30000ms exceeded.
+
+      60 |   await start.click(); await expectCapture(page, true);
+      61 |   // Rotate west with real pointer-lock input; keep the market spawn as the observation point.
+    > 62 |   await page.mouse.move(box.x + box.width / 2 - 290, box.y + box.height / 2 - 120, { steps: 20 });
+         |                    ^
+      63 |   await page.addStyleTag({ content: '.debug { visibility: hidden; }' });
+      64 |   await page.waitForTimeout(1000);
+      65 |   await page.screenshot({ path: 'test-results/building-from-market.png' });
+        at /data/worktrees/ui-hud-669eb5/client/e2e/main-building.spec.ts:62:20
+
+    Error Context: test-results/main-building-default-stre-7c94d-ayer-is-still-on-the-market/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/main-building-default-stre-7c94d-ayer-is-still-on-the-market/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/main-building-default-stre-7c94d-ayer-is-still-on-the-market/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) e2e/market.spec.ts:20:1 › default five-by-five streaming covers pasture and courtyard without idle request churn 
+
+    Error: Timeout 5000ms exceeded while waiting on the predicate
+
+      30 |   const canvas = await page.locator('canvas').elementHandle();
+      31 |   const settle = async () => {
+    > 32 |     await expect.poll(async () => { await page.clock.runFor(200); return page.getByLabel('Кеш мира').textContent(); }).toContain('Чанки: 25 · Ожидание: 0');
+         |                                                                                                                        ^
+      33 |     const before = worldRequests;
+      34 |     await page.clock.runFor(1200);
+      35 |     expect(worldRequests).toBe(before);
+        at settle (/data/worktrees/ui-hud-669eb5/client/e2e/market.spec.ts:32:120)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/market.spec.ts:39:9
+
+    Error Context: test-results/market-default-five-by-fiv-64e4d--without-idle-request-churn/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/market-default-five-by-fiv-64e4d--without-idle-request-churn/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/market-default-five-by-fiv-64e4d--without-idle-request-churn/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) e2e/market.spec.ts:57:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: keyboard.up: Target page, context or browser has been closed
+
+      11 |     const here=(await position(page))[axis];if(Math.abs(here-target)<.25)return;
+      12 |     const key=axis==='x'?(here<target?'d':'a'):(here<target?'s':'w');
+    > 13 |     await page.keyboard.down(key);await page.clock.runFor(Math.min(200,Math.abs(here-target)/3*1000));await page.keyboard.up(key);await page.clock.runFor(100);
+         |                                                                                                                           ^
+      14 |   }
+      15 |   throw new Error(`Blocked at ${JSON.stringify(await position(page))}, destination ${axis}=${target}`);
+      16 | }
+        at walk (/data/worktrees/ui-hud-669eb5/client/e2e/market.spec.ts:13:123)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/market.spec.ts:74:26
+
+    Error Context: test-results/market-market-route-buys-g-23c6f-ure-and-finishes-four-goats/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/market-market-route-buys-g-23c6f-ure-and-finishes-four-goats/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/market-market-route-buys-g-23c6f-ure-and-finishes-four-goats/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) e2e/market.spec.ts:92:1 › client stone draft survives closing and vocabulary can be edited without moving the player 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Камень', exact: true })
+
+
+      93 |   await page.setViewportSize({width:640,height:480});
+      94 |   await page.goto('/');await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Начать прогулку'}).click();await page.keyboard.press('Escape');
+    > 95 |   await page.getByRole('button',{name:'Камень',exact:true}).click();const canvas=page.getByLabel('Камень для рисунка');await canvas.scrollIntoViewIfNeeded();const box=(await canvas.boundingBox())!;
+         |                                                             ^
+      96 |   await page.mouse.move(box.x+40,box.y+40);await page.mouse.down();await page.mouse.move(box.x+100,box.y+100,{steps:5});await page.mouse.up();
+      97 |   await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Камень',exact:true}).click();await expect(canvas.locator('polyline')).toHaveCount(1);
+      98 |   await page.getByRole('button',{name:'Высечь · 0/8',exact:true}).click();await expect(page.getByLabel('Высеченный камень 1')).toBeVisible();await expect(canvas.locator('polyline')).toHaveCount(0);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/market.spec.ts:95:61
+
+    Error Context: test-results/market-client-stone-draft--843e9-d-without-moving-the-player/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/market-client-stone-draft--843e9-d-without-moving-the-player/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/market-client-stone-draft--843e9-d-without-moving-the-player/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) e2e/movement.spec.ts:15:52 › MOVE: demo supports jump, sprint, stamina HUD and interruption ──
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at start (/data/worktrees/ui-hud-669eb5/client/e2e/movement.spec.ts:9:78)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/movement.spec.ts:17:3
+
+    Error Context: test-results/movement-MOVE-demo-support-70c7d-tamina-HUD-and-interruption/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/movement-MOVE-demo-support-70c7d-tamina-HUD-and-interruption/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/movement-MOVE-demo-support-70c7d-tamina-HUD-and-interruption/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) e2e/movement.spec.ts:15:52 › MOVE: market supports jump, sprint, stamina HUD and interruption 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.textContent: Target page, context or browser has been closed
+
+      11 | }
+      12 | async function height(page: Page) {
+    > 13 |   return Number((await page.getByLabel('Положение игрока').textContent())!.match(/Y (-?[\d.]+)/)![1]);
+         |                                                            ^
+      14 | }
+      15 | for (const mapId of ['demo', 'science', 'market']) test(`MOVE: ${mapId} supports jump, sprint, stamina HUD and interruption`, async ({ page }) => {
+      16 |   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+        at height (/data/worktrees/ui-hud-669eb5/client/e2e/movement.spec.ts:13:60)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/movement.spec.ts:21:27
+        at /data/worktrees/ui-hud-669eb5/client/e2e/movement.spec.ts:21:3
+
+    Error Context: test-results/movement-MOVE-market-suppo-9266d-tamina-HUD-and-interruption/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/movement-MOVE-market-suppo-9266d-tamina-HUD-and-interruption/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/movement-MOVE-market-suppo-9266d-tamina-HUD-and-interruption/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) e2e/movement.spec.ts:36:30 › MOVE HUD layout 1280x800 at 100% equivalent CSS viewport ────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at start (/data/worktrees/ui-hud-669eb5/client/e2e/movement.spec.ts:9:78)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/movement.spec.ts:39:5
+
+    Error Context: test-results/movement-MOVE-HUD-layout-1-b1bb4-100-equivalent-CSS-viewport/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/movement-MOVE-HUD-layout-1-b1bb4-100-equivalent-CSS-viewport/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/movement-MOVE-HUD-layout-1-b1bb4-100-equivalent-CSS-viewport/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) e2e/network.spec.ts:6:1 › switches to a labelled mock session, exchanges text, handles loss and reconnects cleanly 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/network.spec.ts:19:9
+
+    Error Context: test-results/network-switches-to-a-labe-35696-loss-and-reconnects-cleanly/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/network-switches-to-a-labe-35696-loss-and-reconnects-cleanly/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/network-switches-to-a-labe-35696-loss-and-reconnects-cleanly/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) e2e/network.spec.ts:45:1 › changes the map and restores local play after an unauthorized real session 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Начать прогулку' })
+        - locator resolved to <button disabled class="primary large">…</button>
+
+
+      51 |   await page.getByLabel('Диагностика').check();
+      52 |   await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
+    > 53 |   await page.getByRole('button', { name: 'Начать прогулку' }).click();
+         |                                                               ^
+      54 |   await expectCapture(page, true);
+      55 |   await expect(page.getByRole('button', { name: 'Сады науки', exact: true })).toBeVisible();
+      56 |   await expect(page.getByLabel('Положение игрока')).toContainText('Z 38.0');
+        at /data/worktrees/ui-hud-669eb5/client/e2e/network.spec.ts:53:63
+
+    Error Context: test-results/network-changes-the-map-an-9b1e3-n-unauthorized-real-session/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/network-changes-the-map-an-9b1e3-n-unauthorized-real-session/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/network-changes-the-map-an-9b1e3-n-unauthorized-real-session/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) e2e/network.spec.ts:72:1 › receives correlated NPC replies through the mock session ──────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: keyboard.up: Target page, context or browser has been closed
+
+      77 |   await page.clock.runFor(200);
+      78 |   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
+    > 79 |   await page.keyboard.down('w'); await page.clock.runFor(1500); await page.keyboard.up('w');
+         |                                                                                     ^
+      80 |   await page.keyboard.down('a'); await page.clock.runFor(1200); await page.keyboard.up('a');
+      81 |   await page.clock.runFor(200);
+      82 |   await page.keyboard.press('e'); await page.clock.runFor(200);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/network.spec.ts:79:85
+
+    Error Context: test-results/network-receives-correlate-9cb7c-es-through-the-mock-session/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/network-receives-correlate-9cb7c-es-through-the-mock-session/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/network-receives-correlate-9cb7c-es-through-the-mock-session/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) e2e/pointer-lock.spec.ts:6:1 › real pointer lock survives repeated relative movement, releases on loss and resumes with clean input 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: mouse.move: Test timeout of 30000ms exceeded.
+
+      12 |   const canvas = page.locator('canvas');
+      13 |   const before = await canvas.screenshot();
+    > 14 |   for (let step = 0; step < 20; step++) await page.mouse.move(650 + step * 60, 440);
+         |                                                          ^
+      15 |   await page.clock.runFor(100);
+      16 |   await expectCapture(page, true);
+      17 |   expect((await canvas.screenshot()).equals(before)).toBe(false);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/pointer-lock.spec.ts:14:58
+
+    Error Context: test-results/pointer-lock-real-pointer--c64ce-nd-resumes-with-clean-input/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pointer-lock-real-pointer--c64ce-nd-resumes-with-clean-input/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pointer-lock-real-pointer--c64ce-nd-resumes-with-clean-input/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) e2e/pointer-lock.spec.ts:44:1 › denied capture keeps controls blocked and a new user click can retry 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "Не удалось захватить мышь"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+
+
+      53 |   await page.goto('/');
+      54 |   await page.getByRole('button', { name: 'Начать прогулку' }).click();
+    > 55 |   await expect(page.getByRole('alert')).toContainText('Не удалось захватить мышь');
+         |                                         ^
+      56 |   await expectCapture(page, false);
+      57 |   await expect(page.getByRole('button', { name: 'На главный экран' })).toBeVisible();
+      58 |   await page.keyboard.press('w');
+        at /data/worktrees/ui-hud-669eb5/client/e2e/pointer-lock.spec.ts:55:41
+
+    Error Context: test-results/pointer-lock-denied-captur-10aa6--a-new-user-click-can-retry/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pointer-lock-denied-captur-10aa6--a-new-user-click-can-retry/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pointer-lock-denied-captur-10aa6--a-new-user-click-can-retry/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) e2e/pointer-lock.spec.ts:64:1 › missing pointer lock offers a clear error, retry and a route back to the main screen 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "не поддерживает захват мыши"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+
+
+      66 |   await page.goto('/');
+      67 |   await page.getByRole('button', { name: 'Начать прогулку' }).click();
+    > 68 |   await expect(page.getByRole('alert')).toContainText('не поддерживает захват мыши');
+         |                                         ^
+      69 |   await expectCapture(page, false);
+      70 |   await expect(page.getByRole('button', { name: 'Повторить захват', exact: true })).toBeVisible();
+      71 |   await page.getByRole('button', { name: 'На главный экран' }).click();
+        at /data/worktrees/ui-hud-669eb5/client/e2e/pointer-lock.spec.ts:68:41
+
+    Error Context: test-results/pointer-lock-missing-point-edf68-ute-back-to-the-main-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pointer-lock-missing-point-edf68-ute-back-to-the-main-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pointer-lock-missing-point-edf68-ute-back-to-the-main-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) e2e/quality.spec.ts:7:41 › profiles demo sixty seconds offline and checks retained resources after five complete restarts 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/quality.spec.ts:19:78
+
+    Error Context: test-results/quality-profiles-demo-sixt-440f2-fter-five-complete-restarts/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/quality-profiles-demo-sixt-440f2-fter-five-complete-restarts/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/quality-profiles-demo-sixt-440f2-fter-five-complete-restarts/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) e2e/quality.spec.ts:7:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 25
+    Received: 13
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      19 |   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
+      20 |   // The normal map window fits within the emergency memory guard.
+    > 21 |   await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBe(mapId === 'market' ? 25 : 9);
+         |                                                                                                                       ^
+      22 |   await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
+      23 |   await page.waitForTimeout(5000);
+      24 |   const cdp = await page.context().newCDPSession(page);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/quality.spec.ts:21:119
+
+    Error Context: test-results/quality-profiles-market-si-f98ae-fter-five-complete-restarts/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/quality-profiles-market-si-f98ae-fter-five-complete-restarts/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/quality-profiles-market-si-f98ae-fter-five-complete-restarts/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) e2e/server-auth.spec.ts:62:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  getByRole('button', { name: 'Начать прогулку' })
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" getByRole('button', { name: 'Начать прогулку' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Начать прогулку' })
+        8 × locator resolved to <button disabled class="primary large">…</button>
+          - unexpected value "disabled"
+
+
+      50 |   const session = await response.json() as { token: string };
+      51 |   expect(session.token).toMatch(/^[\w-]{43}$/);
+    > 52 |   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
+         |                                                                       ^
+      53 |   await expect(page.getByLabel('Состояние связи')).toHaveText('Подключён');
+      54 |   return session;
+      55 | }
+        at login (/data/worktrees/ui-hud-669eb5/client/e2e/server-auth.spec.ts:52:71)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/server-auth.spec.ts:71:42
+
+    Error Context: test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/error-context.md
+
+    Error Context: test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) e2e/server-auth.spec.ts:80:1 › real players exchange chat and NPC memory survives a server restart 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  getByRole('button', { name: 'Начать прогулку' })
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" getByRole('button', { name: 'Начать прогулку' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Начать прогулку' })
+        8 × locator resolved to <button disabled class="primary large">…</button>
+          - unexpected value "disabled"
+
+
+      50 |   const session = await response.json() as { token: string };
+      51 |   expect(session.token).toMatch(/^[\w-]{43}$/);
+    > 52 |   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
+         |                                                                       ^
+      53 |   await expect(page.getByLabel('Состояние связи')).toHaveText('Подключён');
+      54 |   return session;
+      55 | }
+        at login (/data/worktrees/ui-hud-669eb5/client/e2e/server-auth.spec.ts:52:71)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/server-auth.spec.ts:82:3
+
+    Error Context: test-results/server-auth-real-players-e-da96e-y-survives-a-server-restart/error-context.md
+
+    Error Context: test-results/server-auth-real-players-e-da96e-y-survives-a-server-restart/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/server-auth-real-players-e-da96e-y-survives-a-server-restart/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/server-auth-real-players-e-da96e-y-survives-a-server-restart/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) e2e/server-auth.spec.ts:130:1 › switching to the server market enrolls BABEL and opens the authoritative inventory 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Применить и открыть карту' })
+        - locator resolved to <button type="submit">Применить и открыть карту</button>
+
+
+      130 | test('switching to the server market enrolls BABEL and opens the authoritative inventory', async ({ page }) => {
+      131 |   const session = await login(page, 'Рынок'); await page.getByRole('button', { name: 'Настройки', exact: true }).click();
+    > 132 |   await page.getByLabel('Карта', { exact: true }).fill('market'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
+          |                                                                                                                                         ^
+      133 |   await expect(page.getByRole('dialog', { name: 'Куда отправимся?' })).toBeVisible();
+      134 |   await page.getByRole('button', { name: 'Далее: языки →' }).click();
+      135 |   await expect(page.getByRole('dialog', { name: 'Ваши языки' })).toBeVisible();
+        at /data/worktrees/ui-hud-669eb5/client/e2e/server-auth.spec.ts:132:137
+
+    Error Context: test-results/server-auth-switching-to-t-18bff-the-authoritative-inventory/error-context.md
+
+    Error Context: test-results/server-auth-switching-to-t-18bff-the-authoritative-inventory/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/server-auth-switching-to-t-18bff-the-authoritative-inventory/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/server-auth-switching-to-t-18bff-the-authoritative-inventory/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('dialog', { name: 'Пауза' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза' }) with timeout 5000ms
+      - waiting for getByRole('dialog', { name: 'Пауза' })
+
+
+       at helpers.ts:9
+
+       7 |
+       8 | export async function resume(page: Page) {
+    >  9 |   await expect(page.getByRole('dialog', { name: 'Пауза' })).toBeVisible();
+         |                                                             ^
+      10 |   await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
+      11 |   await expectCapture(page, true);
+      12 | }
+        at resume (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:9:61)
+        at avatarWorldScenario (/data/worktrees/ui-hud-669eb5/client/e2e/avatar-world-scenario.ts:53:11)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:60:3
+
+    Error Context: test-results/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    Error Context: test-results/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) e2e/ui-hud.spec.ts:94:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  getByRole('button', { name: 'Начать прогулку' })
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" getByRole('button', { name: 'Начать прогулку' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Начать прогулку' })
+        8 × locator resolved to <button disabled class="primary large">…</button>
+          - unexpected value "disabled"
+
+
+      46 |   await expect(page.getByRole('dialog', { name: 'Добро пожаловать в Вавилон' })).toBeVisible();
+      47 |   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
+    > 48 |   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
+         |                                                                       ^
+      49 |   await page.getByRole('button', { name: 'Начать прогулку' }).click();
+      50 |   await expectCapture(page, true);
+      51 | }
+        at enroll (/data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:48:71)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:97:3
+
+    Error Context: test-results/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/error-context.md
+
+    Error Context: test-results/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) e2e/world.spec.ts:6:1 › streams a nearby region, blocks a slow boundary and stays within its reserved budget 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  getByText('Соседний участок ещё загружается.')
+    Expected: visible
+    Received: undefined
+
+
+      18 |   await page.keyboard.down('s');
+      19 |   await page.clock.runFor(4000);
+    > 20 |   await expect(page.getByText('Соседний участок ещё загружается.', { exact: false })).toBeVisible();
+         |                                                                                       ^
+      21 |   const coords = page.getByLabel('Положение игрока');
+      22 |   const stopped = await coords.textContent();
+      23 |   await page.clock.runFor(1000);
+        at /data/worktrees/ui-hud-669eb5/client/e2e/world.spec.ts:20:87
+
+    Error Context: test-results/world-streams-a-nearby-reg-1d727--within-its-reserved-budget/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/world-streams-a-nearby-reg-1d727--within-its-reserved-budget/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/world-streams-a-nearby-reg-1d727--within-its-reserved-budget/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) e2e/world.spec.ts:39:1 › manifest failure leaves the loop responsive and an explicit retry prepares the world 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/world.spec.ts:48:9
+
+    Error Context: test-results/world-manifest-failure-lea-b1613-it-retry-prepares-the-world/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/world-manifest-failure-lea-b1613-it-retry-prepares-the-world/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/world-manifest-failure-lea-b1613-it-retry-prepares-the-world/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32 failed
+    e2e/babylon.spec.ts:79:1 › two real players enroll, translate, share stones and restore a private dictionary after restart 
+    e2e/babylon.spec.ts:128:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task 
+    e2e/babylon.spec.ts:149:1 › real server authorizes the default 25-chunk window at the market and tower 
+    e2e/demo.spec.ts:14:1 › walks to both NPCs, opens local dialogue, blocks movement and changes camera 
+    e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+    e2e/foundation.spec.ts:6:1 › local build renders with external access blocked and handles resize, pause and restart 
+    e2e/layout.spec.ts:22:3 › controls remain reachable at 1280x800 ────────────────────────────────
+    e2e/layout.spec.ts:22:3 › controls remain reachable at 1024x600 ────────────────────────────────
+    e2e/layout.spec.ts:22:3 › controls remain reachable at 640x480 ─────────────────────────────────
+    e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session 
+    e2e/main-building.spec.ts:54:1 › default streaming loads the landmark while the player is still on the market 
+    e2e/market.spec.ts:20:1 › default five-by-five streaming covers pasture and courtyard without idle request churn 
+    e2e/market.spec.ts:57:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats 
+    e2e/market.spec.ts:92:1 › client stone draft survives closing and vocabulary can be edited without moving the player 
+    e2e/movement.spec.ts:15:52 › MOVE: demo supports jump, sprint, stamina HUD and interruption ────
+    e2e/movement.spec.ts:15:52 › MOVE: market supports jump, sprint, stamina HUD and interruption ──
+    e2e/movement.spec.ts:36:30 › MOVE HUD layout 1280x800 at 100% equivalent CSS viewport ──────────
+    e2e/network.spec.ts:6:1 › switches to a labelled mock session, exchanges text, handles loss and reconnects cleanly 
+    e2e/network.spec.ts:45:1 › changes the map and restores local play after an unauthorized real session 
+    e2e/network.spec.ts:72:1 › receives correlated NPC replies through the mock session ────────────
+    e2e/pointer-lock.spec.ts:6:1 › real pointer lock survives repeated relative movement, releases on loss and resumes with clean input 
+    e2e/pointer-lock.spec.ts:44:1 › denied capture keeps controls blocked and a new user click can retry 
+    e2e/pointer-lock.spec.ts:64:1 › missing pointer lock offers a clear error, retry and a route back to the main screen 
+    e2e/quality.spec.ts:7:41 › profiles demo sixty seconds offline and checks retained resources after five complete restarts 
+    e2e/quality.spec.ts:7:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts 
+    e2e/server-auth.spec.ts:62:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token 
+    e2e/server-auth.spec.ts:80:1 › real players exchange chat and NPC memory survives a server restart 
+    e2e/server-auth.spec.ts:130:1 › switching to the server market enrolls BABEL and opens the authoritative inventory 
+    e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+    e2e/ui-hud.spec.ts:94:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture 
+    e2e/world.spec.ts:6:1 › streams a nearby region, blocks a slow boundary and stays within its reserved budget 
+    e2e/world.spec.ts:39:1 › manifest failure leaves the loop responsive and an explicit retry prepares the world 
+  15 passed (27.8m)

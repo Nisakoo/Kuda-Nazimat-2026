@@ -1,0 +1,3778 @@
+{
+  "origin": "http://127.0.0.1:4387",
+  "startedAt": "2026-11-01T01:11:20.023Z",
+  "scope": "Independent static entry only; actual UI guest auth; no registration submit, enrollment, avatar, world, API injection or Settings Apply.",
+  "flows": [
+    {
+      "width": 1622,
+      "height": 970,
+      "dpr": 1,
+      "screens": [
+        {
+          "label": "login",
+          "file": "fresh-static/login-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "settings-first-action",
+          "file": "fresh-static/settings-first-action-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BUTTON",
+            "role": null,
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "cls": "icon-button"
+          },
+          "dialogs": [
+            {
+              "label": "settings-title",
+              "modal": true,
+              "text": "Настройки\n✕\nРежим\nЛокальная прогулка\nТестовый сетевой режим\nЛокальный сервер\n\nПосле применения настр"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "Настройки\n✕\nРежим\nЛокальная прогулка\nТестовый сетевой режим\nЛокальный сервер\n\nПосле применения настр",
+              "cls": "panel settings-panel"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            },
+            {
+              "class": "panel settings-panel",
+              "top": 0,
+              "left": 0,
+              "width": 400,
+              "scrollWidth": 400,
+              "height": 668,
+              "scrollHeight": 668
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "registration",
+          "file": "fresh-static/registration-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BUTTON",
+            "role": "tab",
+            "label": null,
+            "text": "Регистрация",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode",
+          "file": "fresh-static/mode-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-after-tabs",
+          "file": "fresh-static/mode-after-tabs-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "friends",
+          "file": "fresh-static/friends-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages",
+          "file": "fresh-static/languages-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages-after-tabs",
+          "file": "fresh-static/languages-after-tabs-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-return",
+          "file": "fresh-static/mode-return-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "logged-out",
+          "file": "fresh-static/logged-out-1622x970.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 1532,
+              "y": 882,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1563,
+              "y": 913
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websockets": 0
+        }
+      ],
+      "actions": [
+        {
+          "label": "Settings closed without Apply",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+              "cls": ""
+            },
+            "dialogs": [],
+            "gear": {
+              "rect": {
+                "x": 1532,
+                "y": 882,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 1563,
+                "y": 913
+              },
+              "hit": {
+                "tag": "svg",
+                "role": null,
+                "label": null,
+                "cls": ""
+              },
+              "hitIsGear": true,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "left": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 970,
+                "scrollHeight": 970
+              }
+            ]
+          }
+        },
+        {
+          "label": "Mode root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 1532,
+                "y": 882,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 1563,
+                "y": 913
+              },
+              "hit": {
+                "tag": "DIALOG",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+                "cls": "entry-setup"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 0,
+                "left": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 970,
+                "scrollHeight": 970
+              }
+            ]
+          }
+        },
+        {
+          "label": "Mode actual Tab traversal",
+          "order": [
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            }
+          ]
+        },
+        {
+          "label": "Languages root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 1532,
+                "y": 882,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 1563,
+                "y": 913
+              },
+              "hit": {
+                "tag": "DIALOG",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+                "cls": "entry-setup"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 0,
+                "left": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 970,
+                "scrollHeight": 970
+              }
+            ]
+          }
+        },
+        {
+          "label": "Languages actual Tab traversal",
+          "order": [
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "websockets": 0,
+      "requests": [
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/guest"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/logout"
+        }
+      ],
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "dpr": 1,
+      "screens": [
+        {
+          "label": "login",
+          "file": "fresh-static/login-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "registration",
+          "file": "fresh-static/registration-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BUTTON",
+            "role": "tab",
+            "label": null,
+            "text": "Регистрация",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode",
+          "file": "fresh-static/mode-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 817
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-after-tabs",
+          "file": "fresh-static/mode-after-tabs-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 817
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "friends",
+          "file": "fresh-static/friends-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 934
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages",
+          "file": "fresh-static/languages-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages-after-tabs",
+          "file": "fresh-static/languages-after-tabs-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-return",
+          "file": "fresh-static/mode-return-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 934
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "logged-out",
+          "file": "fresh-static/logged-out-1280x800.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 1190,
+              "y": 712,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 1221,
+              "y": 743
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websockets": 0
+        }
+      ],
+      "actions": [
+        {
+          "label": "Mode root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 1190,
+                "y": 712,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 1221,
+                "y": 743
+              },
+              "hit": {
+                "tag": "DIALOG",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+                "cls": "entry-setup"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 0,
+                "left": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 800,
+                "scrollHeight": 817
+              }
+            ]
+          }
+        },
+        {
+          "label": "Mode actual Tab traversal",
+          "order": [
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            }
+          ]
+        },
+        {
+          "label": "Languages root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 1190,
+                "y": 712,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 1221,
+                "y": 743
+              },
+              "hit": {
+                "tag": "DIALOG",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+                "cls": "entry-setup"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 0,
+                "left": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 800,
+                "scrollHeight": 800
+              }
+            ]
+          }
+        },
+        {
+          "label": "Languages actual Tab traversal",
+          "order": [
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "websockets": 0,
+      "requests": [
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/guest"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/logout"
+        }
+      ],
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "screens": [
+        {
+          "label": "login",
+          "file": "fresh-static/login-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "SECTION",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключен",
+              "cls": "entry-login"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 903
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "login-gear-click",
+          "file": "fresh-static/login-gear-click-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "SECTION",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключен",
+              "cls": "entry-login"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 903
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "login-after-tabs",
+          "file": "fresh-static/login-after-tabs-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "SECTION",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключен",
+              "cls": "entry-login"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 903
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "registration",
+          "file": "fresh-static/registration-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BUTTON",
+            "role": "tab",
+            "label": null,
+            "text": "Регистрация",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "SECTION",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nСоздать героя\n△\nВход\nРегистрация\nИмя игрока\nПароль\nЗарегистрироваться →\nНастроить подключен",
+              "cls": "entry-login"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 903
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode",
+          "file": "fresh-static/mode-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 844
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-after-tabs",
+          "file": "fresh-static/mode-after-tabs-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 844
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "friends",
+          "file": "fresh-static/friends-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 873
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages",
+          "file": "fresh-static/languages-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 844
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages-after-tabs",
+          "file": "fresh-static/languages-after-tabs-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 844
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-return",
+          "file": "fresh-static/mode-return-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 873
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "logged-out",
+          "file": "fresh-static/logged-out-390x844.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 300,
+              "y": 756,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 331,
+              "y": 787
+            },
+            "hit": {
+              "tag": "SECTION",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключен",
+              "cls": "entry-login"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 844,
+              "scrollHeight": 903
+            }
+          ],
+          "websockets": 0
+        }
+      ],
+      "actions": [
+        {
+          "label": "R01 actual pointer click at gear center",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+              "cls": ""
+            },
+            "dialogs": [],
+            "gear": {
+              "rect": {
+                "x": 300,
+                "y": 756,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 331,
+                "y": 787
+              },
+              "hit": {
+                "tag": "SECTION",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключен",
+                "cls": "entry-login"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "left": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 844,
+                "scrollHeight": 903
+              }
+            ]
+          }
+        },
+        {
+          "label": "Login actual Tab traversal",
+          "order": [
+            {
+              "tag": "BUTTON",
+              "role": "tab",
+              "label": null,
+              "text": "Вход",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": "Показать пароль",
+              "text": "",
+              "cls": "entry-eye"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Настроить подключение",
+              "cls": "entry-link"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+              "cls": ""
+            },
+            {
+              "tag": "A",
+              "role": null,
+              "label": "Вавилон — главная",
+              "text": "Вавилон",
+              "cls": "brand"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": "Настройки",
+              "text": "",
+              "cls": "glass compact settings-button"
+            },
+            {
+              "tag": "BUTTON",
+              "role": "tab",
+              "label": null,
+              "text": "Вход",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": "Показать пароль",
+              "text": "",
+              "cls": "entry-eye"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Настроить подключение",
+              "cls": "entry-link"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+              "cls": ""
+            }
+          ]
+        },
+        {
+          "label": "Mode root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 300,
+                "y": 756,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 331,
+                "y": 787
+              },
+              "hit": {
+                "tag": "DIALOG",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+                "cls": "entry-setup"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 0,
+                "left": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 844,
+                "scrollHeight": 844
+              }
+            ]
+          }
+        },
+        {
+          "label": "Mode actual Tab traversal",
+          "order": [
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            }
+          ]
+        },
+        {
+          "label": "Languages root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 300,
+                "y": 756,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 331,
+                "y": 787
+              },
+              "hit": {
+                "tag": "DIALOG",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+                "cls": "entry-setup"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 0,
+                "left": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 844,
+                "scrollHeight": 844
+              }
+            ]
+          }
+        },
+        {
+          "label": "Languages actual Tab traversal",
+          "order": [
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "websockets": 0,
+      "requests": [
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/guest"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/logout"
+        }
+      ],
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "width": 640,
+      "height": 480,
+      "dpr": 1,
+      "screens": [
+        {
+          "label": "login",
+          "file": "fresh-static/login-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 752
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "registration",
+          "file": "fresh-static/registration-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BUTTON",
+            "role": "tab",
+            "label": null,
+            "text": "Регистрация",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 752
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode",
+          "file": "fresh-static/mode-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "LABEL",
+              "role": null,
+              "label": null,
+              "text": "С друзьями\nОбщее приключение\n→",
+              "cls": "entry-choice"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 0,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 664
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-after-tabs",
+          "file": "fresh-static/mode-after-tabs-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "DIV",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-sign"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 286,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 774
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "friends",
+          "file": "fresh-static/friends-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "DIV",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-sign"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 184,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 774
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages",
+          "file": "fresh-static/languages-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "DIV",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-sign"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 184,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 739
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages-after-tabs",
+          "file": "fresh-static/languages-after-tabs-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "DIALOG",
+            "role": null,
+            "label": null,
+            "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+            "cls": "entry-setup"
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "DIV",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-sign"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 204,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 739
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "languages-scrolled",
+          "file": "fresh-static/languages-scrolled-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "SELECT",
+            "role": null,
+            "label": null,
+            "text": "Русский\nEnglish\nEspañol",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "DIV",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-sign"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 204,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 739
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "mode-return",
+          "file": "fresh-static/mode-return-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "INPUT",
+            "role": null,
+            "label": null,
+            "text": "",
+            "cls": ""
+          },
+          "dialogs": [
+            {
+              "label": "entry-setup-title",
+              "modal": true,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+            }
+          ],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "DIV",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-sign"
+            },
+            "hitIsGear": false,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-setup",
+              "top": 204,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 774
+            }
+          ],
+          "websockets": 0
+        },
+        {
+          "label": "logged-out",
+          "file": "fresh-static/logged-out-640x480.png",
+          "canvas": 0,
+          "pointerLocked": false,
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+          ],
+          "active": {
+            "tag": "BODY",
+            "role": null,
+            "label": null,
+            "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить ",
+            "cls": ""
+          },
+          "dialogs": [],
+          "gear": {
+            "rect": {
+              "x": 550,
+              "y": 392,
+              "width": 62,
+              "height": 62
+            },
+            "center": {
+              "x": 581,
+              "y": 423
+            },
+            "hit": {
+              "tag": "svg",
+              "role": null,
+              "label": null,
+              "cls": ""
+            },
+            "hitIsGear": true,
+            "insideModal": false
+          },
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "left": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 480,
+              "scrollHeight": 752
+            }
+          ],
+          "websockets": 0
+        }
+      ],
+      "actions": [
+        {
+          "label": "Mode root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 550,
+                "y": 392,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 581,
+                "y": 423
+              },
+              "hit": {
+                "tag": "LABEL",
+                "role": null,
+                "label": null,
+                "text": "С друзьями\nОбщее приключение\n→",
+                "cls": "entry-choice chosen"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 0,
+                "left": 0,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 480,
+                "scrollHeight": 774
+              }
+            ]
+          }
+        },
+        {
+          "label": "Mode actual Tab traversal",
+          "order": [
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "2\n3\n4",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "2\n3\n4",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            },
+            {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n",
+              "cls": "entry-setup"
+            },
+            {
+              "tag": "INPUT",
+              "role": null,
+              "label": null,
+              "text": "",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "2\n3\n4",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Далее: языки →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее при",
+              "cls": ""
+            }
+          ]
+        },
+        {
+          "label": "Languages root gear actual pointer click",
+          "state": {
+            "canvas": 0,
+            "pointerLocked": false,
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+            ],
+            "active": {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            "dialogs": [
+              {
+                "label": "entry-setup-title",
+                "modal": true,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус"
+              }
+            ],
+            "gear": {
+              "rect": {
+                "x": 550,
+                "y": 392,
+                "width": 62,
+                "height": 62
+              },
+              "center": {
+                "x": 581,
+                "y": 423
+              },
+              "hit": {
+                "tag": "DIV",
+                "role": null,
+                "label": null,
+                "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+                "cls": "entry-sign"
+              },
+              "hitIsGear": false,
+              "insideModal": false
+            },
+            "scroll": [
+              {
+                "class": "entry-setup",
+                "top": 184,
+                "left": 0,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 480,
+                "scrollHeight": 739
+              }
+            ]
+          }
+        },
+        {
+          "label": "Languages actual Tab traversal",
+          "order": [
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "SELECT",
+              "role": null,
+              "label": null,
+              "text": "Русский\nEnglish\nEspañol",
+              "cls": ""
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "cls": "entry-primary"
+            },
+            {
+              "tag": "BUTTON",
+              "role": null,
+              "label": null,
+              "text": "← Назад",
+              "cls": "entry-back"
+            },
+            {
+              "tag": "BODY",
+              "role": null,
+              "label": null,
+              "text": "Вавилон\n\nВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной",
+              "cls": ""
+            },
+            {
+              "tag": "DIALOG",
+              "role": null,
+              "label": null,
+              "text": "ВАВИЛОН\n\nВаши языки\n△\n\nПишите на родном языке. Задания и ответы будут на изучаемом.\n\nРодной язык\nРус",
+              "cls": "entry-setup"
+            }
+          ]
+        }
+      ],
+      "errors": [],
+      "websockets": 0,
+      "requests": [
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/guest"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/babylon"
+        },
+        {
+          "method": "POST",
+          "url": "http://127.0.0.1:4387/api/auth/logout"
+        }
+      ],
+      "logoutStatus": 204,
+      "ok": true
+    }
+  ],
+  "finishedAt": "2026-11-01T01:11:48.301Z"
+}

@@ -1,0 +1,16 @@
+{
+  "at": "2026-11-01T05:16:31.577Z",
+  "scope": "Read-only unauthenticated local asset paths on the frozen actual server, no server change.",
+  "results": [
+    {
+      "path": "/maps/market/manifest.json",
+      "status": 404,
+      "body": ""
+    },
+    {
+      "path": "/maps/demo/manifest.json",
+      "status": 404,
+      "body": ""
+    }
+  ]
+}

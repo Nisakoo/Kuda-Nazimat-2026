@@ -1,0 +1,34 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen (33.6s)
+
+
+  1) e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+
+    Error: Test timeout of 30000ms exceeded
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/demo.spec.ts:81:9
+
+    Error Context: test-results/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 

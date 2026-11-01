@@ -1,0 +1,6 @@
+
+Running 4 tests using 1 worker
+
+  ✘  1 e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug (4.1m)
+  ✓  2 e2e/ui-hud.spec.ts:63:1 › real guest entry preserves only the connection address and returns from mode with Escape (4.0s)
+  ✓  3 e2e/ui-hud.spec.ts:80:1 › real registration resumes mandatory appearance and uses password authentication (42.8s)

@@ -73,11 +73,12 @@ test('real guest entry preserves only the connection address and returns from mo
   expect(await page.evaluate(() => localStorage.getItem('babylon.serverUrl'))).toBe(origin);
   await page.getByLabel('Имя игрока').fill('UI-назад'); await page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'Куда отправимся?' })).toBeVisible();
-  await page.getByRole('radio', { name: /^Одному/ }).focus();
+  await expect(page.getByRole('radio', { name: /^Одному/ })).toBeFocused();
   await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('radio', { name: /^С друзьями/ })).toBeChecked();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('dialog', { name: 'Ваши языки', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Родной язык', { exact: true })).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Куда отправимся?', exact: true })).toBeVisible();
   await expect(page.getByRole('radio', { name: /^С друзьями/ })).toBeChecked();

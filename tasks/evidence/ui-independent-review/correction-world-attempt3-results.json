@@ -1,0 +1,195 @@
+{
+  "startedAt": "2026-11-01T04:14:44.617Z",
+  "username": "indafter-mvxaqa5w",
+  "peerName": "indafterpeer-mvxb0dms",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "One actual rendered client and one real authenticated peer. Pending-only cases use 2500ms CDP transport latency, never response/body/state replacement; not performance evidence.",
+  "steps": [
+    {
+      "label": "Saved party mode is correctly locked; not clicked"
+    },
+    {
+      "label": "Diagnostic actual Start retry only, not readiness acceptance",
+      "notAcceptance": true
+    },
+    {
+      "label": "password-login-enroll-real-two-person-task",
+      "ok": false,
+      "ms": 38271,
+      "failure": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate",
+      "at": 38655.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\n\nЗагружаем оформление…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта"
+    }
+  ],
+  "screens": [
+    {
+      "label": "failure-password-login-enroll-real-two-person-task",
+      "file": "correction-world/failure-password-login-enroll-real-two-person-task.png",
+      "at": 39959,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Подключён    Добро пожаловать в Вавил",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\nЛокальный сервер\nПодключён\n\nДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН\n\nРынок\nВавилона.\n\nЗолотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nСетевая игра использует локальный сервер.\n\nПовторить подключение Выйти из сессии\n\nЗагружаем оформление…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nСцена открыта",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 749
+      },
+      "partyPositions": []
+    }
+  ],
+  "gates": [
+    {
+      "label": "initial world start enabled within5s after entry",
+      "pass": true,
+      "ms": 2378,
+      "deadline": 5000
+    },
+    {
+      "label": "Start actionable click within5s",
+      "pass": false,
+      "ms": 5018,
+      "deadline": 5000,
+      "error": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n    - locator resolved to <button class=\"primary large\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n"
+    }
+  ],
+  "errors": [],
+  "http": [
+    {
+      "at": 1793506487895,
+      "path": "/api/babylon",
+      "action": "languages",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "623f4ecd-6ba7-413e-bdaa-8feb84278a15",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 705
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Help your partners feed the goats: explain their features and food. Only you have the list.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            }
+          ],
+          "replies": []
+        }
+      }
+    }
+  ],
+  "peerEvents": [],
+  "focusTrace": [],
+  "startReturnedAt": 1793506519023,
+  "abortLoop": true
+}

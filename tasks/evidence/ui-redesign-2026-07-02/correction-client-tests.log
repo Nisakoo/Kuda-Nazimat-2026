@@ -1,0 +1,91 @@
+npm --prefix client test
+
+> educational-world-client@0.1.0 pretest
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 22068778 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 23648595 bytes.
+
+> educational-world-client@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5/client[39m
+
+ [32m✓[39m src/render/three/AvatarModels.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 9453[2mms[22m[39m
+     [33m[2m✓[22m[39m has one common hierarchy, forward axis, real surface dimensions and foot origin [33m 835[2mms[22m[39m
+     [33m[2m✓[22m[39m has distinct sculpted hair, frames and Ksu clothing, not only different colours [33m 501[2mms[22m[39m
+     [33m[2m✓[22m[39m uses identical looped clips without root motion or unnormalised rotations [33m 1064[2mms[22m[39m
+     [33m[2m✓[22m[39m holds actual exported stance soles and contact Z within 0.1 mm between dense keys [33m 1431[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the shared trouser surfaces inside the closed tunic throughout the gait [33m 4191[2mms[22m[39m
+     [33m[2m✓[22m[39m rebuilds the checked-in GLBs byte for byte [33m 758[2mms[22m[39m
+[90mstdout[2m | src/render/three/ThreeAvatarPreviewFraming.test.ts[2m > [22m[2mavatar preview camera framing[2m > [22m[2mfits every GLB and the full pedestal with margin at eight yaw angles and throughout sampled idle
+[22m[39mpreview projected maximum absolute NDC { x: [33m0.84381959377191[39m, y: [33m0.975928581010232[39m, z: [33m0.7115716577450093[39m } {
+  y: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m7[39m,
+    coordinate: [33m-0.975928581010232[39m,
+    aspect: [33m0.72[39m
+  },
+  z: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m7[39m,
+    coordinate: [33m-0.7115716577450093[39m,
+    aspect: [33m0.5[39m
+  },
+  x: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m8[39m,
+    coordinate: [33m0.84381959377191[39m,
+    aspect: [33m0.5[39m
+  }
+}
+
+ [32m✓[39m src/render/three/ThreeAvatarPreviewFraming.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 8107[2mms[22m[39m
+     [33m[2m✓[22m[39m fits every GLB and the full pedestal with margin at eight yaw angles and throughout sampled idle [33m 8099[2mms[22m[39m
+ [32m✓[39m src/ui/modal.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 419[2mms[22m[39m
+ [32m✓[39m src/app/GameApp.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 337[2mms[22m[39m
+ [32m✓[39m src/multiplayer/PasswordAuth.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 317[2mms[22m[39m
+ [32m✓[39m src/render/three/CameraRaycast.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 267[2mms[22m[39m
+ [32m✓[39m src/app/EntryFlow.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 258[2mms[22m[39m
+ [32m✓[39m src/render/three/AvatarWalkPace.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 343[2mms[22m[39m
+ [32m✓[39m src/multiplayer/AvatarClient.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 244[2mms[22m[39m
+ [32m✓[39m src/multiplayer/BabylonClient.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 105[2mms[22m[39m
+ [32m✓[39m src/render/three/ThreeAvatarPreview.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 143[2mms[22m[39m
+ [32m✓[39m src/multiplayer/EquipmentClient.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 98[2mms[22m[39m
+ [32m✓[39m src/render/three/GltfLibrary.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 74[2mms[22m[39m
+ [32m✓[39m src/app/TaskMapPeers.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 99[2mms[22m[39m
+ [32m✓[39m src/map/AssetManager.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 93[2mms[22m[39m
+ [32m✓[39m src/multiplayer/GuestAuth.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 96[2mms[22m[39m
+ [32m✓[39m src/render/three/EntityVisuals.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 75[2mms[22m[39m
+ [32m✓[39m src/input/InputController.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 110[2mms[22m[39m
+ [32m✓[39m src/session/MarketSession.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+ [32m✓[39m src/app/GameLoop.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m src/session/OnlineSession.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m src/session/LocalSession.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 54[2mms[22m[39m
+ [32m✓[39m src/ui/inventoryShortcut.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m src/shared/protocol/validate.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m src/map/ChunkManager.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+ [32m✓[39m src/core/GameWorld.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+ [32m✓[39m src/multiplayer/SocketIOAdapter.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m src/render/three/FrameFence.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m src/shared/AsyncLeaseCache.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/core/EntityManager.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/app/config.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/map/WorldBudget.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m src/render/three/CameraObstruction.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/app/FrameMetrics.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/render/three/CharacterMotion.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m src/app/connectionPreference.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m36 passed[39m[22m[90m (36)[39m
+[2m      Tests [22m [1m[32m289 passed[39m[22m[90m (289)[39m
+[2m   Start at [22m 03:33:17
+[2m   Duration [22m 46.35s[2m (transform 2.71s, setup 0ms, import 6.37s, tests 21.37s, environment 4.91s)[22m
+

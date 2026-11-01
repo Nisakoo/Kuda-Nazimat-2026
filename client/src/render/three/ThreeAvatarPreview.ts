@@ -1,9 +1,18 @@
-import { AmbientLight, Box3, Color, CylinderGeometry, DirectionalLight, Group, Mesh, MeshStandardMaterial, OrthographicCamera, PCFSoftShadowMap, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three';
+import { AmbientLight, Box3, Color, CylinderGeometry, DirectionalLight, Group, Mesh, MeshStandardMaterial, OrthographicCamera, PCFShadowMap, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three';
 import type { AvatarId } from '../../../../shared/avatar/types';
 import { AVATAR_IDS } from '../../../../shared/avatar/types';
 import type { AssetManager } from '../../map/AssetManager';
 import type { AvatarPreview, AvatarPreviewEvents } from '../AvatarPreview';
 import { GltfLibrary, type ModelInstance } from './GltfLibrary';
+
+/** Frame the entire pedestal even when the preview becomes unusually narrow. */
+export function configureAvatarCamera(camera: OrthographicCamera, width: number, height: number): void {
+  const aspect = Math.max(1, width) / Math.max(1, height);
+  const halfHeight = Math.max(1.10, .78 / aspect);
+  camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect;
+  camera.top = halfHeight; camera.bottom = -halfHeight;
+  camera.position.set(0, 1.5, 5); camera.lookAt(0, .86, 0); camera.updateProjectionMatrix();
+}
 
 /** A bounded preview renderer. It shares the production GLB parser and resource lifecycle. */
 export class ThreeAvatarPreview implements AvatarPreview {
@@ -31,12 +40,11 @@ export class ThreeAvatarPreview implements AvatarPreview {
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = PCFSoftShadowMap;
+    this.renderer.shadowMap.type = PCFShadowMap;
     this.renderer.setClearColor(new Color('#fff4da'), 0);
     this.renderer.domElement.setAttribute('aria-hidden', 'true');
     host.append(this.renderer.domElement);
-    this.camera.position.set(0, 1.5, 5);
-    this.camera.lookAt(0, .95, 0);
+    configureAvatarCamera(this.camera, 1, 1);
     this.scene.add(new AmbientLight('#fff7df', 2.3));
     const sun = this.sun = new DirectionalLight('#fff1d0', 3.3); sun.position.set(-3, 6, 5); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); sun.shadow.camera.left = -2; sun.shadow.camera.right = 2; sun.shadow.camera.top = 3; sun.shadow.camera.bottom = -1; this.scene.add(sun);
     const fill = new DirectionalLight('#d4e9e9', 1.2); fill.position.set(4, 2, 1); this.scene.add(fill);
@@ -52,8 +60,7 @@ export class ThreeAvatarPreview implements AvatarPreview {
     if (this.disposed) return;
     const { width, height } = this.host.getBoundingClientRect();
     this.renderer.setSize(Math.max(1, width), Math.max(1, height));
-    const aspect = Math.max(1, width) / Math.max(1, height);
-    this.camera.left = -1.15 * aspect; this.camera.right = 1.15 * aspect; this.camera.top = 1.15; this.camera.bottom = -1.15; this.camera.updateProjectionMatrix();
+    configureAvatarCamera(this.camera, width, height);
   };
   private normalize(model: ModelInstance): void {
     // Normalize visual geometry only. Gameplay dimensions are not read from the mesh.

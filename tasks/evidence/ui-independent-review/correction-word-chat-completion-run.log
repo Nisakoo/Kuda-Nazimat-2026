@@ -1,0 +1,25 @@
+ExpectError: expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+Call Log:
+- Timeout 10000ms exceeded while waiting on the predicate
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBe (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-word-chat-completion.mjs:2:640 {
+  matcherResult: {
+    pass: false,
+    message: 'expect(received).toBe(expected) // Object.is equality\n' +
+      '\n' +
+      'Expected: true\n' +
+      'Received: false\n' +
+      '\n' +
+      'Call Log:\n' +
+      '- Timeout 10000ms exceeded while waiting on the predicate',
+    name: 'toBe'
+  }
+}
+CAPTURE failure
+WORD/CHAT COMPLETION CLOSED

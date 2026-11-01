@@ -13,8 +13,8 @@
     {
       "id": "lukas",
       "path": "/assets/models/avatars/lukas.glb",
-      "bytes": 760932,
-      "triangles": 5726,
+      "bytes": 883556,
+      "triangles": 6814,
       "drawCalls": 17,
       "bounds": {
         "min": [
@@ -43,8 +43,8 @@
     {
       "id": "nic",
       "path": "/assets/models/avatars/nic.glb",
-      "bytes": 760940,
-      "triangles": 5726,
+      "bytes": 883560,
+      "triangles": 6814,
       "drawCalls": 17,
       "bounds": {
         "min": [
@@ -73,8 +73,8 @@
     {
       "id": "dan",
       "path": "/assets/models/avatars/dan.glb",
-      "bytes": 760948,
-      "triangles": 5726,
+      "bytes": 883568,
+      "triangles": 6814,
       "drawCalls": 17,
       "bounds": {
         "min": [
@@ -103,8 +103,8 @@
     {
       "id": "ksu",
       "path": "/assets/models/avatars/ksu.glb",
-      "bytes": 687564,
-      "triangles": 5082,
+      "bytes": 720372,
+      "triangles": 5382,
       "drawCalls": 17,
       "bounds": {
         "min": [

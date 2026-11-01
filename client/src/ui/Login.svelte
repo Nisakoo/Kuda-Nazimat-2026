@@ -66,9 +66,9 @@
     </form>
     </div>
     {#if configure}<button class="entry-link" type="button" onclick={configure}>Настроить подключение</button>{/if}
-    <div class="entry-demo">
-      <button class="entry-demo-link" type="button" disabled={pending || !name.trim()} onclick={() => { password = ''; showPassword = false; void login(name); }}>Демонстрационный вход по имени</button>
-      <p id="login-note" class="entry-note">Без пароля и регистрации. Любой участник может использовать это имя.</p>
-    </div>
   </section>
 </div>
+<aside class="entry-demo entry-demo-footer" aria-label="Демонстрационный вход">
+  <button class="entry-demo-link" type="button" disabled={pending || !name.trim()} onclick={() => { password = ''; showPassword = false; void login(name); }}>Демонстрационный вход по имени</button>
+  <p id="login-note" class="entry-note">Без пароля и регистрации. Любой участник может использовать это имя.</p>
+</aside>

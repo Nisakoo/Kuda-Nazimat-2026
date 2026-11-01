@@ -1,0 +1,2322 @@
+{
+  "startedAt": "2026-11-01T02:24:57.999Z",
+  "username": "indbaseline-mvx54ukn",
+  "peerName": "indpeer-mvx6c89r",
+  "scope": "Actual deployed Bb8 application; one actual Socket.IO headless peer, not LAN/hardware.",
+  "screens": [
+    {
+      "label": "map-1622x970",
+      "file": "fresh-world-final-baseline/map-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Карта Вавилона",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "map-dialog parchment",
+          "top": 0,
+          "height": 629,
+          "scrollHeight": 629
+        }
+      ],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "inventory-controls-640x480",
+      "file": "fresh-world-final-baseline/inventory-controls-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "DIV",
+        "label": null,
+        "text": "Инвентарь✕ Тестовый переводчик и NPC. Сохранения и игровые д",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Инвентарь",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 286,
+          "scrollHeight": 286
+        },
+        {
+          "class": "babel-content",
+          "top": 216,
+          "height": 286,
+          "scrollHeight": 647
+        }
+      ],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "dictionary-controls-640x480",
+      "file": "fresh-world-final-baseline/dictionary-controls-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Словарь",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Мой словарь",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 286,
+          "scrollHeight": 286
+        },
+        {
+          "class": "babel-content",
+          "top": 625,
+          "height": 286,
+          "scrollHeight": 939
+        }
+      ],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "chat-controls-640x480",
+      "file": "fresh-world-final-baseline/chat-controls-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Чат с напарниками",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 286,
+          "scrollHeight": 286
+        },
+        {
+          "class": "babel-content",
+          "top": 308,
+          "height": 286,
+          "scrollHeight": 623
+        },
+        {
+          "class": "babel-chat",
+          "top": 0,
+          "height": 182,
+          "scrollHeight": 541
+        }
+      ],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "chat-stone-scrolled-640x480",
+      "file": "fresh-world-final-baseline/chat-stone-scrolled-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Чат с напарниками",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 286,
+          "scrollHeight": 286
+        },
+        {
+          "class": "babel-content",
+          "top": 226,
+          "height": 286,
+          "scrollHeight": 623
+        },
+        {
+          "class": "babel-chat",
+          "top": 344,
+          "height": 182,
+          "scrollHeight": 541
+        }
+      ],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "dictionary-edited-1280x800",
+      "file": "fresh-world-final-baseline/dictionary-edited-1280x800.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  М",
+        "inDialog": false
+      },
+      "dialogs": [
+        {
+          "title": "Мой словарь",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 606,
+          "scrollHeight": 606
+        },
+        {
+          "class": "babel-content",
+          "top": 249,
+          "height": 606,
+          "scrollHeight": 855
+        }
+      ],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-ksu"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "world-dan-jug-1280x800",
+      "file": "fresh-world-final-baseline/world-dan-jug-1280x800.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": true,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  М",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-dan"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    },
+    {
+      "label": "chat-new-language-old-preserved-1280x800",
+      "file": "fresh-world-final-baseline/chat-new-language-old-preserved-1280x800.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Чат с напарниками",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 606,
+          "scrollHeight": 606
+        },
+        {
+          "class": "babel-content",
+          "top": 12,
+          "height": 606,
+          "scrollHeight": 726
+        },
+        {
+          "class": "babel-chat",
+          "top": 0,
+          "height": 304,
+          "scrollHeight": 656
+        }
+      ],
+      "alerts": [],
+      "self": {
+        "id": "p_98prh4yfyia2wkox",
+        "character": {
+          "kind": "player",
+          "name": "indbaseline-mvx54ukn"
+        },
+        "transform": {
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": -26
+          },
+          "rotationY": 3.141592653589793
+        },
+        "movement": {
+          "direction": {
+            "x": 0,
+            "z": 0
+          },
+          "speed": 3
+        },
+        "motion": {
+          "grounded": true,
+          "phase": "grounded",
+          "verticalVelocity": 0,
+          "locomotion": "idle",
+          "stamina": 100,
+          "sprintBlocked": false,
+          "jumpAck": 0
+        },
+        "renderable": {
+          "assetId": "avatar-dan"
+        },
+        "equipment": {
+          "tool": "jug"
+        },
+        "animationState": {
+          "name": "idle"
+        }
+      },
+      "partyPositions": [
+        {
+          "id": "p_fn2u05d6ctonboqm",
+          "name": "indpeer-mvx6c89r",
+          "x": 0,
+          "z": 8
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "label": "login-and-real-peer",
+      "ok": true,
+      "ms": 31718,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel pause-panel",
+          "top": 0,
+          "height": 764,
+          "scrollHeight": 1231
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "map-1622-corrected-reviewer-capture",
+      "ok": true,
+      "ms": 21887,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть",
+        "text": "×",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Карта Вавилона",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "map-dialog parchment",
+          "top": 0,
+          "height": 629,
+          "scrollHeight": 629
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "modal-W-blocks-real-movement",
+      "ok": true,
+      "ms": 19598,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel pause-panel",
+          "top": 0,
+          "height": 934,
+          "scrollHeight": 1174
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "responsive-scroll-controls-640",
+      "ok": true,
+      "ms": 122194,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Чат с напарниками",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 286,
+          "scrollHeight": 286
+        },
+        {
+          "class": "babel-content",
+          "top": 226,
+          "height": 286,
+          "scrollHeight": 623
+        },
+        {
+          "class": "babel-chat",
+          "top": 344,
+          "height": 182,
+          "scrollHeight": 541
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "dictionary-search-edit-delete-and-privacy",
+      "ok": true,
+      "ms": 125284,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон Изучаю English⌄ Локальный сервер Подключён  М",
+        "inDialog": false
+      },
+      "dialogs": [
+        {
+          "title": "Мой словарь",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 606,
+          "scrollHeight": 606
+        },
+        {
+          "class": "babel-content",
+          "top": 249,
+          "height": 606,
+          "scrollHeight": 855
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "live-appearance-authority",
+      "ok": true,
+      "ms": 127574,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Повторить подключение",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Пауза",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel pause-panel",
+          "top": 0,
+          "height": 764,
+          "scrollHeight": 1174
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "languages-ACK-and-old-message-preservation",
+      "ok": true,
+      "ms": 73857,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Чат",
+        "inDialog": true
+      },
+      "dialogs": [
+        {
+          "title": "Чат с напарниками",
+          "modal": true
+        }
+      ],
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "top": 0,
+          "height": 606,
+          "scrollHeight": 606
+        },
+        {
+          "class": "babel-content",
+          "top": 12,
+          "height": 606,
+          "scrollHeight": 726
+        },
+        {
+          "class": "babel-chat",
+          "top": 0,
+          "height": 304,
+          "scrollHeight": 656
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "logout",
+      "ok": true,
+      "ms": 5095,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон  Локальный сервер Не авторизован      Вавилон",
+        "inDialog": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "alerts": []
+    }
+  ],
+  "errors": [],
+  "events": [
+    {
+      "path": "/api/babylon",
+      "action": "languages",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "3549ed25-065f-4267-92bb-7e7c137ef9c3",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              },
+              {
+                "id": "p_fn2u05d6ctonboqm",
+                "name": "indpeer-mvx6c89r",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 940
+          },
+          "availableParty": null,
+          "partyPositions": [],
+          "task": "Help your partners feed the goats: explain their features and food. Only you have the list.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "1e9489ff-8006-4770-8091-7ddeb239e032",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    90.67,
+                    90.67
+                  ],
+                  [
+                    117.33,
+                    117.33
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    170.67,
+                    170.67
+                  ],
+                  [
+                    197.33,
+                    197.33
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793499148065
+            }
+          ],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Свежая заметка перед запоминанием",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Нужен для воды",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793498961399
+            },
+            {
+              "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793499068097
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "body": {
+        "tool": "jug"
+      }
+    },
+    {
+      "path": "/api/equipment",
+      "status": 200,
+      "body": {
+        "tool": "jug"
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "action": "word-save",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "ddd4396f-d06d-451f-81e2-0df107977acc",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              },
+              {
+                "id": "p_fn2u05d6ctonboqm",
+                "name": "indpeer-mvx6c89r",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1188
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_fn2u05d6ctonboqm",
+              "name": "indpeer-mvx6c89r",
+              "x": 0,
+              "z": 8
+            }
+          ],
+          "task": "Help your partners feed the goats: explain their features and food. Only you have the list.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "1e9489ff-8006-4770-8091-7ddeb239e032",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    90.67,
+                    90.67
+                  ],
+                  [
+                    117.33,
+                    117.33
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    170.67,
+                    170.67
+                  ],
+                  [
+                    197.33,
+                    197.33
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793499148065
+            }
+          ],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Свежая заметка перед запоминанием",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Отредактировано независимым reviewer",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793498961399
+            },
+            {
+              "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793499068097
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "action": "word-save",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "9466451b-1eb5-45df-9a94-fd6713889fc3",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              },
+              {
+                "id": "p_fn2u05d6ctonboqm",
+                "name": "indpeer-mvx6c89r",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1220
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_fn2u05d6ctonboqm",
+              "name": "indpeer-mvx6c89r",
+              "x": 0,
+              "z": 8
+            }
+          ],
+          "task": "Help your partners feed the goats: explain their features and food. Only you have the list.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "1e9489ff-8006-4770-8091-7ddeb239e032",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    90.67,
+                    90.67
+                  ],
+                  [
+                    117.33,
+                    117.33
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    170.67,
+                    170.67
+                  ],
+                  [
+                    197.33,
+                    197.33
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793499148065
+            }
+          ],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Свежая заметка перед запоминанием",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Отредактировано независимым reviewer",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            },
+            {
+              "id": "b_qeb9mwd021ge7pnf",
+              "native": "ru",
+              "learning": "en",
+              "word": "<b>safe</b>",
+              "translation": "Безопасный текст",
+              "note": "",
+              "learned": false,
+              "example": "",
+              "exampleTranslation": ""
+            }
+          ],
+          "messages": [
+            {
+              "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793498961399
+            },
+            {
+              "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793499068097
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "action": "word-delete",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "7e0218c6-0db2-4503-a118-35ca46136e6e",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              },
+              {
+                "id": "p_fn2u05d6ctonboqm",
+                "name": "indpeer-mvx6c89r",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1236
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_fn2u05d6ctonboqm",
+              "name": "indpeer-mvx6c89r",
+              "x": 0,
+              "z": 8
+            }
+          ],
+          "task": "Help your partners feed the goats: explain their features and food. Only you have the list.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "1e9489ff-8006-4770-8091-7ddeb239e032",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    90.67,
+                    90.67
+                  ],
+                  [
+                    117.33,
+                    117.33
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    170.67,
+                    170.67
+                  ],
+                  [
+                    197.33,
+                    197.33
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793499148065
+            }
+          ],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Свежая заметка перед запоминанием",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Отредактировано независимым reviewer",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793498961399
+            },
+            {
+              "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793499068097
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "peer": true,
+      "action": {
+        "type": "state"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "f778c215-26b2-4921-a823-b686639a9bb7",
+        "state": {
+          "v": 2,
+          "playerId": "p_fn2u05d6ctonboqm",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              },
+              {
+                "id": "p_fn2u05d6ctonboqm",
+                "name": "indpeer-mvx6c89r",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1238
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_98prh4yfyia2wkox",
+              "name": "indbaseline-mvx54ukn",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "1e9489ff-8006-4770-8091-7ddeb239e032",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    90.67,
+                    90.67
+                  ],
+                  [
+                    117.33,
+                    117.33
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    170.67,
+                    170.67
+                  ],
+                  [
+                    197.33,
+                    197.33
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793499148065
+            }
+          ],
+          "words": [],
+          "messages": [
+            {
+              "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793498961399
+            },
+            {
+              "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "text": "Hello",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793499068097
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/avatar",
+      "status": 200,
+      "body": {
+        "avatarId": "ksu"
+      }
+    },
+    {
+      "path": "/api/avatar",
+      "status": 200,
+      "body": {
+        "avatarId": "dan"
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "action": "languages",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "542c10fc-d6c1-4ff4-9876-7213d3f87bc8",
+        "state": {
+          "v": 2,
+          "playerId": "p_98prh4yfyia2wkox",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "es"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              },
+              {
+                "id": "p_fn2u05d6ctonboqm",
+                "name": "indpeer-mvx6c89r",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1430
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_fn2u05d6ctonboqm",
+              "name": "indpeer-mvx6c89r",
+              "x": 0,
+              "z": 8
+            }
+          ],
+          "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+          "taskTitle": "Las cabras del pastor",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "1e9489ff-8006-4770-8091-7ddeb239e032",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    90.67,
+                    90.67
+                  ],
+                  [
+                    117.33,
+                    117.33
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    170.67,
+                    170.67
+                  ],
+                  [
+                    197.33,
+                    197.33
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793499148065
+            }
+          ],
+          "words": [
+            {
+              "id": "b_2qr7wu3rtanz2hij",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Свежая заметка перед запоминанием",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_3u68en4fascbs7x7",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Отредактировано независимым reviewer",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793498961399
+            },
+            {
+              "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793499068097
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "peer": true,
+      "action": {
+        "type": "chat",
+        "text": "Привет"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "46bf43b8-e699-456c-8f6e-ba1ee70ea2f0",
+        "state": {
+          "v": 2,
+          "playerId": "p_fn2u05d6ctonboqm",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_3smam1r0s3warajr",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_98prh4yfyia2wkox",
+                "name": "indbaseline-mvx54ukn",
+                "role": 1
+              },
+              {
+                "id": "p_fn2u05d6ctonboqm",
+                "name": "indpeer-mvx6c89r",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 1441
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_98prh4yfyia2wkox",
+              "name": "indbaseline-mvx54ukn",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "1e9489ff-8006-4770-8091-7ddeb239e032",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    90.67,
+                    90.67
+                  ],
+                  [
+                    117.33,
+                    117.33
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    170.67,
+                    170.67
+                  ],
+                  [
+                    197.33,
+                    197.33
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793499148065
+            }
+          ],
+          "words": [],
+          "messages": [
+            {
+              "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793498961399
+            },
+            {
+              "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+              "authorId": "p_98prh4yfyia2wkox",
+              "authorName": "indbaseline-mvx54ukn",
+              "text": "Hello",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793499068097
+            },
+            {
+              "id": "46bf43b8-e699-456c-8f6e-ba1ee70ea2f0",
+              "authorId": "p_fn2u05d6ctonboqm",
+              "authorName": "indpeer-mvx6c89r",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793500402973
+            }
+          ],
+          "replies": []
+        }
+      }
+    }
+  ],
+  "peerId": "p_fn2u05d6ctonboqm",
+  "beforeBlockedInput": {
+    "id": "p_98prh4yfyia2wkox",
+    "character": {
+      "kind": "player",
+      "name": "indbaseline-mvx54ukn"
+    },
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -26
+      },
+      "rotationY": 3.141592653589793
+    },
+    "movement": {
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "speed": 3
+    },
+    "motion": {
+      "grounded": true,
+      "phase": "grounded",
+      "verticalVelocity": 0,
+      "locomotion": "idle",
+      "stamina": 100,
+      "sprintBlocked": false,
+      "jumpAck": 0
+    },
+    "renderable": {
+      "assetId": "avatar-ksu"
+    },
+    "equipment": {
+      "tool": "jug"
+    },
+    "animationState": {
+      "name": "idle"
+    }
+  },
+  "afterBlockedInput": {
+    "id": "p_98prh4yfyia2wkox",
+    "character": {
+      "kind": "player",
+      "name": "indbaseline-mvx54ukn"
+    },
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -26
+      },
+      "rotationY": 3.141592653589793
+    },
+    "movement": {
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "speed": 3
+    },
+    "motion": {
+      "grounded": true,
+      "phase": "grounded",
+      "verticalVelocity": 0,
+      "locomotion": "idle",
+      "stamina": 100,
+      "sprintBlocked": false,
+      "jumpAck": 0
+    },
+    "renderable": {
+      "assetId": "avatar-ksu"
+    },
+    "equipment": {
+      "tool": "jug"
+    },
+    "animationState": {
+      "name": "idle"
+    }
+  },
+  "beforeI": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+    ],
+    "locked": false,
+    "viewport": {
+      "width": 1622,
+      "height": 970,
+      "dpr": 1
+    },
+    "active": {
+      "tag": "BUTTON",
+      "label": "Закрыть окно",
+      "text": "✕",
+      "inDialog": true
+    },
+    "dialogs": [
+      {
+        "title": "Инвентарь",
+        "modal": true
+      }
+    ],
+    "scroll": [
+      {
+        "class": "panel market-panel babel-panel",
+        "top": 0,
+        "height": 603,
+        "scrollHeight": 603
+      },
+      {
+        "class": "babel-content",
+        "top": 0,
+        "height": 603,
+        "scrollHeight": 603
+      }
+    ],
+    "alerts": []
+  },
+  "afterI": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+    ],
+    "locked": false,
+    "viewport": {
+      "width": 1622,
+      "height": 970,
+      "dpr": 1
+    },
+    "active": {
+      "tag": "BUTTON",
+      "label": null,
+      "text": "Повторить подключение",
+      "inDialog": true
+    },
+    "dialogs": [
+      {
+        "title": "Пауза",
+        "modal": true
+      }
+    ],
+    "scroll": [
+      {
+        "class": "panel pause-panel",
+        "top": 0,
+        "height": 934,
+        "scrollHeight": 1174
+      }
+    ],
+    "alerts": []
+  },
+  "peerWords": [],
+  "peerObservedAppearance": {
+    "id": "p_98prh4yfyia2wkox",
+    "character": {
+      "kind": "player",
+      "name": "indbaseline-mvx54ukn"
+    },
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -26
+      },
+      "rotationY": 3.141592653589793
+    },
+    "movement": {
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "speed": 3
+    },
+    "motion": {
+      "grounded": true,
+      "phase": "grounded",
+      "verticalVelocity": 0,
+      "locomotion": "idle",
+      "stamina": 100,
+      "sprintBlocked": false,
+      "jumpAck": 0
+    },
+    "renderable": {
+      "assetId": "avatar-dan"
+    },
+    "equipment": {
+      "tool": "jug"
+    },
+    "animationState": {
+      "name": "idle"
+    }
+  },
+  "changedLanguage": {
+    "native": "ru",
+    "learning": "en"
+  },
+  "messagesAfterLanguage": [
+    {
+      "id": "2b427030-13b5-4fd4-99d8-b7eb7e621707",
+      "authorId": "p_fn2u05d6ctonboqm",
+      "authorName": "indpeer-mvx6c89r",
+      "text": "Buy dates",
+      "language": "en",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793498961399
+    },
+    {
+      "id": "11608f3e-58a0-4f00-b51e-198a8260c8de",
+      "authorId": "p_98prh4yfyia2wkox",
+      "authorName": "indbaseline-mvx54ukn",
+      "text": "Привет",
+      "language": "ru",
+      "translated": false,
+      "status": "delivered",
+      "createdAt": 1793499068097
+    }
+  ],
+  "peerLogoutStatus": 204,
+  "finishedAt": "2026-11-01T02:33:52.563Z"
+}

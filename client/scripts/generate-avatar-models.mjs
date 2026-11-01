@@ -22,16 +22,17 @@ const APPEARANCES = {
   dan: { tunic: '#b75233', belt: '#3e7f80', hair: '#3e2b20', lock: '#533b2a', glasses: '#c4c0aa', frame: .0036, style: 'tousled' },
   ksu: { tunic: '#829cbf', belt: '#bb8538', hair: '#39281f', lock: '#4d352a', style: 'long' },
 };
-const SKIN = '#f1b077', SKIN_SHADE = '#d98d55', CREAM = '#f5dfb4', PANTS = '#ead4ab', BOOT = '#71472e', SOLE = '#503723', INK = '#2f251d';
+const SKIN = '#f1b077', SKIN_SHADE = '#e3a06c', CREAM = '#f5dfb4', PANTS = '#ead4ab', BOOT = '#71472e', SOLE = '#503723', INK = '#2f251d';
 const MAT = new MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 });
 
 function group(parent, name, x = 0, y = 0, z = 0) {
   const result = new Group(); result.name = name; result.position.set(x, y, z); parent.add(result); return result;
 }
-function mesh(parent, geometry, tint, name = '') {
+function mesh(parent, geometry, tint, name = '', smooth = false) {
   // Face colours provide controlled facets without random geometry or normal noise.
+  if (smooth) geometry.computeVertexNormals();
   const g = geometry.index ? geometry.toNonIndexed() : geometry;
-  g.deleteAttribute('uv'); g.computeVertexNormals();
+  g.deleteAttribute('uv'); if (!smooth) g.computeVertexNormals();
   const base = new Color(tint), colors = [];
   for (let i = 0; i < g.attributes.position.count; i += 3) {
     const shade = 1 + ((((i / 3) * 17 + 11) % 13) - 6) * .006;
@@ -44,7 +45,7 @@ function orb(parent, tint, x, y, z, rx, ry, rz, segments = 12, rows = 6) {
   const g = new SphereGeometry(1, segments, rows); g.scale(rx, ry, rz); g.translate(x, y, z); return mesh(parent, g, tint);
 }
 /** Closed elliptical loft. Ring entries: [y, halfWidth, halfDepth, xOffset?, zOffset?]. */
-function loft(parent, tint, rings, segments = 12, flatFace = false) {
+function loft(parent, tint, rings, segments = 12, flatFace = false, smooth = false) {
   const vertices = [], indices = [];
   for (const [y, rx, rz, x = 0, z = 0] of rings) {
     for (let i = 0; i < segments; i++) {
@@ -64,7 +65,7 @@ function loft(parent, tint, rings, segments = 12, flatFace = false) {
       if (top) indices.push(middle, a, b); else indices.push(middle, b, a);
     }
   }
-  const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(vertices, 3)); g.setIndex(indices); return mesh(parent, g, tint);
+  const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(vertices, 3)); g.setIndex(indices); return mesh(parent, g, tint, '', smooth);
 }
 function polygon(parent, tint, points, faces) {
   const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(points.flat(), 3)); g.setIndex(faces); return mesh(parent, g, tint);
@@ -89,6 +90,18 @@ function stroke(parent, tint, points, radius) {
 }
 /** A sculpted, closed tapered lock, not a cone pasted on a generic sphere. */
 function lock(parent, tint, points, widths, depths) {
+  if (parent.name === 'hair') {
+    // Add gently bowed intermediate sections while retaining the original ends.
+    const curve = [], wide = [], deep = [];
+    for (let i=0;i<points.length-1;i++) {
+      curve.push(points[i]); wide.push(widths[i]); deep.push(depths[i]);
+      const a=points[i], b=points[i+1];
+      curve.push([(a[0]+b[0])*.5, (a[1]+b[1])*.5, (a[2]+b[2])*.5+.006]);
+      wide.push((widths[i]+widths[i+1])*.5); deep.push((depths[i]+depths[i+1])*.5);
+    }
+    curve.push(points.at(-1)); wide.push(widths.at(-1)); deep.push(depths.at(-1));
+    points=curve; widths=wide; depths=deep;
+  }
   const p = [], idx = [], sides = 6;
   for (let j = 0; j < points.length; j++) {
     const previous = points[Math.max(0, j - 1)], next = points[Math.min(points.length - 1, j + 1)];
@@ -132,14 +145,15 @@ function hair(parent, look) {
   polygon(parent, look.hair, points, faces);
   if (long) {
     // Full rear curtain plus individually tapered shoulder-length locks.
-    for (let i = 0; i < 11; i++) {
-      const a = .98 + i * (Math.PI * 2 - 1.96) / 10, x = Math.sin(a), z = Math.cos(a);
+    for (let i = 0; i < 7; i++) {
+      const a = .98 + i * (Math.PI * 2 - 1.96) / 6, x = Math.sin(a), z = Math.cos(a);
+      const drift = [-.042,.028,-.016,.038,-.026,.045,-.034][i], length = [.02,.075,.035,.095,.015,.065,.04][i];
       lock(parent, i % 3 ? look.hair : look.lock,
-        [[x * .23, .19, z * .215 - .015], [x * .29, -.07, z * .25 - .015], [x * .30, -.30, z * .245], [x * .275 + (i % 2 ? .022 : -.02), -.43 + (i % 3) * .025, z * .23]],
-        [.065, .072, .054, .002], [.04, .042, .032, .002]);
+        [[x * .22, .19, z * .215 - .015], [x * .285 + drift * .4, -.055, z * .25 - .015], [x * .32 + drift, -.27 + length * .2, z * .245], [x * .31 + drift * 1.4, -.45 + length, z * .23]],
+        [.075, .10, .075, .009], [.04, .042, .032, .006]);
     }
     for (const side of [-1, 1]) {
-      lock(parent, look.lock, [[side * .015, .30, .09], [side * .15, .24, .22], [side * .23, .045, .235], [side * .28, -.10, .17]], [.055, .082, .065, .001], [.045, .045, .03, .001]);
+      lock(parent, look.lock, [[side * .015, .30, .09], [side * .15, .24, .22], [side * .23, .045, .235], [side * .28, -.10, .17]], [.05, .068, .054, .001], [.04, .038, .026, .001]);
       lock(parent, look.hair, [[side * .22, .09, .16], [side * .26, -.10, .185], [side * .23, -.28, .19], [side * .17, -.37, .17]], [.05, .043, .035, .001], [.035, .03, .026, .001]);
     }
   } else {
@@ -150,10 +164,11 @@ function hair(parent, look) {
         ? [[-.27,.06,.15],[-.24,.18,.19],[-.18,.10,.235],[-.10,.13,.245],[-.025,.16,.25],[.065,.12,.245],[.15,.17,.23],[.255,.07,.16],[.23,-.035,.13]]
         : [[-.30,.11,.14],[-.26,.23,.12],[-.17,.29,.15],[-.07,.34,.11],[.10,.36,.04],[.245,.29,.08],[.29,.17,.12],[.20,.10,.23],[-.22,.015,.20]];
     for (let i = 0; i < ends.length; i++) {
-      const end = ends[i], startX = look.style === 'short' ? .015 : .055;
+      const originalEnd = ends[i], end = [Math.max(-.275, Math.min(.275, originalEnd[0])), originalEnd[1], originalEnd[2]], startX = look.style === 'short' ? .015 : .055;
       const start = [startX + (i - 4) * .015, .255, .11];
       const mid = [(start[0] + end[0]) * .58, Math.max(.22, (start[1] + end[1]) * .6), .20];
-      lock(parent, i % 3 ? look.lock : look.hair, [start, mid, end], [.045, .069, .0015], [.035, .047, .0015]);
+      const inner = look.style === 'short' ? i >= 2 && i <= 6 : i === 1 || i === 7 || i === 8;
+      lock(parent, i % 3 ? look.lock : look.hair, [start, mid, end], inner ? [.039, .056, .0015] : [.045, .069, .0015], inner ? [.03, .039, .0015] : [.035, .047, .0015]);
     }
     // Layered rear locks break up the scalp and make the hairstyle readable from the game camera.
     for(let row=0;row<2;row++)for(let i=-2;i<=2;i++){
@@ -174,10 +189,9 @@ function face(parent, look) {
   for (const side of [-1, 1]) {
     orb(parent, SKIN, side * .263, -.045, -.005, .057, .083, .045, 10, 5);
     orb(parent, SKIN_SHADE, side * .291, -.046, .027, .022, .044, .009, 8, 4);
-    if (ksu) orb(parent, '#fff0cc', side * .101, .017, .212, .039, .049, .009);
-    orb(parent, INK, side * .101 + (ksu ? .005 : 0), .014, ksu ? .222 : .213, ksu ? .025 : .024, .035, .010);
+    orb(parent, INK, side * .101 + (ksu ? .005 : 0), .014, ksu ? .222 : .213, ksu ? .028 : .027, .046, .010);
     stroke(parent, look.hair, [[side * .065, .105, .212], [side * .108, .119, .212], [side * .151, .105, .202]], ksu ? .006 : .009);
-    if (ksu) stroke(parent, INK, [[side * .065,.044,.223],[side * .083,.061,.222],[side * .113,.063,.220],[side * .14,.045,.216]], .0045);
+    if (ksu) stroke(parent, INK, [[side * .065,.055,.223],[side * .083,.073,.222],[side * .113,.075,.220],[side * .14,.056,.216]], .0045);
   }
   polygon(parent, SKIN_SHADE, [[-.025,-.063,.211],[.025,-.063,.211],[0,.005,.214],[0,-.045,.266],[0,-.079,.23]], [0,3,2,2,3,1,0,4,3,3,4,1]);
   const smile = Array.from({ length: 9 }, (_, i) => { const x = -.068 + i * .017; return [x, -.139 + .023 * (x / .068) ** 2, .198 - .005 * (x / .068) ** 2]; });
@@ -200,9 +214,9 @@ function tunic(parent, look) {
   loft(parent, look.belt, [[-.027,.222,.157],[.028,.219,.153]], 16);
   // Collar sits above the shirt. The skin inset makes the pale V read as a cut neckline.
   frontSurface(parent, CREAM,
-    [[-.148,.342,.079],[-.075,.352,.105],[-.028,.31,.151],[.0,.222,.152],[.031,.31,.151],[.078,.352,.105],[.148,.342,.079],[.117,.302,.139],[.052,.274,.151],[.021,.195,.154],[-.027,.195,.154],[-.058,.274,.151],[-.12,.302,.139]],
+    [[-.12,.342,.079],[-.072,.352,.105],[-.035,.315,.151],[0,.29,.152],[.035,.315,.151],[.072,.352,.105],[.12,.342,.079],[.099,.319,.139],[.045,.292,.151],[.012,.25,.154],[-.012,.25,.154],[-.045,.292,.151],[-.099,.319,.139]],
     [0,1,12,1,2,12,2,11,12,2,3,11,3,10,11,3,9,10,3,8,9,3,4,8,4,7,8,4,5,7,5,6,7]);
-  frontSurface(parent, SKIN, [[-.068,.349,.107],[.07,.349,.107],[.03,.307,.154],[0,.237,.155],[-.026,.307,.154]], [0,4,1,1,4,2,4,3,2]);
+  frontSurface(parent, SKIN, [[-.058,.349,.107],[.058,.349,.107],[.026,.312,.154],[0,.282,.155],[-.026,.312,.154]], [0,4,1,1,4,2,4,3,2]);
   // Folded hanging strap, with thickness and a darker side edge.
   const x = .153;
   loft(parent, look.belt, [[-.253,.034,.011,x+.018,.202],[-.08,.032,.012,x,.14],[.026,.027,.012,x-.012,.122]], 4);
@@ -274,22 +288,23 @@ export function createAvatarModel(id) {
   root.userData={avatarId:id,origin:'ground between feet',units:'metres',forward:'+Z',author:'Original TASK-043 procedural sculpture; no third-party art',walkCycleMetres:1.2};
   const torso=group(root,'torso',0,.95,0); tunic(torso,look);
   const neck=group(torso,'neck',0,.365,0); loft(neck,SKIN,[[-.015,.076,.07],[.105,.073,.071]],12);
-  const head=group(torso,'head',0,.67,0);
-  loft(head,SKIN,[[-.279,.06,.085],[-.25,.155,.155],[-.17,.222,.203],[-.04,.265,.233],[.10,.263,.232],[.22,.226,.198],[.28,.13,.12],[.29,.045,.045]],16,true);
-  const facial=group(head,'face'); face(facial,look);
+  const head=group(torso,'head',0,.67,0); head.scale.x=.84;
+  loft(head,SKIN,[[-.279,.045,.085],[-.25,.125,.155],[-.17,.181,.203],[-.10,.215,.223],[-.04,.237,.233],[.10,.240,.232],[.17,.226,.217],[.22,.210,.198],[.28,.12,.12],[.29,.045,.045]],24,true,true);
+  const facial=group(head,'face'); facial.scale.x=.94; face(facial,look);
   const coiffure=group(head,'hair'); root.updateMatrixWorld(true); hair(coiffure,look);
   for (const side of [-1,1]) {
     const suffix=side<0?'left':'right';
     const shoulder=group(torso,'shoulder-'+suffix,side*.235,.305,0); shoulder.rotation.z=side*.19; shoulder.rotation.x=-.055;
-    loft(shoulder,look.tunic,[[-.205,.105,.108],[-.17,.102,.107],[-.03,.106,.112],[.043,.078,.085],[.082,.022,.026]],10);
-    loft(shoulder,look.style==='long'?CREAM:new Color(look.tunic).multiplyScalar(.94),[[-.211,.108,.11],[-.166,.106,.109]],10);
+    loft(shoulder,look.tunic,[[-.155,.087,.092],[-.13,.088,.094],[-.035,.087,.095],[.035,.068,.078],[.065,.025,.03]],10);
+    loft(shoulder,look.style==='long'?CREAM:new Color(look.tunic).multiplyScalar(.97),[[-.161,.090,.095],[-.125,.089,.096]],10);
     const elbow=group(shoulder,'elbow-'+suffix,0,-.215,0); elbow.rotation.x=-.07;
-    loft(elbow,SKIN,[[-.188,.050,.052],[-.13,.054,.055],[-.045,.068,.065],[.015,.068,.065],[.06,.06,.058]],10);
+    loft(elbow,SKIN,[[-.188,.050,.052],[-.13,.054,.055],[-.045,.064,.061],[.015,.064,.061],[.11,.06,.058]],10);
     const wrist=group(elbow,'wrist-'+suffix,0,-.195,0);
-    orb(wrist,SKIN,side*.005,-.045,.008,.059,.083,.042,10,5);
-    // A thumb and 3 closed finger forms read as a simple friendly hand, not a ball.
-    const thumb=orb(wrist,SKIN,-side*.043,-.026,.034,.022,.042,.026,8,4); thumb.geometry.rotateZ(-side*.24);
-    for(let finger=0;finger<3;finger++)orb(wrist,SKIN,side*(-.025+finger*.023),-.094,.024,.017,.028,.025,8,4);
+    // Narrow the palm and raise its bottom, so the fingers extend below it.
+    // Its top and outside edge still contribute to the shared real bounds.
+    orb(wrist,SKIN,side*.016412675,-.0335,.008,.047,.0715,.042,10,5);
+    const thumb=orb(wrist,SKIN,-side*.040,-.026,.038,.018,.038,.022,8,4); thumb.geometry.rotateZ(-side*.24);
+    for(let finger=0;finger<4;finger++)orb(wrist,SKIN,side*(-.027+finger*.018),finger===1||finger===2?-.09799999:-.094,.014,.011,.030,.012,8,4);
     const hip=group(root,'hip-'+suffix,side*.126,.78,0);
     loft(hip,PANTS,[[-.32,.100,.087],[-.25,.100,.085],[-.09,.088,.085],[.01,.075,.08]],10);
     const knee=group(hip,'knee-'+suffix,0,-.32,0);

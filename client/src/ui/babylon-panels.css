@@ -12,6 +12,8 @@ dialog.babel-panel:not([open]) { display: none; }
 .babel-panel input, .babel-panel textarea { box-sizing: border-box; width: 100%; border: 1px solid #e0c7a8; border-radius: 5px; padding: 10px; color: #073c48; background: #fffaf1; font: inherit; }
 .babel-muted { color: #657d80; }
 .babel-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.babel-panel .babel-action-icon { min-height: 44px; }
+.babel-panel .babel-action-icon > svg { display: inline-block; vertical-align: middle; margin-right: 4px; }
 .babel-word-toolbar { display: flex; gap: 12px; align-items: end; }
 .babel-word-toolbar label { flex: 1; min-width: 0; }
 .babel-word-toolbar button { margin-bottom: .6rem; }

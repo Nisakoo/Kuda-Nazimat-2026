@@ -1,4 +1,4 @@
-import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFSoftShadowMap } from 'three';
+import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFShadowMap } from 'three';
 import type { CameraView, RenderAdapter, VisualChunk, RenderDiagnostics } from '../RenderAdapter';
 import type { EntityId, WorldSnapshot } from '../../core/types';
 import { SceneAssets } from './SceneAssets';
@@ -52,7 +52,7 @@ export class ThreeRenderer implements RenderAdapter {
     sun.position.set(this.marketStyle ? 18 : -8, this.marketStyle ? 12 : 18, this.marketStyle ? -12 : 10);
     if (this.marketStyle) {
       this.renderer.toneMapping = ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.05;
-      this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = PCFSoftShadowMap;
+      this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = PCFShadowMap;
       sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
       Object.assign(sun.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24, near: 1, far: 85 });
       sun.shadow.normalBias = .035; sun.shadow.bias = -.0001;

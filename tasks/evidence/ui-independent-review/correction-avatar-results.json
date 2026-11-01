@@ -1,0 +1,3115 @@
+{
+  "startedAt": "2026-11-01T03:54:28.724Z",
+  "origin": "http://127.0.0.1:4387",
+  "username": "indafter-mvxaqa5w",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "Fresh actual password registration and deployed V4 chooser. 5s gate recorded separately from any diagnostic wait.",
+  "screens": [
+    {
+      "label": "lukas-1622x970",
+      "file": "correction-avatar/lukas-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "lukas",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "nic-1622x970",
+      "file": "correction-avatar/nic-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 2",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "nic",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "dan-1622x970",
+      "file": "correction-avatar/dan-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 3",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "dan",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "ksu-1622x970",
+      "file": "correction-avatar/ksu-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "ksu",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "ksu-rotated-1622x970",
+      "file": "correction-avatar/ksu-rotated-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser-1280x800",
+      "file": "correction-avatar/chooser-1280x800.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1180,
+          "y": 708,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 628,
+          "scrollHeight": 718
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 676,
+          "scrollHeight": 676
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 432,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 432,
+          "scrollHeight": 432
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser-controls-1280x800",
+      "file": "correction-avatar/chooser-controls-1280x800.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 1180,
+          "y": 708,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 90,
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 628,
+          "scrollHeight": 718
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 676,
+          "scrollHeight": 676
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 432,
+          "scrollHeight": 432
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 432,
+          "scrollHeight": 432
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser-390x844",
+      "file": "correction-avatar/chooser-390x844.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 322,
+          "y": 776,
+          "w": 56,
+          "h": 56
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 90,
+          "width": 390,
+          "scrollWidth": 390,
+          "height": 692,
+          "scrollHeight": 826
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354,
+          "height": 790,
+          "scrollHeight": 790
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 322,
+          "scrollWidth": 322,
+          "height": 576,
+          "scrollHeight": 576
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 322,
+          "scrollWidth": 322,
+          "height": 306,
+          "scrollHeight": 306
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser-controls-390x844",
+      "file": "correction-avatar/chooser-controls-390x844.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 322,
+          "y": 776,
+          "w": 56,
+          "h": 56
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 100,
+          "width": 390,
+          "scrollWidth": 390,
+          "height": 692,
+          "scrollHeight": 826
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354,
+          "height": 790,
+          "scrollHeight": 790
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 322,
+          "scrollWidth": 322,
+          "height": 576,
+          "scrollHeight": 576
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 322,
+          "scrollWidth": 322,
+          "height": 306,
+          "scrollHeight": 306
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser-640x480",
+      "file": "correction-avatar/chooser-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 572,
+          "y": 412,
+          "w": 56,
+          "h": 56
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 100,
+          "width": 640,
+          "scrollWidth": 640,
+          "height": 328,
+          "scrollHeight": 1018
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 604,
+          "scrollWidth": 604,
+          "height": 982,
+          "scrollHeight": 982
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 572,
+          "scrollWidth": 572,
+          "height": 784,
+          "scrollHeight": 784
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 572,
+          "scrollWidth": 572,
+          "height": 514,
+          "scrollHeight": 514
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser-controls-640x480",
+      "file": "correction-avatar/chooser-controls-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": true,
+        "inModal": true,
+        "rect": {
+          "x": 572,
+          "y": 412,
+          "w": 56,
+          "h": 56
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 690,
+          "width": 640,
+          "scrollWidth": 640,
+          "height": 328,
+          "scrollHeight": 1018
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 604,
+          "scrollWidth": 604,
+          "height": 982,
+          "scrollHeight": 982
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 572,
+          "scrollWidth": 572,
+          "height": 784,
+          "scrollHeight": 784
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 572,
+          "scrollWidth": 572,
+          "height": 514,
+          "scrollHeight": 514
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    }
+  ],
+  "steps": [
+    {
+      "label": "Settings during initial model load settings owns focus",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        },
+        {
+          "title": "Настройки",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": false,
+        "inModal": false,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "lukas",
+      "angle": "0",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "Settings during initial model load",
+      "before": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "A",
+          "label": "Вавилон — главная",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "lukas",
+        "angle": "0",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 0,
+            "width": 1622,
+            "scrollWidth": 1622,
+            "height": 798,
+            "scrollHeight": 815
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 773,
+            "scrollHeight": 773
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 524,
+            "scrollHeight": 524
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 524,
+            "scrollHeight": 524
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "after": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "lukas",
+        "angle": "0",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 0,
+            "width": 1622,
+            "scrollWidth": 1622,
+            "height": 798,
+            "scrollHeight": 815
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 773,
+            "scrollHeight": 773
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 524,
+            "scrollHeight": 524
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 524,
+            "scrollHeight": 524
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "selectionPreserved": true,
+      "anglePreserved": true
+    },
+    {
+      "label": "chooser selection and angle settings owns focus",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        },
+        {
+          "title": "Настройки",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": false,
+        "inModal": false,
+        "rect": {
+          "x": 1522,
+          "y": 878,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 1622,
+          "scrollWidth": 1622,
+          "height": 798,
+          "scrollHeight": 815
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 773,
+          "scrollHeight": 773
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 524,
+          "scrollHeight": 524
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 524,
+          "scrollHeight": 524
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser selection and angle",
+      "before": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 0,
+            "width": 1622,
+            "scrollWidth": 1622,
+            "height": 798,
+            "scrollHeight": 815
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 773,
+            "scrollHeight": 773
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 524,
+            "scrollHeight": 524
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 524,
+            "scrollHeight": 524
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "after": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1622,
+          "height": 970,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 0,
+            "width": 1622,
+            "scrollWidth": 1622,
+            "height": 798,
+            "scrollHeight": 815
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 773,
+            "scrollHeight": 773
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 524,
+            "scrollHeight": 524
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 524,
+            "scrollHeight": 524
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "selectionPreserved": true,
+      "anglePreserved": true
+    },
+    {
+      "label": "chooser 1280 settings owns focus",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        },
+        {
+          "title": "Настройки",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": false,
+        "inModal": false,
+        "rect": {
+          "x": 1180,
+          "y": 708,
+          "w": 72,
+          "h": 72
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 90,
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 628,
+          "scrollHeight": 718
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 676,
+          "scrollHeight": 676
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 986,
+          "scrollWidth": 986,
+          "height": 432,
+          "scrollHeight": 432
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 523,
+          "scrollWidth": 523,
+          "height": 432,
+          "scrollHeight": 432
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser 1280",
+      "before": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 90,
+            "width": 1280,
+            "scrollWidth": 1280,
+            "height": 628,
+            "scrollHeight": 718
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 676,
+            "scrollHeight": 676
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 432,
+            "scrollHeight": 432
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 432,
+            "scrollHeight": 432
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "after": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 90,
+            "width": 1280,
+            "scrollWidth": 1280,
+            "height": 628,
+            "scrollHeight": 718
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 1062,
+            "scrollWidth": 1062,
+            "height": 676,
+            "scrollHeight": 676
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 986,
+            "scrollWidth": 986,
+            "height": 432,
+            "scrollHeight": 432
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 523,
+            "scrollWidth": 523,
+            "height": 432,
+            "scrollHeight": 432
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "selectionPreserved": true,
+      "anglePreserved": true
+    },
+    {
+      "label": "Tab 1280",
+      "traversal": [
+        {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Повернуть персонажа влево",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Повернуть персонажа вправо",
+          "inModal": true
+        },
+        {
+          "tag": "INPUT",
+          "label": "Облик 4",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "inModal": true
+        },
+        {
+          "tag": "BODY",
+          "label": null,
+          "inModal": false
+        },
+        {
+          "tag": "A",
+          "label": "Вавилон — главная",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        }
+      ]
+    },
+    {
+      "label": "chooser 390 settings owns focus",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        },
+        {
+          "title": "Настройки",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": false,
+        "inModal": false,
+        "rect": {
+          "x": 322,
+          "y": 776,
+          "w": 56,
+          "h": 56
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 100,
+          "width": 390,
+          "scrollWidth": 390,
+          "height": 692,
+          "scrollHeight": 826
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354,
+          "height": 790,
+          "scrollHeight": 790
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 322,
+          "scrollWidth": 322,
+          "height": 576,
+          "scrollHeight": 576
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 322,
+          "scrollWidth": 322,
+          "height": 306,
+          "scrollHeight": 306
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser 390",
+      "before": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 100,
+            "width": 390,
+            "scrollWidth": 390,
+            "height": 692,
+            "scrollHeight": 826
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 354,
+            "scrollWidth": 354,
+            "height": 790,
+            "scrollHeight": 790
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 322,
+            "scrollWidth": 322,
+            "height": 576,
+            "scrollHeight": 576
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 322,
+            "scrollWidth": 322,
+            "height": 306,
+            "scrollHeight": 306
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "after": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 100,
+            "width": 390,
+            "scrollWidth": 390,
+            "height": 692,
+            "scrollHeight": 826
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 354,
+            "scrollWidth": 354,
+            "height": 790,
+            "scrollHeight": 790
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 322,
+            "scrollWidth": 322,
+            "height": 576,
+            "scrollHeight": 576
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 322,
+            "scrollWidth": 322,
+            "height": 306,
+            "scrollHeight": 306
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "selectionPreserved": true,
+      "anglePreserved": true
+    },
+    {
+      "label": "Tab 390",
+      "traversal": [
+        {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Повернуть персонажа влево",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Повернуть персонажа вправо",
+          "inModal": true
+        },
+        {
+          "tag": "INPUT",
+          "label": "Облик 4",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "inModal": true
+        },
+        {
+          "tag": "BODY",
+          "label": null,
+          "inModal": false
+        },
+        {
+          "tag": "A",
+          "label": "Вавилон — главная",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        }
+      ]
+    },
+    {
+      "label": "chooser 640 settings owns focus",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": "Закрыть настройки",
+        "inModal": true
+      },
+      "dialogs": [
+        {
+          "title": "Выберите свой облик",
+          "modal": true
+        },
+        {
+          "title": "Настройки",
+          "modal": true
+        }
+      ],
+      "visibleGears": 1,
+      "visibleBrands": 1,
+      "gear": {
+        "hitIsGear": false,
+        "inModal": false,
+        "rect": {
+          "x": 572,
+          "y": 412,
+          "w": 56,
+          "h": 56
+        }
+      },
+      "selected": "ksu",
+      "angle": "127",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 690,
+          "width": 640,
+          "scrollWidth": 640,
+          "height": 328,
+          "scrollHeight": 1018
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 604,
+          "scrollWidth": 604,
+          "height": 982,
+          "scrollHeight": 982
+        },
+        {
+          "class": "avatar-layout",
+          "top": 0,
+          "width": 572,
+          "scrollWidth": 572,
+          "height": 784,
+          "scrollHeight": 784
+        },
+        {
+          "class": "avatar-options",
+          "top": 0,
+          "width": 572,
+          "scrollWidth": 572,
+          "height": 514,
+          "scrollHeight": 514
+        }
+      ],
+      "portraits": [
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        },
+        {
+          "loaded": true,
+          "width": 320,
+          "height": 320,
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "label": "chooser 640",
+      "before": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 640,
+          "height": 480,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 690,
+            "width": 640,
+            "scrollWidth": 640,
+            "height": 328,
+            "scrollHeight": 1018
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 604,
+            "scrollWidth": 604,
+            "height": 982,
+            "scrollHeight": 982
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 572,
+            "scrollWidth": 572,
+            "height": 784,
+            "scrollHeight": 784
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 572,
+            "scrollWidth": 572,
+            "height": 514,
+            "scrollHeight": 514
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "after": {
+        "bundle": [
+          "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+        ],
+        "viewport": {
+          "width": 640,
+          "height": 480,
+          "dpr": 1
+        },
+        "locked": false,
+        "active": {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        "dialogs": [
+          {
+            "title": "Выберите свой облик",
+            "modal": true
+          }
+        ],
+        "visibleGears": 1,
+        "visibleBrands": 1,
+        "gear": {
+          "hitIsGear": true,
+          "inModal": true,
+          "rect": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56
+          }
+        },
+        "selected": "ksu",
+        "angle": "127",
+        "scroll": [
+          {
+            "class": "avatar-dialog-body",
+            "top": 690,
+            "width": 640,
+            "scrollWidth": 640,
+            "height": 328,
+            "scrollHeight": 1018
+          },
+          {
+            "class": "avatar-tablet",
+            "top": 0,
+            "width": 604,
+            "scrollWidth": 604,
+            "height": 982,
+            "scrollHeight": 982
+          },
+          {
+            "class": "avatar-layout",
+            "top": 0,
+            "width": 572,
+            "scrollWidth": 572,
+            "height": 784,
+            "scrollHeight": 784
+          },
+          {
+            "class": "avatar-options",
+            "top": 0,
+            "width": 572,
+            "scrollWidth": 572,
+            "height": 514,
+            "scrollHeight": 514
+          }
+        ],
+        "portraits": [
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          },
+          {
+            "loaded": true,
+            "width": 320,
+            "height": 320,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+          }
+        ],
+        "alerts": []
+      },
+      "selectionPreserved": true,
+      "anglePreserved": true
+    },
+    {
+      "label": "Tab 640",
+      "traversal": [
+        {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Повернуть персонажа влево",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Повернуть персонажа вправо",
+          "inModal": true
+        },
+        {
+          "tag": "INPUT",
+          "label": "Облик 4",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": null,
+          "inModal": true
+        },
+        {
+          "tag": "BODY",
+          "label": null,
+          "inModal": false
+        },
+        {
+          "tag": "A",
+          "label": "Вавилон — главная",
+          "inModal": true
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Настройки",
+          "inModal": true
+        },
+        {
+          "tag": "DIV",
+          "label": "Вращение персонажа",
+          "inModal": true
+        }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "label": "initial chooser enabled within 5s of visible dialog",
+      "pass": true,
+      "ms": 1870,
+      "deadline": 5000
+    },
+    {
+      "label": "selected nic ready",
+      "pass": true,
+      "ms": 452,
+      "deadline": 5000
+    },
+    {
+      "label": "selected dan ready",
+      "pass": true,
+      "ms": 507,
+      "deadline": 5000
+    },
+    {
+      "label": "selected ksu ready",
+      "pass": true,
+      "ms": 406,
+      "deadline": 5000
+    }
+  ],
+  "errors": [],
+  "models": [
+    {
+      "id": "lukas",
+      "status": 200,
+      "bytes": 883556,
+      "sha256": "76dccb6dad65f3a00b86937841567f98c5e3f98078a3b97c38d584a27eaf8f71",
+      "approved": true
+    },
+    {
+      "id": "nic",
+      "status": 200,
+      "bytes": 883560,
+      "sha256": "b452683fc4b402a6b0242879c095264e359493c564445f594f3c80e386cc8c3b",
+      "approved": true
+    },
+    {
+      "id": "dan",
+      "status": 200,
+      "bytes": 883568,
+      "sha256": "c209d2f78e55b6424689b5e347d1de0423dc72bcce079b646a6cb5878a2a1039",
+      "approved": true
+    },
+    {
+      "id": "ksu",
+      "status": 200,
+      "bytes": 720372,
+      "sha256": "3f085325b1cf993f2947d65df7493422e394f5463c135374f96bc0132567483b",
+      "approved": true
+    },
+    {
+      "id": "lukas",
+      "status": 200,
+      "bytes": 883556,
+      "sha256": "76dccb6dad65f3a00b86937841567f98c5e3f98078a3b97c38d584a27eaf8f71",
+      "approved": true
+    },
+    {
+      "id": "nic",
+      "status": 200,
+      "bytes": 883560,
+      "sha256": "b452683fc4b402a6b0242879c095264e359493c564445f594f3c80e386cc8c3b",
+      "approved": true
+    },
+    {
+      "id": "dan",
+      "status": 200,
+      "bytes": 883568,
+      "sha256": "c209d2f78e55b6424689b5e347d1de0423dc72bcce079b646a6cb5878a2a1039",
+      "approved": true
+    },
+    {
+      "id": "ksu",
+      "status": 200,
+      "bytes": 720372,
+      "sha256": "3f085325b1cf993f2947d65df7493422e394f5463c135374f96bc0132567483b",
+      "approved": true
+    }
+  ],
+  "portraits": [],
+  "initialFocus": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+    ],
+    "viewport": {
+      "width": 1622,
+      "height": 970,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "A",
+      "label": "Вавилон — главная",
+      "inModal": true
+    },
+    "dialogs": [
+      {
+        "title": "Выберите свой облик",
+        "modal": true
+      }
+    ],
+    "visibleGears": 1,
+    "visibleBrands": 1,
+    "gear": {
+      "hitIsGear": true,
+      "inModal": true,
+      "rect": {
+        "x": 1522,
+        "y": 878,
+        "w": 72,
+        "h": 72
+      }
+    },
+    "selected": "lukas",
+    "angle": "0",
+    "scroll": [
+      {
+        "class": "avatar-dialog-body",
+        "top": 0,
+        "width": 1622,
+        "scrollWidth": 1622,
+        "height": 798,
+        "scrollHeight": 815
+      },
+      {
+        "class": "avatar-tablet",
+        "top": 0,
+        "width": 1062,
+        "scrollWidth": 1062,
+        "height": 773,
+        "scrollHeight": 773
+      },
+      {
+        "class": "avatar-layout",
+        "top": 0,
+        "width": 986,
+        "scrollWidth": 986,
+        "height": 524,
+        "scrollHeight": 524
+      },
+      {
+        "class": "avatar-options",
+        "top": 0,
+        "width": 523,
+        "scrollWidth": 523,
+        "height": 524,
+        "scrollHeight": 524
+      }
+    ],
+    "portraits": [
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      }
+    ],
+    "alerts": []
+  },
+  "rotationKeyboard": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+    ],
+    "viewport": {
+      "width": 1622,
+      "height": 970,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "DIV",
+      "label": "Вращение персонажа",
+      "inModal": true
+    },
+    "dialogs": [
+      {
+        "title": "Выберите свой облик",
+        "modal": true
+      }
+    ],
+    "visibleGears": 1,
+    "visibleBrands": 1,
+    "gear": {
+      "hitIsGear": true,
+      "inModal": true,
+      "rect": {
+        "x": 1522,
+        "y": 878,
+        "w": 72,
+        "h": 72
+      }
+    },
+    "selected": "ksu",
+    "angle": "11",
+    "scroll": [
+      {
+        "class": "avatar-dialog-body",
+        "top": 0,
+        "width": 1622,
+        "scrollWidth": 1622,
+        "height": 798,
+        "scrollHeight": 815
+      },
+      {
+        "class": "avatar-tablet",
+        "top": 0,
+        "width": 1062,
+        "scrollWidth": 1062,
+        "height": 773,
+        "scrollHeight": 773
+      },
+      {
+        "class": "avatar-layout",
+        "top": 0,
+        "width": 986,
+        "scrollWidth": 986,
+        "height": 524,
+        "scrollHeight": 524
+      },
+      {
+        "class": "avatar-options",
+        "top": 0,
+        "width": 523,
+        "scrollWidth": 523,
+        "height": 524,
+        "scrollHeight": 524
+      }
+    ],
+    "portraits": [
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      },
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      },
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      },
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      }
+    ],
+    "alerts": []
+  },
+  "rotationDrag": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+    ],
+    "viewport": {
+      "width": 1622,
+      "height": 970,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "DIV",
+      "label": "Вращение персонажа",
+      "inModal": true
+    },
+    "dialogs": [
+      {
+        "title": "Выберите свой облик",
+        "modal": true
+      }
+    ],
+    "visibleGears": 1,
+    "visibleBrands": 1,
+    "gear": {
+      "hitIsGear": true,
+      "inModal": true,
+      "rect": {
+        "x": 1522,
+        "y": 878,
+        "w": 72,
+        "h": 72
+      }
+    },
+    "selected": "ksu",
+    "angle": "127",
+    "scroll": [
+      {
+        "class": "avatar-dialog-body",
+        "top": 0,
+        "width": 1622,
+        "scrollWidth": 1622,
+        "height": 798,
+        "scrollHeight": 815
+      },
+      {
+        "class": "avatar-tablet",
+        "top": 0,
+        "width": 1062,
+        "scrollWidth": 1062,
+        "height": 773,
+        "scrollHeight": 773
+      },
+      {
+        "class": "avatar-layout",
+        "top": 0,
+        "width": 986,
+        "scrollWidth": 986,
+        "height": 524,
+        "scrollHeight": 524
+      },
+      {
+        "class": "avatar-options",
+        "top": 0,
+        "width": 523,
+        "scrollWidth": 523,
+        "height": 524,
+        "scrollHeight": 524
+      }
+    ],
+    "portraits": [
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      },
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      },
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      },
+      {
+        "loaded": true,
+        "width": 320,
+        "height": 320,
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAA"
+      }
+    ],
+    "alerts": []
+  },
+  "avatarSaveStatus": 200,
+  "logoutStatus": 204,
+  "ok": true,
+  "finishedAt": "2026-11-01T03:55:20.802Z"
+}

@@ -1,0 +1,46 @@
+ExpectError: expect(locator).toBeEnabled() failed
+
+Locator:  getByRole('button', { name: 'Начать прогулку', exact: true })
+Expected: enabled
+Received: disabled
+Timeout:  90000ms
+
+Call log:
+  - Expect "toBeEnabled" getByRole('button', { name: 'Начать прогулку', exact: true }) with timeout 90000ms
+  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })
+    162 × locator resolved to <button disabled class="primary large">…</button>
+        - unexpected value "disabled"
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeEnabled (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at gate (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-supplement.mjs:1:2678)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-supplement.mjs:3:595 {
+  matcherResult: {
+    message: 'expect(locator).toBeEnabled() failed\n' +
+      '\n' +
+      "Locator:  getByRole('button', { name: 'Начать прогулку', exact: true })\n" +
+      'Expected: enabled\n' +
+      'Received: disabled\n' +
+      'Timeout:  90000ms\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Начать прогулку', exact: true }) with timeout 90000ms\n` +
+      "  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n" +
+      '    162 × locator resolved to <button disabled class="primary large">…</button>\n' +
+      '        - unexpected value "disabled"\n',
+    pass: false,
+    actual: 'disabled',
+    name: 'toBeEnabled',
+    expected: 'enabled',
+    log: [
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Начать прогулку', exact: true }) with timeout 90000ms`,
+      "  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })",
+      '    162 × locator resolved to <button disabled class="primary large">…</button>',
+      '        - unexpected value "disabled"'
+    ],
+    timeout: 90000,
+    ariaSnapshot: '- button "Начать прогулку" [disabled]'
+  }
+}
+SUPPLEMENT CLOSED

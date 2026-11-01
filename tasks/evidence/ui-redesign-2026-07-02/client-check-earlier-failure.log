@@ -1,0 +1,28 @@
+
+> educational-world-client@0.1.0 check
+> node scripts/generate-demo-world.mjs && svelte-check --tsconfig ./tsconfig.json && tsc --noEmit && npm run check:core
+
+Prepared 1024 chunks; 1024 unique collision resources; world 18697328 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 20277145 bytes.
+Loading svelte-check in workspace: /data/worktrees/ui-hud-669eb5/client
+Getting Svelte diagnostics...
+
+/data/worktrees/ui-hud-669eb5/client/src/ui/EntrySetup.svelte:18:38
+Error: Type 'Language | undefined' is not assignable to type 'Language'.
+  Type 'undefined' is not assignable to type 'Language'. (ts)
+    if (!languages?.length) return;
+    if (!languages.includes(native)) native = languages[0];
+    if (!languages.includes(learning)) learning = languages.find(code => code !== native) ?? languages[0];
+
+/data/worktrees/ui-hud-669eb5/client/src/ui/EntrySetup.svelte:19:40
+Error: Type 'Language | undefined' is not assignable to type 'Language'.
+  Type 'undefined' is not assignable to type 'Language'. (ts)
+    if (!languages.includes(native)) native = languages[0];
+    if (!languages.includes(learning)) learning = languages.find(code => code !== native) ?? languages[0];
+  });
+
+====================================
+svelte-check found 2 errors and 0 warnings in 1 file

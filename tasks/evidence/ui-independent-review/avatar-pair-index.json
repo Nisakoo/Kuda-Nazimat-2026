@@ -1,0 +1,62 @@
+[
+  {
+    "left": "specs/images/lukas.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-avatar-baseline/lukas-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-lukas-reference-current.png",
+    "width": 2281,
+    "height": 970,
+    "leftWidth": 647,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "left": "specs/images/nic.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-avatar-baseline/nic-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-nic-reference-current.png",
+    "width": 2281,
+    "height": 970,
+    "leftWidth": 647,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "left": "specs/images/dan.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-avatar-baseline/dan-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-dan-reference-current.png",
+    "width": 2281,
+    "height": 970,
+    "leftWidth": 647,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "left": "specs/images/ksu.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-avatar-baseline/ksu-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-ksu-reference-current.png",
+    "width": 2281,
+    "height": 970,
+    "leftWidth": 647,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "left": "specs/images/oblik_page.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-avatar-baseline/lukas-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/R02-reference-current.png",
+    "width": 3358,
+    "height": 970,
+    "leftWidth": 1724,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "left": "specs/images/oblik_page.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-avatar-baseline/chooser-390x844.png",
+    "out": "tasks/evidence/ui-independent-review/R05-reference-current.png",
+    "width": 2119,
+    "height": 941,
+    "leftWidth": 1672,
+    "rightWidth": 435,
+    "gap": 12
+  }
+]

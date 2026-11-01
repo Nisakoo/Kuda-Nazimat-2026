@@ -1,0 +1,59 @@
+{
+  "crop": {
+    "width": 380,
+    "height": 370,
+    "pixels": 140600,
+    "changedPixels": 7370,
+    "changedMoreThan2": 5314,
+    "maxChannelDifference": 69,
+    "meanMaxChannelDifferenceOverAllPixels": 0.4793456614509246,
+    "changedBoundingBox": {
+      "minX": 0,
+      "minY": 0,
+      "maxX": 379,
+      "maxY": 348
+    }
+  },
+  "frustum": {
+    "near": 0.5,
+    "far": 15,
+    "left": -2,
+    "right": 2,
+    "top": 3,
+    "bottom": -1,
+    "byKind": {
+      "casters": {
+        "count": 20383,
+        "outside": 0,
+        "min": [
+          -0.19250036440765037,
+          -0.5919473276074911,
+          -0.11617080572253558
+        ],
+        "max": [
+          0.21847741306025956,
+          0.1887344297104776,
+          0.10198044380496385
+        ]
+      },
+      "pedestalReceiver": {
+        "count": 40,
+        "outside": 0,
+        "min": [
+          -0.3799462318770246,
+          -0.7818190997832285,
+          0.025029454326060074
+        ],
+        "max": [
+          0.37994623187702414,
+          -0.27602151373432526,
+          0.1612880352810695
+        ]
+      }
+    }
+  },
+  "notes": [
+    "Pixel differences do not by themselves establish the cause of the reported deployed-chooser cloth dots.",
+    "Frustum samples static mesh vertices and does not prove all animated poses or account for normal-bias offsets."
+  ]
+}

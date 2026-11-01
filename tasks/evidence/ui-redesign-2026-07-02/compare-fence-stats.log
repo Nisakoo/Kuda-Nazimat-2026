@@ -1,0 +1,4 @@
+1251 goto
+26294 click
+33005 capture true GPU warnings 4
+37369 fence stats { waits: 28, timedOut: 11, fences: 18 }

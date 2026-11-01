@@ -1,0 +1,68 @@
+CAPTURE hud-overlap-390x844
+locator.click: Timeout 45000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })
+    - locator resolved to <button aria-pressed="false">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - performing click action
+      - <canvas role="img" width="1622" height="970" data-engine="three.js r187" aria-label="Трёхмерная сцена"></canvas> from <div class="viewport">…</div> subtree intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - performing click action
+      - <canvas role="img" width="1622" height="970" data-engine="three.js r187" aria-label="Трёхмерная сцена"></canvas> from <div class="viewport">…</div> subtree intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - performing click action
+    - <canvas role="img" width="1622" height="970" data-engine="three.js r187" aria-label="Трёхмерная сцена"></canvas> from <div class="viewport">…</div> subtree intercepts pointer events
+  - retrying click action
+    - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-word-chat-completion-joined.mjs:1:1996)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-word-chat-completion-joined.mjs:2:2824 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })",
+    '    - locator resolved to <button aria-pressed="false">…</button>',
+    '  - attempting click action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - performing click action',
+    '      - <canvas role="img" width="1622" height="970" data-engine="three.js r187" aria-label="Трёхмерная сцена"></canvas> from <div class="viewport">…</div> subtree intercepts pointer events',
+    '    - retrying click action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - performing click action',
+    '      - <canvas role="img" width="1622" height="970" data-engine="three.js r187" aria-label="Трёхмерная сцена"></canvas> from <div class="viewport">…</div> subtree intercepts pointer events',
+    '    - retrying click action',
+    '      - waiting 100ms',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed',
+    '    - done scrolling',
+    '    - performing click action',
+    '    - <canvas role="img" width="1622" height="970" data-engine="three.js r187" aria-label="Трёхмерная сцена"></canvas> from <div class="viewport">…</div> subtree intercepts pointer events',
+    '  - retrying click action',
+    '    - waiting 500ms',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure
+WORD/CHAT COMPLETION CLOSED

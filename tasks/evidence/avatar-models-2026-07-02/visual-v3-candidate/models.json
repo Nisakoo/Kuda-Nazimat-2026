@@ -1,0 +1,134 @@
+{
+  "generator": "client/scripts/generate-avatar-models.mjs",
+  "profile": {
+    "height": 1.8,
+    "width": 0.96,
+    "depth": 0.56,
+    "forward": "+Z",
+    "up": "+Y",
+    "units": "metres",
+    "walkCycleMetres": 1.2
+  },
+  "models": [
+    {
+      "id": "lukas",
+      "path": "/assets/models/avatars/lukas.glb",
+      "bytes": 883556,
+      "triangles": 6814,
+      "drawCalls": 17,
+      "bounds": {
+        "min": [
+          -0.48,
+          3.1299644265292415e-9,
+          -0.2847992913476692
+        ],
+        "max": [
+          0.48,
+          1.8000000031299646,
+          0.27520070865233087
+        ]
+      },
+      "clips": [
+        {
+          "name": "idle",
+          "duration": 4
+        },
+        {
+          "name": "walk",
+          "duration": 0.9
+        }
+      ],
+      "portrait": "/assets/models/avatars/lukas-portrait.png"
+    },
+    {
+      "id": "nic",
+      "path": "/assets/models/avatars/nic.glb",
+      "bytes": 883560,
+      "triangles": 6814,
+      "drawCalls": 17,
+      "bounds": {
+        "min": [
+          -0.48,
+          3.25939322753932e-9,
+          -0.2847992913476692
+        ],
+        "max": [
+          0.48,
+          1.8000000032593932,
+          0.27520070865233087
+        ]
+      },
+      "clips": [
+        {
+          "name": "idle",
+          "duration": 4
+        },
+        {
+          "name": "walk",
+          "duration": 0.9
+        }
+      ],
+      "portrait": "/assets/models/avatars/nic-portrait.png"
+    },
+    {
+      "id": "dan",
+      "path": "/assets/models/avatars/dan.glb",
+      "bytes": 883568,
+      "triangles": 6814,
+      "drawCalls": 17,
+      "bounds": {
+        "min": [
+          -0.48,
+          3.16858927984498e-9,
+          -0.2847992913476692
+        ],
+        "max": [
+          0.48,
+          1.8000000031685892,
+          0.27520070865233087
+        ]
+      },
+      "clips": [
+        {
+          "name": "idle",
+          "duration": 4
+        },
+        {
+          "name": "walk",
+          "duration": 0.9
+        }
+      ],
+      "portrait": "/assets/models/avatars/dan-portrait.png"
+    },
+    {
+      "id": "ksu",
+      "path": "/assets/models/avatars/ksu.glb",
+      "bytes": 756852,
+      "triangles": 5702,
+      "drawCalls": 17,
+      "bounds": {
+        "min": [
+          -0.48,
+          3.25939322753932e-9,
+          -0.2853848587930961
+        ],
+        "max": [
+          0.48,
+          1.8000000032593932,
+          0.27461514120690395
+        ]
+      },
+      "clips": [
+        {
+          "name": "idle",
+          "duration": 4
+        },
+        {
+          "name": "walk",
+          "duration": 0.9
+        }
+      ],
+      "portrait": "/assets/models/avatars/ksu-portrait.png"
+    }
+  ]
+}

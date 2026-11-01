@@ -1,12 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import type { AvatarId } from '../../../shared/avatar/types';
   import { AVATAR_IDS } from '../../../shared/avatar/types';
   import type { GameApp, AvatarView, AvatarPreview } from '../app/GameApp';
   import { modal } from './modal';
+  import EntryChrome from './EntryChrome.svelte';
   import './avatar-selection.css';
   const { game, view, first }: { game: GameApp; view: AvatarView | null; first: boolean } = $props();
   let host: HTMLDivElement;
+  let dialog: HTMLDialogElement;
+  let initialFocusDone = false;
+  let interacted = false;
   let preview: AvatarPreview | undefined;
   let selected = $state<AvatarId>('lukas');
   let loading = $state(true), previewError = $state<string | null>(null);
@@ -15,6 +19,14 @@
   let angle = $state(0);
   function turn(radians: number) { angle = (angle + radians * 180 / Math.PI + 360) % 360; preview?.rotate(radians); }
   $effect(() => { const id = selected; if (preview) { loading = true; previewError = null; preview.select(id); } });
+  $effect(() => {
+    if (loading || previewError || initialFocusDone) return;
+    void tick().then(() => {
+      if (initialFocusDone || interacted || !dialog?.open || !dialog.contains(document.activeElement)) return;
+      initialFocusDone = true;
+      host.focus();
+    });
+  });
   function startPreview() {
     preview?.dispose(); preview = undefined;
     loading = true; previewError = null; portraits = {}; angle = 0;
@@ -30,7 +42,9 @@
   function confirm() { if (!view?.busy && view?.state && !loading && !previewError) void game.saveAvatar(selected); }
 </script>
 <div class="avatar-backdrop">
-  <dialog use:modal class="avatar-tablet" aria-labelledby="avatar-title" onkeydown={event => { if (event.code === 'Enter' && !event.isComposing && !event.repeat && !(event.target as HTMLElement).closest('button')) { event.preventDefault(); confirm(); } }} oncancel={event => { event.preventDefault(); game.closeAvatar(); }}>
+  <dialog bind:this={dialog} use:modal class="avatar-dialog" aria-labelledby="avatar-title" onpointerdowncapture={() => { interacted = true; }} onkeydown={event => { interacted = true; const target = event.target as HTMLElement; if (event.code === 'Enter' && !event.isComposing && !event.repeat && (target === host || (target instanceof HTMLInputElement && target.name === 'avatar-choice'))) { event.preventDefault(); confirm(); } }} oncancel={event => { event.preventDefault(); game.closeAvatar(); }}>
+    <EntryChrome openSettings={() => game.openSettings()} />
+    <div class="avatar-dialog-body"><div class="avatar-tablet">
     <div class="avatar-ornament" aria-hidden="true"><span>◆</span><i>▽▽▽</i><i>▽▽▽</i><span>◆</span></div>
     <h1 id="avatar-title">Выберите свой облик</h1>
     <p class="avatar-subtitle">Все персонажи обладают одинаковыми возможностями</p>
@@ -52,5 +66,6 @@
       {#if view?.busy}<p class="avatar-status" role="status">Ожидаем подтверждения сервера…</p>{/if}
       <div class="avatar-bottom"><button type="button" class="avatar-back" onclick={() => game.closeAvatar()}>← Назад</button><button class="avatar-confirm" disabled={!view?.state || view.busy || loading || !!previewError}>{first ? 'Продолжить →' : 'Подтвердить →'}</button></div>
     </form>
+    </div></div>
   </dialog>
 </div>

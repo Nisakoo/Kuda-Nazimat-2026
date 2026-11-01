@@ -1,0 +1,123 @@
+{
+  "status": "complete",
+  "startedAt": "2026-11-01T03:21:23.768Z",
+  "candidates": {
+    "lukas": {
+      "sha256": "76dccb6dad65f3a00b86937841567f98c5e3f98078a3b97c38d584a27eaf8f71",
+      "bytes": 883556
+    },
+    "nic": {
+      "sha256": "b452683fc4b402a6b0242879c095264e359493c564445f594f3c80e386cc8c3b",
+      "bytes": 883560
+    },
+    "dan": {
+      "sha256": "c209d2f78e55b6424689b5e347d1de0423dc72bcce079b646a6cb5878a2a1039",
+      "bytes": 883568
+    },
+    "ksu": {
+      "sha256": "3f085325b1cf993f2947d65df7493422e394f5463c135374f96bc0132567483b",
+      "bytes": 720372
+    }
+  },
+  "images": [
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-front-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "three-quarter",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-three-quarter-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-side-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/nic-neutral-front-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "three-quarter",
+      "pose": "idle",
+      "file": "captures/nic-neutral-three-quarter-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/nic-neutral-side-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/dan-neutral-front-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "three-quarter",
+      "pose": "idle",
+      "file": "captures/dan-neutral-three-quarter-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/dan-neutral-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-front-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "three-quarter",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-three-quarter-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-back-idle.png"
+    }
+  ],
+  "errors": [],
+  "shadowMap": "PCFShadowMap: explicit supported equivalent of the prior removed PCFSoftShadowMap fallback",
+  "limitations": [
+    "Private candidate GLBs only.",
+    "SwiftShader evidence is not hardware acceptance.",
+    "No tool attachment is rendered."
+  ],
+  "finishedAt": "2026-11-01T03:21:31.947Z"
+}

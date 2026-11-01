@@ -1,0 +1,16 @@
+{
+  "model": "lukas",
+  "speedMetresPerSecond": 3,
+  "pace": 2.370996670519162,
+  "worldCycleMetres": 1.1387615858116007,
+  "cyclesPerSecond": 2.6344408148101395,
+  "recordingFrames": 18,
+  "nominalRecordRate": 30,
+  "seconds": 3,
+  "viewport": [
+    800,
+    600
+  ],
+  "hardware": "Chromium headless SwiftShader, isolated model scene, no shadows",
+  "note": "Actual 3-second renderer observation. Not a full application performance or LAN acceptance test."
+}

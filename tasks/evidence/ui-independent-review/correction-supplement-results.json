@@ -1,0 +1,410 @@
+{
+  "startedAt": "2026-11-01T05:00:40.439Z",
+  "username": "indkbd-mvxd3erb",
+  "scope": "Actual narrow initial chooser and native radio keyboard/Enter; local inventory is UI-only, never server/AI authority acceptance.",
+  "steps": [
+    {
+      "label": "Tab to native avatar radio",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "name": "avatar-choice",
+        "label": "Облик 1",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "lukas",
+      "angle": "17",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 390,
+          "scrollWidth": 390
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    },
+    {
+      "label": "native radio ArrowRight nic",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "name": "avatar-choice",
+        "label": "Облик 2",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "nic",
+      "angle": "17",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 390,
+          "scrollWidth": 390
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    },
+    {
+      "label": "native radio ArrowRight dan",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "name": "avatar-choice",
+        "label": "Облик 3",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "dan",
+      "angle": "17",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 390,
+          "scrollWidth": 390
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    },
+    {
+      "label": "native radio ArrowRight ksu",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "name": "avatar-choice",
+        "label": "Облик 4",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "ksu",
+      "angle": "17",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 390,
+          "scrollWidth": 390
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    },
+    {
+      "label": "native radio ArrowRight lukas",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "name": "avatar-choice",
+        "label": "Облик 1",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "lukas",
+      "angle": "17",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 390,
+          "scrollWidth": 390
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    }
+  ],
+  "screens": [
+    {
+      "file": "correction-supplement/initial-lukas-390x844.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "name": null,
+        "label": "Вращение персонажа",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "lukas",
+      "angle": "0",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 390,
+          "scrollWidth": 390
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    },
+    {
+      "file": "correction-supplement/chooser-top-390x844.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "DIV",
+        "name": null,
+        "label": "Вращение персонажа",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "lukas",
+      "angle": "0",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 390,
+          "scrollWidth": 390
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 354,
+          "scrollWidth": 354
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    },
+    {
+      "file": "correction-supplement/chooser-top-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "INPUT",
+        "name": "avatar-choice",
+        "label": "Облик 1",
+        "text": "",
+        "inModal": true
+      },
+      "selected": "lukas",
+      "angle": "17",
+      "title": "Выберите свой облик",
+      "scroll": [
+        {
+          "class": "avatar-dialog-body",
+          "top": 0,
+          "width": 640,
+          "scrollWidth": 640
+        },
+        {
+          "class": "avatar-tablet",
+          "top": 0,
+          "width": 604,
+          "scrollWidth": 604
+        }
+      ],
+      "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+    },
+    {
+      "file": "correction-supplement/failure.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "name": null,
+        "label": null,
+        "text": "\n      Вавилон  Локальное демо     Добро пожаловат",
+        "inModal": false
+      },
+      "scroll": [],
+      "text": "стый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n\nНе удалось загрузить участок мира. Повторите загрузку в меню.\n\nПовторить загрузку\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\nО мире и управлении\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nДемо работает локально. Учебные ответы подготовлены заранее.\n\nСцена открыта"
+    }
+  ],
+  "gates": [
+    {
+      "label": "initial narrow chooser5s",
+      "pass": true,
+      "ms": 2794,
+      "deadline": 5000
+    },
+    {
+      "label": "keyboard selected nic",
+      "pass": true,
+      "ms": 77,
+      "deadline": 5000
+    },
+    {
+      "label": "keyboard selected dan",
+      "pass": true,
+      "ms": 79,
+      "deadline": 5000
+    },
+    {
+      "label": "keyboard selected ksu",
+      "pass": true,
+      "ms": 34,
+      "deadline": 5000
+    },
+    {
+      "label": "keyboard selected lukas",
+      "pass": true,
+      "ms": 43,
+      "deadline": 5000
+    },
+    {
+      "label": "local-only initial Start5s",
+      "pass": false,
+      "ms": 5025,
+      "deadline": 5000,
+      "error": "Error: expect(locator).toBeEnabled() failed\n\nLocator:  getByRole('button', { name: 'Начать прогулку', exact: true })\nExpected: enabled\nReceived: disabled\nTimeout:  5000ms\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Начать прогулку', exact: true }) with timeout 5000ms\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n    12 × locator resolved to <button disabled class=\"primary large\">…</button>\n       - unexpected value \"disabled\"\n"
+    }
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "sockets": [],
+  "initialNarrow": {
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+    ],
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "dpr": 1
+    },
+    "locked": false,
+    "active": {
+      "tag": "DIV",
+      "name": null,
+      "label": "Вращение персонажа",
+      "text": "",
+      "inModal": true
+    },
+    "selected": "lukas",
+    "angle": "0",
+    "title": "Выберите свой облик",
+    "scroll": [
+      {
+        "class": "avatar-dialog-body",
+        "top": 0,
+        "width": 390,
+        "scrollWidth": 390
+      },
+      {
+        "class": "avatar-tablet",
+        "top": 0,
+        "width": 354,
+        "scrollWidth": 354
+      }
+    ],
+    "text": "альный сервер.\n\nПовторить подключение Выйти из сессии\n\nГотовим окрестности точки появления…\n\nНачать прогулку\n↗\n\nW A S D движение относительно камеры\n\nSpace прыжок · Shift спринт\n\nE разговор с персонажем\n\nМышь обзор · колесо — масштаб\n\nEsc освободить курсор и открыть меню\n\nПозиция и история разговоров сохраняются на сервере.\n\nВавилон\n◆\n▽▽▽\n▽▽▽\n◆\nВыберите свой облик\n\nВсе персонажи обладают одинаковыми возможностями\n\n⤺\n⤻\nОблик персонажа\n✓\n\nВнешность можно изменить в настройках\n\n← Назад\nПродолжить →"
+  },
+  "enterSaveStatus": 200,
+  "logoutStatus": 204,
+  "avatarKeyboardPass": true,
+  "failure": "Error: expect(locator).toBeEnabled() failed\n\nLocator:  getByRole('button', { name: 'Начать прогулку', exact: true })\nExpected: enabled\nReceived: disabled\nTimeout:  90000ms\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Начать прогулку', exact: true }) with timeout 90000ms\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n    162 × locator resolved to <button disabled class=\"primary large\">…</button>\n        - unexpected value \"disabled\"\n",
+  "finishedAt": "2026-11-01T05:02:32.790Z"
+}

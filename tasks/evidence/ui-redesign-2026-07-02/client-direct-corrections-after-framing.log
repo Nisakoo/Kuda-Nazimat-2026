@@ -1,0 +1,43 @@
+Sun Nov  1 02:23:36 UTC 2026
+Loading svelte-check in workspace: /data/worktrees/ui-hud-669eb5/client
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5/client[39m
+
+[90mstdout[2m | src/render/three/ThreeAvatarPreviewFraming.test.ts[2m > [22m[2mavatar preview camera framing[2m > [22m[2mfits every GLB and the full pedestal with margin at eight yaw angles and throughout sampled idle
+[22m[39mpreview projected maximum absolute NDC { x: [33m0.84381959377191[39m, y: [33m0.975928581010232[39m, z: [33m0.7115716577450093[39m } {
+  y: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m7[39m,
+    coordinate: [33m-0.975928581010232[39m,
+    aspect: [33m0.72[39m
+  },
+  z: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m7[39m,
+    coordinate: [33m-0.7115716577450093[39m,
+    aspect: [33m0.5[39m
+  },
+  x: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m8[39m,
+    coordinate: [33m0.84381959377191[39m,
+    aspect: [33m0.5[39m
+  }
+}
+
+ [32m✓[39m src/render/three/ThreeAvatarPreviewFraming.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 6815[2mms[22m[39m
+     [33m[2m✓[22m[39m fits every GLB and the full pedestal with margin at eight yaw angles and throughout sampled idle [33m 6811[2mms[22m[39m
+ [32m✓[39m src/ui/modal.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 371[2mms[22m[39m
+ [32m✓[39m src/render/three/ThreeAvatarPreview.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[32m14 passed[39m[22m[90m (14)[39m
+[2m   Start at [22m 02:24:11
+[2m   Duration [22m 10.48s[2m (transform 372ms, setup 0ms, import 696ms, tests 7.31s, environment 1.45s)[22m
+

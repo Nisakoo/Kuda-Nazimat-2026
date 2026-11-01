@@ -1,6 +1,6 @@
 :root { --ui-ink: #073c48; --ui-teal: #086e70; --ui-mint: #d4e2d3; --ui-paper: #fbf1df; --ui-line: #e5cfad; color: var(--ui-ink); font-family: 'Trebuchet MS', Arial, sans-serif; }
 button, input, select, textarea { font: inherit; }
-button { min-height: 44px; border-radius: 3px; background: var(--ui-teal); }
+button { min-height: 44px; border-radius: 3px; background: linear-gradient(120deg, #128b89, var(--ui-teal)); box-shadow: inset 0 1px 0 #60b6ab50, inset 0 -1px 0 #024f5740; }
 button:hover { background: #055558; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #138e93; outline-offset: 3px; }
 .parchment { background: var(--ui-paper) linear-gradient(125deg, #fff8ec, var(--ui-paper) 55%, #f1e4cc); color: var(--ui-ink); border: 2px solid #fff9e9; box-shadow: 0 8px 28px #63412730, inset 0 0 0 1px var(--ui-line); border-radius: 4px; }
@@ -22,8 +22,7 @@ header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
 .game-screen footer .hints { display: none; }
 .game-screen footer .status { margin: 3px; padding: 4px 8px; background: #fff8e9d9; border-radius: 2px; }
 .hud-dock { position: fixed; z-index: 4; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(860px, calc(100vw - 32px)); min-height: 64px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px 18px; gap: 2px; }
-.hud-dock::before, .hud-dock::after { content: '◢'; color: #078687; position: absolute; top: 5px; left: 5px; font-size: 12px; }
-.hud-dock::after { left: auto; right: 5px; transform: rotate(90deg); }
+.hud-dock, .game-screen dialog.babel-panel, .game-screen dialog.map-dialog { background-color: var(--ui-paper); background-image: linear-gradient(135deg, #198b87 0 8px, transparent 8px), linear-gradient(225deg, #198b87 0 8px, transparent 8px), linear-gradient(45deg, #198b87 0 8px, transparent 8px), linear-gradient(315deg, #198b87 0 8px, transparent 8px), linear-gradient(125deg, #fff8ec, #fbf1df 55%, #f1e4cc); background-size: 14px 14px, 14px 14px, 14px 14px, 14px 14px, 100% 100%; background-position: left 5px top 5px, right 5px top 5px, left 5px bottom 5px, right 5px bottom 5px, center; background-repeat: no-repeat; }
 .hud-dock button { display: flex; align-items: center; justify-content: center; gap: 13px; min-width: 0; padding: 8px 10px; background: none; border-right: 1px solid var(--ui-line); color: var(--ui-ink); position: relative; font-size: 15px; font-weight: 500; }
 .hud-dock button:last-child { border: 0; }
 .hud-dock button:hover, .hud-dock .chosen { background: var(--ui-mint); }
@@ -33,7 +32,7 @@ header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
 .game-screen .modal-backdrop { background: none; backdrop-filter: none; }
 .game-screen dialog::backdrop { background: #513f2820; }
 .game-screen .panel, .game-screen .dialog-panel { background: var(--ui-paper); border: 2px solid #fff9e9; border-radius: 4px; color: var(--ui-ink); box-shadow: 0 10px 35px #5c3b2138; }
-dialog.babel-panel, .map-dialog { background-image: linear-gradient(135deg, #198b87 0 8px, transparent 8px), linear-gradient(225deg, #198b87 0 8px, transparent 8px), linear-gradient(45deg, #198b87 0 8px, transparent 8px), linear-gradient(315deg, #198b87 0 8px, transparent 8px); background-size: 14px 14px; background-position: left 5px top 5px, right 5px top 5px, left 5px bottom 5px, right 5px bottom 5px; background-repeat: no-repeat; }
+/* Paper and corner facets above use game-screen specificity, so the panel shorthand cannot erase them. */
 dialog.babel-panel { max-height: calc(100svh - 190px); margin: auto auto 108px; overflow: visible; position: fixed; }
 .babel-content { border-radius: 4px; }
 .babel-navigation { border: 0; }
@@ -58,7 +57,14 @@ dialog.babel-panel { max-height: calc(100svh - 190px); margin: auto auto 108px; 
 .window-hint { text-align: center; color: #657d80; font-size: 12px; margin: 10px 0 0; }
 .entry-screen footer { display: none; }
 .entry-screen .header-actions > :not(.settings-button) { display: none; }
-.entry-screen header .settings-button { position: fixed; bottom: 26px; right: 28px; width: 62px; height: 62px; }
+.entry-screen header { z-index: 10; }
+:root { --entry-header: 76px; --entry-footer: calc(96px + env(safe-area-inset-bottom, 0px)); }
+.entry-chrome { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+.entry-chrome > * { pointer-events: auto; }
+.entry-chrome .entry-brand { position: absolute; top: 10px; left: 24px; min-height: 44px; padding: 0 4px; font-size: 24px; }
+.entry-chrome .entry-settings { position: absolute; right: 28px; bottom: max(20px, env(safe-area-inset-bottom)); display: grid; place-items: center; width: 72px; height: 72px; padding: 12px; border: 2px solid #dec4a1; border-radius: 0; background: #fbf1df; color: #073c48; clip-path: polygon(20% 0, 80% 0, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0 80%, 0 20%); }
+.entry-chrome .entry-settings:focus-visible { outline: none; box-shadow: inset 0 0 0 4px #086e70; }
+@media(max-width: 700px) { :root { --entry-header: 68px; --entry-footer: calc(84px + env(safe-area-inset-bottom, 0px)); } .entry-chrome .entry-brand { top: 8px; left: 12px; font-size: 20px; } .entry-chrome .entry-settings { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); width: 56px; height: 56px; } }
 @media(max-width: 700px) {
   header { padding: 16px; gap: 8px; }
   .brand { font-size: 20px; gap: 8px; }

@@ -1,0 +1,11 @@
+{
+  "note": "Original attempt JSON files are preserved unchanged. Their relative screenshot fields used the active output prefix at the time. Resolve those fields with the enclosing attempt-specific mapping below, never against a newer active capture.",
+  "maps": [
+    {"results":"correction-static-attempt1-results.json","originalPrefix":"correction-static/","preservedPrefix":"correction-static-attempt1/"},
+    {"results":"correction-static-attempt2-results.json","originalPrefix":"correction-static/","preservedPrefix":"correction-static-attempt2/"},
+    {"results":"correction-avatar-attempt1-results.json","originalPrefix":"correction-avatar/","preservedPrefix":"correction-avatar-attempt1/"},
+    {"results":"correction-world-attempt1-results.json","originalPrefix":"correction-world/","preservedPrefix":"correction-world-attempt1/"},
+    {"results":"correction-world-attempt2-results.json","originalPrefix":"correction-world/","preservedPrefix":"correction-world-attempt2/"},
+    {"results":"correction-world-attempt3-results.json","originalPrefix":"correction-world/","preservedPrefix":"correction-world-attempt3/"}
+  ]
+}

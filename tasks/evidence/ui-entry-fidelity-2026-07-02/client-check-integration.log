@@ -1,0 +1,84 @@
+
+> educational-world-client@0.1.0 check
+> node scripts/generate-demo-world.mjs && svelte-check --tsconfig ./tsconfig.json && tsc --noEmit && npm run check:core
+
+Prepared 1024 chunks; 1024 unique collision resources; world 18697328 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 20277145 bytes.
+Loading svelte-check in workspace: /data/worktrees/ui-hud-669eb5/client
+Getting Svelte diagnostics...
+
+/data/worktrees/ui-hud-669eb5/client/src/ui/Login.svelte:43:5
+Warn: Elements with the 'tablist' interactive role must have a tabindex value
+https://svelte.dev/e/a11y_interactive_supports_focus (svelte)
+    <div class="entry-divider" aria-hidden="true">△</div>
+    <div class="entry-auth-tabs" role="tablist" aria-label="Способ входа" onkeydown={(event) => {
+      if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
+        void changeTab(event.key === 'Home' ? 'login' : event.key === 'End' ? 'register' : tab === 'login' ? 'register' : 'login', true);
+      }
+    }}>
+      <button bind:this={loginTab} id="login-tab" type="button" role="tab" aria-selected={tab === 'login'} aria-controls="auth-form" tabindex={tab === 'login' ? 0 : -1} disabled={pending} onclick={() => void changeTab('login')}>Вход</button>
+      <button bind:this={registerTab} id="register-tab" type="button" role="tab" aria-selected={tab === 'register'} aria-controls="auth-form" tabindex={tab === 'register' ? 0 : -1} disabled={pending} onclick={() => void changeTab('register')}>Регистрация</button>
+    </div>
+    <form id="auth-form" class="entry-form" role="tabpanel" aria-labelledby={tab === 'login' ? 'login-tab' : 'register-tab'} aria-busy={pending} onsubmit={submit}>
+
+/data/worktrees/ui-hud-669eb5/client/src/ui/Login.svelte:52:5
+Warn: Non-interactive element `<form>` cannot have interactive role 'tabpanel'
+https://svelte.dev/e/a11y_no_noninteractive_element_to_interactive_role (svelte)
+    </div>
+    <form id="auth-form" class="entry-form" role="tabpanel" aria-labelledby={tab === 'login' ? 'login-tab' : 'register-tab'} aria-busy={pending} onsubmit={submit}>
+      <label for="player-name">Имя игрока</label>
+      <input id="player-name" name="playerName" bind:value={name} placeholder="Ваше имя" maxlength="32" required autocomplete="username" spellcheck="false" disabled={pending} />
+      <label class="entry-password-label" for="player-password">Пароль</label>
+      <div class="entry-password">
+        <input id="player-password" name="password" type={showPassword ? 'text' : 'password'} bind:value={password} required autocomplete={tab === 'login' ? 'current-password' : 'new-password'} disabled={pending} />
+        <button type="button" class="entry-eye" aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'} aria-pressed={showPassword} disabled={pending} onclick={() => showPassword = !showPassword}>
+          <svg viewBox="0 0 32 28" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M2 14S8 4 16 4s14 10 14 10-6 10-14 10S2 14 2 14Z"/><circle cx="16" cy="14" r="4"/>{#if showPassword}<path d="m4 2 24 24"/>{/if}</svg>
+        </button>
+      </div>
+      {#if error}<p class="entry-error" role="alert">{error}</p>{/if}
+      <button class="entry-primary" type="submit" disabled={pending || !name.trim() || !password}>{pending ? 'Связываемся с сервером…' : tab === 'login' ? 'Начать путешествие →' : 'Зарегистрироваться →'}</button>
+      {#if pending}<p role="status">Ожидаем ответа локального сервера…</p>{/if}
+    </form>
+    {#if configure}<button class="entry-link" type="button" onclick={configure}>Настроить подключение</button>{/if}
+
+/data/worktrees/ui-hud-669eb5/client/src/ui/App.svelte:139:71
+Error: Type '{ mode: ClientMode; config: ClientConfig; error: string | null; apply: (mode: ClientMode, server: string, map: string, radius: number, debug: boolean) => boolean; close: () => void; appearance: (() => void) | undefined; }' is not assignable to type '$$ComponentProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'appearance' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'. (ts)
+  {/if}
+  {#if game && state.settingsOpen}<div class="modal-backdrop"><Settings mode={state.mode} config={game.config} error={state.settingsError} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} appearance={state.mode === 'online' && !state.authRequired ? () => game.openAvatar() : undefined} /></div>{/if}
+  {#if game && state.chatOpen}<div class="modal-backdrop"><Chat messages={state.chatMessages} error={state.chatError ?? state.networkError} canSend={state.mode !== 'local' && state.networkStatus === 'connected'} send={(text) => game.sendChat(text)} close={() => game.closeChat()} {navigation} /></div>{/if}
+
+/data/worktrees/ui-hud-669eb5/client/src/ui/App.svelte:145:65
+Error: Object literal may only specify known properties, and '"peers"' does not exist in type '$$ComponentProps'. (ts)
+  {#if game && state.avatarOpen}<AvatarSelection {game} view={state.avatar} first={state.avatarPurpose === 'first'}/>{/if}
+  {#if game && state.mapOpen}<WorldMap player={state.mapPlayer} peers={state.mapPeers} goal={state.babylon?.state?.taskTarget ?? null} market={marketMap} close={() => game.closeMap()} {navigation}/>{/if}
+  {#if game && state.babylon}
+
+/data/worktrees/ui-hud-669eb5/client/src/multiplayer/BabylonClient.test.ts:5:7
+Error: Type '{ v: 2; playerId: string; backend: "test"; languages: ("ru" | "en")[]; profile: null; introSeen: false; party: null; availableParty: null; task: string; goatGuide: null; inventory: Record<ItemId, number>; ... 4 more ...; replies: never[]; }' is missing the following properties from type 'BabylonState': taskTitle, taskTarget 
+
+const state: BabylonState = { v: 2, playerId: 'p', backend: 'test', languages: ['ru', 'en'], profile: null, introSeen: false, party: null, availableParty: null, task: '', goatGuide: null, inventory: EMPTY_INVENTORY, fed: [], stones: [], words: [], messages: [], replies: [] };
+const clients: BabylonClient[] = [];
+
+/data/worktrees/ui-hud-669eb5/client/playwright.ui.config.ts:5:29
+Error: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '{ testMatch: string; webServer: undefined; outputDir: string; projects?: Project<PlaywrightTestOptions & CustomProperties<{}>, PlaywrightWorkerOptions & CustomProperties<...>>[]; ... 34 more ...; workers?: number | string; }' is not assignable to parameter of type 'PlaywrightTestConfig<unknown, unknown>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Types of property 'webServer' are incompatible.
+        Type 'undefined' is not assignable to type 'TestConfigWebServer | TestConfigWebServer[]'. 
+// This suite starts an isolated real server. It does not need Vite's preview port.
+export default defineConfig({
+  ...base,
+  testMatch: 'ui-hud.spec.ts',
+  webServer: undefined,
+  outputDir: 'test-results/ui-hud',
+});
+
+====================================
+svelte-check found 4 errors and 2 warnings in 4 files
