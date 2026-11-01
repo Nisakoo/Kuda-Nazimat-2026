@@ -167,12 +167,18 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def port_free(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        try:
+    """Probe bindability, not a reservation or proof that no bound socket exists.
+
+    Permit TCP TIME_WAIT reuse, but never opt into sharing an active listener.
+    The worker still verifies the actual listener's ownership after spawning.
+    """
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind(('127.0.0.1', port))
             return True
-        except OSError:
-            return False
+    except OSError:
+        return False
 
 
 def owned_listener(pid, port):
