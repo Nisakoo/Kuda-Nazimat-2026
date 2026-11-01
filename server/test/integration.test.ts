@@ -1,17 +1,20 @@
+import { writeFile, rm, mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { localLlmForTest } from '../src/npc/adapters/localLlm.ts';
 import { expect, it, vi } from 'vitest';
 import { defer, setup } from './harness.ts';
 import * as responders from '../src/npc/adapters/index.ts';
 import { DatabaseSync } from 'node:sqlite';
 import { io, type Socket } from 'socket.io-client';
 import { startApplication } from '../src/app/application.ts';
-import { parseConfig } from '../src/app/config.ts';
 import { createGame } from '../src/game/index.ts';
 import { silentLogger } from '../src/common/logger.ts';
-import { parseServerMessage } from '../../shared/protocol/validate.ts';
 import { parseBabylonResult } from '../../shared/babylon/validate.ts';
 import type { ServerMessage } from '../../shared/protocol/types.ts';
 import { testLanguagePort } from '../src/babylon/TestLanguagePort.ts';
 import type { LanguagePort } from '../src/babylon/ports.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 async function authPost(origin: string, route: string, value?: unknown, token?: string) {
   return fetch(`${origin}/api/auth/${route}`, {
@@ -40,9 +43,9 @@ it('password registration restores pending state after restart, gates join, save
   await pending.wait(p => p.type === 'error' && p.requestId === denied && p.code === 'FORBIDDEN');
   expect(pending.packets.some(p => p.type === 'joined')).toBe(false);
   await app.stop();
-  const restarted = await startApplication(config, createGame, silentLogger); defer(() => restarted.stop());
+  const restarted = await startTrusted(startApplication, config, createGame, silentLogger); defer(() => restarted.stop());
   const address = restarted.server.address(); if (!address || typeof address === 'string') throw new Error('No restarted server');
-  const nextOrigin = `http://127.0.0.1:${address.port}`;
+  const nextOrigin = `https://127.0.0.1:${address.port}`;
   expect(await (await fetch(`${nextOrigin}/api/auth/state`, { headers })).json()).toEqual({ requiresAvatar: true });
   const save = await fetch(`${nextOrigin}/api/avatar`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ avatarId: 'dan' }) });
   expect(save.status).toBe(200);
@@ -146,7 +149,7 @@ it('BABEL polling returns only task peer positions outside AOI and omits release
   expect(two.snapshot.entities.some(e => e.id === one.playerId)).toBe(false);
   const third = await connect(outsider.token); third.command('join', { mapId: 'market' }); const other = await third.wait(p => p.type === 'joined'); if (other.type !== 'joined') throw new Error();
   const state = parseBabylonResult(await (await post(b.token, { type: 'state' })).json()).state;
-  expect(state.partyPositions).toEqual([{ id: one.playerId, name: 'Task A', x: 0, z: -26 }]);
+  expect(state.partyPositions).toEqual([{ id: one.playerId, name: 'Task A', x: 0, z: -58 }]);
   expect(state.partyPositions.some(p => p.id === other.playerId)).toBe(false);
   expect(parseBabylonResult(await (await post(outsider.token, { type: 'state' })).json()).state.partyPositions).toEqual([]);
   expect((await post(b.token, { type: 'state', playerId: other.playerId })).status).toBe(400);
@@ -324,7 +327,6 @@ it('streams an NPC answer over a real socket only on request, and npc-cancel end
   await client.wait((p) => p.type === 'npc-answer' && p.requestId === next);
 });
 
-
 it('a LanguagePort that fails to start makes only BABEL language actions unavailable and is still stopped', async () => {
   let stopped = 0;
   const language: LanguagePort = { ...testLanguagePort, async start() { throw new Error('model missing'); }, async stop() { stopped++; } };
@@ -336,6 +338,61 @@ it('a LanguagePort that fails to start makes only BABEL language actions unavail
   expect((await post({ type: 'suggest', word: 'коза' }, 'suggest')).status).toBe(503);
   expect((await post({ type: 'word-save', word: 'goat', translation: 'коза', note: '' }, 'word')).status).toBe(200);
   await app.stop(); expect(stopped).toBe(1);
+});
+
+it.each(['ollama', 'mlx'] as const)('%s supervisor fixture integrates actual game delivery, private history and SQLite (not a model test)', async (backend) => {
+  const dir = await mkdtemp(join(tmpdir(), 'game-llm-worker-'));
+  defer(async () => { await rm(dir, { recursive: true, force: true }); });
+  const workerPath = join(dir, 'fixture.cjs');
+  await writeFile(workerPath, `const readline=require('node:readline');
+readline.createInterface({input:process.stdin}).on('line',line=>{
+ const m=JSON.parse(line); const send=x=>process.stdout.write(JSON.stringify(x)+'\\n');
+ if(m.op==='start')send({type:'ready'});
+ else if(m.op==='answer')send({type:'answer',text:'Fixture, не модель. Предыдущих вопросов: '+m.request.history.length});
+ else if(m.op==='stop')process.exit(0);
+});`);
+  const options = backend === 'ollama'
+    ? { python: process.execPath, executable: '/fixture/ollama', modelsDir: '/fixture/models', tokenizerDir: '/fixture/tokenizer', tokenizerManifest: '/fixture/tokenizer.json', model: 'qwen3.5:2b-q4_K_M', modelDigest: 'a'.repeat(64), runnerVersion: '0.40.13' }
+    : { python: process.execPath, modelDir: '/fixture/mlx', modelManifest: '/fixture/model.json', runnerVersion: '0.32.2' };
+  const factory = vi.spyOn(responders, 'createResponder').mockImplementation((name, input, deps) => {
+    expect(name).toBe(backend);
+    return localLlmForTest(backend, input, deps, { workerPath, workerPrefix: [], platform: 'darwin', arch: 'arm64' });
+  });
+  let server: Awaited<ReturnType<typeof setup>>;
+  try { server = await setup({ npc: { adapter: backend, options } }); } finally { factory.mockRestore(); }
+  const { origin, config, guest, connect } = server;
+  expect(await (await fetch(`${origin}/api/health`)).json()).toEqual({ status: 'ok', protocol: 3, npc: 'ready' });
+  const client = await connect((await guest('LLM fixture')).token); client.command('join', { mapId: 'test' }); await client.wait(p => p.type === 'joined');
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try {
+    for (let i = 0; i < 2; i++) {
+      const requestId = client.command('npc-question', { targetId: 'guide', text: 'Вопрос' });
+      const result = await client.wait(p => p.type === 'npc-answer' && p.requestId === requestId);
+      expect(result.type === 'npc-answer' && result.text).toContain('Предыдущих вопросов: ' + i);
+      expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue').get()!.n).toBe(i + 1);
+    }
+    const other = await connect((await guest('Другой игрок')).token); other.command('join', { mapId: 'test' }); await other.wait(p => p.type === 'joined');
+    const requestId = other.command('npc-question', { targetId: 'guide', text: 'Вопрос' });
+    const result = await other.wait(p => p.type === 'npc-answer' && p.requestId === requestId);
+    expect(result.type === 'npc-answer' && result.text).toContain('Предыдущих вопросов: 0');
+  } finally { db.close(); }
+});
+
+it.each(['ollama', 'mlx'])('configured %s without installed artifacts leaves the actual game available, without fallback', async (adapter) => {
+  const options = adapter === 'ollama'
+    ? { python: '/not-installed/python', executable: '/not-installed/ollama', modelsDir: '/not-installed/models', tokenizerDir: '/not-installed/tokenizer', tokenizerManifest: '/not-installed/tokenizer-sha256.json', model: 'qwen3.5:2b-q4_K_M', modelDigest: 'a'.repeat(64), runnerVersion: '0.40.13', startupTimeoutMs: 1000 }
+    : { python: '/not-installed/python', modelDir: '/not-installed/model', modelManifest: '/not-installed/model-sha256.json', runnerVersion: '0.32.2', startupTimeoutMs: 1000 };
+  const { origin, config, guest, connect } = await setup({ npc: { adapter, options } });
+  expect(await (await fetch(`${origin}/api/health`)).json()).toEqual({ status: 'ok', protocol: 3, npc: 'unavailable' });
+  const client = await connect((await guest('Без реального runtime')).token);
+  client.command('join', { mapId: 'test' }); await client.wait(p => p.type === 'joined');
+  const chatId = client.command('chat-send', { text: 'Мир продолжает работать' }); await client.wait(p => p.type === 'chat' && p.requestId === chatId);
+  const requestId = client.command('npc-question', { targetId: 'guide', text: 'Привет' });
+  const result = await client.wait(p => p.type === 'error' && p.requestId === requestId);
+  expect(result.type === 'error' && result.code).toBe('UNAVAILABLE');
+  expect(client.packets.some(p => p.type === 'npc-answer')).toBe(false);
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try { expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue').get()!.n).toBe(0); } finally { db.close(); }
 });
 
 it('exposes only public health to other origins while authenticated APIs keep their CORS restrictions', async () => {

@@ -1,0 +1,20 @@
+{
+  "chunks": 16,
+  "worldBytes": 19638465,
+  "maxReservedBytesIncludingFourAvatarsAndAudio": 88356216,
+  "guardBytes": 134217728,
+  "note": "Conservative payload reservation, not measured browser RSS/GPU usage.",
+  "additionalScreenshots": 0,
+  "contourSpanMetres": [
+    111,
+    125
+  ],
+  "areaSquareMetres": 12519.5,
+  "outlineVertices": 26,
+  "districts": 15,
+  "residents": 27,
+  "technicalGridMetres": [
+    128,
+    128
+  ]
+}

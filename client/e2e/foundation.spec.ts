@@ -72,12 +72,32 @@ test('runtime config selects guest login before opening online channels', async 
   await page.route('**/config.json', (route) => route.fulfill({
     json: { session: 'online', serverUrl: 'http://school.local' },
   }));
+  await page.route('**/api/auth/mode', (route) => route.fulfill({ json: { password: true, guest: true, dev: true } }));
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Войти в город' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Начать путешествие →', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true })).toBeDisabled();
   await expect(page.locator('canvas')).toHaveCount(0);
   expect(connections).toEqual([]);
+});
+
+test('changing auth servers clears credentials and discards stale mode discovery', async ({ page }) => {
+  await page.route('**/config.json', route => route.fulfill({ json: { session: 'online', serverUrl: 'http://first.local' } }));
+  await page.route('**/api/auth/mode', async route => {
+    const url = route.request().url();
+    if (url.includes('second.local')) { await new Promise(done => setTimeout(done, 1500)); await route.fulfill({ json: { password: true, guest: true, dev: true } }).catch(() => {}); }
+    else await route.fulfill({ json: { password: true, guest: false, dev: false } });
+  });
+  await page.goto('/'); await page.getByLabel('Имя игрока').fill('Аня'); await page.getByLabel('Пароль', { exact: true }).fill('secret 123');
+  await page.getByRole('button', { name: 'Настройки', exact: true }).click();
+  await page.getByLabel('Адрес сервера').fill('http://second.local'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
+  await expect(page.getByText('Получаем способы входа…')).toBeVisible();
+  await page.getByRole('button', { name: 'Настройки', exact: true }).click();
+  await page.getByLabel('Адрес сервера').fill('http://third.local'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
+  await expect(page.getByLabel('Имя игрока')).toHaveValue(''); await expect(page.getByLabel('Пароль', { exact: true })).toHaveValue('');
+  await page.waitForTimeout(1700);
+  await expect(page.getByRole('button', { name: 'Гость', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Вход разработчика' })).toHaveCount(0);
 });
 
 test('missing config remains visible in the interface', async ({ page }) => {

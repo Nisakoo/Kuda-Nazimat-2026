@@ -7,7 +7,7 @@
     "adapter": "scripted",
     "maxConcurrent": 1,
     "maxUnfinished": 4,
-    "timeoutMs": 8000,
+    "timeoutMs": 30000,
     "streamTimeoutMs": 30000,
     "options": {}
   },

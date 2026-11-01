@@ -1,0 +1,80 @@
+import { expect, test } from '@playwright/test';
+import { spawn, type ChildProcess } from 'node:child_process';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { createServer } from 'node:net';
+import { once } from 'node:events';
+
+let server: ChildProcess; let directory: string; let origin: string;
+test.beforeAll(async () => {
+  directory = await mkdtemp(join(tmpdir(), 'production-browser-auth-'));
+  const socket = createServer(); socket.listen(0, '127.0.0.1'); await once(socket, 'listening');
+  const address = socket.address(); if (!address || typeof address === 'string') throw new Error('No port');
+  const port = address.port; await new Promise<void>(done => socket.close(() => done())); origin = `http://127.0.0.1:${port}`;
+  const config = join(directory, 'config.json');
+  await writeFile(config, JSON.stringify({ host: '127.0.0.1', port, clientDir: resolve('dist'), worldDir: resolve('public'), contentDir: resolve('../server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'market', npc: { adapter: 'scripted', options: {} } }));
+  server = spawn(process.execPath, ['../server/src/app/main.ts', '--config', config, '--env', 'production'], { env: { ...process.env, HOME: directory, KUDA_NPC_TIMEOUT: '', KUDA_LLM_BACKEND: '', KUDA_LLM_MODEL: '', KUDA_LLM_PROFILES: '' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  let output = '';
+  await new Promise<void>((done, fail) => {
+    const timer = setTimeout(() => fail(new Error(`Server startup timeout: ${output}`)), 15000);
+    server.once('exit', code => { clearTimeout(timer); fail(new Error(`Server exited ${code}: ${output}`)); });
+    const read = (chunk: Buffer) => { output += String(chunk); if (output.includes('ВАВИЛОН ЗАПУЩЕН')) { clearTimeout(timer); done(); } };
+    server.stdout!.on('data', read); server.stderr!.on('data', read);
+  });
+});
+test.afterAll(async () => {
+  if (server && server.exitCode === null && !server.signalCode) { const exit = once(server, 'exit'); server.kill('SIGTERM'); const timer = setTimeout(() => server.kill('SIGKILL'), 11000); await exit; clearTimeout(timer); }
+  if (directory) await rm(directory, { recursive: true, force: true });
+});
+
+test('production password lifecycle, logout revocation, and temporary password', async ({ page, request }) => {
+  test.setTimeout(90000);
+  await page.goto(origin);
+  const hub = page.getByRole('dialog', { name: 'Личный кабинет', exact: true });
+  const avatar = page.getByRole('dialog', { name: 'Выберите свой облик', exact: true });
+  await expect(page.getByRole('heading', { name: 'Войти в город' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Демонстрационный вход по имени' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Вход разработчика' })).toHaveCount(0);
+  await page.getByRole('tab', { name: 'Регистрация', exact: true }).click();
+  await expect(page.getByRole('tab', { name: 'Регистрация', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.getByLabel('Имя игрока').fill('Проверка'); await page.getByLabel('Пароль', { exact: true }).fill('secret 123');
+  const registered = page.waitForResponse(r => r.url().endsWith('/api/auth/register'));
+  await page.getByRole('button', { name: 'Зарегистрироваться →', exact: true }).click();
+  expect((await registered).status()).toBe(201);
+  await expect(hub).toBeVisible();
+  await hub.getByRole('button', { name: 'Выбрать персонажа', exact: true }).click();
+  await expect(avatar).toBeVisible();
+  const saved = page.waitForResponse(r => r.url().endsWith('/api/avatar') && r.request().method() === 'POST');
+  await avatar.getByRole('button', { name: 'Подтвердить →', exact: true }).click({ timeout: 30000 });
+  expect((await saved).ok()).toBe(true);
+  await expect(hub).toBeVisible();
+  const logout = page.waitForResponse(r => r.url().endsWith('/api/auth/logout'));
+  await hub.getByRole('button', { name: 'Выйти', exact: true }).click(); expect((await logout).status()).toBe(204);
+  await page.getByLabel('Имя игрока').fill('Проверка'); await page.getByLabel('Пароль', { exact: true }).fill('incorrect');
+  const wrong = page.waitForResponse(r => r.url().endsWith('/api/auth/login'));
+  await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click(); expect((await wrong).status()).toBe(401);
+  await expect(page.getByRole('alert')).toBeVisible();
+  await page.getByLabel('Пароль', { exact: true }).fill('secret 123');
+  const logged = page.waitForResponse(r => r.url().endsWith('/api/auth/login'));
+  await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click(); const token = (await (await logged).json()).token as string;
+  await expect(hub).toBeVisible();
+  const logout2 = page.waitForResponse(r => r.url().endsWith('/api/auth/logout')); await hub.getByRole('button', { name: 'Выйти', exact: true }).click(); expect((await logout2).status()).toBe(204);
+  const denied = await request.post(`${origin}/api/babylon`, { headers: { Authorization: `Bearer ${token}` }, data: { v: 2, requestId: 'revoked-check', action: { type: 'state' } } }); expect(denied.status()).toBe(401);
+  await page.getByRole('button', { name: 'Сменить пароль', exact: true }).click();
+  await page.getByLabel('Имя игрока').fill('Проверка'); await page.getByLabel('Текущий или временный пароль').fill('secret 123'); await page.getByLabel('Новый пароль').fill('new secret 123');
+  const changed = page.waitForResponse(r => r.url().endsWith('/api/auth/password'));
+  await page.locator('form.entry-form').getByRole('button', { name: 'Сменить пароль', exact: true }).click(); expect((await changed).status()).toBe(200);
+  await expect(hub).toBeVisible();
+  const logout3 = page.waitForResponse(r => r.url().endsWith('/api/auth/logout')); await hub.getByRole('button', { name: 'Выйти', exact: true }).click(); expect((await logout3).status()).toBe(204);
+  const reset = await request.post(`${origin}/api/operator/actions/reset-password`, { headers: { Origin: origin, 'X-Operator': '1' }, data: { name: 'Проверка' } }); expect(reset.status()).toBe(200);
+  const temporary = (await reset.json()).temporaryPassword as string;
+  await page.getByLabel('Имя игрока').fill('Проверка'); await page.getByLabel('Пароль', { exact: true }).fill(temporary);
+  const loginTemporary = page.waitForResponse(r => r.url().endsWith('/api/auth/login'));
+  await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click(); expect((await loginTemporary).status()).toBe(403);
+  await expect(page.getByLabel('Текущий или временный пароль')).toBeVisible();
+  await page.getByLabel('Текущий или временный пароль').fill(temporary); await page.getByLabel('Новый пароль').fill('final secret 123');
+  const finalChange = page.waitForResponse(r => r.url().endsWith('/api/auth/password'));
+  await page.locator('form.entry-form').getByRole('button', { name: 'Сменить пароль', exact: true }).click(); expect((await finalChange).status()).toBe(200);
+  await expect(hub).toBeVisible();
+});

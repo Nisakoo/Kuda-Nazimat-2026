@@ -11,7 +11,7 @@ export class WorldBudget {
   private readonly emptyListeners = new Set<() => void>();
   whenEmpty(): Promise<void> { return this.allocations.size === 0 ? Promise.resolve() : new Promise((resolve) => this.emptyListeners.add(resolve)); }
   get epoch(): number { return this.releases; }
-  constructor(readonly memoryLimit = 64 * 1024 * 1024) {
+  constructor(readonly memoryLimit = 128 * 1024 * 1024) {
     if (!Number.isSafeInteger(memoryLimit) || memoryLimit <= 0) throw new Error('Invalid world budget');
   }
   get stats() {

@@ -24,11 +24,19 @@ export function applyApplicationMigrations(db: DatabaseSync, now: number): void 
     return db.prepare('PRAGMA table_info(players)').all().some(row => row.name === column);
   };
   const additive = [3, 4, 5, 6];
-  applyMigrations(db, migrations.map(migration => migration.version === 7 || additive.includes(migration.version) && exists(migration.version)
+  applyMigrations(db, migrations.map(migration => migration.version === 7 || migration.version === 9 || additive.includes(migration.version) && exists(migration.version)
     ? { ...migration, sql: 'SELECT 1;' } : migration), now);
   // Version numbers alone do not prove the schema of an old development DB.
   for (const version of additive) if (!exists(version)) db.exec(migrations[version - 1]!.sql);
   reconcileAuth();
+  // Version 4 on the NPC branch already installed these objects. Reconcile each
+  // object independently, including partially upgraded databases, without moving rows.
+  const npcSql = migrations.find(m => m.version === 9)!.sql.replace(/^\s*--.*$/gm, '');
+  for (const statement of npcSql.split(';').map(s => s.trim()).filter(Boolean)) {
+    if (/^ALTER TABLE npc_dialogue ADD COLUMN session_id\b/.test(statement) &&
+        db.prepare('PRAGMA table_info(npc_dialogue)').all().some(row => row.name === 'session_id')) continue;
+    db.exec(statement.replace(/^CREATE TABLE /, 'CREATE TABLE IF NOT EXISTS ').replace(/^CREATE INDEX /, 'CREATE INDEX IF NOT EXISTS '));
+  }
   // Preserve the old scrypt parameters and raw password semantics. No plaintext needed.
   for (const row of db.prepare('SELECT account_id, salt, password_hash FROM account_credentials').all()) {
     const salt = Buffer.from(String(row.salt), 'hex').toString('base64url');

@@ -12,6 +12,9 @@ client/src/shared/marketWorld.generated.ts
 server/node_modules/
 server/data/
 server/config.json
+server/llm/__pycache__/
+server/llm/.venv*/
+server/llm/envs/*/.venv/
 
 # Vitest cache when server tests use repository root.
 /node_modules/

@@ -1,0 +1,171 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /Users/nisakoo/Documents/competition-2026
+
+ ❯ server/test/npc-session.test.ts (12 tests | 1 failed) 145ms
+   × queued NPC role loss prevents LanguagePort execution 15ms
+stderr | server/test/babylon-deadline.test.ts > npc: rejects a late translation after wall rollback before any terminal commit
+Promise returned by `expect(actual).rejects.toMatchObject(expected)` was not awaited. Vitest currently auto-awaits hanging assertions at the end of the test, but this will cause the test to fail in the next Vitest major. Please remember to await the assertion.
+    at /Users/nisakoo/Documents/competition-2026/server/test/babylon-deadline.test.ts:74:35
+
+stderr | server/test/babylon-deadline.test.ts > npc: rejects a late authorization after wall rollback before any terminal commit
+Promise returned by `expect(actual).rejects.toMatchObject(expected)` was not awaited. Vitest currently auto-awaits hanging assertions at the end of the test, but this will cause the test to fail in the next Vitest major. Please remember to await the assertion.
+    at /Users/nisakoo/Documents/competition-2026/server/test/babylon-deadline.test.ts:74:35
+
+ ❯ server/test/babylon-deadline.test.ts (11 tests | 3 failed) 30066ms
+   × npc: rejects a late translation after wall rollback before any terminal commit 15006ms
+   × npc: rejects a late authorization after wall rollback before any terminal commit 15003ms
+   × BABEL npc: admission authorization cannot restore time after monotonic expiry 7ms
+ ❯ server/test/babylon-http-delivery.test.ts (3 tests | 3 failed) 70ms
+   × actual HTTP rechecks captured socket after BabylonService resolves and before NPC delivery 45ms
+   × actual HTTP rechecks range after BabylonService resolves and before NPC delivery 15ms
+   × actual HTTP rechecks role after BabylonService resolves and before NPC delivery 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/test/babylon-deadline.test.ts > npc: rejects a late translation after wall rollback before any terminal commit
+ FAIL  server/test/babylon-deadline.test.ts > npc: rejects a late authorization after wall rollback before any terminal commit
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ server/test/babylon-deadline.test.ts:64:81
+     63|   { type: 'npc', targetId: 'shepherd', text: 'Какой корм нужен?' },
+     64| ];
+     65| for (const action of actions) it.each(['translation', 'authorization']…
+       |                                                                              ^
+     66|   const f = await fixture();
+     67|   const authorizationStarted = deferred<void>(), authorized = deferred…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  server/test/babylon-deadline.test.ts > BABEL npc: admission authorization cannot restore time after monotonic expiry
+AssertionError: expected Error: Подойдите ближе к объекту на рынке { code: '…' } to match object { code: 'UNAVAILABLE' }
+
+- Expected
++ Received
+
+- {
+-   "code": "UNAVAILABLE",
++ BabylonError {
++   "code": "FORBIDDEN",
+  }
+
+ ❯ server/test/babylon-deadline.test.ts:117:35
+    115|   const f = await fixture(), allowed = deferred<boolean>();
+    116|   const translate = vi.spyOn(f.language, 'translate'), answer = vi.spy…
+    117|   const pending = f.call(action, async () => allowed.promise);
+       |                                   ^
+    118|   const rejected = expect(pending).rejects.toMatchObject({ code: 'UNAV…
+    119|   await flush(); f.state.mono = 1000; f.state.wall -= 60000; allowed.r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  server/test/babylon-http-delivery.test.ts > actual HTTP rechecks captured socket after BabylonService resolves and before NPC delivery
+AssertionError: expected 403 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 403
+
+ ❯ server/test/babylon-http-delivery.test.ts:59:27
+     57|       return result;
+     58|     });
+     59|     const result = await post(session.token, { type: 'npc', targetId: …
+       |                           ^
+     60|     expect(result.status).toBe(loss === 'captured socket' ? 401 : 403);
+     61|     expect('state' in result.body).toBe(false); expect('error' in resu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  server/test/babylon-http-delivery.test.ts > actual HTTP rechecks range after BabylonService resolves and before NPC delivery
+ FAIL  server/test/babylon-http-delivery.test.ts > actual HTTP rechecks role after BabylonService resolves and before NPC delivery
+AssertionError: expected "vi.fn()" to be called once, but got 0 times
+ ❯ server/test/babylon-http-delivery.test.ts:61:20
+     59|     const result = await post(session.token, { type: 'npc', targetId: …
+     60|     expect(result.status).toBe(loss === 'captured socket' ? 401 : 403);
+     61|     expect('state' in result.body).toBe(false); expect('error' in resu…
+       |                    ^
+     62|     expect(answer).toHaveBeenCalledOnce();
+     63|     // The result was committed before access changed. Denying deliver…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  server/test/npc-session.test.ts > queued NPC role loss prevents LanguagePort execution
+AssertionError: expected Error: Подойдите ближе к объекту на рынке { code: '…' } to match object { code: 'UNAVAILABLE' }
+
+- Expected
++ Received
+
+- {
+-   "code": "UNAVAILABLE",
++ BabylonError {
++   "code": "FORBIDDEN",
+  }
+
+ ❯ server/test/npc-session.test.ts:149:34
+    147|   await f.call(f.other, { type: 'enroll', size: 2, native: 'ru', learn…
+    148|   const held = deferred<string>(), running = f.npc.generate(f.other.id…
+    149|   const pending = f.call(f.first, { type: 'npc', targetId: 'shepherd',…
+       |                                  ^
+    150|   const failure = expect(pending).rejects.toMatchObject({ code: 'UNAVA…
+    151|   const store = sqliteBabylon(f.db), profile = store.profile(f.first.i…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 2 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+AssertionError: expected Error: Подойдите ближе к объекту на рынке { code: '…' } to match object { code: 'UNAVAILABLE' }
+ ❯ _Assertion.__VITEST_REJECTS__ server/node_modules/@vitest/expect/dist/index.js:1747:17
+ ❯ _Assertion.propertyGetter server/node_modules/chai/index.js:1607:27
+ ❯ Object.proxyGetter [as get] server/node_modules/chai/index.js:1696:22
+ ❯ server/test/babylon-deadline.test.ts:74:35
+     72|     return phase === 'authorization' ? authorized.promise : true;
+     73|   });
+     74|   const pending = f.call(action, authorize);
+       |                                   ^
+     75|   const rejected = expect(pending).rejects.toMatchObject({ code: 'UNAV…
+     76|   await f.translationStarted.promise;
+ ❯ server/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+This error originated in "server/test/babylon-deadline.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "npc: rejects a late translation after wall rollback before any terminal commit". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+AssertionError: expected Error: Подойдите ближе к объекту на рынке { code: '…' } to match object { code: 'UNAVAILABLE' }
+ ❯ _Assertion.__VITEST_REJECTS__ server/node_modules/@vitest/expect/dist/index.js:1747:17
+ ❯ _Assertion.propertyGetter server/node_modules/chai/index.js:1607:27
+ ❯ Object.proxyGetter [as get] server/node_modules/chai/index.js:1696:22
+ ❯ server/test/babylon-deadline.test.ts:74:35
+     72|     return phase === 'authorization' ? authorized.promise : true;
+     73|   });
+     74|   const pending = f.call(action, authorize);
+       |                                   ^
+     75|   const rejected = expect(pending).rejects.toMatchObject({ code: 'UNAV…
+     76|   await f.translationStarted.promise;
+ ❯ server/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+This error originated in "server/test/babylon-deadline.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "npc: rejects a late authorization after wall rollback before any terminal commit". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  3 failed | 44 passed (47)
+      Tests  7 failed | 672 passed | 15 skipped (694)
+     Errors  2 errors
+   Start at  16:53:13
+   Duration  130.06s (transform 964ms, setup 0ms, import 2.82s, tests 123.39s, environment 4ms)
+
+make: *** [server-test] Error 1

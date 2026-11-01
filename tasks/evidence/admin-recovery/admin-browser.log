@@ -1,0 +1,1 @@
+PASS: CLI create/list/revoke-admin, production LAN admin login, temporary password change, game/admin isolation, NPC revision conflict, author journal, authenticated CSV, logout, role revocation, empty browser storage.

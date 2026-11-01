@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { scryptSync, randomBytes } from 'node:crypto';
 import { AuthError, createAuthService, hashToken } from '../src/auth/AuthService.ts';
 import { HashQueueFullError, PasswordHasher, checkPassword, temporaryPassword } from '../src/auth/password.ts';
 import { memoryLogger } from '../src/common/logger.ts';
+import { systemClock } from '../src/common/time.ts';
 import type { RevokeReason } from '../src/auth/ports.ts';
 import { memoryStores } from './memory.ts';
 import { setup } from './harness.ts';
@@ -84,9 +85,11 @@ describe('AuthService (AUTH-001–016)', () => {
     for (let i = 0; i < 5; i++) expect(await code(auth.login('Аня', 'неверно12', '10.0.0.4'))).toBe('CREDENTIALS');
     const locked = await auth.login('Аня', 'секрет12', '10.0.0.5').catch((e: AuthError) => e) as AuthError;
     expect(locked.code).toBe('RATE_LIMIT'); expect(locked.retryAfterSeconds).toBe(900);
+    expect(auth.operator.list().find(account => account.name === 'Аня')?.loginBlockedSeconds).toBe(900);
     expect(await code(auth.login('Борис', 'секрет34', '10.0.0.4'))).toBe('ok');
     expect(logger.records.some((r) => r.event === 'auth.locked')).toBe(true);
     expect(auth.operator.unlock('аня')).toBe(true);
+    expect(auth.operator.list().find(account => account.name === 'Аня')?.loginBlockedSeconds).toBe(0);
     expect(await code(auth.login('Аня', 'секрет12'))).toBe('ok');
     // A second lock within the hour after the previous one lasts an hour.
     for (let i = 0; i < 5; i++) await code(auth.login('Аня', 'неверно12'));
@@ -168,12 +171,12 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     expect((await fetch(`${origin}/api/auth/logout`, { method: 'POST', headers: { Authorization: `Bearer ${anya.token}` } })).status).toBe(204);
     const boris = (await post('/api/auth/dev', { name: 'Борис' })).body as { token: string };
     const other = await connect(boris.token); other.command('join', { mapId: 'test' }); await other.wait((p) => p.type === 'joined');
-    const self = `http://127.0.0.1:${port}`;
+    const self = `https://127.0.0.1:${port}`;
     expect((await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: self })).status).toBe(403);
     expect((await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: 'http://evil.test', 'X-Operator': '1' })).status).toBe(403);
     expect(other.packets.some((p) => p.type === 'error')).toBe(false);
     expect(await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: self, 'X-Operator': '1' })).toMatchObject({ status: 200, body: { revoked: 1 } });
-    expect(await other.wait((p) => p.type === 'error' && p.requestId === 'server')).toMatchObject({ message: 'Ведущий завершил сессию.' });
+    expect(await other.wait((p) => p.type === 'error' && p.requestId === 'server')).toMatchObject({ message: 'Администратор завершил сессию.' });
     const reset = await post('/api/operator/actions/reset-password', { name: 'Борис' }, { Origin: self, 'X-Operator': '1' });
     expect(reset.body).toMatchObject({ name: 'Борис', temporaryPassword: expect.stringMatching(/^\w{10}$/) });
     expect(await post('/api/auth/login', { name: 'Борис', password: reset.body!.temporaryPassword })).toMatchObject({ status: 403, body: { error: { code: 'PASSWORD_CHANGE_REQUIRED' } } });
@@ -185,12 +188,16 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     const { token } = (await post('/api/auth/dev', {})).body as { token: string };
     const client = await connect(token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
     const headers = { Authorization: `Bearer ${token}` };
-    // A flood must arrive concurrently: sequential requests on a busy machine can be
-    // slower than the refill rate and never exercise the limiter.
-    const statuses = await Promise.all(Array.from({ length: 400 }, async () =>
-      (await fetch(`${origin}/world/maps/test/manifest.json`, { method: 'HEAD', headers })).status));
-    expect(statuses.filter((s) => s === 200).length).toBeGreaterThanOrEqual(300); expect(statuses).toContain(429);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    expect((await fetch(`${origin}/world/maps/test/manifest.json`, { headers })).status).toBe(200);
+    // The HTTP path is real, but a burst must not refill merely because this host takes >2 s to send 400 requests.
+    let now = systemClock.now();
+    const clock = vi.spyOn(systemClock, 'now').mockImplementation(() => now);
+    try {
+      const statuses: number[] = [];
+      for (let i = 0; i < 400; i++) statuses.push((await fetch(`${origin}/world/maps/test/manifest.json`, { method: 'HEAD', headers })).status);
+      expect(statuses.filter((s) => s === 200)).toHaveLength(300);
+      expect(statuses.filter((s) => s === 429)).toHaveLength(100);
+      now += 100;
+      expect((await fetch(`${origin}/world/maps/test/manifest.json`, { headers })).status).toBe(200);
+    } finally { clock.mockRestore(); }
   });
 });

@@ -1,0 +1,56 @@
+
+> educational-world-server@0.1.0 test
+> vitest run server/test/llm-diagnostic.test.ts
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-admin-main-check
+
+ ❯ server/test/llm-diagnostic.test.ts (39 tests | 2 failed) 623ms
+     × refuses an occupied game port before constructing or starting a responder 10ms
+     × refuses an occupied native port before constructing or starting a responder 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > refuses an occupied game port before constructing or starting a responder
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ server/test/llm-diagnostic.test.ts:120:69
+    118|     const occupied = createServer(); servers.push(occupied);
+    119|     await new Promise<void>((yes, no) => { occupied.once('error', no);…
+    120|     expect(await runDiagnostic({ ...h, configPath: f.configPath })).to…
+       |                                                                     ^
+    121|     expect(h.events()).toEqual([{ event: 'failure', code: 'game_port_u…
+    122|     expect(h.factory).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > refuses an occupied native port before constructing or starting a responder
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ server/test/llm-diagnostic.test.ts:131:69
+    129|     const occupied = createServer(); servers.push(occupied);
+    130|     await new Promise<void>((yes, no) => { occupied.once('error', no);…
+    131|     expect(await runDiagnostic({ ...h, configPath: f.configPath })).to…
+       |                                                                     ^
+    132|     expect(h.events()).toEqual([{ event: 'failure', code: 'native_port…
+    133|     expect(h.factory).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 37 passed (39)
+   Start at  16:35:09
+   Duration  856ms (transform 89ms, setup 0ms, import 123ms, tests 623ms, environment 0ms)

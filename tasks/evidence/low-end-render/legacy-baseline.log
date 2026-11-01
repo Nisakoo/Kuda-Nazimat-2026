@@ -1,0 +1,60 @@
+
+Running 2 tests using 1 worker
+
+(node:95118) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session (12.3s)
+(node:95189) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 e2e/market.spec.ts:58:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats (2.0m)
+
+
+  1) e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('group', { name: 'Текущая область', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('group', { name: 'Текущая область', exact: true }) with timeout 5000ms
+      - waiting for getByRole('group', { name: 'Текущая область', exact: true })
+
+
+      28 |   await page.clock.runFor(300);
+      29 |   await walk(page, 'z', 9); await walk(page, 'x', -32); await walk(page, 'z', 10);
+    > 30 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+         |                                                                                   ^
+      31 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Двор Вавилонской башни');
+      32 |   await page.addStyleTag({ content: '.debug { visibility: hidden; }' });
+      33 |   await page.screenshot({ path: 'test-results/building-courtyard.png' });
+        at /private/tmp/competition-2026-render-perf/client/e2e/main-building.spec.ts:30:83
+
+    Error Context: ../../render-baseline-test-results/main-building-building-cou-81bcc-eturn-preserves-the-session/error-context.md
+
+  2) e2e/market.spec.ts:58:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats
+
+    Test timeout of 120000ms exceeded.
+
+    Error: locator.click: Test timeout of 120000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+
+
+      16 |   throw new Error(`Blocked at ${JSON.stringify(await position(page))}, destination ${axis}=${target}`);
+      17 | }
+    > 18 | async function closeAndResume(page:Page) {await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Продолжить',exact:true}).click();await expectCapture(page,true);}
+         |                                                                                                                                                                            ^
+      19 | async function interact(page:Page,name:string){await page.keyboard.press('e');await page.clock.runFor(100);await expect(page.getByRole('dialog',{name,exact:true})).toBeVisible();await expectCapture(page,false);}
+      20 |
+      21 | test('default five-by-five streaming covers pasture and courtyard without idle request churn', async ({ page }) => {
+        at closeAndResume (/private/tmp/competition-2026-render-perf/client/e2e/market.spec.ts:18:172)
+        at /private/tmp/competition-2026-render-perf/client/e2e/market.spec.ts:73:3
+
+    Error Context: ../../render-baseline-test-results/market-market-route-buys-g-23c6f-ure-and-finishes-four-goats/error-context.md
+
+  2 failed
+    e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session
+    e2e/market.spec.ts:58:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats

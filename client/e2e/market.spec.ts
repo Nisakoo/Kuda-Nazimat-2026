@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { browserTestOrigin } from '../playwright.settings';
 import type { Page } from '@playwright/test';
-import { expectCapture } from './helpers';
+import { expectCapture, pastureRoute } from './helpers';
 
 async function position(page: Page) {
   const text=(await page.getByLabel('Положение игрока').textContent())!;
@@ -29,8 +29,8 @@ test('default five-by-five streaming covers pasture and courtyard without idle r
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку', exact: true }).click(); await expectCapture(page, true);
   const canvas = await page.locator('canvas').elementHandle();
-  const settle = async () => {
-    await expect.poll(async () => { await page.clock.runFor(200); return page.getByLabel('Кеш мира').textContent(); }).toContain('Чанки: 25 · Ожидание: 0');
+  const settle = async (chunks = 16) => {
+    await expect.poll(async () => { await page.clock.runFor(200); return page.getByLabel('Кеш мира').textContent(); }).toContain(`Чанки: ${chunks} · Ожидание: 0`);
     const before = worldRequests;
     await page.clock.runFor(1200);
     expect(worldRequests).toBe(before);
@@ -39,11 +39,11 @@ test('default five-by-five streaming covers pasture and courtyard without idle r
   };
   await settle();
   await expect(page.getByLabel('Кеш мира')).toContainText('Отложено: 0');
-  await walk(page, 'z', -26);
+  await pastureRoute(page, walk);
   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Пастбище у рынка');
-  await settle();
-  await walk(page, 'z', 9); await walk(page, 'x', -32);
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Пастбище у северной стены');
+  await settle(12);
+  await pastureRoute(page, walk, true); await walk(page, 'z', 9); await walk(page, 'x', -32);
   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Двор Вавилонской башни');
   await settle();
@@ -72,16 +72,16 @@ test('market route buys goods, rejects wrong feed, streams pasture and finishes 
   for(const name of ['Финики','Красные плоды','Жёлтые фрукты'])await page.getByRole('button',{name:`Взять: ${name}`,exact:true}).click();
   await closeAndResume(page);await walk(page,'x',2.2);await walk(page,'z',-.5);
   await interact(page,'Гончар');await page.getByRole('button',{name:'Взять: Вода в кувшине',exact:true}).click();await closeAndResume(page);
-  await walk(page,'x',0);await walk(page,'z',-26);await walk(page,'x',-1);
+  await pastureRoute(page,walk);await walk(page,'x',-1);
   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Пастбище у рынка');
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Пастбище у северной стены');
   await interact(page,'Пастух');await expect(page.getByRole('dialog')).toContainText('Колокольчик'.toLowerCase());await closeAndResume(page);
-  await walk(page,'x',0);await walk(page,'z',-31);await walk(page,'x',2);
+  await walk(page,'x',0);await walk(page,'z',-63);await walk(page,'x',2);
   await interact(page,'Чёрная коза');await page.getByRole('button',{name:'Финики · 1',exact:true}).click();await page.getByRole('button',{name:'Дать выбранный корм'}).click();
   await expect(page.getByRole('status').filter({hasText:'Коза отказалась'})).toBeVisible();await expect(page.getByRole('button',{name:'Финики · 1',exact:true})).toBeEnabled();
   await page.getByRole('button',{name:'Красные плоды · 1',exact:true}).click();await page.getByRole('button',{name:'Дать выбранный корм'}).click();await closeAndResume(page);
   await walk(page,'x',-3);await interact(page,'Белая коза');await page.getByRole('button',{name:'Финики · 1',exact:true}).click();await page.getByRole('button',{name:'Дать выбранный корм'}).click();await closeAndResume(page);
-  await walk(page,'z',-35);await interact(page,'Рыжая коза');await page.getByRole('button',{name:'Жёлтые фрукты · 1',exact:true}).click();await page.getByRole('button',{name:'Дать выбранный корм'}).click();await closeAndResume(page);
+  await walk(page,'z',-67);await interact(page,'Рыжая коза');await page.getByRole('button',{name:'Жёлтые фрукты · 1',exact:true}).click();await page.getByRole('button',{name:'Дать выбранный корм'}).click();await closeAndResume(page);
   await page.screenshot({path:'test-results/market-pasture.png'});
   await walk(page,'x',3);await interact(page,'Светло-серый козлёнок');await page.getByRole('button',{name:'Вода в кувшине · 1',exact:true}).click();await page.getByRole('button',{name:'Дать выбранный корм'}).click();
   await expect(page.getByRole('dialog',{name:'Спасибо за помощь!'})).toContainText('Все четыре козы сыты');

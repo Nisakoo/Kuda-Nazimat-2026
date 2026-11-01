@@ -1,0 +1,6 @@
+uv run --no-project --no-config --python 3.12 --no-python-downloads --offline python -B -m unittest discover -s server/llm -p 'test_*.py'
+..............................................................................s...................
+----------------------------------------------------------------------
+Ran 98 tests in 11.215s
+
+OK (skipped=1)

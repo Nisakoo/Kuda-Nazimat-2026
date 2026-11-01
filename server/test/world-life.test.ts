@@ -82,7 +82,7 @@ it('atomic race has one winner; changed intent conflicts; lost reply and 5 resta
 
 it('all 4 actual BABEL roles can pick up and place without changing BABEL inventory',async()=>{
   const f=durable();const queue=createGenerationQueue({clock:systemClock,scheduler:systemScheduler,logger:silentLogger},{maxConcurrent:1,maxUnfinished:4,timeoutMs:1000});
-  let n=0;const babel=new BabylonService({store:sqliteBabylon(f.db),language:testLanguagePort,generate:queue.generate,now:Date.now,id:()=>`b${++n}`,location:()=>null});
+  let n=0;const babel=new BabylonService({store:sqliteBabylon(f.db),language:testLanguagePort,generate:queue.generate,now:Date.now,monotonicNow:()=>performance.now(),id:()=>`b${++n}`,location:()=>null});
   for(const p of f.people)await babel.handle(p,{v:2,requestId:`enroll-${p.playerId}`,action:{type:'enroll',size:4,native:'ru',learning:'en'}},p.playerId);
   for(const [index,p] of f.people.entries()){
     expect(babel.state(p).party?.role).toBe(index+1);const before=copy(babel.state(p).inventory);
@@ -210,7 +210,9 @@ it.each([2, 3])('migrates an actual v%i DB to the current schema without losing 
   const upgraded=openDatabase(path);dbs.push(upgraded);expect(upgraded.prepare('SELECT max(version) AS v FROM schema_migrations').get()!.v).toBe(loadMigrations().length);
   if (version === 3) expect(upgraded.prepare('SELECT password_hash FROM accounts WHERE id = ?').get(p.accountId)!.password_hash).toBe('preserved-password-hash');
   expect(upgraded.prepare('SELECT count(*) AS n FROM world_apples').get()!.n).toBe(0);
-  const restored=sqliteStores(upgraded);expect(restored.accounts.findOrCreate('Old','old',3)).toEqual(p);expect(restored.players.load(p.playerId)?.position).toEqual(pos(2,3));expect(restored.dialogue.history(p.playerId,'npc')).toEqual([{question:'Q',answer:'A'}]);
+  const restored=sqliteStores(upgraded);expect(restored.accounts.findOrCreate('Old','old',3)).toEqual(p);expect(restored.players.load(p.playerId)?.position).toEqual(pos(2,3));
+  expect(upgraded.prepare('SELECT question, answer, session_id FROM npc_dialogue WHERE player_id = ? AND npc_id = ?').all(p.playerId,'npc')).toEqual([{question:'Q',answer:'A',session_id:null}]);
+  expect(restored.dialogue.history(p.playerId,'npc','new-session')).toEqual([]);
   expect(()=>transaction(upgraded,()=>applyMigrations(upgraded,[...loadMigrations(),{version:loadMigrations().length+1,sql:'CREATE TABLE transient(id INTEGER); INSERT INTO missing VALUES(1)'}],4))).toThrow();
   expect(upgraded.prepare("SELECT name FROM sqlite_master WHERE name='transient'").get()).toBeUndefined();
   upgraded.prepare('INSERT INTO schema_migrations VALUES(?,4)').run(loadMigrations().length+1);upgraded.close();expect(()=>openDatabase(path)).toThrow('Не удалось открыть БД');

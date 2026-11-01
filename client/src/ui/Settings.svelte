@@ -2,18 +2,22 @@
   import { untrack } from 'svelte';
   import type { ClientMode } from '../app/GameApp';
   import type { ClientConfig } from '../app/config';
+  import type { GraphicsQuality } from '../render/GraphicsQuality';
   import { modal } from './modal';
-  const { mode, config, error, volume, setVolume, apply, close, appearance }: { appearance?: () => void; mode: ClientMode; config: ClientConfig; error: string | null; volume: number; setVolume: (percent: number) => void; apply: (mode: ClientMode, server: string, map: string, radius: number, debug: boolean) => boolean; close: () => void } = $props();
+  const { quality, mode, config, error, volume, setVolume, apply, close, appearance }: { quality: GraphicsQuality; appearance?: () => void; mode: ClientMode; config: ClientConfig; error: string | null; volume: number; setVolume: (percent: number) => void; apply: (mode: ClientMode, server: string, map: string, radius: number, debug: boolean, quality: GraphicsQuality) => boolean; close: () => void } = $props();
   let selected = $state<ClientMode>(untrack(() => mode));
   let server = $state(untrack(() => config.serverUrl));
   let map = $state(untrack(() => config.mapId));
   let radius = $state(untrack(() => config.chunkRadius ?? 1));
+  let graphics = $state<GraphicsQuality>(untrack(() => quality));
   let debug = $state(untrack(() => config.debug));
 </script>
 
 <dialog use:modal class="panel settings-panel" aria-labelledby="settings-title" oncancel={(event) => { event.preventDefault(); close(); }}>
   <div class="panel-top"><h2 id="settings-title">Настройки</h2><button class="icon-button" onclick={close} aria-label="Закрыть настройки">✕</button></div>
-  <form class="settings-form" onsubmit={(event) => { event.preventDefault(); apply(selected, server, map, Number(radius), debug); }}>
+  <form class="settings-form" onsubmit={(event) => { event.preventDefault(); apply(selected, server, map, Number(radius), debug, graphics); }}>
+    <label>Качество графики <select aria-label="Качество графики" bind:value={graphics}><option value="low">Облегчённое</option><option value="balanced">Обычное</option><option value="high">Высокое</option></select></label>
+    <p class="small subtle">Облегчённое отключает тени и сглаживание. Изменения применятся при открытии карты.</p>
     <label>Радиус загрузки <select aria-label="Радиус загрузки" bind:value={radius}><option value={0}>Текущая область</option><option value={1}>Ближайшие области</option><option value={2}>Расширенный обзор</option></select></label>
 
     {#if error}<p role="alert" class="capture-error">{error}</p>{/if}

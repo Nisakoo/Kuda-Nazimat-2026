@@ -9,7 +9,7 @@ related:
   - spec: ../specs/client-input-ui.md
     requirements: [UI-001–003, UI-007]
   - spec: ../specs/client-pause-menu.md
-    requirements: [PAUSE-001, PAUSE-015]
+    requirements: [PAUSE-001, PAUSE-009]
 scheduling_note: новый запрос пользователя; выполнить до отложенной TASK-053
 ---
 

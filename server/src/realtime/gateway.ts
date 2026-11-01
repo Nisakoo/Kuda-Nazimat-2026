@@ -5,7 +5,7 @@ import { SERVER_REQUEST_ID } from '../../../shared/protocol/types.ts';
 import type { ClientMessage, ErrorCode, ServerMessage } from '../../../shared/protocol/types.ts';
 import { ProtocolError, parseClientMessage, parseServerMessage, peekRequestId } from '../../../shared/protocol/validate.ts';
 import type { Logger } from '../common/logger.ts';
-import { MetricsRegistry, type Counter, type Metrics } from '../common/metrics.ts';
+import { MetricsRegistry, RTT_MS_BUCKETS, type Counter, type Histogram, type Metrics } from '../common/metrics.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { NpcAnswer, NpcQuestions, PlayerIdentity, SessionVerifier } from '../contracts.ts';
 import type { GameService } from '../game/GameService.ts';
@@ -32,7 +32,7 @@ export interface GatewayDeps {
   readonly validateOutgoing?: boolean;
 }
 
-interface GatewayMetrics { readonly packetsIn: Counter; readonly packetsOut: Counter; readonly invalid: Counter; readonly limited: Counter; readonly handshakes: Counter }
+interface GatewayMetrics { readonly packetsIn: Counter; readonly packetsOut: Counter; readonly invalid: Counter; readonly limited: Counter; readonly handshakes: Counter; readonly rtt: Histogram }
 
 const PACKET_LIMIT = 262144 + 4096;
 const CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
@@ -67,6 +67,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
     invalid: registry.counter('realtime_invalid_packets_total', 'Отклонённые пакеты клиента'),
     limited: registry.counter('realtime_rate_limited_total', 'Пакеты, отброшенные лимитами, по типу'),
     handshakes: registry.counter('realtime_handshakes_total', 'Handshake по результату'),
+    rtt: registry.histogram('game_rtt_ms', 'RTT игроков по heartbeat Engine.IO', RTT_MS_BUCKETS),
   };
   const nsp = io.of('/game');
   registry.gauge('realtime_connections', 'Открытые соединения /game', () => nsp.sockets.size);
@@ -81,7 +82,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
     if (auth?.version !== 3) { reject('VERSION', 'Несовместимая версия игрового протокола.', `version ${String(auth?.version)}`); return; }
     if (typeof auth.token !== 'string' || auth.token.length > 512) { reject('UNAUTHORIZED', 'Нужна серверная сессия.', 'no token'); return; }
     deps.sessions.verify(auth.token).then((check) => {
-      if (!check.ok) { reject('UNAUTHORIZED', 'Сессия отсутствует или истекла.', 'session'); return; }
+      if (!check.ok || !check.sessionId) { reject('UNAUTHORIZED', 'Сессия отсутствует или истекла.', 'session'); return; }
       if (!deps.game.canAdmit(check.identity.accountId)) { reject('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.', 'full'); return; }
       metrics.handshakes.inc({ result: 'ok' });
       socket.data.sessionKey = hashToken(auth.token as string);
@@ -100,6 +101,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
 class Connection implements Channel {
   readonly id: string;
   readonly sessionKey: string;
+  private readonly sessionId: string;
   private readonly socket: Socket;
   private readonly deps: GatewayDeps;
   private readonly log: Logger;
@@ -119,6 +121,7 @@ class Connection implements Channel {
   private invalidTimes: number[] = [];
   private expiry: TimerHandle | null = null;
   private closed = false;
+  private workCancelled = false;
   private readonly metrics: GatewayMetrics;
   /** Heartbeat RTT samples of the last minute (OBS-010). */
   private rtt: { at: number; ms: number }[] = [];
@@ -130,6 +133,7 @@ class Connection implements Channel {
     this.socket = socket; this.deps = deps; this.metrics = metrics;
     this.id = socket.id; this.sessionKey = socket.data.sessionKey as string;
     this.identity = socket.data.identity as PlayerIdentity;
+    this.sessionId = socket.data.sessionId as string;
     this.expiresAt = socket.data.expiresAt as number;
     this.ip = socket.handshake.address;
     this.log = log.child('realtime', { playerId: this.identity.playerId, connectionId: this.id });
@@ -146,7 +150,9 @@ class Connection implements Channel {
     this.socket.conn.on('packet', (packet: { type: string }) => {
       if (packet.type !== 'pong' || !this.pingAt) return;
       const now = this.deps.clock.now();
-      this.rtt = [...this.rtt.filter((sample) => now - sample.at < 60_000), { at: now, ms: performance.now() - this.pingAt }];
+      const ms = performance.now() - this.pingAt;
+      this.rtt = [...this.rtt.filter((sample) => now - sample.at < 60_000), { at: now, ms }];
+      this.metrics.rtt.observe(ms);
       this.pingAt = 0;
     });
     this.socket.on('disconnect', reason => this.onDisconnect(reason));
@@ -234,7 +240,16 @@ class Connection implements Channel {
     if (this.closed) return;
     this.send({ v: 3, type: 'error', requestId: SERVER_REQUEST_ID, code, message });
     this.closed = true;
+    this.cancelWork();
     this.socket.disconnect(true);
+  }
+
+  private cancelWork(): void {
+    if (this.workCancelled) return;
+    this.workCancelled = true;
+    this.deps.npc.cancelConnection(this.id);
+    // Socket-specific ownership cannot cancel work of a replacement connection, even with the same AUTH token.
+    this.deps.npc.cancelConnection('babel:socket:' + this.id);
   }
 
   private scheduleExpiry(): void {
@@ -249,7 +264,7 @@ class Connection implements Channel {
     if (this.expiry) this.deps.scheduler.clearTimeout(this.expiry);
     for (const stream of this.streams.values()) stream.stop();
     this.streams.clear();
-    this.deps.npc.cancelConnection(this.id);
+    this.cancelWork();
     this.deps.game.detach(this);
   }
 
@@ -345,12 +360,19 @@ class Connection implements Channel {
     const { id, name, topic, persona, greeting } = target.npc;
     let onPartial: ((text: string) => void) | undefined;
     if (stream) {
-      const throttle = new PartialThrottle(this.deps.scheduler, PARTIAL_INTERVAL_MS, (seq, text) => this.sendVolatile({ v: 3, type: 'npc-partial', requestId, targetId, seq, text }));
+      const throttle = new PartialThrottle(this.deps.scheduler, PARTIAL_INTERVAL_MS, (seq, text) => {
+        if (this.npcAccess(targetId)) this.sendVolatile({ v: 3, type: 'npc-partial', requestId, targetId, seq, text });
+      });
       this.streams.set(requestId, throttle);
       onPartial = (text) => throttle.push(text);
     }
-    this.deps.npc.ask({ connectionId: this.id, requestId, player: this.identity, npc: { id, name, topic, persona, greeting }, question }, onPartial)
+    const authorize = () => this.npcAccess(targetId);
+    this.deps.npc.ask({ sessionId: this.sessionId, authorize, connectionId: this.id, requestId, player: this.identity, npc: { id, name, topic, persona, greeting }, question }, onPartial)
       .then((answer) => this.deliver(requestId, targetId, answer), () => this.deliver(requestId, targetId, { ok: false, reason: 'unavailable' }));
+  }
+
+  private npcAccess(targetId: string): boolean {
+    return !this.closed && this.deps.sessions.isActive?.(this.sessionId, this.identity.playerId) === true && this.deps.game.isControlling(this) && this.deps.game.interact(this, targetId).ok;
   }
 
   private endStream(requestId: string): void { this.streams.get(requestId)?.stop(); this.streams.delete(requestId); }
@@ -358,7 +380,11 @@ class Connection implements Channel {
   /** Terminal message of a question: a pending partial is dropped so it can never arrive after the answer. */
   private deliver(requestId: string, targetId: string, answer: NpcAnswer): void {
     this.endStream(requestId);
-    if (this.closed || !this.deps.game.isControlling(this)) return;
+    if (!this.npcAccess(targetId)) {
+      // ADMIN-SRV-005: the administrator withdrew the NPC; the player still waits for this answer.
+      if (!this.closed && this.deps.game.hasNpc?.(targetId) === false && this.deps.game.isControlling(this) && this.deps.sessions.isActive?.(this.sessionId, this.identity.playerId) === true) this.error(requestId, 'UNAVAILABLE', 'Собеседник сейчас недоступен.');
+      return;
+    }
     if (answer.ok) { this.send({ v: 3, type: 'npc-answer', requestId, targetId, text: answer.text }); return; }
     switch (answer.reason) {
       case 'cancelled': return;

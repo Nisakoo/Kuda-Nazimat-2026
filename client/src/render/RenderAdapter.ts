@@ -35,6 +35,7 @@ export interface RenderAdapter {
   revealChunks?(): void;
   getDiagnostics(): RenderDiagnostics;
   retryFailedModels(): void;
-  render(elapsedSeconds: number, alpha: number): void;
+  /** False means GPU backpressure; void is retained for non-GPU test adapters. */
+  render(elapsedSeconds: number, alpha: number): boolean | void;
   dispose(): void;
 }

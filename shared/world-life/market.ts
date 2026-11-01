@@ -32,15 +32,15 @@ export const MARKET_WORLD_LIFE: WorldLifeDefinition = {
     { id: 'market-apple-1', templateId: 'pickup-apple', position: position(.8,6.4), rotationY: 0 },
     { id: 'market-apple-2', templateId: 'pickup-apple', position: position(-1.1,4.5), rotationY: .5 },
     { id: 'market-apple-3', templateId: 'pickup-apple', position: position(1.2,1.8), rotationY: 1 },
-    { id: 'market-apple-4', templateId: 'pickup-apple', position: position(1,-27), rotationY: 1.5 },
+    { id: 'market-apple-4', templateId: 'pickup-apple', position: position(1,-59), rotationY: 1.5 },
     { id: 'market-apple-5', templateId: 'pickup-apple', position: position(-30,8), rotationY: 2 },
     { id: 'market-cat-sleep', templateId: 'cat', position: position(-7,7), rotationY: 1 },
-    { id: 'market-cat-walk', templateId: 'cat', position: position(-7,-27), rotationY: 0 },
+    { id: 'market-cat-walk', templateId: 'cat', position: position(-7,-59), rotationY: 0 },
     { id: 'market-cat-wash', templateId: 'cat', position: position(-31,8), rotationY: -.8 },
   ],
   cats: [
     { instanceId: 'market-cat-sleep', behavior: 'sleep', route: [position(-7,7)], cycleMs: 6000, pauseMs: 0 },
-    { instanceId: 'market-cat-walk', behavior: 'walk', route: [position(-7,-27),position(-5,-27),position(-5,-29),position(-7,-29)], cycleMs: 24000, pauseMs: 4000 },
+    { instanceId: 'market-cat-walk', behavior: 'walk', route: [position(-7,-59),position(-5,-59),position(-5,-61),position(-7,-61)], cycleMs: 24000, pauseMs: 4000 },
     { instanceId: 'market-cat-wash', behavior: 'wash', route: [position(-31,8)], cycleMs: 8000, pauseMs: 1000 },
   ],
   flock: {

@@ -11,7 +11,7 @@ import { answerRequest } from './responderContract.ts';
 
 const deps = { clock: systemClock, scheduler: systemScheduler };
 afterEach(() => vi.useRealTimers());
-const question = (requestId = 'r', connectionId = 'c'): NpcQuestion => ({ connectionId, requestId, player: { accountId: 'a', playerId: 'p', displayName: 'Аня' }, npc: answerRequest().npc, question: 'Расскажи' });
+const question = (requestId = 'r', connectionId = 'c'): NpcQuestion => ({ sessionId: 'test-session', authorize: () => true, connectionId, requestId, player: { accountId: 'a', playerId: 'p', displayName: 'Аня' }, npc: answerRequest().npc, question: 'Расскажи' });
 
 it('throttle sends the newest text at most once per interval, skips repeats and stops cleanly (PROTO-007)', async () => {
   vi.useFakeTimers(); const sent: [number, string][] = [];
@@ -50,7 +50,7 @@ it('service normalizes partials, silences them after cancel, cancels one questio
   npc.cancel('c', 'other'); npc.cancel('other', 'r'); emit('Всё ещё'); expect(partials).toHaveLength(3);
   npc.cancel('c', 'r'); expect(await pending).toEqual({ ok: false, reason: 'cancelled' });
   emit('Поздно'); finish({ text: 'Поздно' }); await vi.advanceTimersByTimeAsync(0);
-  expect(partials).toHaveLength(3); expect(stores.dialogue.history('p', 'n')).toHaveLength(0);
+  expect(partials).toHaveLength(3); expect(stores.dialogue.history('p', 'n', 'test-session')).toHaveLength(0);
   // The cancelled question no longer holds the player's slot; an unstreamed one keeps the short deadline.
   const asked = Date.now(); const next = npc.ask(question('next')); await vi.advanceTimersByTimeAsync(0);
   expect(deadline - asked).toBe(8000); await npc.stop(); expect(await next).toEqual({ ok: false, reason: 'cancelled' });

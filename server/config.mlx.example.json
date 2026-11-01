@@ -1,0 +1,19 @@
+{
+  "host": "127.0.0.1",
+  "port": 8080,
+  "defaultMap": "demo",
+  "npc": {
+    "adapter": "mlx",
+    "maxConcurrent": 1,
+    "maxUnfinished": 4,
+    "timeoutMs": 30000,
+    "options": {
+      "python": "/absolute/mlx-venv/bin/python3",
+      "modelDir": "/absolute/qwen35-2b-text-4bit",
+      "modelManifest": "/absolute/model-sha256.json",
+      "runnerVersion": "0.32.2",
+      "threads": 2,
+      "startupTimeoutMs": 120000
+    }
+  }
+}

@@ -2,6 +2,8 @@ import type { ServerSession } from '../../../shared/protocol/types';
 import { parseServerSession } from '../../../shared/protocol/validate';
 import { guestName } from './GuestAuth';
 import { readBoundedJson as json } from './readBoundedJson';
+import { AuthError } from './Auth';
+import type { AuthAction } from './Auth';
 
 const registrationRecovery = ' Аккаунт мог быть создан. Попробуйте войти по имени и паролю, а не регистрироваться повторно.';
 function boundedReadError(error: unknown): string | null {
@@ -18,20 +20,24 @@ function authFailure(raw: unknown, status: number): string {
   if (code === 'INVALID') return 'Проверьте имя и пароль.';
   return 'Не удалось войти. Проверьте подключение и повторите попытку.';
 }
-export async function requestPasswordSession(serverUrl: string, mode: 'login' | 'register', rawName: string, password: string, signal: AbortSignal): Promise<{ session: ServerSession; requiresAvatar: boolean }> {
-  const name = guestName(rawName);
-  if (!password || password.length > 128) throw new Error('Введите пароль длиной до 128 символов.');
+export async function requestPasswordSession(serverUrl: string, mode: AuthAction, rawName: string, password: string, signal: AbortSignal, newPassword = ''): Promise<{ session: ServerSession; requiresAvatar: boolean }> {
+  const name = mode === 'dev' && !rawName.trim() ? '' : guestName(rawName);
+  if (mode !== 'dev' && (!password || password.length > 128)) throw new Error('Введите пароль длиной до 128 символов.');
   const recovery = mode === 'register' ? registrationRecovery : '';
   let response: Response;
   try {
     signal.throwIfAborted();
-    response = await fetch(`${serverUrl.replace(/\/$/, '')}/api/auth/${mode}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, password }), cache: 'no-store', credentials: 'omit', redirect: 'error', signal });
+    response = await fetch(`${serverUrl.replace(/\/$/, '')}/api/auth/${mode}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mode === 'dev' ? (name ? { name } : {}) : mode === 'password' ? { name, password, newPassword } : { name, password }), cache: 'no-store', credentials: 'omit', redirect: 'error', signal });
   } catch { throw new Error('Сервер недоступен. Проверьте подключение и повторите попытку.' + recovery); }
   if (response.status === 404 || response.status === 405) throw new Error(mode === 'register' ? 'Этот сервер не поддерживает регистрацию. Аккаунт не создан.' : 'Этот сервер не поддерживает вход по паролю. Гостевой вход выполняется отдельно.');
   let raw: unknown;
   try { raw = await json(response); }
   catch (error) { throw new Error((boundedReadError(error) ?? 'Не удалось прочитать ответ сервера.') + recovery); }
-  if (!response.ok) throw new Error(authFailure(raw, response.status) + recovery);
+  if (!response.ok) {
+    const issue = (raw as { error?: { code?: unknown; message?: unknown } } | null)?.error;
+    if (issue?.code === 'PASSWORD_CHANGE_REQUIRED') throw new AuthError(typeof issue.message === 'string' ? issue.message.slice(0, 500) : 'Смените пароль.', issue.code);
+    throw new Error(authFailure(raw, response.status) + recovery);
+  }
   let session: ServerSession;
   try { session = parseServerSession(raw, Date.now()); }
   catch { throw new Error('Сервер вернул недействительную сессию. Повторите вход.' + recovery); }
@@ -55,6 +61,6 @@ export async function revokeSession(serverUrl: string, token: string): Promise<v
   const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 10000);
   try {
     const response = await fetch(`${serverUrl.replace(/\/$/, '')}/api/auth/logout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', credentials: 'omit', redirect: 'error', signal: controller.signal });
-    if (!response.ok && response.status !== 401) throw new Error('Не удалось подтвердить выход на сервере.');
+    if (response.status !== 204) throw new Error('Не удалось подтвердить выход на сервере.');
   } finally { clearTimeout(timer); }
 }

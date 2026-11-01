@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { readFile, rm, stat, writeFile, appendFile } from 'node:fs/promises';
 import { existsSync, rmSync } from 'node:fs';
-import { request } from 'node:http';
+import { request } from 'node:https';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadWorld } from '../src/world/loader.ts';
@@ -66,7 +66,7 @@ it('S5: NPC content with a duplicate id, an unknown map or a position outside th
 
 function rawGet(port: number, path: string, token: string): Promise<number> {
   return new Promise((resolve, reject) => {
-    const req = request({ host: '127.0.0.1', port, path, headers: { Authorization: `Bearer ${token}` } }, (res) => { res.resume(); res.on('end', () => resolve(res.statusCode!)); });
+    const req = request({ host: '127.0.0.1', port, path, rejectUnauthorized: true, headers: { Authorization: `Bearer ${token}` } }, (res) => { res.resume(); res.on('end', () => resolve(res.statusCode!)); });
     req.on('error', reject); req.end();
   });
 }
@@ -80,7 +80,7 @@ it('S3: traversal, encoded separators, unknown files and trailing slashes are 40
   }
   expect(await rawGet(port, '/world/maps/test/manifest.json', session.token)).toBe(200);
   await rm(join(config.worldDir, 'maps/test/chunks/0_0.json'));
-  const response = await fetch(`http://127.0.0.1:${port}/world/maps/test/chunks/0_0.json`, { headers: { Authorization: `Bearer ${session.token}` } });
+  const response = await fetch(`https://127.0.0.1:${port}/world/maps/test/chunks/0_0.json`, { headers: { Authorization: `Bearer ${session.token}` } });
   expect(response.status).toBe(500); expect(await response.text()).not.toContain(config.worldDir);
-  expect((await fetch(`http://127.0.0.1:${port}/api/health`)).status).toBe(200);
+  expect((await fetch(`https://127.0.0.1:${port}/api/health`)).status).toBe(200);
 });

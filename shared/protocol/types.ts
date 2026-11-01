@@ -1,7 +1,8 @@
 import type { Direction, Entity, WorldSnapshot } from '../world/types.ts';
+import { NPC_TIMING } from './npcTiming.ts';
 
 export const PROTOCOL_VERSION = 3 as const;
-export const LIMITS = { packetBytes: 262144, entities: 256, pending: 32, chat: 500, question: 240, answer: 4000, inputHz: 20, requestMs: 10000 } as const;
+export const LIMITS = { packetBytes: 262144, entities: 256, pending: 32, chat: 500, question: 240, answer: 4000, inputHz: 20, requestMs: 10000, npcRequestMs: NPC_TIMING.defaultMs + NPC_TIMING.deliveryGraceMs } as const;
 export type ConnectionStatus = 'unauthorized' | 'connecting' | 'connected' | 'lost' | 'error' | 'disconnected';
 export type ErrorCode = 'UNAUTHORIZED' | 'VERSION' | 'INVALID' | 'FORBIDDEN' | 'RATE_LIMIT' | 'NOT_READY' | 'UNAVAILABLE';
 export const ERROR_CODES: readonly ErrorCode[] = ['UNAUTHORIZED', 'VERSION', 'INVALID', 'FORBIDDEN', 'RATE_LIMIT', 'NOT_READY', 'UNAVAILABLE'];

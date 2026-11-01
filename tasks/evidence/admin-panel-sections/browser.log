@@ -1,0 +1,4 @@
+(node:21477) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS: real HTTP/SQLite/Socket.IO; offline assets; navigation, filters, 1024 px, confirmations, revoke, lock/unlock, one-time password, dump, API failure/recovery, XSS and thresholds; client FPS report; NPC live edit/create/delete/restore; world block; journal filter/details/CSV; partial account search; SVG charts (threshold, gap, above-scale, tooltip).
+Thresholds, chart series and HTTP failures used controlled API fixtures. Physical LAN, real client FPS and a live scene reset were not measured.

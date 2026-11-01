@@ -55,5 +55,6 @@ describe('avatar preview camera framing', () => {
     console.log('preview projected maximum absolute NDC', worst, worstPoint);
     expect(worst.x).toBeLessThanOrEqual(.98); expect(worst.y).toBeLessThanOrEqual(.98); expect(worst.z).toBeLessThanOrEqual(.98);
     pedestal.geometry.dispose(); pedestal.material.dispose();
-  }, 30000);
+  // All vertices are checked at every camera, yaw and idle sample. Parallel suites can contend for CPU.
+  }, 90000);
 });

@@ -18,6 +18,44 @@ function setup() {
   session.connect({ kind: 'mock' }); clock.advance(100);
   return { clock, adapter, session, sent, notices };
 }
+it('PROTO-007: accepts only increasing whole snapshots and makes the final answer authoritative', () => {
+  const s = setup();
+  const requestId = s.session.askNpc('guide', 'Вопрос', true)!;
+  s.clock.advance(50);
+  expect(s.sent.at(-1)).toMatchObject({ type: 'npc-question', stream: true });
+  for (const [seq, text, targetId] of [[2, 'Hello world', 'guide'], [1, 'Hello', 'guide'], [3, 'wrong', 'other'], [2, 'duplicate', 'guide']] as const) {
+    s.adapter.receive({ v: 3, type: 'npc-partial', requestId, targetId, seq, text });
+  }
+  s.clock.advance(0);
+  expect(s.notices.mock.calls.filter(([notice]) => notice.type === 'npc-partial').map(([notice]) => notice.text)).toEqual(['Hello world']);
+  s.clock.advance(11000);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId }));
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId, targetId: 'guide', text: 'Final correction' });
+  s.adapter.receive({ v: 3, type: 'npc-partial', requestId, targetId: 'guide', seq: 4, text: 'late' });
+  s.clock.advance(0);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', text: 'Final correction' }));
+  expect(s.notices.mock.calls.filter(([notice]) => notice.type === 'npc-partial')).toHaveLength(1);
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
+it('PROTO-007: cancels one question without replay, ignores late messages and bounds a silent stream', () => {
+  const s = setup();
+  const requestId = s.session.askNpc('guide', 'First', true)!;
+  expect(s.session.askNpc('guide', 'Overlapping', true)).toBeNull();
+  s.clock.advance(50); s.session.cancelNpc(requestId); s.clock.advance(50);
+  expect(s.sent.at(-1)).toMatchObject({ type: 'npc-cancel', questionId: requestId });
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId, targetId: 'guide', text: 'late' });
+  s.clock.advance(0);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc' }));
+  const next = s.session.askNpc('guide', 'Second', true)!;
+  s.clock.advance(32001);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: next, message: expect.stringContaining('32 секунд') }));
+  s.clock.advance(50);
+  expect(s.sent.at(-1)).toMatchObject({ type: 'npc-cancel', questionId: next });
+  s.session.askNpc('guide', 'Third', true); s.clock.advance(50);
+  s.adapter.drop(); s.session.reconnect(); s.clock.advance(100);
+  expect(s.sent.filter(message => message.type === 'npc-question' && message.text === 'Third')).toHaveLength(1);
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
 it('MOVE-012: sends a diagonal intention when its tangent is ready', () => {
   const s = setup();
   s.session.setMovementGuard(position => position.x <= 0);
@@ -103,6 +141,60 @@ it('correlates NPC replies, deduplicates chat, times out failures and discards a
   expect(s.sent.filter((message) => message.type === 'chat-send' && message.text === 'pending')).toHaveLength(0);
   expect(s.session.state.status).toBe('connected'); s.session.dispose(); expect(s.clock.pending).toBe(0);
 });
+it('accepts an NPC answer at 29.9 seconds but ignores one at the 32-second deadline', () => {
+  const s = setup();
+  const accepted = s.session.askNpc('guide', 'first');
+  expect(accepted).not.toBeNull();
+  s.clock.advance(29900);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: accepted }));
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId: accepted, targetId: 'guide', text: 'answer' }); s.clock.advance(0);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: accepted, text: 'answer' }));
+
+  const expired = s.session.askNpc('guide', 'second');
+  s.clock.advance(31999);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: expired }));
+  s.clock.advance(1);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: expired, message: expect.stringContaining('32 секунд') }));
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId: expired, targetId: 'guide', text: 'late' }); s.clock.advance(0);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: expired }));
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
+it('keeps ordinary request deadlines at 10 seconds while NPC requests remain pending', () => {
+  const s = setup();
+  const npc = s.session.askNpc('guide', 'question');
+  const chat = s.session.chat('message');
+  s.clock.advance(9999);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: chat }));
+  s.clock.advance(1);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: chat, message: expect.stringContaining('10 секунд') }));
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: npc }));
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
+it('clears NPC requests on disconnect and dispose without replay', () => {
+  const s = setup();
+  const dropped = s.session.askNpc('guide', 'drop'); s.clock.advance(50);
+  s.adapter.drop();
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: dropped }));
+  s.session.reconnect(); s.clock.advance(100);
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId: dropped, targetId: 'guide', text: 'stale' }); s.clock.advance(0);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: dropped }));
+  expect(s.sent.filter((message) => message.type === 'npc-question' && message.text === 'drop')).toHaveLength(1);
+  const disposed = s.session.askNpc('guide', 'dispose'); s.clock.advance(50);
+  s.session.dispose();
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: disposed }));
+  expect(s.clock.pending).toBe(0);
+  s.clock.advance(32000);
+  expect(s.sent.filter((message) => message.type === 'npc-question' && message.text === 'dispose')).toHaveLength(1);
+});
+it('bounds all pending requests to 32 while allowing only one NPC question', () => {
+  const s = setup();
+  expect(s.session.askNpc('guide', 'First question')).not.toBeNull();
+  expect(s.session.askNpc('guide', 'Overlapping question')).toBeNull();
+  for (let i = 0; i < 31; i++) expect(s.session.chat(`message ${i}`)).not.toBeNull();
+  expect(s.session.chat('overflow')).toBeNull();
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: 'limit' }));
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
 it('delivers one text message to two independent sessions over a controlled test network', () => {
   const clock = new TestClock(); const peers: MockNetworkAdapter[] = []; let messageCount = 0;
   const sessions = ['p1', 'p2'].map((id) => {
@@ -137,6 +229,65 @@ it('smooths the camera-followed player between network updates without changing 
   s.clock.advance(1000); expect(renderedX()).toBe(0.5);
   s.adapter.drop(); expect(renderedX()).toBe(0.5);
   s.session.dispose();
+});
+
+it('refreshes real timing, ignores stale metadata and uses a 62-second deadline', async () => {
+  const clock = new TestClock();
+  const adapter = new MockNetworkAdapter(clock, (message, peer) => {
+    if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world });
+  });
+  const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' });
+  const requests: { signal: AbortSignal; resolve: (value: number) => void }[] = [];
+  const session = new OnlineSession(adapter, 'demo', clock, () => { const controller = new AbortController(); return { result: new Promise((resolve) => requests.push({ signal: controller.signal, resolve })), cancel: () => controller.abort() }; });
+  const notices = vi.fn(); session.subscribeNotices(notices);
+  session.connect(); clock.advance(100); await Promise.resolve();
+  expect(session.askNpc('guide', 'not ready')).toBeNull(); expect(session.chat('works')).not.toBeNull();
+  adapter.drop(); expect(requests[0]!.signal.aborted).toBe(true);
+  session.reconnect(); clock.advance(100); await Promise.resolve();
+  requests[0]!.resolve(30000); await Promise.resolve(); await Promise.resolve();
+  expect(session.askNpc('guide', 'stale')).toBeNull();
+  requests[1]!.resolve(60000); await Promise.resolve(); await Promise.resolve();
+  const first = session.askNpc('guide', 'first'); expect(first).not.toBeNull();
+  clock.advance(45000); adapter.receive({ v: 3, type: 'npc-answer', requestId: first, targetId: 'guide', text: 'answer' }); clock.advance(0);
+  expect(notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: first }));
+  const late = session.askNpc('guide', 'late'); clock.advance(62000);
+  expect(notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: late }));
+  adapter.receive({ v: 3, type: 'npc-answer', requestId: late, targetId: 'guide', text: 'late' }); clock.advance(0);
+  expect(notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: late }));
+  session.dispose(); expect(requests[1]!.signal.aborted).toBe(true); expect(clock.pending).toBe(0);
+});
+
+it('recovers after metadata failure on reconnect and ignores resolution after disposal', async () => {
+  const clock = new TestClock();
+  const adapter = new MockNetworkAdapter(clock, (message, peer) => { if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world }); });
+  const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' });
+  let resolve!: (value: number) => void; let cancelled = false; let count = 0;
+  const session = new OnlineSession(adapter, 'demo', clock, () => ({
+    result: ++count === 1 ? Promise.reject(new Error('unavailable')) : count === 2 ? Promise.resolve(60000) : new Promise<number>((done) => { resolve = done; }),
+    cancel: () => { cancelled = true; },
+  }));
+  const notices = vi.fn(); session.subscribeNotices(notices);
+  session.connect(); clock.advance(100); await Promise.resolve(); await Promise.resolve();
+  expect(session.askNpc('guide', 'failed')).toBeNull();
+  adapter.drop(); session.reconnect(); clock.advance(100); await Promise.resolve();
+  expect(session.askNpc('guide', 'recovered')).not.toBeNull();
+  adapter.drop(); session.reconnect(); clock.advance(100);
+  session.dispose(); expect(cancelled).toBe(true);
+  const calls = notices.mock.calls.length; resolve(60000); await Promise.resolve();
+  expect(notices.mock.calls.length).toBe(calls); expect(session.askNpc('guide', 'disposed')).toBeNull();
+  expect(clock.pending).toBe(0);
+});
+
+it('disables NPC questions without valid real metadata without blocking chat', async () => {
+  for (const provider of [undefined, async () => { throw new Error('offline'); }, async () => 300001]) {
+    const clock = new TestClock();
+    const adapter = new MockNetworkAdapter(clock, (message, peer) => { if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world }); });
+    const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' });
+    const session = new OnlineSession(adapter, 'demo', clock, provider ? () => ({ result: provider(), cancel: () => {} }) : undefined); const notices = vi.fn(); session.subscribeNotices(notices);
+    session.connect(); clock.advance(100); await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
+    expect(session.askNpc('guide', 'question')).toBeNull(); expect(session.chat('works')).not.toBeNull();
+    expect(notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: 'npc-config' })); session.dispose();
+  }
 });
 
 it('smooths the local avatar with the same history while keeping authoritative position current',()=>{

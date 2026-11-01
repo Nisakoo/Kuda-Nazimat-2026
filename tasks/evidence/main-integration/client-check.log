@@ -1,0 +1,14 @@
+Loading svelte-check in workspace: /Users/nisakoo/Documents/competition-2026/client
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+> educational-world-client@0.1.0 check:core
+> tsc --project tsconfig.core.json
+
+
+> educational-world-client@0.1.0 check:imports
+> depcruise src --config .dependency-cruiser.cjs
+
+
+✔ no dependency violations found (198 modules, 629 dependencies cruised)

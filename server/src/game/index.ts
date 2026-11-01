@@ -1,7 +1,7 @@
 import type { Server as HttpServer } from 'node:http';
 import type { CreateGame, GameConfig, GameDeps, GameRuntime, WorldFileAccess } from '../contracts.ts';
 import type { TimerHandle } from '../common/time.ts';
-import { FAST_MS_BUCKETS, MS_BUCKETS, MetricsRegistry } from '../common/metrics.ts';
+import { BROADCAST_MS_BUCKETS, FAST_MS_BUCKETS, MetricsRegistry } from '../common/metrics.ts';
 import { attachGateway } from '../realtime/gateway.ts';
 import { canAccess } from '../world/access.ts';
 import { loadWorld } from '../world/loader.ts';
@@ -25,6 +25,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   const loaded = await loadWorld({ worldDir: config.worldDir, maps: config.maps, contentDir: config.contentDir });
   for (const map of loaded.maps.values()) log.info('world.loaded', 'Карта готова', { mapId: map.id, chunks: map.manifest.chunks.length, worldBytes: map.manifest.worldBytes, durationMs: Math.round(performance.now() - began) });
   const recoveries = metrics.counter('game_motion_recovered_total', 'Восстановления движения по причине (MOVE)');
+  metrics.gauge('game_npcs', 'NPC на картах', () => loaded.npcs.length);
   const life = new WorldLife(loaded.maps, deps.clock.now(), randomId('scene'));
   if (life.catalogue().length && !deps.worldLife) throw new Error('World-life requires a durable store');
   life.setApples(deps.worldLife?.initialize(life.catalogue()) ?? []);
@@ -39,7 +40,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
     maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery, initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
   }, log, deps.avatars, deps.equipment, metrics, deps.worldLife);
   const tickHistogram = metrics.histogram('game_tick_duration_ms', 'Длительность шага симуляции', FAST_MS_BUCKETS);
-  const broadcastHistogram = metrics.histogram('game_broadcast_interval_ms', 'Интервал между рассылками AOI', MS_BUCKETS);
+  const broadcastHistogram = metrics.histogram('game_broadcast_interval_ms', 'Интервал между рассылками AOI', BROADCAST_MS_BUCKETS);
   let stats: { tickP95Ms: number; broadcastP95Ms: number; players: number } | null = null;
 
   const timers: TimerHandle[] = [];
@@ -89,6 +90,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
     setAvatar: (playerId, avatarId) => game.setAvatar(playerId, avatarId),
     setEquipment: (playerId, tool) => game.setEquipment(playerId, tool),
     canAct: (accountId, sessionKey) => game.canAct(accountId, sessionKey),
+    controlId: (accountId, sessionKey) => game.controlId(accountId, sessionKey),
     location: accountId => game.locate(accountId),
     playerLocation: playerId => game.playerLocation(playerId),
     maps: [...loaded.maps.values()].map((map) => ({ mapId: map.id, worldBytes: map.manifest.worldBytes, chunks: map.manifest.chunks.length })),
@@ -102,6 +104,21 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
       gateway = attachGateway(server, { game, sessions: deps.sessions, npc: deps.npc, clock: deps.clock, scheduler: deps.scheduler, logger: deps.logger, metrics, corsOrigins: config.corsOrigins, babylon: deps.babylon, ...(deps.pingIntervalMs ? { pingIntervalMs: deps.pingIntervalMs } : {}), validateOutgoing: deps.validateOutgoing ?? false });
       running = true;
       startLoop();
+    },
+    content: {
+      baseNpcs: loaded.npcs,
+      maps: () => [...loaded.maps.values()].map((map) => ({ mapId: map.id, chunks: map.manifest.chunks.length, npcs: world.npcCount(map.id) })),
+      surface(mapId, x, z) {
+        const map = loaded.maps.get(mapId);
+        return map && Number.isFinite(x) && Number.isFinite(z) && map.footprintChunkIds(x, z) ? map.heightAt(x, z) : null;
+      },
+      walkable(mapId, x, z) {
+        const map = loaded.maps.get(mapId);
+        return !!map && Number.isFinite(x) && Number.isFinite(z) && map.isSafeSupport(x, z);
+      },
+      setNpcs: (npcs) => world.setNpcs(npcs),
+      scene: (mapId) => game.sceneView(mapId),
+      resetScene: (mapId) => game.resetScene(mapId),
     },
     activePlayers: () => game.activePlayers,
     presence: () => game.presence(),

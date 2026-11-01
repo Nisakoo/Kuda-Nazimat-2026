@@ -1,11 +1,14 @@
-import { Box3, BufferGeometry, Mesh, Ray, Sphere, Vector3, Matrix4 } from 'three';
-import type { Intersection, Object3D, Raycaster } from 'three';
+import { Box3, BufferGeometry, Mesh, Ray, Sphere, Vector3, Matrix4, Object3D, Line } from 'three';
+import type { Intersection, Raycaster } from 'three';
 
 interface Range { readonly start: number; readonly count: number; readonly bounds: Box3 }
 interface Index { readonly positionVersion: number; readonly indexVersion: number; readonly ranges: readonly Range[] }
+interface Bounds { readonly own: Box3; readonly tree: Box3; readonly matrix: Matrix4; geometry: BufferGeometry | null; version: number; bounded: boolean }
 
 /** Bounds for contiguous triangle ranges; vertex/index buffers remain shared with the model. */
 export class CameraRaycast {
+  private readonly bounds = new WeakMap<Object3D, Bounds>();
+  private readonly boundsVersions = new WeakMap<BufferGeometry, { position: unknown; version: number }>();
   private readonly indices = new WeakMap<BufferGeometry, Index>();
   private readonly geometry = new BufferGeometry();
   private readonly proxy: Mesh = new Mesh(this.geometry, []);
@@ -14,7 +17,53 @@ export class CameraRaycast {
   private readonly vertex = new Vector3();
   private readonly sphere = new Sphere();
 
+  /** One bottom-up broad phase for all five probes. Static world boxes are reused.
+   * Unknown/custom raycasters remain unbounded; invisible source meshes still count. */
+  prepare(object: Object3D, lineThreshold = 1): Box3 | null {
+    let state = this.bounds.get(object);
+    if (!state) {
+      state = { own: new Box3(), tree: new Box3(), matrix: new Matrix4(), geometry: null, version: -1, bounded: true };
+      this.bounds.set(object, state);
+    }
+    state.tree.makeEmpty(); state.bounded = true;
+    if (object.userData.cameraIgnore === true) return state.tree;
+    const plainMesh = object instanceof Mesh && object.raycast === Mesh.prototype.raycast && !object.morphTargetInfluences?.length;
+    const plainLine = object instanceof Line && object.raycast === Line.prototype.raycast;
+    if (plainMesh || plainLine) {
+      const geometry = (object as Mesh | Line).geometry;
+      const position = geometry.getAttribute('position');
+      const version = position ? 'isInterleavedBufferAttribute' in position ? position.data.version : position.version : -1;
+      const cached = this.boundsVersions.get(geometry);
+      const changed = !cached || cached.position !== position || cached.version !== version;
+      if (changed || !geometry.boundingBox) {
+        geometry.computeBoundingBox();
+        this.boundsVersions.set(geometry, { position, version });
+      }
+      if (changed || state.geometry !== geometry || state.version !== version || !state.matrix.equals(object.matrixWorld)) {
+        state.own.copy(geometry.boundingBox!).applyMatrix4(object.matrixWorld);
+        state.geometry = geometry; state.version = version; state.matrix.copy(object.matrixWorld);
+      }
+      state.tree.copy(state.own);
+      if (plainLine) {
+        // Line.raycast divides its local tolerance by local (not world) scale.
+        // Frobenius norm bounds world stretch, including parent scale/shear.
+        const m = object.matrixWorld.elements;
+        const stretch = Math.hypot(m[0]!, m[1]!, m[2]!, m[4]!, m[5]!, m[6]!, m[8]!, m[9]!, m[10]!);
+        const scale = Math.abs((object.scale.x + object.scale.y + object.scale.z) / 3);
+        if (scale > 0) state.tree.expandByScalar(lineThreshold * stretch / scale); else state.bounded = false;
+      }
+    } else if (object.raycast !== Object3D.prototype.raycast) state.bounded = false;
+    for (const child of object.children) {
+      const bounds = this.prepare(child, lineThreshold);
+      if (bounds) state.tree.union(bounds); else state.bounded = false;
+    }
+    return state.bounded ? state.tree : null;
+  }
+
   intersect(object: Object3D, ray: Raycaster, hits: Intersection[]): void {
+    if (object.userData.cameraIgnore === true) return;
+    const state = this.bounds.get(object);
+    if (state?.bounded && (state.tree.isEmpty() || state.tree.distanceToPoint(ray.ray.origin) > ray.far || !ray.ray.intersectsBox(state.tree))) return;
     if (ray.layers.test(object.layers)) {
       if (object instanceof Mesh && object.raycast === Mesh.prototype.raycast &&
           !object.morphTargetInfluences?.length && (object.geometry.index?.count ?? object.geometry.attributes.position?.count ?? 0) >= 3072) {

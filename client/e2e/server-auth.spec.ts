@@ -10,7 +10,10 @@ import { expectCapture, createFromHub } from './helpers';
 
 let processHandle: ChildProcess; let directory: string; let origin: string; let configFile: string;
 async function startServer() {
-  processHandle = spawn(process.execPath, ['../server/src/app/main.ts', '--config', configFile], { stdio: ['ignore', 'pipe', 'pipe'] });
+  processHandle = spawn(process.execPath, ['../server/src/app/main.ts', '--config', configFile, '--env', 'development'], {
+    env: { ...process.env, HOME: directory, KUDA_NPC_TIMEOUT: '', KUDA_LLM_BACKEND: '', KUDA_LLM_MODEL: '', KUDA_LLM_PROFILES: '' },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
   let output = '';
   await new Promise<void>((resolve, reject) => {
     const timeout = setTimeout(() => reject(new Error(`Server startup timeout: ${output}`)), 15000);
@@ -36,7 +39,7 @@ test.beforeAll(async () => {
   const address = portServer.address(); if (!address || typeof address === 'string') throw new Error('No port');
   const port = address.port; await new Promise<void>((done) => portServer.close(() => done()));
   origin = `http://127.0.0.1:${port}`; configFile = join(directory, 'config.json');
-  await writeFile(configFile, JSON.stringify({ clientDebug: false, logs: { fileLevel: 'off', consoleLevel: 'warn' }, host: '127.0.0.1', port, clientDir: resolve('dist'), worldDir: resolve('public'), contentDir: resolve('../server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'demo', disconnectGraceMs: 100, saveIntervalMs: 100, npc: { options: { delayMs: 30 } } }));
+  await writeFile(configFile, JSON.stringify({ clientDebug: false, logs: { fileLevel: 'off', consoleLevel: 'warn' }, host: '127.0.0.1', port, clientDir: resolve('dist'), worldDir: resolve('public'), contentDir: resolve('../server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'demo', disconnectGraceMs: 100, saveIntervalMs: 100, npc: { adapter: 'scripted', options: { delayMs: 30 } } }));
   await startServer();
 });
 test.afterAll(async () => { await stopServer(); if (directory) await rm(directory, { recursive: true, force: true }); });

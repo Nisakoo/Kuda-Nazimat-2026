@@ -3,12 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { AssetManager } from '../../map/AssetManager';
 import { GltfLibrary } from './GltfLibrary';
 
-async function setup() {
+async function setup(now?: () => number) {
   const file = await readFile(new URL('../../../e2e/fixtures/tablet-plain.glb', import.meta.url));
   const bytes = file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength);
   const load = vi.fn(async () => bytes);
   const assets = new AssetManager({ resolve: (path) => path, load });
-  const library = new GltfLibrary(assets);
+  const library = new GltfLibrary(assets, 'high', now);
   library.register({ tablet: 'tablet.glb' });
   return { assets, library, load };
 }
@@ -21,6 +21,20 @@ async function instantiate(library: GltfLibrary, id = 'tablet') {
 }
 
 describe('real embedded GLB parsing and animation', () => {
+  it('yields between expensive clones and cancels queued ownership without starving remaining jobs', async () => {
+    let clock = 0;
+    const { assets, library } = await setup(() => clock += 3);
+    const signals = [new AbortController(), new AbortController(), new AbortController()];
+    const pending = signals.map(signal => library.instantiate('tablet', signal.signal));
+    const cancelled = expect(pending[1]).rejects.toMatchObject({ name: 'AbortError' });
+    for (let i = 0; i < 100 && library.stats.queued < 3; i++) await new Promise(resolve => setTimeout(resolve, 1));
+    expect(library.stats.queued).toBe(3);
+    library.flush(); expect(library.stats.queued).toBe(2); expect(library.stats.instances).toBe(1);
+    signals[1]!.abort(); await cancelled; expect(library.stats.queued).toBe(1);
+    library.flush(); expect(library.stats.queued).toBe(0);
+    (await pending[0])!.dispose(); (await pending[2])!.dispose();
+    expect(library.stats.resources).toBe(0); library.dispose(); assets.dispose();
+  });
   it('parses once, shares template geometry, runs independent mixers and frees ownership', async () => {
     const { assets, library, load } = await setup();
     const a = await instantiate(library);

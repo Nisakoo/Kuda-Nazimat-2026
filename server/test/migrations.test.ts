@@ -13,6 +13,28 @@ afterEach(() => {
   for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true });
 });
 function memory() { const db = new DatabaseSync(':memory:'); databases.push(db); return db; }
+it('upgrades main v8 and NPC branch v4 without exposing legacy history or losing scoped rows', () => {
+  const migrations = loadMigrations();
+  for (const branch of ['main', 'npc'] as const) {
+    const directory = mkdtempSync(join(tmpdir(), 'npc-schema-')); directories.push(directory);
+    const path = join(directory, 'game.sqlite'); const old = new DatabaseSync(path);
+    const history = branch === 'main' ? migrations.slice(0, 8) : [
+      ...migrations.slice(0, 2), { version: 3, sql: migrations[6]!.sql }, { version: 4, sql: migrations[8]!.sql },
+    ];
+    transaction(old, () => applyMigrations(old, history, 1));
+    old.exec("INSERT INTO accounts(id,name,name_key,created_at) VALUES ('a','Saved','saved',1); INSERT INTO players(id,account_id,updated_at) VALUES ('p','a',1)");
+    old.prepare('INSERT INTO npc_dialogue(player_id,npc_id,question,answer,created_at) VALUES (?,?,?,?,?)').run('p', 'n', 'legacy', 'private', 1);
+    if (branch === 'npc') old.prepare('INSERT INTO npc_dialogue(player_id,npc_id,question,answer,created_at,session_id) VALUES (?,?,?,?,?,?)').run('p', 'n', 'scoped', 'kept', 2, 'session');
+    old.close();
+    const db = openDatabase(path); databases.push(db); const stores = sqliteStores(db);
+    expect(stores.dialogue.history('p', 'n', 'other')).toEqual([]);
+    expect(stores.dialogue.history('p', 'n', 'session')).toEqual(branch === 'npc' ? [{ question: 'scoped', answer: 'kept' }] : []);
+    expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue WHERE session_id IS NULL').get()!.n).toBe(1);
+    expect(db.prepare('PRAGMA foreign_key_check').all()).toEqual([]);
+    expect(db.prepare('SELECT max(version) AS n FROM schema_migrations').get()!.n).toBe(11);
+  }
+});
+
 const first = { version: 1, sql: 'CREATE TABLE example (value TEXT); INSERT INTO example VALUES (\'original\')' };
 const second = { version: 2, sql: 'ALTER TABLE example ADD COLUMN note TEXT; UPDATE example SET note = \'preserved\'' };
 
@@ -76,7 +98,7 @@ it('upgrades and restores a separate backup with existing accounts, position and
   const stores = sqliteStores(db);
   const player = stores.accounts.findOrCreate('Путник', 'путник', 1);
   stores.players.save([{ id: player.playerId, mapId: 'market', position: { x: 2, y: 0, z: 3 }, rotationY: 1 }]);
-  stores.dialogue.append(player.playerId, 'shepherd', 'Вопрос', 'Ответ', 2);
+  stores.dialogue.append(player.playerId, 'shepherd', 'Вопрос', 'Ответ', 2, 'test-session');
   const migrations = loadMigrations();
   transaction(db, () => applyMigrations(db, [...migrations, { version: migrations.length + 1, sql: 'CREATE TABLE extension (id INTEGER)' }], 3));
   const backup = join(directory, 'backup.sqlite'); db.prepare('VACUUM INTO ?').run(backup);
@@ -85,7 +107,7 @@ it('upgrades and restores a separate backup with existing accounts, position and
   const restored = sqliteStores(copy);
   expect(restored.accounts.findOrCreate('Путник', 'путник', 4)).toEqual(player);
   expect(restored.players.load(player.playerId)?.position).toEqual({ x: 2, y: 0, z: 3 });
-  expect(restored.dialogue.history(player.playerId, 'shepherd')).toEqual([{ question: 'Вопрос', answer: 'Ответ' }]);
+  expect(restored.dialogue.history(player.playerId, 'shepherd', 'test-session')).toEqual([{ question: 'Вопрос', answer: 'Ответ' }]);
   copy.exec('DROP TABLE extension');
   expect(db.prepare("SELECT name FROM sqlite_master WHERE name = 'extension'").get()!.name).toBe('extension');
 });

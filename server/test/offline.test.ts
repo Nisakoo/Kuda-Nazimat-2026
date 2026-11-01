@@ -24,16 +24,19 @@ it('lists non-loopback IPv4 per interface, private ranges first and link-local l
 it('builds the connection block with the operator address and the right warnings', () => {
   const lan = lanAddresses({ wifi: [entry('192.168.1.96')], eth: [entry('169.254.1.2')] });
   const open = connectionInfo('0.0.0.0', 8080, lan, 'win32');
-  expect(open.local).toBe('http://localhost:8080/'); expect(open.operator).toBe('http://localhost:8080/operator');
-  expect(open.lan.map((a) => a.url)).toEqual(['http://192.168.1.96:8080/', 'http://169.254.1.2:8080/']);
+  expect(open.local).toBe('https://localhost:8080/'); expect(open.operator).toBe('https://localhost:8080/operator');
+  expect(open.lan.map((a) => a.url)).toEqual(['https://192.168.1.96:8080/', 'https://169.254.1.2:8080/']);
   expect(open.warnings).toEqual([firewallHint('win32')]);
-  const block = connectionBlock(open);
-  expect(block).toContain('http://192.168.1.96:8080/'); expect(block).toContain('169.254.1.2:8080/'); expect(block).toMatch(/169\.254\.1\.2:8080\/\s+eth \(нет сети\)/);
+  expect(open.setup).toEqual(['http://192.168.1.96:8080/setup']);
+  const certificate = { fingerprint: 'AAAA BBBB', notAfter: new Date('2029-02-03T00:00:00Z') };
+  const block = connectionBlock(open, certificate);
+  expect(block).toContain('http://192.168.1.96:8080/setup'); expect(block).toContain('AAAA BBBB'); expect(block).toContain('2029-02-03');
+  expect(block).toContain('https://192.168.1.96:8080/'); expect(block).toContain('169.254.1.2:8080/'); expect(block).toMatch(/169\.254\.1\.2:8080\/\s+eth \(нет сети\)/);
   expect(connectionInfo('0.0.0.0', 8080, lanAddresses({ eth: [entry('169.254.1.2')] }), 'linux').warnings[0]).toContain('только режим одного компьютера');
   expect(connectionInfo('0.0.0.0', 8080, [], 'darwin').warnings[0]).toContain('только режим одного компьютера');
   const local = connectionInfo('127.0.0.1', 8080, lan, 'darwin');
   expect(local.lan).toEqual([]); expect(local.warnings).toEqual([expect.stringContaining('другие устройства не подключатся')]);
-  expect(connectionInfo('192.168.1.96', 9000, lan, 'linux')).toMatchObject({ lan: [{ url: 'http://192.168.1.96:9000/' }], warnings: [expect.stringContaining('9000/tcp')] });
+  expect(connectionInfo('192.168.1.96', 9000, lan, 'linux')).toMatchObject({ lan: [{ url: 'https://192.168.1.96:9000/' }], warnings: [expect.stringContaining('9000/tcp')] });
   for (const platform of ['win32', 'darwin', 'linux'] as const) expect(firewallHint(platform).length).toBeGreaterThan(20);
 });
 
@@ -50,7 +53,7 @@ const lan = lanAddresses().find((a) => a.kind !== 'link-local') ?? lanAddresses(
 
 it.skipIf(!lan)(`two players over a non-loopback IPv4 (${lan?.address ?? 'нет адреса — пропуск, не успех'}): login, movement, chat and protected world`, async () => {
   const { port, connect } = await setup({ host: '0.0.0.0' });
-  const base = `http://${lan!.address}:${port}`;
+  const base = `https://${lan!.address}:${port}`;
   const login = async (name: string) => (await (await fetch(`${base}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) })).json()) as { token: string };
   const [anya, boris] = [await login('Аня'), await login('Борис')];
   const a = await connect(anya.token, lan!.address); const b = await connect(boris.token, lan!.address);
@@ -67,7 +70,7 @@ it.skipIf(!lan)(`two players over a non-loopback IPv4 (${lan?.address ?? 'нет
 
 it.skipIf(!lan)('operator screen and status are 404 from a non-loopback address', async () => {
   const { port } = await setup({ host: '0.0.0.0' });
-  for (const path of ['/operator', '/api/operator/status']) expect((await fetch(`http://${lan!.address}:${port}${path}`)).status).toBe(404);
+  for (const path of ['/operator', '/api/operator/status', '/api/operator/metrics', '/api/operator/accounts']) expect((await fetch(`https://${lan!.address}:${port}${path}`)).status).toBe(404);
 });
 
 it('operator screen shows seats, presence and NPC state without secrets; logs carry IP but no tokens or texts (OFFLINE-010, 016)', async () => {
@@ -79,8 +82,9 @@ it('operator screen shows seats, presence and NPC state without secrets; logs ca
   const page = await fetch(`${origin}/operator`);
   expect(page.status).toBe(200); expect(page.headers.get('content-security-policy')).toContain("default-src 'none'"); expect(await page.text()).toContain('/api/operator/status');
   const status = await (await fetch(`${origin}/api/operator/status`)).json() as { addresses: string[]; players: unknown[]; seats: unknown; npc: string; uptimeSeconds: number };
-  expect(status.addresses[0]).toMatch(/^http:\/\/localhost:\d+\/$/);
+  expect(status.addresses[0]).toMatch(/^https:\/\/localhost:\d+\/$/);
   expect(status).toMatchObject({ players: [{ name: 'Аня', mapId: 'test', connected: true, releaseInMs: null }], seats: { used: 1, max: 4 }, npc: 'ready' });
+  expect(status).toMatchObject({ environment: 'test', version: '0.1.0', performance: { rssBytes: expect.any(Number), heapBytes: expect.any(Number) } });
   const takeover = await connect((await guest('аня')).token);
   await client.wait((p) => p.type === 'error' && p.code === 'UNAUTHORIZED');
   takeover.socket.disconnect();

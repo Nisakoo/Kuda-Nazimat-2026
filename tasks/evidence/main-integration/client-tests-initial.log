@@ -1,0 +1,113 @@
+npm --prefix client test
+
+> educational-world-client@0.1.0 pretest
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 21928618 bytes.
+City detail scenes gate: 4
+Edge fitting gate: 2 moved, 0 removed
+market: 728488 bytes; 26 collision rectangles; 223 ceiling volumes
+City detail scenes guest: 5
+Edge fitting guest: 16 moved, 0 removed
+pasture: 442336 bytes; 59 collision rectangles; 53 ceiling volumes
+main-building: 421808 bytes; 29 collision rectangles; 187 ceiling volumes
+City detail scenes fountain: 5
+Edge fitting fountain: 0 moved, 0 removed
+cat: 31776 bytes; 0 collision rectangles; 0 ceiling volumes
+City detail scenes school: 5
+Removed edge object school: house
+Edge fitting school: 1 moved, 1 removed
+bird: 11240 bytes; 0 collision rectangles; 0 ceiling volumes
+pushable-pot: 11168 bytes; 0 collision rectangles; 0 ceiling volumes
+pickup-apple: 9848 bytes; 0 collision rectangles; 0 ceiling volumes
+City detail scenes garden: 3
+Edge fitting garden: 4 moved, 0 removed
+house: 39416 bytes; 1 collision rectangles; 29 ceiling volumes
+wall: 2048 bytes; 1 collision rectangles; 0 ceiling volumes
+City detail scenes mill: 5
+Edge fitting mill: 2 moved, 0 removed
+fence: 4352 bytes; 1 collision rectangles; 0 ceiling volumes
+paving: 2116 bytes; 0 collision rectangles; 0 ceiling volumes
+City detail scenes bakery: 5
+Edge fitting bakery: 8 moved, 0 removed
+table: 5044 bytes; 1 collision rectangles; 0 ceiling volumes
+City detail scenes dye: 5
+Edge fitting dye: 0 moved, 0 removed
+shelf: 2856 bytes; 1 collision rectangles; 0 ceiling volumes
+City detail scenes dock: 5
+Removed edge object dock: workshop
+Edge fitting dock: 15 moved, 1 removed
+crate: 3612 bytes; 1 collision rectangles; 0 ceiling volumes
+basket: 16112 bytes; 0 collision rectangles; 0 ceiling volumes
+City detail scenes homes: 3
+Edge fitting homes: 8 moved, 0 removed
+fruit: 3280 bytes; 0 collision rectangles; 0 ceiling volumes
+dates: 3280 bytes; 0 collision rectangles; 0 ceiling volumes
+City detail scenes gardens: 4
+Edge fitting gardens: 6 moved, 0 removed
+textile-sign: 9164 bytes; 0 collision rectangles; 5 ceiling volumes
+fabric-roll: 2528 bytes; 0 collision rectangles; 0 ceiling volumes
+City detail scenes palace: 5
+Edge fitting palace: 0 moved, 0 removed
+canopy: 32312 bytes; 4 collision rectangles; 24 ceiling volumes
+cart: 36824 bytes; 1 collision rectangles; 0 ceiling volumes
+bench: 4316 bytes; 1 collision rectangles; 0 ceiling volumes
+scroll-table: 6236 bytes; 1 collision rectangles; 0 ceiling volumes
+bowl: 4776 bytes; 0 collision rectangles; 0 ceiling volumes
+jar: 11156 bytes; 0 collision rectangles; 0 ceiling volumes
+palm: 32804 bytes; 1 collision rectangles; 11 ceiling volumes
+planter: 8320 bytes; 1 collision rectangles; 0 ceiling volumes
+vines: 6560 bytes; 0 collision rectangles; 0 ceiling volumes
+grass: 1764 bytes; 0 collision rectangles; 0 ceiling volumes
+merchant: 39016 bytes; 0 collision rectangles; 1 ceiling volumes
+shepherd: 39012 bytes; 0 collision rectangles; 1 ceiling volumes
+goat: 29732 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-ground: 17820 bytes; 5 collision rectangles; 0 ceiling volumes
+stepped-building: 209160 bytes; 1 collision rectangles; 124 ceiling volumes
+main-portal: 21576 bytes; 0 collision rectangles; 8 ceiling volumes
+exterior-stair: 69244 bytes; 3 collision rectangles; 9 ceiling volumes
+courtyard-arch: 6040 bytes; 2 collision rectangles; 2 ceiling volumes
+rest-canopy: 46980 bytes; 6 collision rectangles; 23 ceiling volumes
+courtyard-plants: 50872 bytes; 6 collision rectangles; 21 ceiling volumes
+courtyard-lanterns: 5988 bytes; 6 collision rectangles; 0 ceiling volumes
+babel-symbols: 6396 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-vessel: 11204 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-planter: 9472 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-palm: 32864 bytes; 0 collision rectangles; 11 ceiling volumes
+courtyard-lantern: 5056 bytes; 0 collision rectangles; 0 ceiling volumes
+Edge fitting lane-0: 4 moved, 0 removed
+Edge fitting lane-1: 4 moved, 0 removed
+Edge fitting lane-2: 4 moved, 0 removed
+Edge fitting lane-3: 4 moved, 0 removed
+Market world 19638465 bytes.
+
+> educational-world-client@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /Users/nisakoo/Documents/competition-2026/client
+
+ ❯ src/session/OnlineSession.test.ts (18 tests | 1 failed) 205ms
+   × bounds pending NPC requests to 32 42ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/session/OnlineSession.test.ts > bounds pending NPC requests to 32
+AssertionError: expected null not to be null
+ ❯ src/session/OnlineSession.test.ts:191:87
+    190|   const s = setup();
+    191|   expect(s.session.askNpc('guide', 'First question')).not.toBeNull();
+    192|   expect(s.session.askNpc('guide', 'Overlapping question')).toBeNull();
+       |                 ^
+    193|   for (let i = 0; i < 31; i++) expect(s.session.chat(`message ${i}`)).…
+    194|   expect(s.session.chat('overflow')).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 53 passed (54)
+      Tests  1 failed | 464 passed (465)
+   Start at  16:53:13
+   Duration  29.01s (transform 16.16s, setup 0ms, import 30.13s, tests 55.49s, environment 13.34s)
+
+make: *** [client-test] Error 1

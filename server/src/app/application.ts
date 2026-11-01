@@ -16,12 +16,21 @@ import { createAuthService, REVOKE_MESSAGES } from '../auth/AuthService.ts';
 import { createResponder } from '../npc/adapters/index.ts';
 import { createNpcDialogueService } from '../npc/NpcDialogueService.ts';
 import { createHttpServer } from '../http/server.ts';
-import { CounterWindow, evaluateHealth } from '../obs/health.ts';
+import { lanAddresses } from '../common/network.ts';
+import { uncoveredNames } from '../tls/certificate.ts';
+import { certificateNames, loadCertificate, daysLeft, EXPIRY_WARNING_DAYS, type ServerCertificate } from '../tls/store.ts';
+import { sqliteAdminContent } from '../persistence/adminContent.ts';
+import { accountEntry, createContentAdmin, type AccountAction, type ContentAdmin } from '../content/ContentAdmin.ts';
+import { NPCS } from '../babylon/content.ts';
+import { AVATAR_IDS } from '../../../shared/avatar/types.ts';
+import { avatarAssetId } from '../../../shared/avatar/index.ts';
+import { createOverview, type Overview } from '../obs/overview.ts';
 import type { Config } from './config.ts';
 
 /** Optional observability pieces from `createObservability`; tests run without them. */
 export interface AppObservability {
   readonly metrics: MetricsRegistry;
+  readonly runId?: string;
   readonly recorder?: { warnings(): readonly LogRecord[]; dump(reason: string): string | null };
   readonly process?: () => { eventLoopP99Ms: number };
   readonly setSnapshot?: (snapshot: () => unknown) => void;
@@ -37,28 +46,41 @@ function listenError(error: NodeJS.ErrnoException, port: number): Error {
   return error;
 }
 
-/** OBS-003 `app.start`: what runs and with which settings — never the monitoring token. */
+/** Server version from package.json for `app.start` and the admin screen. */
+function serverVersion(): string {
+  try { return (JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string }).version; } catch { return 'unknown'; }
+}
+
+/** OBS-003 `app.start`: what runs and with which settings; the config holds no secrets. */
 function startFields(config: Config): Record<string, unknown> {
-  let version = 'unknown', commit: string | undefined;
-  try { version = (JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string }).version; } catch { /* optional */ }
+  const version = serverVersion(); let commit: string | undefined;
   try {
     const git = new URL('../../../.git/', import.meta.url);
     const head = readFileSync(new URL('HEAD', git), 'utf8').trim();
     commit = (head.startsWith('ref: ') ? readFileSync(new URL(head.slice(5), git), 'utf8') : head).trim().slice(0, 12);
   } catch { /* not a git checkout */ }
-  const { monitoring, ...rest } = config;
-  return { env: config.env, version, commit, node: process.version, platform: `${process.platform} ${process.arch}`, pid: process.pid, config: { ...rest, monitoring: { ...monitoring, token: monitoring.token ? '[задан]' : null } } };
+  return { env: config.env, version, commit, node: process.version, platform: `${process.platform} ${process.arch}`, pid: process.pid, config };
 }
 
 /** `languagePort` overrides config.language for tests; production selects the adapter by config. */
 export async function startApplication(config: Config, createGame: CreateGame, logger: Logger, languagePort?: LanguagePort, obs: AppObservability = { metrics: new MetricsRegistry() }) {
   const log = logger.child('app');
   const { metrics } = obs;
-  log.info('app.start', 'Запуск сервера', startFields(config));
+  const startup = startFields(config);
+  log.info('app.start', 'Запуск сервера', startup);
   try { if (!(await stat(join(config.clientDir, 'index.html'))).isFile()) throw new Error(); }
   catch { throw new Error(`Нет сборки ${config.clientDir}/index.html. Выполните npm --prefix client run build`); }
   try { if (!(await stat(config.worldDir)).isDirectory()) throw new Error(); }
   catch { throw new Error(`Нет мира ${config.worldDir}. Выполните npm --prefix client run world:generate`); }
+
+  // TLS-001, 009: no certificate, no server; an existing one is never replaced silently.
+  const names = () => certificateNames(config.tls, lanAddresses());
+  const certificate: ServerCertificate = await loadCertificate(config.tls, names(), new Date());
+  const tlsLog = logger.child('tls');
+  tlsLog.info(certificate.created ? 'tls.certificate.created' : 'tls.certificate.loaded', certificate.created ? 'Создан сертификат сервера: устройства должны ему доверять (/setup)' : 'Сертификат сервера загружен',
+    { fingerprint: certificate.info.fingerprint, notAfter: certificate.info.notAfter.toISOString(), names: certificate.info.names });
+  if (certificate.uncovered.length) tlsLog.warn('tls.names.uncovered', 'Сертификат не покрывает текущие адреса', { uncovered: certificate.uncovered });
+  if (daysLeft(certificate.info, new Date()) < EXPIRY_WARNING_DAYS) tlsLog.warn('tls.certificate.expiring', 'Сертификат скоро истечёт', { notAfter: certificate.info.notAfter.toISOString() });
 
   const dbLog = logger.child('db');
   const dbTime = metrics.histogram('db_operation_ms', 'Длительность операции хранилища', MS_BUCKETS);
@@ -73,23 +95,33 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   dbLog.info('db.opened', 'База данных открыта', { path: config.dbPath, schema });
   metrics.gauge('db_size_bytes', 'Размер файла БД и WAL', () => databaseBytes(config.dbPath));
   const stores = sqliteStores(db, Date.now, observe);
-  const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: systemClock, ttlMs: config.sessionTtlMs, canAdmit: accountId => game?.canAdmit ? game.canAdmit(accountId ?? '') : !game || game.activePlayers() < config.maxPlayers, maxSessions: config.auth.maxSessions, passwordless: config.auth.passwordless, logger: logger.child('auth'), metrics });
+  const adminStore = sqliteAdminContent(db);
+  let content: ContentAdmin | undefined;
+  const audit = (entry: AccountAction): void => { if (content) content.audit(entry); else adminStore.append(accountEntry(entry, Date.now(), null)); };
+  const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: systemClock, ttlMs: config.sessionTtlMs, canAdmit: accountId => game?.canAdmit ? game.canAdmit(accountId ?? '') : !game || game.activePlayers() < config.maxPlayers, maxSessions: config.auth.maxSessions, passwordless: config.auth.passwordless, logger: logger.child('auth'), metrics, audit });
   if (config.auth.passwordless) log.warn('auth.passwordless.enabled', `Вход без пароля включён (${config.env}); в production он запрещён`);
   let npc: ReturnType<typeof createNpcDialogueService> | undefined;
   let language: LanguagePort | undefined;
   let languageReady = false;
   let game: Awaited<ReturnType<CreateGame>> | undefined;
   let http: ReturnType<typeof createHttpServer> | undefined;
+  let overview: Overview | undefined;
   const languageTime = metrics.histogram('babylon_language_ms', 'Длительность языковой операции BABEL', MS_BUCKETS);
   try {
-    npc = createNpcDialogueService({ responder: createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler }), dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger, metrics }, config.npc);
+    const responder = createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler });
+    npc = createNpcDialogueService({ responder, dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger, metrics }, config.npc);
     await npc.start();
-    language = languagePort ?? createLanguagePort(config.language.adapter, config.language.options);
-    try { await language.start(); languageReady = true; logger.child('language').info('language.ready', 'Переводчик готов', { mode: language.mode, languages: language.languages }); }
+    language = languagePort ?? createLanguagePort(config.language.adapter, config.language.options, { responder, ready: npc.ready, observeRuntimeFailure: npc.observeRuntimeFailure });
+    try {
+      await language.start?.(); languageReady = language.ready?.() ?? true;
+      if (languageReady) logger.child('language').info('language.ready', 'Переводчик готов', { mode: language.mode, languages: language.languages });
+      else logger.child('language').warn('language.unavailable', 'Переводчик настроен, но runtime недоступен', { mode: language.mode });
+    }
     catch (error) { logger.child('language').error('language.unavailable', 'LanguagePort недоступен', { error }); language = unavailableLanguagePort(language); }
     const babylonLog = logger.child('babylon');
     const babylon = new BabylonService({
-      store: sqliteBabylon(db), language, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, peerLocation: playerId => game?.playerLocation?.(playerId) ?? null,
+      npc: (id) => content?.babylonNpc(id),
+      store: sqliteBabylon(db), language, generate: npc.generate, now: Date.now, monotonicNow: () => systemClock.monotonicNow!(), id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, peerLocation: playerId => game?.playerLocation?.(playerId) ?? null,
       measure: (kind, durationMs, success) => {
         languageTime.observe(durationMs, { kind, success: String(success) });
         if (success) babylonLog.debug('babylon.language', 'Языковая операция BABEL', { kind, durationMs });
@@ -98,51 +130,50 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     });
     game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), avatars: stores.avatars, equipment: stores.equipment, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing });
     const runtime = game;
-    auth.onRevoked((hashes, reason) => runtime.closeSessions(hashes, REVOKE_MESSAGES[reason]));
-    const npcService = npc;
-    const counters = new CounterWindow();
-    const sample = () => counters.sample(Date.now(), {
-      timeouts: metrics.value('npc_requests_total', { outcome: 'timeout' }),
-      requests: metrics.value('npc_requests_total'),
-      dbErrors: metrics.value('db_errors_total'),
-      logDropped: metrics.value('log_dropped_total'),
+    auth.onRevoked((hashes, reason) => {
+      runtime.closeSessions(hashes, REVOKE_MESSAGES[reason]);
+      for (const hash of hashes) npc!.cancelConnection('babel:' + hash);
     });
-    sample();
-    const sampler = setInterval(sample, 30_000); sampler.unref();
-    const health = () => {
-      const stats = runtime.stats();
-      const requests = counters.delta('requests');
-      let diskFreeBytes: number | null = null;
-      try { const fs = statfsSync(dirname(config.dbPath)); diskFreeBytes = fs.bavail * fs.bsize; } catch { /* unknown */ }
-      return evaluateHealth({
-        tickP95Ms: stats?.tickP95Ms ?? null, broadcastP95Ms: stats?.broadcastP95Ms ?? null, eventLoopP99Ms: obs.process?.().eventLoopP99Ms ?? null,
-        npcReady: npcService.ready(), languageReady, timeoutShare: requests ? counters.delta('timeouts') / requests : null,
-        dbErrors5m: counters.delta('dbErrors'), logDropped5m: counters.delta('logDropped'), diskFreeBytes, players: runtime.presence(),
-      });
+    const npcService = npc;
+    if (runtime.content) {
+      content = createContentAdmin({ store: adminStore, world: runtime.content, clock: systemClock, logger, avatarAssets: AVATAR_IDS.map(avatarAssetId), questNpcs: new Set(Object.keys(NPCS)),
+        cancelNpc: (id) => npcService.cancelNpc(id), lockedUntil: (name) => auth.operator.lockedUntil(name), location: (accountId) => runtime.location?.(accountId) ?? null });
+      content.start();
+    }
+    const diskFreeBytes = (): number | null => {
+      try { const fs = statfsSync(dirname(config.dbPath)); return fs.bavail * fs.bsize; } catch { return null; }
     };
+    metrics.gauge('disk_free_bytes', 'Свободное место на диске с БД', () => diskFreeBytes() ?? 0);
+    const view = overview = createOverview({
+      metrics, logger, runId: obs.runId ?? 'test', env: config.env, version: serverVersion(), maxPlayers: config.maxPlayers, maxUnfinished: config.npc.maxUnfinished,
+      presence: () => runtime.presence(), stats: () => runtime.stats(), npcReady: () => npcService.ready(), languageReady: () => language?.ready?.() ?? languageReady,
+      eventLoopP99Ms: () => obs.process?.().eventLoopP99Ms ?? null, diskFreeBytes, dbBytes: () => databaseBytes(config.dbPath),
+    });
     http = createHttpServer(config, {
       auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
-      operator: { languageReady: () => languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
+      certificate, uncoveredNames: () => uncoveredNames(certificate.info, names()),
+      operator: { version: typeof startup.version === 'string' ? startup.version : undefined, languageReady: () => language?.ready?.() ?? languageReady, health: view.health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null, overview: view, ...(content ? { content } : {}) },
+      clientPerf: (playerId, report) => view.perf.record(playerId, report),
     });
-    obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state() }));
-    game.attach(http.server);
+    obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state(), history: view.recent() }));
+    game.attach(http.secure);
     stores.sessions.prune(Date.now() - 86400000);
     await new Promise<void>((resolve, reject) => {
       const failed = (error: NodeJS.ErrnoException) => reject(listenError(error, config.port));
       http!.server.once('error', failed);
       http!.server.listen(config.port, config.host, () => { http!.server.removeListener('error', failed); resolve(); });
     });
-    const stopSampler = () => clearInterval(sampler);
-    http.server.once('close', stopSampler);
+    http.server.once('close', view.stop);
   } catch (error) {
+    overview?.stop();
     log.error('app.start.failed', 'Запуск не удался', { error });
     http?.rejectNewRequests();
-    try { await language?.stop().catch(() => {}); await npc?.stop(); } finally {
+    try { await language?.stop?.().catch(() => {}); await npc?.stop(); } finally {
       try { await game?.stop('startup-failure'); } finally { http?.server.close(); db.close(); }
     }
     throw error;
   }
-  const runtime = game; const npcService = npc; const transport = http; const languageService = language!;
+  const runtime = game; const npcService = npc; const transport = http; const languageService = language!; const metricsView = overview!;
   const cleanup = setInterval(() => {
     try { stores.sessions.prune(Date.now() - 86400000); } catch (error) { log.error('db.transaction.failed', 'Не удалось очистить сессии', { operation: 'sessions.prune', error }); }
   }, 3600000);
@@ -150,7 +181,9 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   log.info('app.ready', 'Сервер готов', { host: config.host, port: address && typeof address !== 'string' ? address.port : config.port, maps: runtime.maps.map((map) => map.mapId) });
   let stopping: Promise<void> | undefined;
   return {
-    server: transport.server,
+    server: transport.server, certificate,
+    /** OBS-017 table for this run; main prints it at a clean shutdown. */
+    report: () => metricsView.report(),
     stop(reason = 'shutdown'): Promise<void> {
       if (stopping) return stopping;
       stopping = (async () => {
@@ -162,7 +195,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
         try {
           const npcStopped = npcService.stop(); // Aborts synchronously before closing connections.
           const gameStopped = runtime.stop(reason);
-          const results = await Promise.allSettled([npcStopped, gameStopped, languageService.stop()]);
+          const results = await Promise.allSettled([npcStopped, gameStopped, languageService.stop?.()]);
           phase('modules');
           for (const result of results) if (result.status === 'rejected') log.error('app.stop.failed', 'Модуль не остановился', { error: result.reason });
           if (results.some((result) => result.status === 'rejected')) throw new Error('Ошибка остановки модуля');

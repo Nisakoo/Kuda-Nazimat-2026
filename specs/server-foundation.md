@@ -34,12 +34,12 @@ related:
 - **SERVER-003:** Сервер раздаёт по HTTP:
   - готовую сборку клиента из `clientDir` по `/`, публично;
   - `GET /config.json` — публичную конфигурацию клиента `{session: "online", serverUrl: null, mapId: <defaultMap>, chunkRadius: null, debug: <clientDebug>}`, сформированную из конфигурации сервера; файл `config.json` из сборки клиента не отдаётся;
-  - `/api/*` — [AUTH](server-auth.md), `GET /api/health` и HTTP BABEL (PROTO-009);
-  - `GET /operator` и `GET /api/operator/status` — экран ведущего, только с loopback ([OFFLINE](offline-multiplayer.md) OFFLINE-010);
+  - `/api/*` — [AUTH](server-auth.md), `GET /api/health`, HTTP BABEL (PROTO-009) и публичный `GET /api/game-config` (только effective `npcTimeoutMs`, no-store, обычный CORS, без model options/путей/pins/секретов);
+  - `GET /operator` и `GET /api/operator/status` — экран администратора, только с loopback ([OFFLINE](offline-multiplayer.md) OFFLINE-010);
   - `/world/*` — данные мира только с проверками [SERVER-WORLD](server-world.md).
 
   Из `clientDir` не отдаются пути `maps/` и `assets/models/`: данные мира не должны быть публичными в обход `/world/`. Статические ответы ограничены `clientDir`, без directory listing и выхода за корень; неизвестный путь — 404. Браузерный клиент не требует установки ПО.
-- **SERVER-004:** Конфигурация — JSON-файл (по умолчанию `server/config.json`, путь меняется аргументом `--config`, порт можно переопределить `--port`) поверх документированных значений по умолчанию. Неизвестные ключи и неверные типы — ошибка запуска. Минимальный набор:
+- **SERVER-004:** Конфигурация — JSON-файл (по умолчанию `server/config.json`, путь меняется аргументом `--config`, порт — `--port`) поверх документированных значений по умолчанию. Неизвестные ключи и неверные типы — ошибка запуска. Для игрового запуска дополнительно доступны `--backend`/`--model` (только вместе) и `--profiles`; Make передаёт соответствующие BACKEND/MODEL/LLM_PROFILES как environment data. Подготовленный внешний каталог по LLM-015 заменяет только npc.adapter/options в effective config на один запуск; отсутствие каталога без явного выбора сохраняет старый config. Повреждённый/явно отсутствующий профиль не вызывает fallback. Общий NPC deadline можно переопределить на один запуск целыми секундами 1–300: `make server NPC_TIMEOUT=60` / `make demo NPC_TIMEOUT=60`, env KUDA_NPC_TIMEOUT или CLI `--npc-timeout 60` (CLI приоритетнее env). Без override npc.timeoutMs остаётся из config/default 30000 мс, config допускает 1–300000 мс. Override задаёт оба effective поля `npc.timeoutMs` и `npc.streamTimeoutMs` одним значением, но не пишет config/profile. Без override отдельные допустимые config-значения сохраняются; оба поля допускают 1–300000 мс, default 30000 мс. Некорректное значение даёт раннюю ошибку, не clamp/fallback. Минимальный набор:
 
   | Ключ | По умолчанию | Смысл |
   |---|---|---|
@@ -51,7 +51,7 @@ related:
   | contentDir | `content` | серверный контент (NPC) |
   | dbPath | `data/game.sqlite` | SQLite |
   | maxPlayers | `4` | активные игроки |
-  | sessionTtlMs | `43200000` | 12 ч, mock-сессия (AUTH-002) |
+  | sessionTtlMs | `43200000` | 12 ч, серверная сессия (AUTH-002) |
   | tickHz / broadcastHz | `20` / `10` | симуляция / рассылка |
   | aoiRadius | `64` | м, AOI динамических сущностей |
   | staticChunkRadius | `3` | чанков, допустимая область `/world/` |
@@ -61,12 +61,12 @@ related:
   | logWorldAccess | `false` | лог выдачи `/world/*` (OFFLINE-016) |
   | auth | `{maxSessions: 5, passwordless}` | сессии, [AUTH](server-auth.md); `passwordless` задаёт окружение (SERVER-009) |
   | logs | `{consoleLevel: "info", fileLevel: "debug", dir: "data/logs", maxFileMb: 20, maxTotalMb: 200, retentionDays: 14}` | логи, [OBS](server-observability.md) |
-  | monitoring | `{token: null, pingIntervalMs: 5000, validateOutgoing: false}` | `/metrics` из сети, RTT, проверка исходящих пакетов (OBS-005/008/010) |
+  | monitoring | `{pingIntervalMs: 5000, validateOutgoing: false}` | RTT, проверка исходящих пакетов (OBS-005/010); `token` снят вместе с OBS-009 |
   | clientDebug | `false` | поле `debug` в `/config.json` |
-  | npc | `{adapter: "scripted", maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000, streamTimeoutMs: 30000, options: {}}` | [NPC](server-npc-dialogue.md) NPC-002, 005, 008 |
+  | npc | `{adapter: "scripted", maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000, streamTimeoutMs: 30000, options: {}}` | [NPC](server-npc-dialogue.md) NPC-002, 005, 008 |
   | language | `{adapter: "test", options: {}}` | переводчик BABEL, [NPC](server-npc-dialogue.md) NPC-009 |
 
-  Относительные пути разрешаются от каталога файла конфигурации. Секреты в конфигурации не нужны. Runtime не обращается в интернет.
+  Относительные пути разрешаются от каталога файла конфигурации. Пароли игроков и токены не записываются в этот файл. Секрет доступа к `/metrics`, если используется, остаётся серверным. Runtime не обращается в интернет.
 - **SERVER-005:** При запуске проверяются конфигурация, доступность `clientDir`, миры ([SERVER-WORLD](server-world.md)), NPC-контент, БД и миграции, готовность NpcResponder и LanguagePort (их отказ не останавливает запуск, NPC-005/009). Ошибка выводится понятным текстом с путём/ключом и завершает процесс с ненулевым кодом. Сервер не слушает порт до готовности. По SIGINT/SIGTERM выполняется штатная остановка:
   1. новые HTTP-запросы и handshake отклоняются;
   2. ожидающие NPC-запросы отменяются;
@@ -77,7 +77,7 @@ related:
   Остановка укладывается в 10 с, иначе процесс завершается с ошибкой в логе. Сбой NpcResponder не останавливает мир (NPC-005).
 - **SERVER-006:** Не более `maxPlayers` (4) активных игроков. Активный игрок — аккаунт, чья сущность находится в мире: подключён или в grace после разрыва. Новое соединение аккаунта, не являющегося активным, при занятых слотах получает отказ handshake `UNAVAILABLE` без создания сущности. Дополнительная вкладка или устройство того же аккаунта не занимает второй слот и не расширяет квоты: управление переходит по AUTH-005. Число слотов не подменяется числом TCP-соединений.
 - **SERVER-007:** `GET /api/health` публичен и возвращает `{status: "ok", protocol: 3, npc: "ready" | "unavailable"}` без данных игроков. Логи — строки в stdout с уровнем, временем и модулем. В логи не попадают токены и их хеши, тексты чата и NPC-диалогов; допустимы ID, коды ошибок и длительности. Для dev-клиента на другом origin CORS разрешён только для `corsOrigins` (включая preflight для `Authorization`); по умолчанию — same-origin.
-- **SERVER-008:** Команды из корня: `make server` — запуск, `make server-test` — тесты без watch; в `server/` — `npm run check` (типы `server` и `shared`, импорты) и `npm test`. Тестовые клиенты в интеграционных тестах используют `socket.io-client` и `shared/protocol`, без браузера и кода `client/`.
+- **SERVER-008:** Команды из корня: `make server` — development, `make start` — production, `make server-test` — тесты без watch; в `server/` — `npm run check` (типы `server` и `shared`, импорты) и `npm test`. Тестовые клиенты в интеграционных тестах используют `socket.io-client` и `shared/protocol`, без браузера и кода `client/`.
 - **SERVER-009 (окружения):** окружение выбирается `--env <имя>` или переменной `APP_ENV` (аргумент важнее), допустимы `development` (по умолчанию), `production`, `test`; неизвестное имя — ошибка запуска. Итоговая конфигурация собирается слоями, каждый следующий важнее: значения по умолчанию → пресет окружения → файл конфигурации → переменные `PORT`/`HOST` → аргументы `--port`. Пресеты:
 
   | Ключ | development | production | test |
@@ -100,7 +100,7 @@ related:
 
 ## Ограничения и вне scope
 
-- Без микросервисов, облачной БД, внешнего ИИ, TLS и обратного прокси. HTTP в LAN — принятый риск офлайн-демо.
+- Без микросервисов, облачной БД, внешнего ИИ и обратного прокси. TLS завершается в самом сервере по [TLS](server-tls.md); HTTP-режима нет.
 - Выбор/квалификация LLM-backend — [LLM](server-llm-runtime.md). В MVP включена только заглушка NpcResponder.
 - Серверный runtime не импортирует код `client/`; UI входа принадлежит клиентскому фасаду GameApp (NET-007).
 

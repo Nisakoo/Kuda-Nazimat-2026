@@ -58,3 +58,9 @@ export async function hudWindow(page: Page, key: string) {
   await page.keyboard.press(key);
   await expectCapture(page, false);
 }
+
+/** Walk around the fountain, through the northern gate of the relocated pasture. */
+export async function pastureRoute(page: Page, walk: (page: Page, axis: 'x'|'z', target: number) => Promise<void>, reverse = false) {
+  const points = [[0,-16],[2,-16],[2,-17],[3,-17],[3,-27],[4,-27],[4,-39],[2,-39],[2,-40],[0,-40],[0,-58]] as const;
+  for (const [x,z] of reverse ? [...points].reverse() : points) { await walk(page,'x',x); await walk(page,'z',z); }
+}
