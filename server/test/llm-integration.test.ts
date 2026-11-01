@@ -44,6 +44,76 @@ describe('configured game LLM integration without real models', () => {
     expect(JSON.stringify(error.mock.calls)).not.toContain('secret');
     await service.stop();
   });
+  it('logs ready only after successful startup and again after recovery', async () => {
+    vi.useFakeTimers(); const info = vi.fn(); let status: 'ready' | 'unavailable' = 'unavailable';
+    let finish!: () => void;
+    const responder: NpcResponder = {
+      start: vi.fn(() => new Promise<void>(resolve => { finish = () => { status = 'ready'; resolve(); }; })),
+      async stop() { status = 'unavailable'; }, status: () => status, async answer() { return { text: 'Ответ' }; },
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, config);
+    const started = service.start(); expect(info).not.toHaveBeenCalled();
+    finish(); await started;
+    expect(info).toHaveBeenCalledExactlyOnceWith('NPC готов к вопросам', { status: 'ready' });
+    status = 'unavailable'; await service.ask(q()); await vi.advanceTimersByTimeAsync(2000);
+    expect(info).toHaveBeenCalledTimes(1); finish(); await vi.advanceTimersByTimeAsync(0);
+    expect(info).toHaveBeenCalledTimes(2); await service.stop();
+  });
+  it('does not log ready for failed startup or a startup completed after shutdown', async () => {
+    for (const failure of [false, true]) {
+      const info = vi.fn(); let finish!: () => void;
+      const responder: NpcResponder = {
+        start: () => new Promise<void>((resolve, reject) => { finish = () => failure ? reject(new Error('private')) : resolve(); }),
+        async stop() {}, status: () => 'ready', async answer() { return { text: 'Ответ' }; },
+      };
+      const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, config);
+      const started = service.start(); const stopped = service.stop(); finish(); await started; await stopped;
+      expect(info).not.toHaveBeenCalled();
+    }
+  });
+  it('logs only bounded timing fields at timeout before abort clears diagnostics', async () => {
+    vi.useFakeTimers(); const info = vi.fn(); let sample: ReturnType<NonNullable<NpcResponder['diagnostics']>>;
+    const responder: NpcResponder = {
+      async start() {}, async stop() {}, status: () => 'ready', diagnostics: () => sample,
+      answer: (_request, signal) => new Promise((_resolve, reject) => {
+        sample = { stage: 'decoding', elapsedMs: 100, promptTokens: 80, firstTokenMs: 40, outputChunks: 3, secret: 'private prompt' } as NonNullable<typeof sample>;
+        signal.addEventListener('abort', () => { sample = undefined; reject(new Error('abort')); }, { once: true });
+      }),
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, { ...config, timeoutMs: 100 });
+    await service.start(); const pending = service.ask(q()); await vi.advanceTimersByTimeAsync(100);
+    expect(await pending).toEqual({ ok: false, reason: 'timeout' });
+    expect(info).toHaveBeenLastCalledWith('Этапы ответа NPC', { reason: 'timeout', stage: 'decoding', elapsedMs: 100, promptTokens: 80, firstTokenMs: 40, outputChunks: 3 });
+    expect(JSON.stringify(info.mock.calls)).not.toContain('private'); await service.stop();
+  });
+  it.each(['throws', 'bad-stage', 'unsafe-count', 'negative', 'missing-elapsed'])('ignores invalid timing (%s) without changing delivery', async (mode) => {
+    const info = vi.fn();
+    const responder: NpcResponder = {
+      async start() {}, async stop() {}, status: () => 'ready', async answer() { return { text: 'Ответ' }; },
+      diagnostics() {
+        if (mode === 'throws') throw new Error('private');
+        const value = { stage: mode === 'bad-stage' ? 'private stage' : 'complete', elapsedMs: 10,
+          outputChunks: mode === 'unsafe-count' ? 4097 : mode === 'negative' ? -1 : 1 };
+        if (mode === 'missing-elapsed') delete (value as Partial<typeof value>).elapsedMs;
+        return value as NonNullable<ReturnType<NonNullable<NpcResponder['diagnostics']>>>;
+      },
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, config);
+    await service.start(); expect(await service.ask(q())).toEqual({ ok: true, text: 'Ответ' });
+    expect(info).toHaveBeenCalledExactlyOnceWith('NPC готов к вопросам', { status: 'ready' }); await service.stop();
+  });
+  it('logs bounded timing after a successful committed answer', async () => {
+    const info = vi.fn(); const store = memoryStores();
+    const responder: NpcResponder = {
+      async start() {}, async stop() {}, status: () => 'ready', async answer() { return { text: 'Ответ' }; },
+      diagnostics: () => ({ stage: 'complete', elapsedMs: 50, promptTokens: 80, firstTokenMs: 20, outputChunks: 4 }),
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: store.dialogue, logger: { ...silentLogger, info } }, config);
+    await service.start(); expect(await service.ask(q())).toEqual({ ok: true, text: 'Ответ' });
+    expect(store.dialogue.history('p', 'n')).toHaveLength(1);
+    expect(info).toHaveBeenLastCalledWith('Этапы ответа NPC', { reason: 'completed', stage: 'complete', elapsedMs: 50, promptTokens: 80, firstTokenMs: 20, outputChunks: 4 });
+    await service.stop();
+  });
   it('reports an idle backend failure immediately and recovers once without replaying a question', async () => {
     vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'unavailable';
     const responder: NpcResponder = {

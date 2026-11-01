@@ -1,6 +1,7 @@
 """Owned Ollama worker. Loopback alone is not an OS isolation boundary."""
 from contextlib import contextmanager, nullcontext
 import hashlib
+import http.client
 import importlib.metadata
 import json
 import os
@@ -340,7 +341,7 @@ class OllamaWorker:
                           allow_empty=True, expected_tokens=expected)
         self.stage = None
 
-    def http(self, path, payload=None, timeout=10, stream=False):
+    def http(self, path, payload=None, timeout=10, stream=False, on_line=None):
         if path not in ('/api/version', '/api/tags', '/api/generate'):
             raise WorkerError('invalid_config', 'Invalid runner endpoint')
         if self.child is None or self.child.poll() is not None or not owned_listener(self.child.pid, self.port):
@@ -350,6 +351,36 @@ class OllamaWorker:
                                      headers={'Content-Type': 'application/json'})
         try:
             with self.opener.open(req, timeout=timeout) as response:
+                if stream and on_line is not None:
+                    # HTTPResponse.read(n) can wait for n bytes/EOF. read1 returns
+                    # available bytes, including a flushed NDJSON line before EOF.
+                    total = 0
+                    pending = b''
+                    while True:
+                        chunk = response.read1(min(4096, WIRE_LIMIT + 1 - total))
+                        if not chunk:
+                            # read1 does not raise IncompleteRead for a short
+                            # Content-Length body. Reject even a valid done prefix.
+                            remaining = getattr(response, 'length', None)
+                            if isinstance(remaining, int) and remaining > 0:
+                                error = WorkerError('invalid_response', 'Invalid runner response')
+                                error.diagnostic = 'ollama_response_invalid'
+                                raise error
+                            break
+                        total += len(chunk)
+                        if total > WIRE_LIMIT:
+                            raise WorkerError('output_limit', 'Runner wire limit exceeded')
+                        pending += chunk
+                        while b'\n' in pending:
+                            line, pending = pending.split(b'\n', 1)
+                            if len(line) > LINE_LIMIT:
+                                raise WorkerError('output_limit', 'Runner line limit exceeded')
+                            on_line(line)
+                        if len(pending) > LINE_LIMIT:
+                            raise WorkerError('output_limit', 'Runner line limit exceeded')
+                    if pending:
+                        on_line(pending)
+                    return None
                 raw = response.read(WIRE_LIMIT + 1)
             if len(raw) > WIRE_LIMIT:
                 raise WorkerError('output_limit', 'Runner wire limit exceeded')
@@ -376,6 +407,10 @@ class OllamaWorker:
             error = WorkerError('model_unavailable', 'Ollama request failed')
             error.diagnostic = diagnostic
             raise error from None
+        except http.client.HTTPException:
+            error = WorkerError('invalid_response', 'Invalid runner response')
+            error.diagnostic = 'ollama_response_invalid'
+            raise error from None
         except (OSError, urllib.error.URLError):
             error = WorkerError('model_unavailable', 'Ollama request failed')
             error.diagnostic = 'ollama_runner_connection'
@@ -385,7 +420,7 @@ class OllamaWorker:
             error.diagnostic = 'ollama_response_invalid'
             raise error from None
 
-    def generate(self, prompt, predict, timeout=10, allow_empty=False, expected_tokens=None):
+    def generate(self, prompt, predict, timeout=10, allow_empty=False, expected_tokens=None, progress=False):
         if expected_tokens is not None and (not isinstance(expected_tokens, int) or isinstance(expected_tokens, bool) or not 0 <= expected_tokens <= 1792):
             raise WorkerError('input_too_long', 'Input token limit exceeded')
         o = self.options
@@ -393,16 +428,28 @@ class OllamaWorker:
                    'options': {'num_ctx': 2048, 'num_predict': predict, 'num_thread': o['threads'],
                                'num_gpu': o.get('numGpu', 0), 'temperature': 1.0, 'top_p': 1.0,
                                'top_k': 20, 'presence_penalty': 2.0, 'repeat_penalty': 1.0}}
-        raw = self.http('/api/generate', payload, timeout=timeout, stream=True)
         parts = []
         size = 0
+        chunks = 0
+        frames = 0
         done = False
-        try:
-            for line in raw.splitlines():
-                if not line.strip():
-                    continue
-                obj = json.loads(line)
-                if not isinstance(obj, dict) or done or obj.get('error') or obj.get('thinking'):
+
+        def invalid():
+            error = WorkerError('invalid_response', 'Invalid runner response')
+            error.diagnostic = 'ollama_response_invalid'
+            return error
+
+        def reject_constant(value):
+            raise ValueError()
+
+        def consume(line):
+            nonlocal size, chunks, frames, done
+            if not line.strip():
+                return
+            try:
+                obj = json.loads(line, object_pairs_hook=_unique_pairs, parse_constant=reject_constant)
+                frames += 1
+                if frames > 4096 or not isinstance(obj, dict) or done or obj.get('error') or obj.get('thinking'):
                     raise ValueError()
                 text = obj.get('response', '')
                 if not isinstance(text, str) or not isinstance(obj.get('done', False), bool):
@@ -419,20 +466,35 @@ class OllamaWorker:
                         error = WorkerError('invalid_response', 'Invalid runner response')
                         error.diagnostic = 'ollama_token_count_mismatch'
                         raise error
-            if not done:
-                raise ValueError()
-        except (ValueError, UnicodeError):
-            error = WorkerError('invalid_response', 'Invalid runner response')
-            error.diagnostic = 'ollama_response_invalid'
-            raise error from None
+                if text:
+                    chunks += 1
+                    # At most 6 decoding updates, independent of model text size.
+                    if progress and chunks in (1, 16, 64, 256, 1024, 4096):
+                        emit({'type': 'progress', 'stage': 'decoding', 'outputChunks': chunks})
+            except (ValueError, UnicodeError, RecursionError):
+                raise invalid() from None
+
+        raw = self.http('/api/generate', payload, timeout=timeout, stream=True, on_line=consume)
+        # Keep the existing byte-returning HTTP fixture seam. Production consumes
+        # each line inside the owned response context and never returns the body.
+        if raw is not None:
+            for line in raw.splitlines():
+                consume(line)
+        if not done:
+            raise invalid()
         text = ''.join(parts)
-        if allow_empty and not text:
-            return ''
-        return normalize_text(text)
+        text = '' if allow_empty and not text else normalize_text(text)
+        if progress:
+            # Do not claim completion until EOF, count, thinking and text checks pass.
+            emit({'type': 'progress', 'stage': 'complete', 'outputChunks': chunks})
+        return text
 
     def answer(self, request):
         prompt = compile_prompt(request, self.tokenizer)
-        return self.generate(prompt, 128, expected_tokens=count_prompt_tokens(prompt, self.tokenizer))
+        tokens = count_prompt_tokens(prompt, self.tokenizer)
+        # Operational prefill means waiting for first text, including HTTP setup.
+        emit({'type': 'progress', 'stage': 'prefill', 'promptTokens': tokens})
+        return self.generate(prompt, 128, expected_tokens=tokens, progress=True)
 
     def stop(self):
         if self.child is not None:

@@ -5,16 +5,28 @@ export interface NpcAnswerRequest {
   readonly npc: NpcProfile; readonly question: string; readonly history: readonly DialogueEntry[];
   readonly locale: 'ru'; readonly deadlineAt: number;
 }
-/** Receives the whole text generated so far (not a delta). Adapters without streaming never call it. */
-export type PartialAnswer = (text: string) => void;
-/** NPC-005: the model boundary. A local LLM adapter implements this and registers in adapters/index.ts. */
+/**
+ * Private current/last answer timing only. No identifiers, content, or IO.
+ * Preparing includes IPC/tokenization. Prefill is the operational wait for first
+ * text (also HTTP setup), not an isolated runner prefill measurement. Complete
+ * means the adapter accepted the full answer. Times <=120000 ms, prompt <=1792,
+ * nonempty output chunk count <=4096; all numbers are nonnegative safe integers.
+ */
+export interface NpcDiagnostics {
+  readonly stage: 'preparing' | 'prefill' | 'decoding' | 'complete';
+  readonly elapsedMs: number;
+  readonly promptTokens?: number;
+  readonly firstTokenMs?: number;
+  readonly outputChunks?: number;
+}
 export interface NpcResponder {
   start(): Promise<void>;
-  /** Resolves with the final text; `onPartial` must not be called after the promise settles or the signal aborts. */
-  answer(request: NpcAnswerRequest, signal: AbortSignal, onPartial?: PartialAnswer): Promise<{ text: string }>;
+  answer(request: NpcAnswerRequest, signal: AbortSignal): Promise<{ text: string }>;
   stop(): Promise<void>;
   /** Optional local-runtime health; never performs IO or starts recovery. */
   status?(): 'ready' | 'unavailable';
   /** Optional fixed diagnostic code, never a prompt, path, or third-party exception. */
   lastFailure?(): string | undefined;
+  /** Optional synchronous bounded snapshot; retained after abort until restart/next answer. */
+  diagnostics?(): NpcDiagnostics | undefined;
 }

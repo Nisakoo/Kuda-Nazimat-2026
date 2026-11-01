@@ -9,6 +9,9 @@ import sys
 import textwrap
 import tempfile
 import time
+import threading
+import queue
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import unittest
 from unittest import mock
 
@@ -418,10 +421,16 @@ class WorkerTests(unittest.TestCase):
         self.w.tokenizer = Tokenizer()
         prompt = common.compile_prompt(request(), self.w.tokenizer)
         count = common.count_prompt_tokens(prompt, self.w.tokenizer)
-        with mock.patch.object(self.w, 'http', return_value=json.dumps({'response': 'ответ', 'done': True, 'prompt_eval_count': count}).encode()):
+        with mock.patch.object(self.w, 'http', return_value=json.dumps({'response': 'ответ', 'done': True, 'prompt_eval_count': count}).encode()), \
+             mock.patch.object(worker, 'emit') as emit:
             self.assertEqual(self.w.answer(request()), 'ответ')
-        with mock.patch.object(self.w, 'http', return_value=b'{"response":"answer","done":true}'):
+            self.assertEqual([call.args[0] for call in emit.call_args_list], [
+                {'type': 'progress', 'stage': 'prefill', 'promptTokens': count},
+                {'type': 'progress', 'stage': 'decoding', 'outputChunks': 1},
+                {'type': 'progress', 'stage': 'complete', 'outputChunks': 1}])
+        with mock.patch.object(self.w, 'http', return_value=b'{"response":"answer","done":true}'), mock.patch.object(worker, 'emit') as emit:
             with self.assertRaises(common.WorkerError): self.w.answer(request())
+            self.assertEqual([call.args[0]['stage'] for call in emit.call_args_list], ['prefill'])
 
     def test_bad_streams(self):
         for raw in (b'{"response":"x"}\n', b'{"error":"bad","done":true}\n',
@@ -429,6 +438,147 @@ class WorkerTests(unittest.TestCase):
                     json.dumps({'response': 'a' * 16385, 'done': True}).encode()):
             with self.subTest(raw=raw[:50]), mock.patch.object(self.w, 'http', return_value=raw):
                 with self.assertRaises(common.WorkerError): self.w.generate('x', 128)
+
+    def test_incremental_http_progress_before_eof_without_releasing_partial_answer(self):
+        self.w.tokenizer = Tokenizer()
+        count = common.count_prompt_tokens(common.compile_prompt(request(), self.w.tokenizer), self.w.tokenizer)
+        release = threading.Event()
+        events = queue.Queue()
+        results = []
+        errors = []
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args): pass
+
+            def do_POST(self):
+                self.rfile.read(int(self.headers['Content-Length']))
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/x-ndjson')
+                self.end_headers()
+                self.wfile.write(b'{"response":"hello","done":false}\n')
+                self.wfile.flush()
+                if release.wait(4):
+                    self.wfile.write(json.dumps({'done': True, 'prompt_eval_count': count}).encode() + b'\n')
+                    self.wfile.flush()
+
+        server = HTTPServer(('127.0.0.1', 0), Handler)
+        server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+        self.w.port = server.server_port
+        self.w.child = mock.Mock(pid=42)
+        self.w.child.poll.return_value = None
+
+        def run():
+            try:
+                results.append(self.w.answer(request()))
+            except BaseException as exc:
+                errors.append(exc)
+
+        answer_thread = threading.Thread(target=run, daemon=True)
+        server_thread.start()
+        try:
+            with mock.patch.object(worker, 'owned_listener', return_value=True), mock.patch.object(worker, 'emit', side_effect=events.put):
+                answer_thread.start()
+                self.assertEqual(events.get(timeout=2), {'type': 'progress', 'stage': 'prefill', 'promptTokens': count})
+                self.assertEqual(events.get(timeout=2), {'type': 'progress', 'stage': 'decoding', 'outputChunks': 1})
+                self.assertTrue(answer_thread.is_alive())
+                self.assertEqual(results, [])
+                self.assertEqual(errors, [])
+                self.assertTrue(events.empty())
+                release.set()
+                answer_thread.join(2)
+                self.assertFalse(answer_thread.is_alive())
+                self.assertEqual(results, ['hello'])
+                self.assertEqual(errors, [])
+                self.assertEqual(events.get(timeout=2), {'type': 'progress', 'stage': 'complete', 'outputChunks': 1})
+        finally:
+            release.set()
+            answer_thread.join(5)
+            server.shutdown()
+            server.server_close()
+            server_thread.join(2)
+
+    def test_real_http_rejects_done_prefix_with_truncated_length_or_chunked_body(self):
+        self.w.child = mock.Mock(pid=42)
+        self.w.child.poll.return_value = None
+        body = b'{"response":"hello","done":true,"prompt_eval_count":17}\n'
+        for mode in ('short-length', 'short-chunked', 'valid-length'):
+            class Handler(BaseHTTPRequestHandler):
+                def log_message(self, *args): pass
+
+                def do_POST(self):
+                    self.rfile.read(int(self.headers['Content-Length']))
+                    self.send_response(200)
+                    if mode == 'short-chunked':
+                        self.send_header('Transfer-Encoding', 'chunked')
+                    else:
+                        self.send_header('Content-Length', str(len(body) + (1 if mode == 'short-length' else 0)))
+                    self.end_headers()
+                    if mode == 'short-chunked':
+                        # A complete NDJSON done frame, but no terminal HTTP chunk.
+                        self.wfile.write(('%x\r\n' % len(body)).encode() + body + b'\r\n')
+                    else:
+                        self.wfile.write(body)
+                    self.wfile.flush()
+                    self.close_connection = True
+
+            server = HTTPServer(('127.0.0.1', 0), Handler)
+            self.w.port = server.server_port
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                with self.subTest(mode=mode), mock.patch.object(worker, 'owned_listener', return_value=True), \
+                     mock.patch.object(worker, 'emit') as emit:
+                    if mode == 'valid-length':
+                        self.assertEqual(self.w.generate('x', 128, expected_tokens=17, progress=True), 'hello')
+                        self.assertEqual(emit.call_args_list[-1].args[0]['stage'], 'complete')
+                    else:
+                        with self.assertRaises(common.WorkerError) as error:
+                            self.w.generate('x', 128, expected_tokens=17, progress=True)
+                        self.assertEqual(error.exception.code, 'invalid_response')
+                        self.assertEqual(error.exception.diagnostic, 'ollama_response_invalid')
+                        self.assertFalse(any(call.args[0]['stage'] == 'complete' for call in emit.call_args_list))
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(2)
+
+    def test_progress_milestones_are_bounded_and_calibration_is_silent(self):
+        lines = [json.dumps({'response': 'x', 'done': False}).encode()] * 1100
+        lines.append(b'{"done":true,"prompt_eval_count":17}')
+        raw = b'\n'.join(lines)
+        with mock.patch.object(self.w, 'http', return_value=raw), mock.patch.object(worker, 'emit') as emit:
+            self.assertEqual(len(self.w.generate('x', 128, expected_tokens=17, progress=True)), 1100)
+            updates = [call.args[0] for call in emit.call_args_list]
+            self.assertEqual([item['outputChunks'] for item in updates], [1, 16, 64, 256, 1024, 1100])
+            self.assertEqual(updates[-1]['stage'], 'complete')
+            emit.reset_mock()
+            self.w.generate('calibration', 1, expected_tokens=17, allow_empty=True)
+            emit.assert_not_called()
+
+    def test_stream_read1_bounds_and_invalid_suffix_never_complete(self):
+        self.w.child = mock.Mock(pid=42)
+        self.w.child.poll.return_value = None
+        good = b'{"response":"hello","done":false}\n'
+        cases = [
+            (good + b'{"done":true,"prompt_eval_count":17}\n{bad}\n', 'invalid_response'),
+            (good + b'{"done":true,"prompt_eval_count":17}\n{"done":true}', 'invalid_response'),
+            (b' ' * 32769, 'output_limit'),
+            (b'\n' * 65537, 'output_limit'),
+            (good + b'{"response":"' + b'x' * 16385 + b'","done":true,"prompt_eval_count":17}', 'output_limit'),
+            (good + b'{"done":true,"prompt_eval_count":18}', 'invalid_response'),
+            (b'{"response":"<think>secret</think>","done":true,"prompt_eval_count":17}', 'invalid_response'),
+            (b'{"response":"x","done":true,"done":true,"prompt_eval_count":17}', 'invalid_response'),
+            (b'{"response":"x","done":true,"prompt_eval_count":17,"total_duration":NaN}', 'invalid_response'),
+        ]
+        for raw, code in cases:
+            response = mock.MagicMock()
+            response.__enter__.return_value = io.BytesIO(raw)
+            with self.subTest(code=code, size=len(raw)), mock.patch.object(worker, 'owned_listener', return_value=True), \
+                 mock.patch.object(self.w.opener, 'open', return_value=response), mock.patch.object(worker, 'emit') as emit:
+                with self.assertRaises(common.WorkerError) as error:
+                    self.w.generate('x', 128, expected_tokens=17, progress=True)
+                self.assertEqual(error.exception.code, code)
+                self.assertNotIn('complete', [call.args[0]['stage'] for call in emit.call_args_list])
 
     def test_http_refuses_unowned_listener(self):
         self.w.child = mock.Mock(pid=42); self.w.child.poll.return_value = None
@@ -702,6 +852,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 root = Path(sys.argv[1])
 stubborn = sys.argv[2] == 'stubborn'
+streaming = sys.argv[2] == 'streaming'
 # Fixture safety if a regression exits the leader before cleanup. Do not send
 # a stale PID/group signal from the supervisor; the child exits itself instead.
 parent = os.getppid()
@@ -731,6 +882,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', '65536')
         self.end_headers()
         self.wfile.flush()
+        if streaming:
+            self.wfile.write(b'{"response":"hello","done":false}\n')
+            self.wfile.flush()
         (root / 'blocked').write_text('yes')
         time.sleep(60)
 server = HTTPServer(('127.0.0.1', 0), Handler)
@@ -755,7 +909,7 @@ instance = None
 
 def spawn(*args, **kwargs):
     child = real_popen([sys.executable, '-B', str(root / 'child.py'), str(root),
-                        'stubborn' if mode == 'stubborn' else 'cooperative'], **kwargs)
+                        'stubborn' if mode == 'stubborn' else 'streaming' if mode == 'streaming' else 'cooperative'], **kwargs)
     # Do not lose the handle even if the fixture preparation fails.
     try:
         deadline = time.monotonic() + 4
@@ -815,6 +969,8 @@ def emit(message):
     real_emit(message)
     if message['type'] == 'ready':
         (root / 'ready').write_text('yes')
+    if message.get('stage') == 'decoding':
+        (root / 'decoding').write_text('yes')
 worker.OllamaWorker.start = start
 worker.OllamaWorker.stop = stop
 worker.emit = emit
@@ -861,6 +1017,8 @@ def _supervise_signal_fixture(mode, directory):
             else:
                 send({'op': 'answer', 'request': request()})
                 wait_file('blocked')
+                if mode == 'streaming':
+                    wait_file('decoding')
         started = time.monotonic()
         if mode not in ('stop', 'eof'):
             leader.send_signal(signal.SIGTERM)
@@ -919,7 +1077,7 @@ print(json.dumps(_supervise_signal_fixture(sys.argv[1], sys.argv[2])))
             return json.loads(result.stdout)
 
     def test_sigterm_interrupts_startup_and_answer_http_and_reaps(self):
-        for mode in ('startup', 'answer'):
+        for mode in ('startup', 'answer', 'streaming'):
             with self.subTest(mode=mode):
                 result = self.run_fixture(mode)
                 self.assertEqual(result['returncode'], 0, result)
@@ -927,7 +1085,15 @@ print(json.dumps(_supervise_signal_fixture(sys.argv[1], sys.argv[2])))
                 self.assertTrue(result['cleaned'], result)
                 self.assertEqual(result['stderr'], '')
                 messages = [json.loads(line) for line in result['output'].splitlines()]
-                self.assertEqual(messages, [] if mode == 'startup' else [{'type': 'ready'}])
+                if mode == 'startup':
+                    self.assertEqual(messages, [])
+                else:
+                    self.assertEqual(messages[0], {'type': 'ready'})
+                    self.assertEqual(messages[1]['stage'], 'prefill')
+                    self.assertEqual(len(messages), 3 if mode == 'streaming' else 2)
+                    if mode == 'streaming':
+                        self.assertEqual(messages[2], {'type': 'progress', 'stage': 'decoding', 'outputChunks': 1})
+                    self.assertFalse(any(m.get('stage') == 'complete' or m['type'] == 'answer' for m in messages))
 
     def test_sigterm_during_popen_assigns_then_reaps_child(self):
         result = self.run_fixture('spawn')
@@ -943,7 +1109,10 @@ print(json.dumps(_supervise_signal_fixture(sys.argv[1], sys.argv[2])))
         self.assertFalse(result['cleaned'], result)
         if sys.platform.startswith('linux'):
             self.assertTrue(result['group_child_killed'], result)
-        self.assertEqual(result['output'], '{"type":"ready"}\n')
+        messages = [json.loads(line) for line in result['output'].splitlines()]
+        self.assertEqual(messages[0], {'type': 'ready'})
+        self.assertEqual(messages[1]['stage'], 'prefill')
+        self.assertEqual(len(messages), 2)
         self.assertEqual(result['stderr'], '')
 
     def test_normal_eof_and_ipc_stop_reap_cooperative_child(self):

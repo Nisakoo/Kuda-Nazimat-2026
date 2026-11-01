@@ -56,9 +56,48 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
       log({type:'descendant',pid:descendant.pid});
     }
     send({type:'ready'});
+    if (startup === 'ready-partial') setTimeout(() => process.stdout.write('{'), 20);
   } else if (event.op === 'answer') {
     const q = event.request.question;
     log({type:'answer',question:q,history:event.request.history});
+    const prefill = {type:'progress',stage:'prefill',promptTokens:123};
+    const decoding = {type:'progress',stage:'decoding',outputChunks:1};
+    const complete = {type:'progress',stage:'complete',outputChunks:1};
+    const answer = {type:'answer',text:'Ответ'};
+    const batch = (...items) => process.stdout.write(items.map(JSON.stringify).join('\\n')+'\\n');
+    if (q === 'progress-live') {
+      const gate = (name, action) => {
+        const timer = setInterval(() => { if (fs.existsSync(${JSON.stringify(dir)}+'/'+name)) { clearInterval(timer); action(); } }, 5);
+      };
+      send(prefill);
+      gate('decode', () => { send(decoding); gate('complete', () => batch(complete, answer)); });
+      return;
+    }
+    if (q === 'progress-timeout' || q === 'progress-terminal-later') {
+      send(prefill);
+      setTimeout(() => send(decoding), 40);
+      if (q === 'progress-terminal-later') setTimeout(() => send(complete), 80);
+      return;
+    }
+    if (q === 'late-partial') { send(answer); setTimeout(() => process.stdout.write('{'), 50); return; }
+    if (q === 'progress-batch') return batch(prefill, decoding, complete, answer);
+    if (q === 'progress-batch-bad') return process.stdout.write([prefill,decoding,complete,answer].map(JSON.stringify).join('\\n')+'\\n{bad}\\n');
+    if (q === 'progress-batch-extra') return batch(prefill, decoding, complete, answer, answer);
+    if (q === 'progress-batch-prefix') return process.stdout.write([prefill,decoding,complete,answer].map(JSON.stringify).join('\\n')+'\\n{');
+    if (q === 'progress-extra') return send({...prefill,secret:'prompt /private/path'});
+    if (q === 'progress-prompt-limit') return send({...prefill,promptTokens:1793});
+    if (q === 'progress-fraction') return send({...prefill,promptTokens:0.5});
+    if (q === 'progress-infinite') return process.stdout.write('{"type":"progress","stage":"prefill","promptTokens":1e999}\\n');
+    if (q === 'progress-long-literal') return process.stdout.write('{"type":"progress","stage":"prefill","promptTokens":0.'+'0'.repeat(600)+'}\\n');
+    if (q === 'progress-order') return send(decoding);
+    if (q === 'progress-skip-first') return batch(prefill, {...decoding,outputChunks:2});
+    if (q === 'progress-no-first') return batch(prefill, complete, answer);
+    if (q === 'progress-repeat') return batch(prefill, prefill);
+    if (q === 'progress-regress') return batch(prefill, decoding, {...decoding,outputChunks:0});
+    if (q === 'progress-chunk-limit') return batch(prefill, {...decoding,outputChunks:4097});
+    if (q === 'progress-too-many') return batch(prefill, ...Array.from({length:12},(_,i)=>({...decoding,outputChunks:i+1})));
+    if (q === 'progress-early-answer') return batch(prefill, decoding, answer);
+    if (q === 'progress-after-complete') return batch(prefill, decoding, complete, decoding);
     if (q === 'stall') return;
     if (q === 'exit') return process.exit(7);
     if (q === 'malformed') return process.stdout.write('{bad}\\n');
@@ -97,7 +136,7 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
     if (ownedGroup === undefined) throw new Error('Fixture worker has not spawned');
     return ownedGroup;
   };
-  return { responder, events, pid };
+  return { responder, events, pid, releaseProgress: (name: 'decode' | 'complete') => writeFileSync(join(dir, name), '') };
 }
 afterEach(async () => {
   for (const release of releaseCleanup.splice(0)) release();
@@ -161,6 +200,79 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
     expect(responder.lastFailure()).toBeUndefined();
     const second = events().filter((event) => event.type === 'spawn')[1]!.pid!;
     await responder.stop(); expect(alive(second)).toBe(false);
+  });
+  it('exposes only bounded monotonic current-answer diagnostics and resets on next answer/restart', async () => {
+    let mono = 0;
+    const { responder, releaseProgress } = fixture('ollama', 'normal', { monotonicNow: () => mono });
+    await responder.start(); expect(responder.diagnostics?.()).toBeUndefined();
+    mono = 100;
+    const pending = responder.answer({ ...answerRequest(), question: 'progress-live' }, new AbortController().signal);
+    expect(responder.diagnostics?.()).toEqual({ stage: 'preparing', elapsedMs: 0 });
+    mono = 110;
+    await until(() => responder.diagnostics?.()?.stage === 'prefill');
+    expect(responder.diagnostics?.()).toEqual({ stage: 'prefill', elapsedMs: 10, promptTokens: 123 });
+    mono = 125; releaseProgress('decode');
+    await until(() => responder.diagnostics?.()?.stage === 'decoding');
+    expect(responder.diagnostics?.()).toEqual({ stage: 'decoding', elapsedMs: 25, promptTokens: 123, firstTokenMs: 25, outputChunks: 1 });
+    // Returned values are fresh copies, not an externally mutable backing object.
+    Object.assign(responder.diagnostics?.() ?? {}, { promptTokens: 999, secret: 'private' });
+    mono = 140; releaseProgress('complete');
+    await expect(pending).resolves.toEqual({ text: 'Ответ' });
+    const completed = responder.diagnostics?.();
+    expect(completed).toEqual({ stage: 'complete', elapsedMs: 40, promptTokens: 123, firstTokenMs: 25, outputChunks: 1 });
+    mono = 500; expect(responder.diagnostics?.()).toEqual(completed);
+    const controller = new AbortController();
+    const next = responder.answer({ ...answerRequest(), question: 'stall' }, controller.signal);
+    const rejected = expect(next).rejects.toThrow('aborted');
+    expect(responder.diagnostics?.()).toEqual({ stage: 'preparing', elapsedMs: 0 });
+    mono = 200000; expect(responder.diagnostics?.()?.elapsedMs).toBe(120000);
+    controller.abort(); mono = 300000;
+    await rejected; expect(responder.diagnostics?.()).toEqual({ stage: 'preparing', elapsedMs: 120000 });
+    await responder.start(); expect(responder.diagnostics?.()).toBeUndefined();
+  });
+  it('accepts coalesced private progress plus one terminal answer, but MLX supplies no fabricated timing', async () => {
+    const { responder } = fixture(); await responder.start();
+    await expect(responder.answer({ ...answerRequest(), question: 'progress-batch' }, new AbortController().signal)).resolves.toEqual({ text: 'Ответ' });
+    expect(responder.diagnostics?.()).toMatchObject({ stage: 'complete', promptTokens: 123, outputChunks: 1 });
+    const { responder: other } = fixture('mlx'); await other.start();
+    await other.answer(answerRequest(), new AbortController().signal); expect(other.diagnostics?.()).toBeUndefined();
+    await expect(other.answer({ ...answerRequest(), question: 'progress-batch' }, new AbortController().signal)).rejects.toThrow('protocol_error');
+  });
+  it.each(['progress-timeout', 'progress-terminal-later'])('keeps %s diagnostics after timeout without claiming accepted completion', async (question) => {
+    const { responder } = fixture(); await responder.start();
+    const began = performance.now();
+    await expect(responder.answer({ ...answerRequest(), question, deadlineAt: Date.now() + 200 }, new AbortController().signal)).rejects.toThrow('timeout');
+    const sample = responder.diagnostics?.();
+    expect(sample).toMatchObject({ stage: 'decoding', promptTokens: 123, outputChunks: 1 });
+    expect(sample?.firstTokenMs).toBeLessThanOrEqual(sample!.elapsedMs);
+    expect(performance.now() - began).toBeLessThan(1500);
+    await wait(20); expect(responder.diagnostics?.()).toEqual(sample);
+  });
+  it.each([
+    'progress-batch-bad', 'progress-batch-extra', 'progress-batch-prefix', 'progress-extra', 'progress-prompt-limit',
+    'progress-fraction', 'progress-infinite', 'progress-long-literal', 'progress-order', 'progress-skip-first', 'progress-no-first', 'progress-repeat', 'progress-regress', 'progress-chunk-limit',
+    'progress-too-many', 'progress-early-answer', 'progress-after-complete',
+  ])('rejects invalid bounded progress %s without accepting a terminal prefix', async (question) => {
+    const { responder } = fixture(); await responder.start();
+    await expect(responder.answer({ ...answerRequest(), question }, new AbortController().signal)).rejects.toThrow(/^protocol_error$/);
+    expect(responder.diagnostics?.()).toMatchObject({ stage: 'preparing' });
+    expect(JSON.stringify(responder.diagnostics?.())).not.toMatch(/private|promptTokens|secret/);
+  });
+  it('rejects partial bytes after ready even while the initial memory sample still blocks admission', async () => {
+    const { responder, events } = fixture('ollama', 'ready-partial', { memoryBytes: async () => { await wait(300); return 100; } });
+    await expect(responder.start()).rejects.toThrow('protocol_error');
+    expect(responder.status()).toBe('unavailable');
+    await expect(responder.answer(answerRequest(), new AbortController().signal)).rejects.toThrow('unavailable');
+    expect(events().some((item) => item.type === 'answer')).toBe(false);
+  });
+  it('rejects later idle partial bytes before they can contaminate another answer', async () => {
+    const { responder, events } = fixture(); await responder.start();
+    await expect(responder.answer({ ...answerRequest(), question: 'late-partial' }, new AbortController().signal)).resolves.toEqual({ text: 'Ответ' });
+    // A later pipe event cannot retract that accepted answer. It must close this worker.
+    await until(() => responder.status() === 'unavailable');
+    expect(responder.lastFailure()).toBe('protocol_error');
+    await expect(responder.answer(answerRequest(), new AbortController().signal)).rejects.toThrow('unavailable');
+    expect(events().filter((item) => item.type === 'answer')).toHaveLength(1);
   });
   it('sends strict defaults and offline environment through private IPC without mutating caller options', async () => {
     for (const backend of ['ollama', 'mlx'] as const) {

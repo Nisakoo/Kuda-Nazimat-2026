@@ -133,7 +133,8 @@ def compile_prompt(request, tokenizer):
             turns.append([{'role': 'user', 'content': q}, {'role': 'assistant', 'content': a}])
     except (KeyError, TypeError, ValueError, UnicodeError):
         raise WorkerError('invalid_message', 'Invalid answer request') from None
-    system = ('Ты учебный персонаж. Отвечай кратко по-русски, предложи продолжить разговор. '
+    system = ('Ты учебный персонаж. Отвечай по-русски: 1–2 коротких предложения, всего до 20 слов. '
+              'На приветствие — короткое приветствие и вопрос. Предложи продолжить разговор. '
               'Не выдумывай факты, если не знаешь, скажи об этом. '
               f'Имя: {fields[0]}. Тема: {fields[1]}. Манера: {fields[2]}. Приветствие: {fields[3]}')
     while True:

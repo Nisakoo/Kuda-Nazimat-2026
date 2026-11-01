@@ -2,7 +2,7 @@ import { execFile, spawn, type ChildProcessWithoutNullStreams } from 'node:child
 import { isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Clock, Scheduler, TimerHandle } from '../../common/time.ts';
-import type { NpcAnswerRequest, NpcResponder } from '../NpcResponder.ts';
+import type { NpcAnswerRequest, NpcDiagnostics, NpcResponder } from '../NpcResponder.ts';
 import { isNpcFailureCode, type NpcFailureCode } from '../failureCodes.ts';
 
 type Backend = 'ollama' | 'mlx';
@@ -152,6 +152,7 @@ interface Session {
   answer?: Pending & { resolve(value: { text: string }): void; expired(): boolean; aborted(): boolean };
   buffer: Buffer;
   outputBytes: number;
+  messageCount: number;
   stderrBytes: number;
   readyReceived: boolean;
   measured: boolean;
@@ -180,6 +181,15 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
   let owned: Session | undefined;
   let starting: Promise<void> | undefined;
   let lastFailure: Failure | undefined;
+  let diagnostic: NpcDiagnostics | undefined;
+  let diagnosticBegan = 0;
+  let diagnosticEnd: number | undefined;
+  let answerAccepted = false;
+  const elapsed = () => {
+    const value = (diagnosticEnd ?? runtime.monotonicNow()) - diagnosticBegan;
+    return Number.isFinite(value) ? Math.max(0, Math.min(120000, Math.floor(value))) : 0;
+  };
+  const freezeDiagnostic = () => { if (diagnostic && diagnosticEnd === undefined) diagnosticEnd = runtime.monotonicNow(); };
   const delay = (ms: number) => new Promise<void>((resolve) => scheduler.setTimeout(resolve, ms));
   function signalGroup(s: Session, signal: NodeJS.Signals): void {
     // Only our detached process group. Never address an external runner or an arbitrary PID.
@@ -199,6 +209,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
   function cleanup(s: Session): Promise<void> {
     if (s.cleanup) return s.cleanup;
     const wasStarting = s.phase === 'starting';
+    freezeDiagnostic();
     s.phase = 'stopping';
     // Startup must not block the world while physical cleanup is quarantined.
     // Only answer settlement retains the scheduler's active slot until confirmation.
@@ -257,39 +268,76 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
   }
   function output(s: Session, chunk: Buffer): void {
     if (s.phase === 'stopping') return;
+    // Idle bytes cannot belong to a future request, even without a newline.
+    if (s.readyReceived && !s.answer) { fail(s, 'protocol_error'); return; }
     s.outputBytes += chunk.length;
     if (s.outputBytes > LIMIT) { fail(s, 'output_limit'); return; }
     s.buffer = Buffer.concat([s.buffer, chunk]);
     const newline = s.buffer.indexOf(10);
     if (newline < 0) return;
-    // One complete response only. Never accept a valid prefix followed by malformed/extra output.
-    if (newline !== s.buffer.length - 1) { fail(s, 'protocol_error'); return; }
-    let message: Record<string, unknown>;
-    try {
-      const parsed: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(s.buffer.subarray(0, newline)));
-      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error();
-      message = parsed as Record<string, unknown>;
-    } catch { fail(s, 'protocol_error'); return; }
-    s.buffer = Buffer.alloc(0);
-    if (message.type === 'error') {
-      // Do not expose arbitrary worker output, paths, prompts or stderr in health/errors.
-      if (typeof message.code !== 'string' || typeof message.message !== 'string' || Buffer.byteLength(message.message) > 1024) { fail(s, 'protocol_error'); return; }
-      const code = isNpcFailureCode(message.diagnostic) && message.diagnostic.startsWith('ollama_')
-        ? message.diagnostic
-        : failures.has(message.code as Failure) ? message.code as Failure : 'unavailable';
-      fail(s, code); return;
-    }
-    if (s.phase === 'starting' && message.type === 'ready' && Object.keys(message).length === 1 && !s.readyReceived) {
-      s.readyReceived = true; ready(s); return;
-    }
+    // Validate the entire available batch before publishing diagnostics or settling a terminal.
+    // Progress can coalesce with an answer. A valid terminal prefix plus any extra bytes cannot.
+    let offset = 0;
+    let count = s.messageCount;
+    let nextDiagnostic = diagnostic;
+    let terminal: Record<string, unknown> | undefined;
+    let error: Failure | undefined;
     const pending = s.answer;
-    if (s.phase !== 'ready' || !pending || message.type !== 'answer' || typeof message.text !== 'string' || Object.keys(message).length !== 2) { fail(s, 'protocol_error'); return; }
-    if (Buffer.byteLength(message.text) > TEXT_LIMIT) { fail(s, 'output_limit'); return; }
-    if (!message.text.trim() || /<\s*\/?\s*(?:think|analysis)\b/i.test(message.text)) { fail(s, 'protocol_error'); return; }
-    if (pending.aborted()) { fail(s, 'aborted'); return; }
-    if (pending.expired()) { fail(s, 'timeout'); return; }
-    pending.clear(); s.answer = undefined;
-    pending.resolve({ text: message.text });
+    const integer = (value: unknown, max: number): value is number => Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= max;
+    try {
+      for (let end = newline; end >= 0; end = s.buffer.indexOf(10, offset)) {
+        if (++count > 12 || terminal) throw new Error();
+        const parsed: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(s.buffer.subarray(offset, end)));
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error();
+        const message = parsed as Record<string, unknown>;
+        const lineBytes = end - offset;
+        offset = end + 1;
+        if (message.type === 'progress') {
+          if (lineBytes > 512) throw new Error();
+          if (backend !== 'ollama' || s.phase !== 'ready' || !pending || !nextDiagnostic) throw new Error();
+          if (message.stage === 'prefill') {
+            if (nextDiagnostic.stage !== 'preparing' || Object.keys(message).length !== 3 || !integer(message.promptTokens, 1792)) throw new Error();
+            nextDiagnostic = { stage: 'prefill', elapsedMs: 0, promptTokens: message.promptTokens };
+          } else if (message.stage === 'decoding' || message.stage === 'complete') {
+            if (!['prefill', 'decoding'].includes(nextDiagnostic.stage) || Object.keys(message).length !== 3 || !integer(message.outputChunks, 4096)) throw new Error();
+            const previous = nextDiagnostic.outputChunks ?? 0;
+            if (nextDiagnostic.stage === 'prefill' && (message.stage !== 'decoding' || message.outputChunks !== 1)) throw new Error();
+            if (message.stage === 'decoding' ? message.outputChunks <= previous : message.outputChunks < previous) throw new Error();
+            nextDiagnostic = { ...nextDiagnostic, stage: message.stage, outputChunks: message.outputChunks,
+              ...(message.stage === 'decoding' && nextDiagnostic.firstTokenMs === undefined ? { firstTokenMs: elapsed() } : {}) };
+          } else throw new Error();
+          continue;
+        }
+        terminal = message;
+        if (message.type === 'error') {
+          // Never expose arbitrary worker output, paths, prompts or stderr.
+          if (typeof message.code !== 'string' || typeof message.message !== 'string' || Buffer.byteLength(message.message) > 1024) throw new Error();
+          error = isNpcFailureCode(message.diagnostic) && message.diagnostic.startsWith('ollama_')
+            ? message.diagnostic : failures.has(message.code as Failure) ? message.code as Failure : 'unavailable';
+        } else if (s.phase === 'starting' && message.type === 'ready' && Object.keys(message).length === 1 && !s.readyReceived) {
+          // Initial memory admission still gates ready() below.
+        } else {
+          if (s.phase !== 'ready' || !pending || message.type !== 'answer' || typeof message.text !== 'string' || Object.keys(message).length !== 2) throw new Error();
+          if (Buffer.byteLength(message.text) > TEXT_LIMIT) { error = 'output_limit'; }
+          else if (!message.text.trim() || /<\s*\/?\s*(?:think|analysis)\b/i.test(message.text)) throw new Error();
+          if (nextDiagnostic && !['preparing', 'complete'].includes(nextDiagnostic.stage)) throw new Error();
+        }
+      }
+      if (terminal && offset !== s.buffer.length) throw new Error();
+    } catch { fail(s, 'protocol_error'); return; }
+    s.messageCount = count;
+    s.buffer = s.buffer.subarray(offset);
+    diagnostic = nextDiagnostic;
+    // Progress never resets the deadline or releases an aborted generation.
+    if (pending?.aborted()) { fail(s, 'aborted'); return; }
+    if (pending?.expired()) { fail(s, 'timeout'); return; }
+    if (error) { fail(s, error); return; }
+    if (!terminal) return;
+    if (terminal.type === 'ready') { s.readyReceived = true; ready(s); return; }
+    answerAccepted = true;
+    if (diagnostic) { diagnostic = { ...diagnostic, stage: 'complete' }; freezeDiagnostic(); }
+    pending!.clear(); s.answer = undefined;
+    pending!.resolve({ text: terminal.text as string });
   }
   async function start(): Promise<void> {
     if (starting) return starting;
@@ -300,6 +348,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
         (backend === 'ollama' && (!['darwin', 'linux'].includes(runtime.platform) || !['x64', 'arm64'].includes(runtime.arch)))) {
       lastFailure = 'unsupported_platform'; throw new Error('unsupported_platform');
     }
+    diagnostic = undefined; diagnosticEnd = undefined;
     const env = {
       ...process.env,
       PYTHONNOUSERSITE: '1', PYTHONDONTWRITEBYTECODE: '1', PYTHONPATH: '',
@@ -316,7 +365,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     try { child = spawn(String(options.python), [...(runtime.workerPrefix ?? ['-u', '-B']), runtime.workerPath], { shell: false, detached: true, stdio: ['pipe', 'pipe', 'pipe'], env }); }
     catch { starting = undefined; lastFailure = 'unavailable'; throw new Error('unavailable'); }
     const s: Session = {
-      child, group: child.pid, exited: false, phase: 'starting', buffer: Buffer.alloc(0), outputBytes: 0, stderrBytes: 0, readyReceived: false, measured: false,
+      child, group: child.pid, exited: false, phase: 'starting', buffer: Buffer.alloc(0), outputBytes: 0, messageCount: 0, stderrBytes: 0, readyReceived: false, measured: false,
       startup: { resolve, reject, clear: () => { if (timer) scheduler.clearTimeout(timer); } },
       startupExpired: () => clock.now() - wall >= timeout || runtime.monotonicNow() - began >= timeout,
     };
@@ -339,11 +388,15 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     async stop() { if (owned) { if (!owned.failure) { owned.failure = 'stopped'; lastFailure = 'stopped'; } await cleanup(owned); } },
     status: () => owned?.phase === 'ready' ? 'ready' : 'unavailable',
     lastFailure: () => lastFailure,
+    diagnostics: () => diagnostic ? { ...diagnostic, elapsedMs: elapsed(),
+      stage: diagnostic.stage === 'complete' && !answerAccepted ? (diagnostic.outputChunks ? 'decoding' : 'prefill') : diagnostic.stage } : undefined,
     answer(request: NpcAnswerRequest, signal: AbortSignal): Promise<{ text: string }> {
       const s = owned;
       if (!s || s.phase !== 'ready') return Promise.reject(new Error('unavailable'));
       if (s.answer) return Promise.reject(new Error('busy'));
       const began = runtime.monotonicNow();
+      diagnosticBegan = began; diagnosticEnd = undefined; answerAccepted = false;
+      diagnostic = backend === 'ollama' ? { stage: 'preparing', elapsedMs: 0 } : undefined;
       const remaining = Math.min(9000, request.deadlineAt - clock.now());
       let timer: TimerHandle | undefined;
       const abort = () => fail(s, 'aborted');
@@ -359,7 +412,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
       if (!Number.isFinite(remaining) || remaining <= 0) { fail(s, 'timeout'); return promise; }
       signal.addEventListener('abort', abort, { once: true });
       timer = scheduler.setTimeout(() => fail(s, 'timeout'), remaining);
-      s.outputBytes = 0; s.stderrBytes = 0;
+      s.outputBytes = 0; s.messageCount = 0; s.stderrBytes = 0;
       const bounded = boundedRequest(request);
       if (!bounded || !write(s, { op: 'answer', request: bounded })) fail(s, 'input_too_long');
       return promise;

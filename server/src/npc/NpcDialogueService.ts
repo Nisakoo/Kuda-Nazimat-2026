@@ -26,12 +26,33 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
     runtimeFailureLogged = true;
     logger.error('NpcResponder недоступен во время игры', { code: isNpcFailureCode(failure) ? failure : 'unavailable' });
   }
+  function logTiming(reason: 'timeout' | 'completed'): void {
+    // Diagnostics are local and numeric only. Optional adapter hooks must not
+    // break cancellation or disclose arbitrary data from another adapter.
+    try {
+      const sample = responder.diagnostics?.();
+      if (!sample || !['preparing', 'prefill', 'decoding', 'complete'].includes(sample.stage)) return;
+      const fields: Record<string, string | number> = { reason, stage: sample.stage };
+      for (const [key, max] of [['elapsedMs', 120000], ['promptTokens', 1792], ['firstTokenMs', 120000], ['outputChunks', 4096]] as const) {
+        const value = sample[key];
+        if (value !== undefined) {
+          if (!Number.isSafeInteger(value) || value < 0 || value > max) return;
+          fields[key] = value;
+        }
+      }
+      if (!Object.hasOwn(fields, 'elapsedMs')) return;
+      logger.info('Этапы ответа NPC', fields);
+    } catch { /* Diagnostic failure cannot extend a deadline or affect delivery. */ }
+  }
   async function startResponder(): Promise<void> {
     if (starting) return starting;
     const operation = (async () => {
       try {
         await responder.start(); available = !stopped && backendReady();
-        if (available) runtimeFailureLogged = false;
+        if (available) {
+          runtimeFailureLogged = false;
+          if (responder.status) logger.info('NPC готов к вопросам', { status: 'ready' });
+        }
       }
       catch {
         available = false; runtimeFailureLogged = true;
@@ -64,6 +85,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
   }
   function abort(job: Job, reason: 'cancelled' | 'timeout'): void {
     if (job.controller.signal.aborted) return;
+    if (reason === 'timeout' && job.running) logTiming('timeout');
     job.controller.abort(); settle(job, { ok: false, reason });
     if (reason === 'timeout' && job.running && responder.status) {
       logger.error('Истёк deadline ответа NPC', { code: 'timeout' });
@@ -82,6 +104,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
       // Synchronous check + SQLite commit: cancellation cannot interleave here.
       dialogue.append(q.player.playerId, q.npc.id, q.question, text, clock.now());
       settle(job, { ok: true, text });
+      logTiming('completed');
     } catch {
       if (!job.controller.signal.aborted) settle(job, { ok: false, reason: 'unavailable' });
     } finally {
