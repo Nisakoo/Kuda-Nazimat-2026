@@ -1,0 +1,13 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-admin-panel
+
+
+ Test Files  45 passed | 1 skipped (46)
+      Tests  670 passed | 17 skipped (687)
+   Start at  16:35:54
+   Duration  30.07s (transform 3.50s, setup 0ms, import 13.80s, tests 136.02s, environment 15ms)

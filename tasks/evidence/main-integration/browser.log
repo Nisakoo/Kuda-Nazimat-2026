@@ -1,0 +1,10 @@
+
+Running 2 tests using 1 worker
+
+(node:90723) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/2] e2e/completion-contracts.spec.ts:45:1 › actual Socket.IO stream renders partial text, replaces it with the final, and cancels on close
+[2/2] e2e/completion-contracts.spec.ts:70:1 › production disables guest/dev and a forced temporary-password change issues a usable session
+  2 passed (14.1s)

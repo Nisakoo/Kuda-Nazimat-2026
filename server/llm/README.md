@@ -38,7 +38,7 @@ Windows supervisor в этом срезе отсутствует; Windows из �
 
 - Установить выбранную **закреплённую** версию Ollama на поддержанную ОС. Сохранить полный layout runner/библиотек, не копировать только случайный executable. `executable` — абсолютный путь к нему; `runnerVersion` — фактический `x.y.z` установленной версии.
 - Подготовить **отдельный** каталог `modelsDir` с выбранным allowlisted tag: основной `qwen3.5:2b-q4_K_M` либо явно выбранный кандидат `qwen3.5:0.8b-q8_0`. Каталог может хранить оба артефакта на диске, но запросы/startup адресуют только выбранный; отсутствие его файлов не переключает на второй. Модель должна быть полностью скачана до игры. Не направлять worker на порт/каталог одновременно работающего пользовательского daemon. Worker сам запускает `ollama serve`, но никогда `pull/create`.
-- В отдельном Python venv установить `server/llm/requirements-ollama.txt`: Transformers 4.57.6 и Jinja2 3.1.6. Установка выполняется оператором заранее; при наличии подготовленного wheelhouse можно использовать `pip install --no-index --find-links /wheelhouse -r server/llm/requirements-ollama.txt`. Транзитивные пакеты поставки нужно закрепить отдельно; этот файл не является полным wheel lock.
+- Выполнить `uv python install 3.12`, затем `make llm-prepare BACKEND=ollama`. `envs/ollama/pyproject.toml` закрепляет Transformers 4.57.6 и Jinja2 3.1.6, `uv.lock` — транзитивные версии и хеши. Подготовка через `uv sync --locked`; runtime запускает готовый Python напрямую. Для кеша без сети: `node server/llm/prepare.mjs ollama --offline`.
 - Подготовить обычные локальные файлы tokenizer/config/chat template от **того же post-trained Qwen/Qwen3.5-2B**, не Base. Не нужны вторые веса Hugging Face для Ollama. Каталог должен поддерживать `AutoTokenizer.from_pretrained(...local_files_only=True, trust_remote_code=False)`.
 - Зафиксировать snapshot tokenizer без symlinks командой (она не запускает модель):
 
@@ -62,7 +62,7 @@ Worker проверяет активный manifest **выбранного tag**
 
 ## Подготовка MLX
 
-- На Apple Silicon создать отдельный Python venv и заранее установить `server/llm/requirements-mlx.txt` (`mlx-lm==0.32.2`, Jinja2 3.1.6). Установленная версия должна совпадать с `runnerVersion`.
+- На Apple Silicon выполнить `uv python install 3.12`, затем `make llm-prepare BACKEND=mlx`. Отдельные `envs/mlx/pyproject.toml`/`uv.lock` закрепляют MLX-LM 0.32.2, Jinja2 3.1.6 и транзитивные зависимости. `runnerVersion` остаётся 0.32.2. Сценарий весов — [install-local-ai](../../.agents/skills/install-local-ai/references/mlx.md).
 - Подготовить локальный text-only Qwen3.5-2B post-trained, 4-bit/group64. Обычный VLM snapshot не принимается. Кандидат конвертации закреплённой исходной модели **до игры**:
 
   ```sh
@@ -100,7 +100,7 @@ Manifest — инструмент закрепления **доверенног�
 
 LLM-адаптер использует серверный профиль NPC и историю пользователя. Он **не реализует** FTS5 grounding, утверждённый учебный корпус, компактную память/preferences/reset/ledger, языки en/es или текстовый streaming. После main синхронизации игровой wire — **v3**; серверные opt-in partial/cancel уже реализованы и проверяются scripted-адаптером, но real workers не вызывают onPartial, а клиент пока не включает stream (TASK-041). Private числовые progress-сообщения не являются текстовыми partial. System prompt не обеспечивает достоверность фактов. Сейчас в игре торговцы/пастух и Лея/Марк; Эйнштейн/Геродот из AI-корпуса требуют отдельной подготовки.
 
-Полная реализация AI, клиентского streaming и аппаратная квалификация — отдельные задачи. `LanguagePort` перевода/ответов BABEL остаётся test: выбор NPC Ollama/MLX не подключает реальную языковую модель к BABEL. Одна GenerationQueue обслуживает оба вида работ и не обходит общий лимит. Этот срез нельзя обозначать как завершённый TASK-017/018.
+Полная реализация AI, клиентского streaming и аппаратная квалификация — отдельные задачи. `LanguagePort` рынка по умолчанию test; явный `language.adapter: local` подключает уже созданный Ollama/MLX responder к BABEL без второй модели. Одна GenerationQueue обслуживает оба вида работ и не обходит общий лимит. Этот срез нельзя обозначать как завершённый TASK-017/018.
 
 ## Операторская диагностика на Intel Mac
 
@@ -111,7 +111,8 @@ LLM-адаптер использует серверный профиль NPC и
 ```sh
 npm --prefix server test
 npm --prefix server run check
-python3 -B -m unittest discover -s server/llm -p 'test_*.py'
+make llm-test
+make llm-lock-check
 ```
 
 Node subprocess fixtures и Python mocks не скачивают и не запускают Ollama/MLX. Общий контракт проверяет отсутствие внешних Node-соединений и допускает явно заданный loopback; он не наблюдает сеть дочернего Python и не заменяет OS/offline-тест. Фактические результаты и unverified gates — [TASK-067](../../tasks/067-configurable-game-llm.md).

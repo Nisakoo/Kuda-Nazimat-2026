@@ -6,7 +6,7 @@ import { resolve, join } from 'node:path';
 import { createServer } from 'node:net';
 import { once } from 'node:events';
 import { expectCapture, createFromHub, joinFromHub } from './helpers';
-import { hudWindow } from './helpers';
+import { hudWindow, pastureRoute } from './helpers';
 let child: ChildProcess, directory: string, origin: string, configFile: string;
 async function start() {
   child = spawn(process.execPath, ['../server/src/app/main.ts', '--config', configFile], { stdio: ['ignore', 'pipe', 'pipe'] });
@@ -136,12 +136,12 @@ test('solo buys and feeds through the real server, rejects wrong food and restor
   for (const name of ['Финики', 'Красные плоды', 'Жёлтые фрукты']) { await page.getByRole('button', { name: `Купить: ${name}`, exact: true }).click(); await expect(page.getByRole('status').filter({ hasText: 'Предмет добавлен' })).toBeVisible(); }
   await resume(page); await walk(page, 'z', -1); await walk(page, 'x', 2.4); await interact(page, 'Гончар');
   await page.getByRole('button', { name: 'Купить: Вода в кувшине', exact: true }).click(); await expect(page.getByRole('status').filter({ hasText: 'Предмет добавлен' })).toBeVisible();
-  await resume(page); await walk(page, 'x', 0); await walk(page, 'z', -31); await walk(page, 'x', 2);
+  await resume(page); await pastureRoute(page, walk); await walk(page, 'z', -63); await walk(page, 'x', 2);
   await interact(page, 'Чёрная коза'); await page.getByRole('button', { name: 'Финики · 1', exact: true }).click(); await page.getByRole('button', { name: 'Дать выбранный корм' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Коза отказалась' })).toBeVisible(); await expect(page.getByRole('button', { name: 'Финики · 1', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'Красные плоды · 1', exact: true }).click(); await page.getByRole('button', { name: 'Дать выбранный корм' }).click(); await expect(page.getByText('Уже накормлена.', { exact: false })).toBeVisible();
   await resume(page); await walk(page, 'x', -3); await interact(page, 'Белая коза'); await page.getByRole('button', { name: 'Финики · 1', exact: true }).click(); await page.getByRole('button', { name: 'Дать выбранный корм' }).click(); await expect(page.getByText('Уже накормлена.', { exact: false })).toBeVisible();
-  await resume(page); await walk(page, 'z', -35); await interact(page, 'Рыжая коза'); await page.getByRole('button', { name: 'Жёлтые фрукты · 1', exact: true }).click(); await page.getByRole('button', { name: 'Дать выбранный корм' }).click(); await expect(page.getByText('Уже накормлена.', { exact: false })).toBeVisible();
+  await resume(page); await walk(page, 'z', -67); await interact(page, 'Рыжая коза'); await page.getByRole('button', { name: 'Жёлтые фрукты · 1', exact: true }).click(); await page.getByRole('button', { name: 'Дать выбранный корм' }).click(); await expect(page.getByText('Уже накормлена.', { exact: false })).toBeVisible();
   await resume(page); await walk(page, 'x', 3); await interact(page, 'Светло-серый козлёнок'); await page.getByRole('button', { name: 'Вода в кувшине · 1', exact: true }).click(); await page.getByRole('button', { name: 'Дать выбранный корм' }).click();
   await expect(page.getByRole('dialog', { name: 'Козы пастуха' })).toContainText('All four goats have been fed');
   await page.screenshot({ path: 'test-results/babylon-solo-complete.png' });
@@ -156,9 +156,9 @@ test('real server authorizes the default 25-chunk window at the market and tower
   page.on('response', response => { if (response.url().includes('/world/') && !response.ok()) rejected.push(response.url()); });
   await login(page, 'Обзор-тест', '1', 'en', null);
   const cache = page.getByLabel('Кеш мира');
-  await expect(cache).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+  await expect(cache).toContainText('Чанки: 16 · Ожидание: 0 · Отложено: 0');
   await walk(page, 'z', 9); await walk(page, 'x', -32);
-  await expect(cache).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+  await expect(cache).toContainText('Чанки: 16 · Ожидание: 0 · Отложено: 0');
   await page.mouse.move(850, 250, { steps: 20 });
   await page.waitForTimeout(500);
   await page.screenshot({ path: 'test-results/tower-25-chunks-online.png' });

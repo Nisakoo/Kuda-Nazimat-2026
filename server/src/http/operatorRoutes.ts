@@ -12,6 +12,7 @@ import { BodyError, body, error, fields, json, type RequestContext } from './uti
 export interface OperatorDeps {
   readonly auth: AuthService; readonly game: GameRuntime; readonly metrics: MetricsRegistry; readonly logger: Logger;
   readonly host: string; readonly configPort: number; readonly maxPlayers: number;
+  readonly environment?: string; readonly version?: string;
   readonly npcReady: () => boolean; readonly languageReady: () => boolean;
   readonly health: () => Health;
   readonly warnings: () => readonly LogRecord[];
@@ -44,13 +45,17 @@ export async function handleOperator(req: IncomingMessage, res: ServerResponse, 
   context.route = path.startsWith('/api/operator/actions/') ? '/api/operator/actions' : path;
   if (!isLoopback(req.socket.remoteAddress)) { req.resume(); res.writeHead(404); res.end(); return true; }
   if (req.method === 'GET' && path === '/operator') {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'" });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" });
     res.end(OPERATOR_PAGE); return true;
   }
   if (req.method === 'GET' && path === '/api/operator/status') {
     const info = connectionInfo(deps.host, req.socket.localPort ?? deps.configPort, lanAddresses());
     const players = deps.game.presence();
+    const stats = deps.game.stats();
+    const memory = process.memoryUsage();
     json(res, 200, {
+      environment: deps.environment ?? null, version: deps.version ?? null,
+      performance: { tickP95Ms: stats?.tickP95Ms ?? null, broadcastP95Ms: stats?.broadcastP95Ms ?? null, rssBytes: memory.rss, heapBytes: memory.heapUsed },
       addresses: [info.local, ...info.lan.filter((entry) => entry.kind !== 'link-local').map((entry) => entry.url)],
       health: deps.health(), players, seats: { used: players.length, max: deps.maxPlayers },
       npc: deps.npcReady() ? 'ready' : 'unavailable', language: deps.languageReady() ? 'ready' : 'unavailable',

@@ -18,6 +18,44 @@ function setup() {
   session.connect({ kind: 'mock' }); clock.advance(100);
   return { clock, adapter, session, sent, notices };
 }
+it('PROTO-007: accepts only increasing whole snapshots and makes the final answer authoritative', () => {
+  const s = setup();
+  const requestId = s.session.askNpc('guide', 'Вопрос', true)!;
+  s.clock.advance(50);
+  expect(s.sent.at(-1)).toMatchObject({ type: 'npc-question', stream: true });
+  for (const [seq, text, targetId] of [[2, 'Hello world', 'guide'], [1, 'Hello', 'guide'], [3, 'wrong', 'other'], [2, 'duplicate', 'guide']] as const) {
+    s.adapter.receive({ v: 3, type: 'npc-partial', requestId, targetId, seq, text });
+  }
+  s.clock.advance(0);
+  expect(s.notices.mock.calls.filter(([notice]) => notice.type === 'npc-partial').map(([notice]) => notice.text)).toEqual(['Hello world']);
+  s.clock.advance(11000);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId }));
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId, targetId: 'guide', text: 'Final correction' });
+  s.adapter.receive({ v: 3, type: 'npc-partial', requestId, targetId: 'guide', seq: 4, text: 'late' });
+  s.clock.advance(0);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', text: 'Final correction' }));
+  expect(s.notices.mock.calls.filter(([notice]) => notice.type === 'npc-partial')).toHaveLength(1);
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
+it('PROTO-007: cancels one question without replay, ignores late messages and bounds a silent stream', () => {
+  const s = setup();
+  const requestId = s.session.askNpc('guide', 'First', true)!;
+  expect(s.session.askNpc('guide', 'Overlapping', true)).toBeNull();
+  s.clock.advance(50); s.session.cancelNpc(requestId); s.clock.advance(50);
+  expect(s.sent.at(-1)).toMatchObject({ type: 'npc-cancel', questionId: requestId });
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId, targetId: 'guide', text: 'late' });
+  s.clock.advance(0);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc' }));
+  const next = s.session.askNpc('guide', 'Second', true)!;
+  s.clock.advance(32001);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: next, message: expect.stringContaining('32 секунд') }));
+  s.clock.advance(50);
+  expect(s.sent.at(-1)).toMatchObject({ type: 'npc-cancel', questionId: next });
+  s.session.askNpc('guide', 'Third', true); s.clock.advance(50);
+  s.adapter.drop(); s.session.reconnect(); s.clock.advance(100);
+  expect(s.sent.filter(message => message.type === 'npc-question' && message.text === 'Third')).toHaveLength(1);
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
 it('MOVE-012: sends a diagonal intention when its tangent is ready', () => {
   const s = setup();
   s.session.setMovementGuard(position => position.x <= 0);
@@ -148,10 +186,12 @@ it('clears NPC requests on disconnect and dispose without replay', () => {
   s.clock.advance(32000);
   expect(s.sent.filter((message) => message.type === 'npc-question' && message.text === 'dispose')).toHaveLength(1);
 });
-it('bounds pending NPC requests to 32', () => {
+it('bounds all pending requests to 32 while allowing only one NPC question', () => {
   const s = setup();
-  for (let i = 0; i < 32; i++) expect(s.session.askNpc('guide', `question ${i}`)).not.toBeNull();
-  expect(s.session.askNpc('guide', 'overflow')).toBeNull();
+  expect(s.session.askNpc('guide', 'First question')).not.toBeNull();
+  expect(s.session.askNpc('guide', 'Overlapping question')).toBeNull();
+  for (let i = 0; i < 31; i++) expect(s.session.chat(`message ${i}`)).not.toBeNull();
+  expect(s.session.chat('overflow')).toBeNull();
   expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: 'limit' }));
   s.session.dispose(); expect(s.clock.pending).toBe(0);
 });

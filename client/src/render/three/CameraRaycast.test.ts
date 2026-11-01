@@ -19,7 +19,7 @@ it('matches exact mesh intersections for transformed indexed and nonindexed wall
         const origin = new Vector3(3 + Math.sin(i) * 7, 2 + Math.cos(i * .7) * 6, -1 + Math.cos(i) * 7);
         const ray = new Raycaster(origin, mesh.position.clone().sub(origin).normalize(), .05, i % 2 ? 30 : 5);
         const expected = ray.intersectObject(group).map(hit => hit.distance).sort((a, b) => a - b);
-        const actual: Intersection[] = []; cast.intersect(group, ray, actual);
+        const actual: Intersection[] = []; cast.prepare(group); cast.intersect(group, ray, actual);
         expect(actual.every(hit => hit.object === mesh)).toBe(true);
         const distances = actual.map(hit => hit.distance).sort((a, b) => a - b);
         expect(distances.length).toBe(expected.length);
@@ -38,7 +38,7 @@ it('updates bounds after vertex edits and respects transformed parents and ray l
   const ray = new Raycaster(new Vector3(0, 0, 10), new Vector3(0, 0, -1));
   for (const offset of [0, 4]) {
     geometry.translate(0, 0, offset); parent.position.z = offset / 2; parent.updateMatrixWorld(true);
-    const hits: Intersection[] = []; cast.intersect(parent, ray, hits);
+    const hits: Intersection[] = []; cast.prepare(parent); cast.intersect(parent, ray, hits);
     expect(Math.min(...hits.map(hit => hit.distance))).toBeCloseTo(ray.intersectObject(parent)[0]!.distance);
   }
   mesh.layers.set(1);

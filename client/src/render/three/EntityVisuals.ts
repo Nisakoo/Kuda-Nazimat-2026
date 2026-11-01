@@ -1,4 +1,4 @@
-import { Group } from 'three';
+import { Box3, Group } from 'three';
 import type { Scene, Object3D } from 'three';
 import type { Entity, EntityId, Transform, WorldSnapshot } from '../../core/types';
 import { DEMO_NPCS } from '../../shared/demo';
@@ -183,9 +183,8 @@ export class EntityVisuals {
     visual.group.add(visual.rig.root);
     visual.rig.pose(0,0,0,0);
     this.addEquipment(visual, entity);
-    const label = this.assets.label(player?'Вы':`${npc?.name??entity.character?.name??'Гость'}${npc?.topic?` · ${npc.topic}`:''}`);
-    if (player) label.scale.set(1,.4,1);
-    label.position.y=2.45; visual.group.add(label);
+    const label = this.assets.label(entity.character?.name ?? npc?.name ?? (player ? 'Игрок' : 'Гость'));
+    label.position.y=2.1; visual.group.add(label);
   }
 
   private addEquipment(visual: Visual, entity: Entity): void {
@@ -205,8 +204,9 @@ export class EntityVisuals {
   private loadModel(id: string, assetId: string, visual: Visual, entity: Entity, player: boolean): void {
     void this.library!.instantiate(assetId,visual.controller.signal).then(model=>{
       if (visual.controller.signal.aborted || this.visuals.get(id)!==visual) { model.dispose(); return; }
+      const labelHeight = Math.max(1.3, new Box3().setFromObject(model.root).max.y + .28);
       visual.model=model; visual.group.add(model.root);
-      if (entity.character) { const label = this.assets.label(player ? 'Вы' : entity.character.name); label.position.y = 2.25; visual.group.add(label); }
+      if (entity.character) { const label = this.assets.label(entity.character.name); label.position.y = labelHeight; visual.group.add(label); }
       this.addEquipment(visual, entity); this.report(id,null);
     },(error:unknown)=>{
       if (visual.controller.signal.aborted) return;

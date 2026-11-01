@@ -99,7 +99,9 @@ class CommonTests(unittest.TestCase):
 class ModelFixture:
     """Small local Docker manifests; no real weights or daemon."""
     def __init__(self, root, model=worker.MODEL):
-        self.root = Path(root)
+        # macOS temporary directories may start with the /var -> /private/var alias.
+        # The allowed absolute-link fixture must not contain a symlinked ancestor.
+        self.root = Path(root).resolve()
         self.blobs = self.root / 'blobs'
         self.blobs.mkdir(exist_ok=True)
         tag = model.split(':')[1]
@@ -916,6 +918,10 @@ real_emit = worker.emit
 instance = None
 
 def spawn(*args, **kwargs):
+    # macOS ownership checks run lsof through subprocess.run/Popen. Only replace
+    # the synthetic daemon; retain the real ownership probe and its subprocess.
+    if args and args[0] != ['/fixture', 'serve']:
+        return real_popen(*args, **kwargs)
     child = real_popen([sys.executable, '-B', str(root / 'child.py'), str(root),
                         'stubborn' if mode == 'stubborn' else 'streaming' if mode == 'streaming' else 'cooperative'], **kwargs)
     # Do not lose the handle even if the fixture preparation fails.

@@ -1,0 +1,6 @@
+
+> educational-world-server@0.1.0 check
+> tsc -p tsconfig.json && tsc -p ../shared/tsconfig.json && depcruise src --config .dependency-cruiser.cjs
+
+
+✔ no dependency violations found (92 modules, 309 dependencies cruised)

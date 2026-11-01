@@ -30,6 +30,8 @@ npm --prefix client run preview -- --host 0.0.0.0 --port 4173 --strictPort
 
 ## Ручная проверка рынка
 
+В **Настройки → Качество графики** доступны обычное (по умолчанию: DPR ≤1, тени 1024), облегчённое (без теней и сглаживания) и высокое (DPR ≤2, тени 2048). Выбор сохраняется в браузере и применяется кнопкой «Применить и открыть карту». Разрешение интерфейса не снижается. Диагностика показывает частоту отправленных кадров отдельно от частоты цикла и пропусков из-за занятого GPU. Изменения и измерения — [TASK-079](tasks/079-low-end-render.md).
+
 1. Закройте вводное окно и нажмите **Начать прогулку**. WASD — идти, мышь — камера, E — взаимодействие, Esc — меню.
 2. Фрукты — слева, керамика — справа, ткани — слева дальше. Подойдите к продавцу сбоку от прилавка и нажмите E; кнопки «Взять» добавляют предметы в локальную сумку. Покупки бесплатны.
 3. Пройдите прямо к лестнице и между домами на пастбище. Пастух рассказывает приметы и корм четырёх коз.
@@ -46,7 +48,7 @@ make prepare   # один раз, с интернетом
 make start     # без интернета; make demo — синоним, PORT=9000 меняет порт
 ```
 
-Сервер печатает блок подключения с адресами для этого компьютера и для других устройств; экран ведущего — `http://localhost:8080/operator` (только на самом сервере). Самопроверка без запуска — `npm --prefix server run lan:check`. Подробности и диагностика — [server/README.md](server/README.md), [OFFLINE](specs/offline-multiplayer.md).
+Сервер печатает блок подключения с адресами для этого компьютера и для других устройств; экран администратора — `http://localhost:8080/operator` (только на самом сервере). Первый этап новой панели содержит обзор, сервер, клиентов и действия с аккаунтами; история метрик, FPS и редактирование NPC пока недоступны ([TASK-083](tasks/083-admin-panel-foundation.md)). Самопроверка без запуска — `npm --prefix server run lan:check`. Подробности и диагностика — [server/README.md](server/README.md), [OFFLINE](specs/offline-multiplayer.md).
 
 Откройте [http://localhost:8080/](http://localhost:8080/) (или LAN-адрес из вывода сервера). Зарегистрируйтесь с именем и паролем, подтвердите облик, выберите режим и два разных языка. Для существующего аккаунта используйте вкладку «Вход». В режиме «С друзьями» можно выбрать 2–4 игроков. Первый участник задаёт размер группы, остальные присоединяются. В соло доступны все шаги; в совместном задании первый игрок у пастуха получает список, остальные покупают и кормят. Группа стартует после заполнения ролей. Повторный вход восстанавливает данные. Отдельная кнопка «Демонстрационный вход по имени» открывает тестовый гостевой вход без пароля.
 
@@ -140,7 +142,7 @@ PLAYWRIGHT_CHANNEL=chrome npm --prefix client run test:render
 
 Демо — 1024 чанка по 32 м, общие авторские GLB, тематические районы и уникальные видимые таблички. Collision bitmap получается из GLB, одинаковые BIN адресуются по SHA. Генерируемые JSON/BIN/bootstrap исключены из git; исходные модели и генератор сохранены. Небольшой bootstrap входит в JS, полный мир — нет. `models:generate` воспроизводит таблички GLB/glTF; экспорт окружения — `client/scripts/export-demo-scene.mjs` с локальным dev-сервером и Chrome.
 
-Клиент держит окно чанков вокруг игрока: для market по умолчанию 5×5 (25 чанков), для demo/science — 3×3. При движении новые ряды подгружаются, дальние освобождаются, модели между чанками общие. Процентного лимита кеша нет. Защита полезных данных 64 MiB сохраняет резерв до последнего CPU/GPU-владельца, включая pending; это не полный RSS браузера/драйвера. Диагностика показывает резерв памяти, готовые, загружаемые и отложенные чанки. Подробности — [MAP](specs/client-world-streaming.md) и [TASK-037](tasks/037-chunk-window.md).
+Клиент держит окно чанков вокруг игрока: для market по умолчанию радиус 2 (до 25 чанков; текущий компактный город — 16), для demo/science — 3×3. При движении новые ряды подгружаются, дальние освобождаются, модели между чанками общие. Процентного лимита кеша нет. Защита полезных данных 128 MiB сохраняет резерв до последнего CPU/GPU-владельца, включая pending; это не полный RSS браузера/драйвера. Диагностика показывает резерв памяти, готовые, загружаемые и отложенные чанки. Подробности — [MAP](specs/client-world-streaming.md) и [TASK-037](tasks/037-chunk-window.md).
 
 ## Конфигурация
 
@@ -176,7 +178,7 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 | 040 | [Сервер: поток NPC и модельные порты](tasks/040-npc-stream-model-ports.md) | [NPC](specs/server-npc-dialogue.md), [PROTO-007](specs/protocol.md) | 014, 025, 032 |
 | 041 | [Клиент: потоковый ответ NPC (передача от сервера)](tasks/041-client-npc-stream.md) | [PROTO-007](specs/protocol.md) | 040 · клиент |
 | 042 | [Сервер: пароли, сессии с отзывом, окружения](tasks/042-server-auth-sessions.md) | [AUTH](specs/server-auth.md), SERVER-009 | 012, 016 |
-| 043 | [Сервер: логи, метрики, экран ведущего](tasks/043-server-observability.md) | [OBS](specs/server-observability.md) | 016 |
+| 043 | [Сервер: логи, метрики, экран администратора](tasks/043-server-observability.md) | [OBS](specs/server-observability.md) | 016 |
 | 044 | [Клиент: пароли и отчёты (передача от сервера)](tasks/044-client-auth-observability-handoff.md) | AUTH, OBS-011 | 042, 043 · клиент |
 | 015 | [Сервер: локальные NPC (полный AI)](tasks/015-server-ai.md) | [AI](specs/server-ai.md) | 011, 014, 017, 025 |
 | 067 | [Ollama/MLX в игре, профили и timeout](tasks/067-configurable-game-llm.md) | [LLM](specs/server-llm-runtime.md) | 025 |
@@ -191,13 +193,18 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 | 076 | [Клиент: выбор облика](tasks/076-client-avatar-selection.md) | [AVATAR](specs/client-avatar-select.md) | 073 |
 | 077 | [Клиент: визуальное соответствие](tasks/077-client-visual-fidelity.md) | [HUD](specs/client-game-hud.md) | 073, 074, 075 |
 | 078 | [Интеграция NPC с main](tasks/078-npc-main-sync.md) | [NPC-AI](specs/npc-character-behavior.md) | 070, 071, 072 |
+| 084 | [Барьер неправильного языка и роль NPC](tasks/084-npc-language-role-regression.md) | [NPC-AI](specs/npc-character-behavior.md) | 071, 072 |
+| 085 | [Бюджет замера памяти macOS](tasks/085-macos-memory-sample-budget.md) | [LLM](specs/server-llm-runtime.md) | 084 |
+| 086 | [Прямые ответы без подмены роли](tasks/086-npc-direct-grounded-replies.md) | [NPC-AI](specs/npc-character-behavior.md) | 084 |
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
 
-Наборы A и B объединены, полный серверный `check` проходит. Работают UI входа, SQLite, защищённая потоковая карта, чат, NPC с памятью через scripted, раздельное появление игроков, потоковый ответ NPC (PROTO-007, клиент его пока не включает), экран ведущего и `lan:check`. TASK-010–014, 024–026 и 040 выполнены; в TASK-016 остаются ручная приёмка на устройствах (R1–R3) и прогоны на macOS/Linux. Запуск — `make start`, подробности — [server/README.md](server/README.md). Клиент использует корневой shared. Результаты реальной браузерной интеграции — [TASK-028](tasks/028-client-guest-login.md); оставшиеся критерии защиты — [TASK-026](tasks/026-server-demo.md).
+Наборы A и B объединены, полный серверный `check` проходит. Работают UI входа, SQLite, защищённая потоковая карта, чат, NPC с памятью через scripted, раздельное появление игроков, потоковый ответ NPC (PROTO-007, клиент его пока не включает), экран администратора и `lan:check`. TASK-010–014, 024–026 и 040 выполнены; в TASK-016 остаются ручная приёмка на устройствах (R1–R3) и прогоны на macOS/Linux. Запуск — `make start`, подробности — [server/README.md](server/README.md). Клиент использует корневой shared. Результаты реальной браузерной интеграции — [TASK-028](tasks/028-client-guest-login.md); оставшиеся критерии защиты — [TASK-026](tasks/026-server-demo.md).
 
 
 ## Локальные NPC и LLM
+
+Python-зависимости локального ИИ готовятся через **uv**: `uv python install 3.12`, затем `make llm-prepare BACKEND=mlx` (Apple Silicon) или `BACKEND=ollama`. Команда устанавливает пакеты по отдельному lock, но не скачивает веса и не включает ИИ автоматически. Полный маршрут с инструментами, моделями и конфигурацией — [скилл install-local-ai](.agents/skills/install-local-ai/SKILL.md). Node 24 остаётся под nvm/существующим менеджером, JS-зависимости — npm.
 
 **Установка на своём компьютере с нуля:** [server/llm/SETUP.md](server/llm/SETUP.md). [Справочник runtime](server/llm/README.md), [подготовленные профили](server/llm/PROFILES.md), [timeout в секундах](server/llm/TIMEOUT.md). На уже подготовленной машине не нужно повторять скачивание моделей, установку Python или импорт профилей.
 
@@ -236,7 +243,7 @@ make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=120 # при наличии prep
 
 `make help` показывает команды; CLIENT_RUN_CMD/CLIENT_TEST_CMD можно переопределить, пустые значения и ошибки не скрываются. Серверные решения по runtime, входу и сохранениям — в серверных спеках; локальный ИИ — в AI/LLM.
 
-После rebase сохранены [GAME — Вавилон](specs/game-babylon.md) и [MARKET — рыночная демо-сцена](specs/demo-scene-market.md), а также [экраны входа и выбора режима](specs/client-auth-screens.md) и [игровой интерфейс](specs/client-game-hud.md), [выбор облика](specs/client-avatar-select.md), [разговор с жителем](specs/client-npc-chat.md), [пауза и помощь](specs/client-pause-menu.md), [настройки](specs/client-settings.md), [жители и локации](specs/world-cast-locations.md) (draft). Клиентская часть рынка реализована в [TASK-022](tasks/022-market-client-demo.md); серверное совместное задание (механики BABEL/SCENE) реализовано отдельным HTTP-дополнением PROTO-009; реальная LLM остаётся внешней интеграцией. `npc-question`/`npc-answer` сохраняют однофинальный режим в игровом v3; PROTO-007 реализован сервером как opt-in stream/cancel, клиентская интеграция остаётся в TASK-041.
+После rebase сохранены [GAME — Вавилон](specs/game-babylon.md) и [MARKET — рыночная демо-сцена](specs/demo-scene-market.md), а также [экраны входа и выбора режима](specs/client-auth-screens.md) и [игровой интерфейс](specs/client-game-hud.md), [выбор облика](specs/client-avatar-select.md), [разговор с жителем](specs/client-npc-chat.md), [пауза и помощь](specs/client-pause-menu.md), [настройки](specs/client-settings.md), [жители и локации](specs/world-cast-locations.md), [панель администратора](specs/admin-panel-ui.md) (draft). Клиентская часть рынка реализована в [TASK-022](tasks/022-market-client-demo.md); серверное совместное задание (механики BABEL/SCENE) реализовано отдельным HTTP-дополнением PROTO-009; реальная LLM остаётся внешней интеграцией. `npc-question`/`npc-answer` сохраняют однофинальный режим в игровом v3; PROTO-007 реализован сервером как opt-in stream/cancel, клиентская интеграция остаётся в TASK-041.
 
 Номера TASK-017/018 из main принадлежат [runtime MLX/Ollama](tasks/017-local-llm-runtime.md) и [LLM-квалификации](tasks/018-npc-llm-qualification.md). Клиентские демо перенумерованы в [TASK-019](tasks/019-client-playable-demo.md) и [TASK-020](tasks/020-client-babylon-controls.md), чтобы ID не повторялись.
 
@@ -253,3 +260,9 @@ make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=120 # при наличии prep
 Исправления паузы и компоновки окон: [TASK-061](tasks/061-window-polish.md); минимальный индикатор выносливости по центру: [TASK-063](tasks/063-stamina-center.md). Совместимость новых моделей/UI с переносом предметов, звуком и миграциями main проверяется в [TASK-062](tasks/062-ui-main-integration.md).
 
 Покрытие клиентских unit-тестов: `npm --prefix client run test:coverage` (V8; весь client/src, без тестов/генерированных данных). HTML: `client/coverage/index.html`. Измерение и границы: [TASK-064](tasks/064-client-test-coverage.md); Playwright в этот процент не включается.
+
+Компактный город всех четырёх волн: 128×128 м, 15 районов, 27 говорящих жителей; исходные рынок, пастбище и башня сохранены. Городские задания и открытые районы сохраняет сервер. Помощь, поток demo/science и формы смены пароля описаны с результатами проверок в [TASK-087](tasks/087-map-ui-completion.md); [7 снимков обхода](tasks/evidence/map-ui-completion/index.html) включают найденные и исправленные дефекты. Сценарии `client/playwright.city.config.ts` используют отдельную временную БД; повторный запуск не создаёт копий уже сохранённых снимков и не превышает лимит 7.
+
+Дальнейшее уплотнение города, более узкие дороги, тематические детали и гладкие ники с перекрытием стенами — [TASK-088](tasks/088-city-density-nameplates.md). Семь снимков выше относятся к предыдущей версии 160×160; для новой версии лимит сохранён, проверки выполняются без дополнительных снимков.
+
+Контур города теперь зигзагообразный, ширина суши около 111 м; техническая сетка остаётся 16 чанков. Пастбище перенесено к северной стене, кварталы и улицы получили разные повороты и смещения — [TASK-089](tasks/089-organic-city-layout.md).

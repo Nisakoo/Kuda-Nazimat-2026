@@ -33,31 +33,33 @@ export class SceneAssets {
     return mesh;
   }
 
-  label(text: string, color = '#243b43'): Sprite {
+  label(text: string, color = '#f5f5f5'): Sprite {
     const key = `label:${text}:${color}`;
     const texture = this.textures.acquire(key, () => {
       const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 112;
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Не удалось создать подпись персонажа.');
-      context.fillStyle = '#fffffff0';
-      context.beginPath();
-      context.roundRect(5, 5, 502, 102, 28);
-      context.fill();
-      context.fillStyle = color;
-      context.font = '600 36px system-ui, sans-serif';
+      const font = '500 48px system-ui, sans-serif';
+      context.font = font;
+      canvas.width = Math.min(1536, Math.max(72, Math.ceil(context.measureText(text).width) + 28));
+      canvas.height = 76;
+      context.font = font;
+      context.fillStyle = 'rgba(12, 14, 17, 0.58)';
+      context.fillRect(0, 0, canvas.width, canvas.height);
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.fillText(text, 256, 56, 470);
+      context.fillStyle = '#000000b3';
+      context.fillText(text, canvas.width / 2 + 2, 40, canvas.width - 24);
+      context.fillStyle = color;
+      context.fillText(text, canvas.width / 2, 38, canvas.width - 24);
       const result = new CanvasTexture(canvas);
       result.colorSpace = SRGBColorSpace;
       return result;
     });
-    const material = this.materials.acquire(key, () => new SpriteMaterial({ map: texture, depthTest: false, transparent: true })) as SpriteMaterial;
+    const material = this.materials.acquire(key, () => new SpriteMaterial({ map: texture, depthTest: true, depthWrite: false, transparent: true, alphaTest: .01, toneMapped: false })) as SpriteMaterial;
     const sprite = new Sprite(material);
-    sprite.scale.set(2.8, 0.61, 1);
-    sprite.renderOrder = 10;
+    sprite.name = 'nameplate';
+    sprite.scale.set(.32 * (texture.image as HTMLCanvasElement).width / 76, .32, 1);
     this.releases.set(sprite, () => { this.materials.release(key); this.textures.release(key); });
     return sprite;
   }

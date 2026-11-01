@@ -22,7 +22,7 @@ export class VisualChunks {
     }
   }
   private readonly chunks = new Map<string, ChunkState>();
-  constructor(private readonly scene: Scene, private readonly library: GltfLibrary) {}
+  constructor(private readonly scene: Scene, private readonly library: GltfLibrary, private readonly farWindInterval = 0) {}
   get ids(): readonly string[] { return [...this.chunks.keys()]; }
   get readyIds(): readonly string[] { return [...this.chunks].filter(([,state])=>state.loaded).map(([id])=>id); }
 
@@ -37,13 +37,14 @@ export class VisualChunks {
     this.scene.add(state.root);
     try {
       await Promise.all(chunk.objects.map(async (object) => {
-        const model = await this.library.instantiate(object.assetId, state.controller.signal);
+        const model = await this.library.instantiate(object.assetId, state.controller.signal, true);
         if (this.chunks.get(chunk.id) !== state || state.controller.signal.aborted) { model.dispose(); throw abortError(); }
         const root = new Group();
         root.name = object.id;
         root.position.set(object.transform.position.x, object.transform.position.y, object.transform.position.z);
         root.rotation.y = object.transform.rotationY;
         root.add(model.root);
+        root.updateMatrix(); root.matrixAutoUpdate = false;
         const symbols = model.root.getObjectByName('babel-symbols');
         if (symbols) symbols.visible = this.symbolsVisible;
         state.models.push(model);
@@ -59,15 +60,20 @@ export class VisualChunks {
     }
   }
 
-  animate(delta: number, timeMs = 0, wind?: WorldLifeDefinition['wind']): void {
-    for (const state of this.chunks.values()) {
+  animate(delta: number, timeMs = 0, wind?: WorldLifeDefinition['wind'], viewer?: { x: number; z: number }): void {
+    for (const [id, state] of this.chunks) {
       if (this.revealed && state.loaded) {
         state.root.visible = true;
         state.progress = Math.min(1, state.progress + delta / (this.reduced ? .1 : .6));
-        state.root.position.y = this.reduced || state.progress === 1 ? 0 : -3 * Math.pow(1 - state.progress, 3);
+        if (state.root.matrixAutoUpdate) {
+          state.root.position.y = this.reduced || state.progress === 1 ? 0 : -3 * Math.pow(1 - state.progress, 3);
+          if (state.progress === 1) { state.root.updateMatrix(); state.root.matrixAutoUpdate = false; }
+        }
       }
       state.models.forEach((model, index) => model.animate(String(state.root.children[index]?.userData.animation ?? 'idle'), delta));
-      for (const flexible of state.winds) flexible.animate(timeMs, wind);
+      const [x, z] = id.split('_').map(Number);
+      const distant = viewer && Number.isFinite(x) && Number.isFinite(z) && Math.hypot(x! * 32 - viewer.x, z! * 32 - viewer.z) > 48;
+      for (const flexible of state.winds) flexible.animate(timeMs, wind, distant ? this.farWindInterval : 0);
     }
   }
 

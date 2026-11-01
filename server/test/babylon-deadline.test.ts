@@ -1,4 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
+import { PASTURE_ORIGIN } from '../../shared/city/catalogue.ts';
 import type { DatabaseSync } from 'node:sqlite';
 import { openDatabase, sqliteStores } from '../src/persistence/database.ts';
 import { sqliteBabylon } from '../src/persistence/babylon.ts';
@@ -47,7 +48,7 @@ async function fixture() {
   }, options);
   const store = sqliteBabylon(db); let ids = 0;
   const service = new BabylonService({ store, language, generate, now: () => state.wall, monotonicNow: () => state.mono, id: () => `id${++ids}`,
-    location: () => ({ mapId: 'market', position: { x: -3, y: 0, z: -26 } }),
+    location: () => ({ mapId: 'market', position: { x: -3, y: 0, z: PASTURE_ORIGIN.z + 6 } }),
   });
   for (const [index, person] of [sender, recipient].entries()) await service.handle(person,
     parseBabylonRequest({ v: 2, requestId: `enroll${index}`, action: { type: 'enroll', size: 2, native: 'ru', learning: 'en' } }), 'enroll');

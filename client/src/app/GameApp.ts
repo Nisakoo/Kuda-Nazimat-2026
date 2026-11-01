@@ -1,3 +1,6 @@
+import { isGraphicsQuality, type GraphicsQuality } from '../render/GraphicsQuality';
+import { readGraphicsQuality, rememberGraphicsQuality } from './graphicsPreference';
+import { CITY_BOUNDS } from '../../../shared/city/catalogue';
 import type { CameraView, RenderAdapter } from '../render/RenderAdapter';
 import { ThreeRenderer } from '../render/three/ThreeRenderer';
 import type { Entity, GameCommand, WorldEvent, WorldSnapshot } from '../core/types';
@@ -82,6 +85,7 @@ const localEntities: readonly Entity[] = [
 interface Nearby { readonly id: string; readonly name: string }
 export interface AppSnapshot {
   readonly pauseOpen: boolean;
+  readonly helpOpen: boolean;
   readonly controlsHint: boolean;
   readonly entryStage: 'profile' | 'mode' | 'connect' | 'loading' | null;
   readonly entryReveal: boolean;
@@ -120,6 +124,7 @@ export interface AppSnapshot {
   readonly settingsOpen: boolean;
   readonly settingsError: string | null;
   readonly authRequired: boolean;
+  readonly cityBoundary?: 'river' | 'gate' | null;
   readonly authPending: boolean;
   readonly authError: string | null;
   readonly authName: string;
@@ -131,6 +136,7 @@ export interface AppSnapshot {
   readonly chatMessages: readonly { readonly id: string; readonly name: string; readonly text: string }[];
   readonly chatError: string | null;
   readonly dialogPending: boolean;
+  readonly dialogPartial: string;
   readonly dialogError: string | null;
   readonly market: MarketState | null;
   readonly marketPanel: MarketPanel | null;
@@ -144,6 +150,7 @@ export interface AppSnapshot {
   readonly carryError: string | null;
   readonly heldItemId: string | null;
   readonly volume: number;
+  readonly graphicsQuality: GraphicsQuality;
   readonly audioStats: string;
 }
 
@@ -193,9 +200,11 @@ export class GameApp {
   private snapshot: AppSnapshot;
   private readonly listeners = new Set<(snapshot: AppSnapshot) => void>();
 
+  private graphicsQuality = readGraphicsQuality();
+
   constructor(
     public config: ClientConfig,
-    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false, this.config.mapId === 'market'),
+    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false, this.config.mapId === 'market', this.graphicsQuality),
     private readonly createSession: () => GameSession = () => this.config.mapId === 'market' ? new MarketSession() : new LocalSession('local-player', localEntities),
     private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
     private readonly createNetwork: (mock: boolean, url: string, clock: Clock) => NetworkAdapter = (mock, url, clock) => mock ? createMockDemo(clock) : new SocketIOAdapter(url, clock),
@@ -207,7 +216,7 @@ export class GameApp {
     this.snapshot = Object.freeze({
       controlsHint: false,
       entryStage: null, entryReveal: false, avatarRequired: false,
-      phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null, pauseOpen: false,
+      phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null, pauseOpen: false, helpOpen: false,
       babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '', mapOpen: false, mapPlayer: null, mapPeers: [], avatar: null, avatarOpen: false, avatarPurpose: 'settings', equipment: null,
       debug: config.debug, buildingSymbols: true, coordinates: '',
       capture: 'idle', captureError: null,
@@ -215,9 +224,9 @@ export class GameApp {
       worldReady: createMap === null, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: config.chunkRadius ?? (config.mapId === 'market' ? 2 : 1),
       authRequired: config.session === 'online', authPending: false, authError: null, authName: '', authChangeRequired: false, authRevision: 0,
       mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
-      chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
+      chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null,
       performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
-      carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: this.audio.volume, audioStats: this.audioDiagnostics(),
+      carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: this.audio.volume, graphicsQuality: this.graphicsQuality, audioStats: this.audioDiagnostics(),
     });
   }
 
@@ -374,13 +383,14 @@ export class GameApp {
           },
           render: (alpha, elapsed) => {
             const began = this.snapshot.debug ? performance.now() : 0;
+            let submitted: boolean | void;
             if (this.session instanceof OnlineSession) {
               const presentation = this.session.getRenderState();
               this.renderer?.syncWorld(presentation.previous, presentation.current, this.session.playerId);
-              this.renderer?.render(elapsed, presentation.alpha);
-            } else this.renderer?.render(elapsed, alpha);
+              submitted = this.renderer?.render(elapsed, presentation.alpha);
+            } else submitted = this.renderer?.render(elapsed, alpha);
             this.updateVisualStatus();
-            if (this.snapshot.debug) this.updateMetrics(began);
+            if (this.snapshot.debug) this.updateMetrics(began, submitted !== false);
             if (this.snapshot.phase === 'stopped' && !(this.session instanceof OnlineSession) && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
           },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
@@ -417,7 +427,7 @@ export class GameApp {
 
   private requestPlay(): void {
     this.updateVisualStatus();
-    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.visualLoading || this.snapshot.babylonPanel || this.snapshot.mapOpen || this.snapshot.avatarOpen || this.snapshot.settingsOpen || this.snapshot.chatOpen || this.snapshot.marketPanel || this.snapshot.dialog) return;
+    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.visualLoading || this.snapshot.babylonPanel || this.snapshot.mapOpen || this.snapshot.avatarOpen || this.snapshot.helpOpen || this.snapshot.settingsOpen || this.snapshot.chatOpen || this.snapshot.marketPanel || this.snapshot.dialog) return;
     this.patch({ capture: 'requesting', captureError: null });
     this.input.requestCapture();
     void this.audio?.unlock();
@@ -433,7 +443,15 @@ export class GameApp {
     if (this.session instanceof OnlineSession || this.world?.stats.loading || this.renderer?.getDiagnostics().pending) this.loop?.start();
   }
 
+  openHelp(): void {
+    if (this.snapshot.screen !== 'playing' || !this.snapshot.pauseOpen || this.overlayOpen) return;
+    this.input?.stop(); this.stop();
+    this.patch({ helpOpen: true, controlsHint: false });
+  }
+  closeHelp(): void { this.patch({ helpOpen: false }); }
+
   toggleMenu(): void {
+    if (this.snapshot.helpOpen) { this.closeHelp(); return; }
     if (this.snapshot.settingsOpen) { this.closeSettings(); return; }
     if (this.snapshot.chatOpen) { this.closeChat(); return; }
     if (this.snapshot.avatarOpen) { this.closeAvatar(); return; }
@@ -449,7 +467,7 @@ export class GameApp {
 
   private get overlayOpen(): boolean {
     const s = this.snapshot;
-    return Boolean(s.settingsOpen || s.chatOpen || s.avatarOpen || s.mapOpen || s.babylonPanel || s.marketPanel || s.dialog);
+    return Boolean(s.helpOpen || s.settingsOpen || s.chatOpen || s.avatarOpen || s.mapOpen || s.babylonPanel || s.marketPanel || s.dialog);
   }
 
   private returnFromOverlay(): void {
@@ -466,7 +484,7 @@ export class GameApp {
     this.detach();
     this.releaseResources();
     this.camera = { yaw: 0, pitch: this.config.mapId === 'market' ? .5 : .7, distance: this.config.mapId === 'market' ? 18 : 15 };
-    this.patch({ screen, pauseOpen: false, mapOpen: false, mapPlayer: null, mapPeers: [], dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null, market: null, marketPanel: null, marketTarget: null });
+    this.patch({ screen, pauseOpen: false, mapOpen: false, mapPlayer: null, mapPeers: [], dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null, market: null, marketPanel: null, marketTarget: null });
     this.setState('idle');
     this.start(host);
   }
@@ -493,8 +511,9 @@ export class GameApp {
 
   closeDialog(): void {
     this.input?.stop();
+    if (this.npcRequest && this.session instanceof OnlineSession) this.session.cancelNpc(this.npcRequest);
     this.npcRequest = null;
-    this.patch({ dialog: null, dialogPending: false, dialogError: null });
+    this.patch({ dialog: null, dialogPending: false, dialogPartial: '', dialogError: null });
     this.stop();
     this.returnFromOverlay();
   }
@@ -503,10 +522,10 @@ export class GameApp {
     const dialog = this.snapshot.dialog;
     if (!dialog || !text.trim() || this.snapshot.dialogPending) return;
     if (this.session instanceof OnlineSession) {
-      this.npcRequest = this.session.askNpc(dialog.npcId, text);
+      this.npcRequest = this.session.askNpc(dialog.npcId, text, true);
       if (this.npcRequest) {
         this.audioMessage(`npc-question:${this.npcRequest}`, `npc:${dialog.npcId}`, 'live');
-        this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-18), { author: 'player', text: text.trim() }] }, dialogPending: true, dialogError: null });
+        this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-18), { author: 'player', text: text.trim() }] }, dialogPending: true, dialogPartial: '', dialogError: null });
       }
     } else {
       const answer = answerDemoDialog(dialog, text);
@@ -554,8 +573,9 @@ export class GameApp {
     this.patch({ mapOpen: false, chatOpen: false, marketPanel: null, babylonPanel: this.snapshot.babylonPanel === 'setup' ? 'setup' : null, settingsOpen: true, settingsError: null });
   }
   closeSettings(): void { this.patch({ settingsOpen: false }); if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host); else this.returnFromOverlay(); }
-  applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean): boolean {
+  applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean, quality: GraphicsQuality = this.graphicsQuality): boolean {
     try {
+      if (!isGraphicsQuality(quality)) throw new Error('Неизвестное качество графики.');
       const config = parseConfig({ session: mode === 'local' ? 'local' : 'online', serverUrl, mapId, chunkRadius, debug }, window.location.origin);
       if ((mode === 'local' || mode === 'mock') && !['demo', 'science', 'market'].includes(mapId)) throw new Error('Для локальной прогулки доступны market, demo и science.');
       if (mode === 'mock' && mapId === 'market') throw new Error('Рынок пока доступен в локальной прогулке. Тестовая сеть использует demo или science.');
@@ -565,6 +585,8 @@ export class GameApp {
       this.entryPending = mode === 'online' && config.mapId === 'market';
       this.patch({ entryStage: this.serverSession && this.entryPending ? 'profile' : null, entryReveal: false });
       this.mock = mode === 'mock'; this.config = config;
+      this.graphicsQuality = quality; rememberGraphicsQuality(quality);
+      this.patch({ graphicsQuality: quality });
       try { rememberConnection(config.serverUrl, window.localStorage); } catch { /* Storage is optional; never persist authentication. */ }
       this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mapId: config.mapId, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
       if (this.host) this.restart(this.host);
@@ -667,7 +689,7 @@ export class GameApp {
     this.cancelLogin(); this.stopBabylon(); this.serverSession = null; this.requiresAvatar = false;
     this.detach(); this.releaseResources();
     this.host = host;
-    this.patch({ entryStage: null, entryReveal: false, authRequired: true, authPending: false, authError: message, authChangeRequired: false, authRevision: this.snapshot.authRevision + 1, screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, chatMessages: [], dialogPending: false, dialogError: null, networkStatus: 'unauthorized', networkError: null });
+    this.patch({ entryStage: null, entryReveal: false, authRequired: true, authPending: false, authError: message, authChangeRequired: false, authRevision: this.snapshot.authRevision + 1, screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, chatMessages: [], dialogPending: false, dialogPartial: '', dialogError: null, networkStatus: 'unauthorized', networkError: null });
     this.setState('idle');
   }
   private readonly onOnlineNotice = (notice: OnlineNotice): void => {
@@ -695,16 +717,18 @@ export class GameApp {
     } else if (notice.type === 'chat') {
       this.audioMessage(`chat:${notice.message.messageId}`, 'chat', this.snapshot.chatOpen ? 'live' : 'history');
       this.patch({ chatMessages: [...this.snapshot.chatMessages.slice(-49), { id: notice.message.messageId, name: notice.message.name, text: notice.message.text }] });
+    } else if (notice.type === 'npc-partial') {
+      if (this.snapshot.dialog?.npcId === notice.targetId && this.npcRequest === notice.requestId) this.patch({ dialogPartial: notice.text });
     } else if (notice.type === 'npc') {
       const dialog = this.snapshot.dialog;
       if (dialog?.npcId === notice.targetId && this.npcRequest === notice.requestId) {
         this.npcRequest = null;
         this.audioMessage(`npc-answer:${notice.requestId}`, `npc:${notice.targetId}`, 'live');
-        this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-19), { author: 'npc', text: notice.text }] }, dialogPending: false, dialogError: null });
+        this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-19), { author: 'npc', text: notice.text }] }, dialogPending: false, dialogPartial: '', dialogError: null });
       }
     } else if (notice.type === 'request-error') {
-      if (notice.requestId === 'npc-config' && this.snapshot.dialog) this.patch({ dialogPending: false, dialogError: notice.message });
-      else if (this.npcRequest === notice.requestId) { this.npcRequest = null; this.patch({ dialogPending: false, dialogError: notice.message }); }
+      if (notice.requestId === 'npc-config' && this.snapshot.dialog) this.patch({ dialogPending: false, dialogPartial: '', dialogError: notice.message });
+      else if (this.npcRequest === notice.requestId) { this.npcRequest = null; this.patch({ dialogPending: false, dialogPartial: '', dialogError: notice.message }); }
       else if (this.snapshot.chatOpen) this.patch({ chatError: notice.message });
       else this.patch({ networkError: notice.message });
     }
@@ -768,13 +792,13 @@ export class GameApp {
     }
   }
 
-  private updateMetrics(began: number): void {
+  private updateMetrics(began: number, submitted: boolean): void {
     const now = performance.now();
-    this.frameMetrics.record(began, now - began);
+    this.frameMetrics.record(began, now - began, submitted);
     if (now - this.lastMetrics < 1000) return;
     this.lastMetrics = now;
     const stats = this.frameMetrics.stats; const render = this.renderer?.getDiagnostics(); const budget = this.worldBudget.stats;
-    this.patch({ performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms`,
+    this.patch({ performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms · Цикл ${stats.loopFps.toFixed(1)} FPS · GPU-пропуски ${stats.skipped}`,
       audioStats: this.audioDiagnostics(),
       renderStats: `Draw ${render?.drawCalls ?? 0} · Геометрии ${render?.geometries ?? 0} · Текстуры ${render?.textures ?? 0} · Ресурсы ${budget.resources} · Память ${budget.memory} / ${budget.memoryLimit} · Пик ${budget.peakBytes}` });
   }
@@ -887,7 +911,7 @@ export class GameApp {
   private handleShortcut(code: string): boolean {
     if (this.snapshot.screen !== 'playing' || this.snapshot.entryStage || this.snapshot.authRequired || this.snapshot.avatarOpen || this.snapshot.dialog) return false;
     if (code === 'Escape' && !this.overlayOpen && !this.input?.hasCapture) { this.toggleMenu(); return true; }
-    if (this.snapshot.settingsOpen) return false;
+    if (this.snapshot.settingsOpen || this.snapshot.helpOpen) return false;
     const panel = ({ Digit1: 'chat', Digit2: 'words', Digit3: 'map' } as const)[code as 'Digit1' | 'Digit2' | 'Digit3'];
     if (panel) { this.toggleHudPanel(panel); return true; }
     // Tab belongs to native focus navigation once a modal releases the cursor.
@@ -907,7 +931,7 @@ export class GameApp {
   }
   toggleHudPanel(panel: HudPanel): void {
     if (this.snapshot.babylonPanel === 'interaction') this.babylonClient?.cancelNpc();
-    if (this.snapshot.screen !== 'playing' || this.snapshot.avatarOpen || this.snapshot.settingsOpen || this.snapshot.dialog || this.snapshot.babylonPanel === 'intro') return;
+    if (this.snapshot.screen !== 'playing' || this.snapshot.helpOpen || this.snapshot.avatarOpen || this.snapshot.settingsOpen || this.snapshot.dialog || this.snapshot.babylonPanel === 'intro') return;
     if (panel === 'map') {
       if (this.snapshot.mapOpen) { this.closeMap(); return; }
       this.input?.stop(); this.stop();
@@ -1084,6 +1108,8 @@ export class GameApp {
       if (candidate <= 2.7 && candidate < distance) { nearby = { id: goat.id, name: goat.name }; distance = candidate; }
     }
     const changes: Partial<AppSnapshot> = {};
+    const cityBoundary = this.config.mapId !== 'market' ? null : player.x < CITY_BOUNDS.minX + 12 ? 'river' : Math.abs(player.x) < 6 && player.z > CITY_BOUNDS.maxZ - 10 ? 'gate' : null;
+    if (cityBoundary !== (this.snapshot.cityBoundary ?? null)) Object.assign(changes, { cityBoundary });
     if (this.snapshot.mapOpen) {
       const mapPlayer = { x: player.x, z: player.z, yaw: transform!.rotationY, authoritative: this.session instanceof OnlineSession };
       const old = this.snapshot.mapPlayer;
@@ -1153,7 +1179,7 @@ export class GameApp {
     this.unsubscribeSession?.(); this.unsubscribeSession = null;
     this.session?.dispose(); this.session = null;
     this.network = null; this.activeBootstrap = null; this.npcRequest = null;
-    this.patch({ carryHint: null, carryPending: false, carryError: null, heldItemId: null });
+    this.patch({ helpOpen: false, carryHint: null, carryPending: false, carryError: null, heldItemId: null });
     this.host = null;
   }
 

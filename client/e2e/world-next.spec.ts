@@ -1,5 +1,5 @@
 import { expect as baseExpect, test, type Page, type Locator } from '@playwright/test';
-import { createFromHub, joinFromHub, resume as resumeWindow } from './helpers';
+import { pastureRoute, createFromHub, joinFromHub, resume as resumeWindow } from './helpers';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -221,7 +221,7 @@ test('NEXT: four real roles share the scene; physical F carries one durable appl
   }
   const carrier = pages[1]!; const data = observed[1]!;
   await resume(carrier);
-  await expect(carrier.getByLabel('Кеш мира')).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+  await expect(carrier.getByLabel('Кеш мира')).toContainText('Чанки: 16 · Ожидание: 0 · Отложено: 0');
   const apple = data.state!.apples.find(item => item.state === 'world' && item.position.z > 5 && item.position.z < 15 && Math.abs(item.position.x) < 8);
   if (!apple || apple.state !== 'world') throw new Error('No reachable market route apple');
   // Role2 starts within 2m and has an unobstructed pickup sweep in the production map.
@@ -256,15 +256,15 @@ test('NEXT: four real roles share the scene; physical F carries one durable appl
   await expect.poll(() => data.state?.apples.some(item => item.state === 'held' && item.holderId === data.playerId)).toBe(false);
   await expect.poll(() => data.state!.apples.find(item => item.id === held.id)?.state).toBe('world');
   await carrier.screenshot({ path: testInfo.outputPath('placed-apple.png') });
-  await walk(carrier, 'x', 0); await walk(carrier, 'z', -25);
-  await expect(carrier.getByLabel('Область мира')).toHaveText('Пастбище у рынка');
+  await pastureRoute(carrier, walk);
+  await expect(carrier.getByLabel('Область мира')).toHaveText('Пастбище у северной стены');
   await carrier.screenshot({ path: testInfo.outputPath('pasture-live-scene.png') });
-  await walk(carrier, 'z', 9); await walk(carrier, 'x', -32);
+  await pastureRoute(carrier, walk, true); await walk(carrier, 'z', 9); await walk(carrier, 'x', -32);
   await expect(carrier.getByLabel('Область мира')).toHaveText('Двор Вавилонской башни');
   await carrier.screenshot({ path: testInfo.outputPath('courtyard-live-scene.png') });
   await walk(carrier, 'x', 0);
   await expect(carrier.getByLabel('Область мира')).toHaveText('Рынок Вавилона');
-  await expect(carrier.getByLabel('Кеш мира')).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+  await expect(carrier.getByLabel('Кеш мира')).toContainText('Чанки: 16 · Ожидание: 0 · Отложено: 0');
   await expect(carrier.getByLabel('Состояние связи')).toContainText('Подключён');
   const scenePath = testInfo.outputPath('scene-contract.json'); await writeFile(scenePath, JSON.stringify({ initial, restored: data.state }));
   await testInfo.attach('scene-contract', { path: scenePath, contentType: 'application/json' });
@@ -397,13 +397,13 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
     await expect.poll(countJumps).toBe(prior + 1);
     await expect.poll(() => page.evaluate(() => window.worldAudioProbe.active)).toBe(0);
     await expect.poll(audioMemory).toMatchObject({ sources: 0, pending: 0 });
-    await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
+    await expect(page.getByLabel('Кеш мира')).toContainText('Чанки: 16 · Ожидание: 0 · Отложено: 0');
     await page.waitForTimeout(300);
     const memory = await audioMemory(); expect(memory.buffers).toBeGreaterThanOrEqual(1); expect(memory.buffers).toBeLessThanOrEqual(7);
     expect(memory.bytes).toBeGreaterThan(0);
     const cache = (await page.getByLabel('Кеш мира').textContent())!.match(/^(\d+) \/ (\d+)/)!;
     expect(Number(cache[1])).toBeLessThanOrEqual(Number(cache[2]));
-    expect(Number(cache[2])).toBe(64 * 1024 * 1024);
+    expect(Number(cache[2])).toBe(128 * 1024 * 1024);
     audioCycles.push({ ...memory, worldBytesWithoutAudio: Number(cache[1]) - memory.bytes });
   }
   expect(new Set(audioCycles.map(cycle => cycle.worldBytesWithoutAudio)).size).toBe(1);

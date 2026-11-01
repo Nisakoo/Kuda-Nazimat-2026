@@ -85,9 +85,11 @@ describe('AuthService (AUTH-001–016)', () => {
     for (let i = 0; i < 5; i++) expect(await code(auth.login('Аня', 'неверно12', '10.0.0.4'))).toBe('CREDENTIALS');
     const locked = await auth.login('Аня', 'секрет12', '10.0.0.5').catch((e: AuthError) => e) as AuthError;
     expect(locked.code).toBe('RATE_LIMIT'); expect(locked.retryAfterSeconds).toBe(900);
+    expect(auth.operator.list().find(account => account.name === 'Аня')?.loginBlockedSeconds).toBe(900);
     expect(await code(auth.login('Борис', 'секрет34', '10.0.0.4'))).toBe('ok');
     expect(logger.records.some((r) => r.event === 'auth.locked')).toBe(true);
     expect(auth.operator.unlock('аня')).toBe(true);
+    expect(auth.operator.list().find(account => account.name === 'Аня')?.loginBlockedSeconds).toBe(0);
     expect(await code(auth.login('Аня', 'секрет12'))).toBe('ok');
     // A second lock within the hour after the previous one lasts an hour.
     for (let i = 0; i < 5; i++) await code(auth.login('Аня', 'неверно12'));

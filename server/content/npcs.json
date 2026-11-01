@@ -21,7 +21,7 @@
     "id": "shepherd", "mapId": "market", "name": "Пастух", "topic": "Козы и пастбище",
     "persona": "Простой и внимательный пастух. Говорит медленно и ясно, знает приметы и любимый корм каждой своей козы.",
     "greeting": "Тише, не спугни коз. Хочешь помочь мне их накормить?",
-    "position": { "x": -3, "y": 0, "z": -26 }, "rotationY": 0, "interactionRadius": 2.7
+    "position": { "x": -3, "y": 0, "z": -58 }, "rotationY": 0, "interactionRadius": 2.7
   },
   {
     "id": "history-guide", "mapId": "demo", "name": "Лея", "topic": "История",

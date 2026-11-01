@@ -4,11 +4,11 @@
 
 Backend выбирает оператор, а не программа. Выбор модели, pins, tokenizer и runtime составляет один профиль. Ошибка не переключает его на другую модель, backend, пользовательский daemon или `scripted`. Явно выбранная заглушка `scripted` не доказывает работу LLM.
 
-**Проверять реальный `NpcResponder` нужно на карте `demo` у Леи или Марка.** На `market` профиль BABEL перенаправляет взаимодействие E в отдельный `BabylonLanguagePort` (`LanguagePort`), где сейчас зарегистрирован только `test`. Это не мост к Ollama/MLX; ответ торговца на рынке не доказывает работу выбранной LLM. Новые config ниже явно выбирают `defaultMap: "demo"`; старые примеры с `market` требуют этого предупреждения, но существующие файлы автоматически не изменяются.
+На `demo` обычные NPC используют выбранный responder. На `market` дополнительно нужен `language: { "adapter": "local", "options": {} }`: этот мост заимствует ту же модель и очередь. По умолчанию язык рынка — `test`. Создаваемые ниже config выбирают `demo`; для рынка после подготовки изменить только `defaultMap` и `language`. На рынке выбрать изучаемый en/es; HTTP-клиент ждёт 30 секунд независимо от большего `NPC_TIMEOUT`.
 
 ## 1. Сначала определить маршрут
 
-**Уже подготовленный Mac:** если есть `server/config.json`, `~/kuda-llm`, venv, веса, tokenizer или `profiles.json`, **не повторять разделы новой установки**. Сначала пройти [UPDATING.md](UPDATING.md): обновление после переписанной истории ветки, резервная копия БД и выбор карты `demo` вместо BABEL `market`. Не перезаписывать config/catalog, не пересоздавать venv, не делать повторный pull ради обновления кода. Остановить игру, обновить согласованную версию проекта без сброса своих изменений, сохранить прежние файлы. Для новых timeout один раз пересобрать клиент: `npm --prefix client run build`. Далее — разделы 8–10. При необходимости миграции существующих 0.8B/2B — раздел 7 и [PROFILES.md](PROFILES.md).
+**Уже подготовленный Mac:** если есть `server/config.json`, `~/kuda-llm`, venv, веса, tokenizer или `profiles.json`, **не повторять разделы новой установки**. Сначала пройти [UPDATING.md](UPDATING.md): обновление после переписанной истории ветки, резервная копия БД и проверка выбранной карты/языкового адаптера. Не перезаписывать config/catalog, не пересоздавать venv, не делать повторный pull ради обновления кода. Остановить игру, обновить согласованную версию проекта без сброса своих изменений, сохранить прежние файлы. Для новых timeout один раз пересобрать клиент: `npm --prefix client run build`. Далее — разделы 8–10. При необходимости миграции существующих 0.8B/2B — раздел 7 и [PROFILES.md](PROFILES.md).
 
 **Новый компьютер:** разделы 2–6 создают новую Ollama-установку. MLX — отдельный, пока не подтверждённый аппаратно путь в разделе 11. Если подготовка прервалась, остановиться и проверить частичные файлы; create-only отказ — не причина удалять их или запускать всё заново.
 
@@ -27,18 +27,21 @@ Backend выбирает оператор, а не программа. Выбо�
 
 ## 2. Код, инструменты и внешний каталог
 
-Нужны Git, Make, npm, **Node >=24.15.0 и <25**, **Python 3.12**. Проверить существующие инструменты до установки:
+Нужны Git, Make, npm, **Node >=24.15.0 и <25**, **uv и Python 3.12**. Python устанавливает/выбирает uv; Node остаётся под nvm либо существующим менеджером. Проверить существующие инструменты до установки:
 
 ```sh
 git status --short
 uname -s
 uname -m
-command -v node npm make python3.12
+command -v node npm make uv
 node --version
 npm --version
 make --version
-python3.12 --version
+uv --version
+uv python find --no-python-downloads 3.12
 ```
+
+Если uv ещё отсутствует, установить его по [официальной инструкции](https://docs.astral.sh/uv/getting-started/installation/); существующий uv повторно не устанавливать. До offline-работы выполнить `uv python install 3.12`. Подробные команды инструментов и выбор nvm — [установочный скилл](../../.agents/skills/install-local-ai/SKILL.md). Проверенный минимум uv — 0.8.13.
 
 Checkout должен содержать `server/llm/PROFILES.md`, `TIMEOUT.md`, `server/src/app/llmProfiles.ts` и соответствующий Make-переключатель. Получить согласованный командой release/commit из `https://github.com/Nisakoo/Kuda-Nazimat-2026.git`; не переключать ветку с локальными изменениями вслепую. Имя исторической ветки в старых Mac-инструкциях не является гарантией актуальной поставки.
 
@@ -55,7 +58,7 @@ test -n "$KUDA_GAME_REVISION" && \
 Для **совершенно новой** установки создать корень один раз. Следующий блок откажется, если каталог уже есть:
 
 ```sh
-python3.12 - <<'PY'
+uv run --no-project --no-config --python 3.12 --no-python-downloads --offline python - <<'PY'
 from pathlib import Path
 base = Path.home() / 'kuda-llm'
 base.mkdir(mode=0o700, exist_ok=False)
@@ -112,23 +115,15 @@ npm --prefix server ci && npm --prefix client ci && npm --prefix client run buil
 
 Сборка создаёт клиент и подготовленный мир. Это **подготовка**, не ежедневный запуск.
 
-Следующий блок создаёт только новый venv и откажется поверх существующего пути:
+Подготовить Ollama Python-окружение с полным lock-файлом:
 
 ```sh
-python3.12 - <<'PY'
-from pathlib import Path
-import venv
-p = Path.home() / 'kuda-llm/venv'
-p.mkdir(exist_ok=False)
-venv.EnvBuilder(with_pip=True).create(p)
-PY
+make llm-prepare BACKEND=ollama
 ```
 
-```sh
-"$HOME/kuda-llm/venv/bin/python3" -m pip install -r server/llm/requirements-ollama.txt
-```
+Команда использует `uv sync --locked --no-dev` и создаёт `~/kuda-llm/venv`. Прямые pins — Transformers 4.57.6 и Jinja2 3.1.6; транзитивные версии/хеши находятся в `envs/ollama/uv.lock`. MLX имеет отдельный lock, поскольку ему нужен другой набор Transformers. Повторный запуск синхронизирует только окружение с marker этого backend. Legacy/чужой каталог не изменяется: для миграции см. [UPDATING](UPDATING.md#переход-python-окружения-на-uv).
 
-Прямые pins: `transformers==4.57.6`, `jinja2==3.1.6`; `huggingface_hub` приходит с зависимостями Transformers. Это не полный транзитивный wheel lock. Для воспроизводимой поставки отдельно сохранить версии/хеши и лицензии всех пакетов. Если имеется подготовленный wheelhouse, вместо сетевой установки использовать `pip install --no-index --find-links /absolute/wheelhouse -r server/llm/requirements-ollama.txt` в **новом** venv. Нельзя превращать runtime в установщик недостающих пакетов.
+Сеть разрешена только на подготовке. Для полного локального кеша и доступного Python: `node server/llm/prepare.mjs ollama --offline`. При отсутствии пакета команда завершается ошибкой. uv cache переносится отдельно от окружения; lock-файл сам по себе не содержит пакеты. В runtime используется готовый `venv/bin/python3`, а не `uv run` или `uv sync`.
 
 ## 4. Подготовить ровно выбранные веса Ollama
 
@@ -429,8 +424,8 @@ Production принимает **пароль**, а `auth.passwordless: true` в 
 | `ollama_dependencies`, tokenizer load/template | Сверить venv, версии и локальные tokenizer/template файлы. Исправление зависимостей — отдельная подготовка до игры; не скачивать runtime |
 | `ollama_tokenizer_integrity`, `ollama_model_integrity`, `ollama_model_digest`, `ollama_version` | Сохранить код; проверить поставку, pins, active manifest/blobs и фактическую версию. Не переписывать SHA/manifest ради ready и не делать автоматический repin |
 | `ollama_port`, `ollama_listener`, `ollama_spawn` | Проверить, что остановлен свой подготовительный daemon, порт 11501 свободен и полный layout executable сохранён. Не подключаться к чужому daemon и не убивать произвольные PID |
-| `memory_sample_ps_timeout` | `/bin/ps -axo pid=,ppid=,pgid=,rss=,stat=` не завершил измерение в лимите **500 мс**, и запрошена остановка команды. Это **не цензура текста и не доказанное превышение RAM**; физическая остановка точно в 500 мс не гарантируется. Сохранить безопасный лог/нагрузку ОС, остановить пробу; не отключать watchdog |
-| `memory_sample_deadline`, `memory_unavailable`, другие `memory_sample_*` | Нет надёжной метрики (окно наблюдателя 600 мс, parse/буфер/строка процесса и т. п.). Более поздний успешный `ps` не отменяет отказ под нагрузкой. Не увеличивать guards ради ready |
+| `memory_sample_ps_timeout` | `/bin/ps -axo pid=,ppid=,pgid=,rss=,stat=` не завершил измерение в лимите **1500 мс на macOS / 500 мс на Linux**, и запрошена остановка команды. Это **не цензура текста и не доказанное превышение RAM**; физическая остановка точно в этот срок не гарантируется. Бюджет macOS увеличен в TASK-085 как ограниченный кандидат против задержки ОС; пик RAM не квалифицирован. Cleanup-пробы сохраняют 500 мс. Сохранить безопасный лог/нагрузку ОС, остановить пробу; не отключать watchdog |
+| `memory_sample_deadline`, `memory_unavailable`, другие `memory_sample_*` | Нет надёжной метрики (окно наблюдателя 1600 мс на macOS / 600 мс на Linux, parse/буфер/строка процесса и т. п.). Более поздний успешный `ps` не отменяет отказ под нагрузкой. Не отключать guards и не увеличивать RAM-лимиты ради ready |
 | `resource_limit` | Сработал soft RSS threshold **3 500 000 000 байт** для Node и учитываемых потомков. Это не hard cap и не измерение всего GPU/unified peak |
 | `ollama_memory_insufficient` | Runner явно отказал из-за нехватки системной памяти; это отличается от ошибки измерения. Не принимать размер файла за RAM |
 | `ollama_token_count_mismatch` | Локальный HF count и фактическая метрика runner не совпали/отсутствуют. Проверить совместимость; не отключать сверку |
@@ -447,22 +442,17 @@ Production принимает **пароль**, а `auth.passwordless: true` в 
 
 Этот альтернативный backend выбирает оператор **только на Apple Silicon**. Не устанавливать MLX в Ollama venv и не использовать его как fallback для Intel.
 
-Для совершенно нового, ещё не существующего MLX venv:
+Подготовить отдельное MLX-окружение:
 
 ```sh
-python3.12 - <<'PY'
-from pathlib import Path
-import venv
-p = Path.home() / 'kuda-llm/mlx-venv'
-p.mkdir(exist_ok=False)
-venv.EnvBuilder(with_pip=True).create(p)
-PY
-"$HOME/kuda-llm/mlx-venv/bin/python3" -m pip install -r server/llm/requirements-mlx.txt
+make llm-prepare BACKEND=mlx
 ```
+
+Путь по умолчанию — `~/kuda-llm/mlx-venv`, lock — `envs/mlx/uv.lock`. Существующее legacy-окружение сохраняется; другой путь задаётся `node server/llm/prepare.mjs mlx --environment /absolute/new/mlx-venv` и затем явно переносится в `npc.options.python`/выбранный профиль.
 
 Подготовка пакетов выполняется до игры на машине оператора. Ожидается `mlx-lm==0.32.2`, Jinja2 3.1.6. Требуется заранее проверенный **post-trained Qwen3.5-2B**, `model_type=qwen3_5`, text-only, quantization **4-bit/group64**, локальные tokenizer/template, лицензия/provenance. Для исходника использовать закреплённую revision 2B из раздела 5, а не Base/latest; эта revision сама по себе не превращает исходную multimodal-поставку в допустимый MLX-артефакт.
 
-В [README.md, подготовка MLX](README.md#подготовка-mlx) и `requirements-mlx.txt` приведён изученный по API кандидат `mlx_lm.convert` с `--q-bits 4 --q-group-size 64`. **Он не выполнен и UNVERIFIED.** Здесь нет подтверждённой команды скачивания готовых подходящих MLX-весов и нет обещания рабочей конвертации с нуля. Она может требовать больше 4 GB на машине подготовки. Без полученного и проверенного snapshot остановиться; выбрать Ollama можно только отдельно и явно.
+В [MLX-сценарии скилла](../../.agents/skills/install-local-ai/references/mlx.md) и [README.md](README.md#подготовка-mlx) приведён кандидат `mlx_lm.convert` с `--q-bits 4 --q-group-size 64`. **Он не выполнен и UNVERIFIED.** Здесь нет подтверждённой команды скачивания готовых подходящих MLX-весов и нет обещания рабочей конвертации с нуля. Она может требовать больше 4 GB на машине подготовки. Без полученного и проверенного snapshot остановиться; выбрать Ollama можно только отдельно и явно.
 
 Отвергать VLM: отсутствие `vision_config`/`audio_config`, отсутствие vision/visual/audio tensors во всех safetensors, корректные quantization metadata и реальная загрузка обязательны. Нельзя маскировать VLM удалением полей JSON. Исходные `.py`, которые копирует converter, не включать в окончательную исполняемую поставку; подготовленный snapshot должен сохранить tokenizer/template/license/provenance. Изменения артефакта завершить **до** закрепления manifest.
 

@@ -321,11 +321,11 @@ describe('WorldAudio', () => {
     audio.dispose(); expect(budget.stats.memory).toBe(2000); other.release();
   });
 
-  it('never requests bytes if the shared 64 MiB guard has no room', async () => {
+  it('never requests bytes if the shared 128 MiB guard has no room', async () => {
     const budget = new WorldBudget(); const other = budget.reserve('world', 0, budget.memoryLimit);
     const { audio, fetcher } = fixture(budget); await audio.unlock();
     audio.message(message(1)); await flush(); expect(fetcher).not.toHaveBeenCalled();
-    expect(audio.stats.reservedBytes).toBe(0); expect(budget.stats.memory).toBe(64 * 1024 * 1024);
+    expect(audio.stats.reservedBytes).toBe(0); expect(budget.stats.memory).toBe(128 * 1024 * 1024);
     audio.dispose(); other.release();
   });
 

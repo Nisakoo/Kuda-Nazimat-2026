@@ -1,9 +1,11 @@
+import type { CityQuestProgress } from '../../../shared/city/types.ts';
 import type { ChatEntry, ItemId, Languages, NpcReply, PartySize, Tablet, Word, Language } from '../../../shared/babylon/types.ts';
 import type { NpcAnswer, NpcProfile, PlayerIdentity } from '../contracts.ts';
 
-export interface Profile extends Languages { groupId: string | null; introSeen: boolean; spawnPending: boolean; words: Word[]; replies: NpcReply[] }
+export interface Profile extends Languages { discovered?: string[]; groupId: string | null; introSeen: boolean; spawnPending: boolean; words: Word[]; replies: NpcReply[] }
 export interface Message { id: string; authorId: string; authorName: string; source: string; sourceLanguage: Language; createdAt: number; deliveries: Record<string, { language: Language; text: string | null; translated: boolean; status: ChatEntry['status']; error?: string }> }
 export interface Party {
+  city?: CityQuestProgress;
   id: string; size: PartySize; members: { id: string; name: string; role: number }[];
   startedAt: number | null; completedAt: number | null; fed: string[];
   inventory: Record<string, Record<ItemId, number>>; stones: Tablet[]; messages: Message[];

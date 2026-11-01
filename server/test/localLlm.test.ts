@@ -6,6 +6,7 @@ import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
 import { localLlm, localLlmForTest, memoryBytesForTest, mlx, ollama, type LocalLlmResponder } from '../src/npc/adapters/localLlm.ts';
 import { systemClock, systemScheduler } from '../src/common/time.ts';
 import { answerRequest, responderContract } from './responderContract.ts';
+import { hasObviousCyrillicReply } from '../src/npc/targetLanguage.ts';
 
 type Backend = 'ollama' | 'mlx';
 type Runtime = Parameters<typeof localLlmForTest>[3];
@@ -65,6 +66,7 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
       const timer = setInterval(() => { if (fs.existsSync(${JSON.stringify(dir)}+'/answer')) { clearInterval(timer); send({type:'translation',text:'late',finishReason:'stop'}); } }, 5);
       return;
     }
+    if (request.text === 'cyrillic') return send({type:'translation',text:'Привет!',finishReason:'stop'});
     if (request.text === 'cap') return send({type:'translation',text:'unfinished',finishReason:'length'});
     if (request.text === 'bad-type') return send({type:'answer',text:'wrong',finishReason:'stop'});
     if (request.text === 'long') return send({type:'translation',text:'x'.repeat(4001),finishReason:'stop'});
@@ -131,6 +133,9 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
     if (q === 'error-limit') return send({type:'error',code:'model_unavailable',message:'x'.repeat(1025)});
     if (q === 'partial') return process.stdout.write('{"type":"answer","text":"prefix"}');
     if (event.request.locale !== 'ru') {
+      if (q === 'russian-one') return send({type:'answer',text:'Здравствуйте, я исследователь и изучаю древний город.',finishReason:'stop'});
+      if (q === 'russian-two') return send({type:'answer',text:'Меня зовут Александр, я исследователь и расскажу вам о рынке.',finishReason:'stop'});
+      if (q === 'prefixed') return send({type:'answer',text:'NPC: Я продаю свежие фрукты на рынке.',finishReason:'stop'});
       if (q === 'cap') return send({type:'answer',text:'unfinished',finishReason:'length'});
       if (q === 'missing-reason') return send({type:'answer',text:'uncertain'});
       if (q === 'emoji') return send({type:'answer',text:'Hello 🙂',finishReason:'stop'});
@@ -199,6 +204,22 @@ it('pins identical Python and TypeScript emoji tables to the documented Unicode 
   }
 });
 
+it('applies the same narrow letter and word-run policy as Python', () => {
+  const rejected = ['Здравствуйте, я исследователь и изучаю древний город.',
+    'Меня зовут Александр, я исследователь и расскажу вам о рынке.', 'Привет!',
+    'NPC: Я продаю свежие фрукты на рынке.', 'abc абвг дежз ийкл'];
+  const accepted = ['I sell fruit at the market.', '¡Hola, señor! Vendo frutas.',
+    'My friend Иван sells fruit.', 'Ask Иван and Мария about fruit.', 'The word «привет» means hello.',
+    'éééééééééééé абвг дежз ийкл', 'ab абвг дежз', '123 ☀'];
+  for (const text of rejected) expect(hasObviousCyrillicReply(text), text).toBe(true);
+  for (const text of accepted) expect(hasObviousCyrillicReply(text), text).toBe(false);
+  const python = readFileSync(new URL('../llm/local_common.py', import.meta.url), 'utf8');
+  const ts = readFileSync(new URL('../src/npc/targetLanguage.ts', import.meta.url), 'utf8');
+  for (const script of ['LATIN', 'CYRILLIC']) {
+    expect(new RegExp(`_${script} = '([^']+)'`).exec(python)?.[1]).toBe(new RegExp(`const ${script} = '([^']+)'`).exec(ts)?.[1]);
+  }
+});
+
 for (const backend of ['ollama', 'mlx'] as const) {
   describe(`${backend} translation`, () => {
     const translation = (text: string) => ({ requestKey: 'private-key', text, source: 'es' as const, target: 'en' as const, deadlineAt: Date.now() + 5000 });
@@ -207,6 +228,7 @@ for (const backend of ['ollama', 'mlx'] as const) {
       const request = { ...translation('Hola 🙂'), npc: { persona: 'private' }, history: ['secret'], token: 'credential' };
       expect(await responder.answer(answerRequest(), new AbortController().signal)).toEqual({ text: 'Ответ: Вопрос' });
       expect(await responder.translate!(request, new AbortController().signal)).toEqual({ text: 'Hello 🙂' });
+      expect(await responder.translate!(translation('cyrillic'), new AbortController().signal)).toEqual({ text: 'Привет!' });
       expect(await responder.answer(answerRequest(), new AbortController().signal)).toEqual({ text: 'Ответ: Вопрос' });
       const sent = events().find(event => event.type === 'translate') as unknown as { request: Record<string, unknown> };
       expect(sent.request).toEqual({ text: 'Hola 🙂', source: 'es', target: 'en', deadlineAt: request.deadlineAt });
@@ -253,6 +275,13 @@ for (const backend of ['ollama', 'mlx'] as const) {
       const { responder, events } = fixture(backend); await responder.start();
       await expect(responder.answer({ ...answerRequest(), locale: 'en', question }, new AbortController().signal)).rejects.toThrow('input_too_long');
       expect(events().some(event => event.type === 'answer')).toBe(false);
+    });
+    it.each(['en', 'es'] as const)('rejects Russian-style %s answers without retry', async locale => {
+      for (const question of ['russian-one', 'russian-two', 'prefixed']) {
+        const { responder, events } = fixture(backend); await responder.start();
+        await expect(responder.answer({ ...answerRequest(), locale, question }, new AbortController().signal)).rejects.toThrow('protocol_error');
+        expect(events().filter(event => event.type === 'answer')).toHaveLength(1);
+      }
     });
     it.each(['cap', 'missing-reason', 'emoji', 'flag', 'keycap', 'zwj-emoji', 'modifier', 'vs16', 'long-output', 'bad-output'])('rejects target output %s', async question => {
       const { responder } = fixture(backend); await responder.start();
@@ -604,6 +633,13 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
       expect(responder.lastFailure()).toBe('resource_limit'); expect(alive(pid())).toBe(false);
       bytes = 100; await responder.start(); expect(responder.status()).toBe('ready'); await responder.stop();
     }
+  });
+  it('accepts a macOS sample slower than the former deadline but never announces ready before measurement', async () => {
+    const { responder } = fixture('ollama', 'normal', { platform: 'darwin', memoryBytes: async () => { await wait(800); return 100; } });
+    const starting = responder.start();
+    await wait(700); expect(responder.status()).toBe('unavailable');
+    await starting; expect(responder.status()).toBe('ready');
+    await responder.stop();
   });
   it('bounds hung startup memory sampling and refuses ready before the initial sample', async () => {
     const { responder, pid } = fixture('ollama', 'normal', { memoryBytes: () => new Promise(() => {}) });

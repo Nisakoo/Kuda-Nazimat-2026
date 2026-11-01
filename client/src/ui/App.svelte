@@ -5,6 +5,7 @@
   import BabylonPanel from './BabylonPanel.svelte';
   import Dialog from './Dialog.svelte';
   import Settings from './Settings.svelte';
+  import Help from './Help.svelte';
   import Chat from './Chat.svelte';
   import MarketPanel from './MarketPanel.svelte';
   import { modal } from './modal';
@@ -20,7 +21,7 @@
   const { game, startupError }: { game: GameApp | null; startupError: string | null } = $props();
   let viewport: HTMLDivElement;
   let snapshot = $state<AppSnapshot>({
-    pauseOpen: false,
+    pauseOpen: false, helpOpen: false,
     controlsHint: false,
     entryStage: null, entryReveal: false, avatarRequired: false,
     babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '', mapOpen: false, mapPlayer: null, mapPeers: [], avatar: null, avatarOpen: false, avatarPurpose: 'settings', equipment: null,
@@ -30,9 +31,9 @@
     worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
     authRequired: false, authPending: false, authError: null, authName: '', authChangeRequired: false, authRevision: 0,
     mapId: 'demo', mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
-    chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
+    chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null,
     performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
-    carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: .3, audioStats: 'Источники: 0 · Буферы: 0 · Загрузки: 0 · Память: 0 байт',
+    carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: .3, graphicsQuality: 'balanced', audioStats: 'Источники: 0 · Буферы: 0 · Загрузки: 0 · Память: 0 байт',
   });
   let avatarMounted = $state(false);
   let entryMounted = $state(false);
@@ -48,7 +49,9 @@
   const error = $derived(startupError ?? snapshot.message);
   const languageNames = { ru: 'Русский', en: 'English', es: 'Español' };
   const profile = $derived(snapshot.babylon?.state?.profile);
-  const overlayOpen = $derived(Boolean(snapshot.avatarOpen || snapshot.babylonPanel || snapshot.marketPanel || snapshot.mapOpen || snapshot.chatOpen || snapshot.settingsOpen || snapshot.dialog));
+  const boundaryText = { river: { ru: 'Вода глубокая. Оставайтесь на берегу.', en: 'The water is deep. Stay on the bank.', es: 'El agua es profunda. Quédate en la orilla.' }, gate: { ru: 'Дальше — пустыня. Город здесь.', en: 'Beyond lies the desert. The city is here.', es: 'Más allá está el desierto. La ciudad está aquí.' } };
+  const cityTask = $derived(snapshot.babylon?.state?.city?.active);
+  const overlayOpen = $derived(Boolean(snapshot.helpOpen || snapshot.avatarOpen || snapshot.babylonPanel || snapshot.marketPanel || snapshot.mapOpen || snapshot.chatOpen || snapshot.settingsOpen || snapshot.dialog));
 
   onMount(() => {
     if (!game) return;
@@ -97,7 +100,7 @@
   {/if}
 
   {#if !error && snapshot.screen === 'playing'}
-    <div class="hud-top"><aside class="location"><div class="task-chip parchment" aria-label="Текущее задание"><span>{profile ? snapshot.babylon?.state?.taskTitle : snapshot.market ? 'Козы пастуха' : snapshot.region}{#if profile || snapshot.market}<span class="task-count"> · {snapshot.babylon?.state?.fed.length ?? snapshot.market?.fed.length ?? 0} / 4</span>{/if}</span></div></aside>
+    <div class="hud-top"><aside class="location"><div class="task-chip parchment" aria-label="Текущее задание"><span>{cityTask?.title ?? (profile ? snapshot.babylon?.state?.taskTitle : snapshot.market ? 'Козы пастуха' : snapshot.region)}{#if cityTask}<span class="task-count"> · {cityTask.step + 1} / {cityTask.total}</span>{:else if profile || snapshot.market}<span class="task-count"> · {snapshot.babylon?.state?.fed.length ?? snapshot.market?.fed.length ?? 0} / 4</span>{/if}</span></div></aside>
     {#if snapshot.debug}<div class="debug glass"><output aria-label="Область мира">{snapshot.region}</output><output aria-label="Состояние связи">{snapshot.networkStatus === 'connected' ? 'Подключён' : snapshot.networkStatus}</output><output aria-label="Положение игрока">{snapshot.coordinates}</output><p aria-label="Ресурсы оформления">{snapshot.modelStats}</p><p aria-label="Кеш мира">{snapshot.cacheStats}</p><p aria-label="Производительность">{snapshot.performance}</p><p aria-label="Ресурсы сцены">{snapshot.renderStats}</p><p aria-label="Звук">{snapshot.audioStats}</p></div>{/if}
     </div>
     {#if snapshot.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
@@ -108,6 +111,7 @@
     {#if !overlayOpen && snapshot.phase === 'running' && (snapshot.carryHint || snapshot.carryPending || snapshot.carryError || snapshot.heldItemId)}
       <aside class="hand-status parchment" role="status" aria-label="Предмет в руке">{snapshot.carryError ?? (snapshot.carryPending ? 'Подождите…' : snapshot.heldItemId ? 'В руке яблоко' : snapshot.carryHint)}</aside>
     {/if}
+    {#if snapshot.cityBoundary && marketMap && !overlayOpen && snapshot.phase === 'running'}<aside class="hand-status parchment" role="status" title={boundaryText[snapshot.cityBoundary][profile?.native ?? 'ru']}>{boundaryText[snapshot.cityBoundary][profile?.learning ?? 'ru']}</aside>{/if}
     {#if snapshot.nearby && !snapshot.dialog && snapshot.phase === 'running'}
       <div class="interaction glass"><span>{snapshot.nearby.name}</span></div>
     {/if}</div>
@@ -152,6 +156,7 @@
       {#if snapshot.visualLoading}<p class="small" role="status">Загружаем оформление… Можно перезапустить сцену или выйти.</p>{/if}
       <div class="menu-buttons"><button disabled={!snapshot.worldReady || snapshot.visualLoading} onclick={() => game.resume()}>{snapshot.captureError ? 'Вернуть управление' : 'Продолжить'}</button>{#if snapshot.captureError && snapshot.mode === 'online'}<button class="secondary" onclick={() => game.cancelEntry()}>Вернуться в кабинет</button>{/if}<button class="secondary" onclick={() => game.leaveWorld()}>На главный экран</button></div>
       <button class="secondary" onclick={() => game.openSettings()}>Настройки</button>
+      <button class="secondary" onclick={() => game.openHelp()}>Помощь</button>
       {#if snapshot.mode === 'online'}<button class="secondary" onclick={() => game.logout()}>Выйти из сессии</button>{/if}
     </dialog></div>
   {/if}
@@ -169,20 +174,22 @@
   {/if}
 
   {#if !error && game && snapshot.dialog}
-    <div class="modal-backdrop dialog-backdrop"><Dialog dialog={snapshot.dialog} pending={snapshot.dialogPending} error={snapshot.dialogError} send={(text) => game.submitDialog(text)} close={() => game.closeDialog()} /></div>
+    <div class="modal-backdrop dialog-backdrop"><Dialog dialog={snapshot.dialog} pending={snapshot.dialogPending} partial={snapshot.dialogPartial} error={snapshot.dialogError} send={(text) => game.submitDialog(text)} close={() => game.closeDialog()} /></div>
   {/if}
   {#if game && snapshot.chatOpen}<div class="modal-backdrop"><Chat messages={snapshot.chatMessages} error={snapshot.chatError ?? snapshot.networkError} canSend={snapshot.mode !== 'local' && snapshot.networkStatus === 'connected'} send={(text) => game.sendChat(text)} close={() => game.closeChat()} /></div>{/if}
 
   {#if game && snapshot.market}{#key snapshot.market.runId}<MarketPanel {game} market={snapshot.market} panel={snapshot.marketPanel} target={snapshot.marketTarget} />{/key}{/if}
 
   {#if game && snapshot.avatarOpen && avatarMounted}<AvatarSelection {game} view={snapshot.avatar} first={snapshot.avatarPurpose === 'first'}/>{/if}
-  {#if game && snapshot.mapOpen}<WorldMap simulated={snapshot.mode === 'mock'} player={snapshot.mapPlayer} peers={snapshot.mapPeers} goal={snapshot.babylon?.state?.taskTarget ?? null} market={marketMap} close={() => game.closeMap()}/>{/if}
+  {#if game && snapshot.mapOpen}<WorldMap simulated={snapshot.mode === 'mock'} player={snapshot.mapPlayer} peers={snapshot.mapPeers} goal={snapshot.babylon?.state?.city?.active ? snapshot.babylon.state.city.active.target : snapshot.babylon?.state?.taskTarget ?? null} city={snapshot.babylon?.state?.city} profile={profile ?? undefined} learn={(word, translation) => void game.babylonAction({type:'word-save',word,translation,note:''})} market={marketMap} close={() => game.closeMap()}/>{/if}
   {#if game && snapshot.babylon}
     {#if snapshot.babylonPanel === 'setup' && !snapshot.avatarOpen && entryMounted}<EntrySetup {game} {snapshot} view={snapshot.babylon}/>{/if}
     <BabylonPanel {game} view={snapshot.babylon} panel={snapshot.babylonPanel === 'setup' || snapshot.avatarOpen ? null : snapshot.babylonPanel} target={snapshot.babylonTarget} wordSeed={snapshot.babylonWord} equipment={snapshot.equipment} avatarId={snapshot.avatar?.state?.avatarId ?? null}/>
   {/if}
 
-  {#if game && snapshot.settingsOpen}<div class="modal-backdrop"><Settings mode={snapshot.mode} config={game.config} error={snapshot.settingsError} volume={snapshot.volume} setVolume={(percent) => game.setVolume(percent)} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} {...(snapshot.mode === 'online' && !snapshot.authRequired && !snapshot.avatarOpen ? { appearance: () => game.openAvatar() } : {})} /></div>{/if}
+  {#if game && snapshot.helpOpen}<Help language={profile?.native ?? 'ru'} close={() => game.closeHelp()}/>{/if}
+
+  {#if game && snapshot.settingsOpen}<div class="modal-backdrop"><Settings quality={snapshot.graphicsQuality} mode={snapshot.mode} config={game.config} error={snapshot.settingsError} volume={snapshot.volume} setVolume={(percent) => game.setVolume(percent)} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} {...(snapshot.mode === 'online' && !snapshot.authRequired && !snapshot.avatarOpen ? { appearance: () => game.openAvatar() } : {})} /></div>{/if}
 
 
 

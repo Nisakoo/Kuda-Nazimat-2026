@@ -1,3 +1,4 @@
+import type { CityState } from '../city/types.ts';
 export type Language = 'ru' | 'en' | 'es';
 export type PartySize = 1 | 2 | 3 | 4;
 export type ItemId = 'dates' | 'red-fruit' | 'yellow-fruit' | 'water' | 'fabric';
@@ -9,6 +10,7 @@ export interface ChatEntry { id: string; authorId: string; authorName: string; t
 export interface NpcReply { id: string; npcId: string; question: string; text: string; language: Language }
 export interface BabylonState {
   v: 2;
+  city?: CityState;
   playerId: string;
   backend: 'test' | 'local';
   languages: readonly Language[];
@@ -30,6 +32,8 @@ export interface BabylonState {
 }
 export type BabylonAction =
   | { type: 'state' }
+  | { type: 'city-start'; questId: string }
+  | { type: 'city-step'; questId: string; step: number; choice: string; targetId: string }
   | { type: 'create'; size: PartySize; replacePartyId?: string }
   | { type: 'join' }
   | { type: 'enroll'; size: PartySize; native: Language; learning: Language }
