@@ -13,66 +13,148 @@ import time
 import urllib.error
 import urllib.request
 
-from local_common import WorkerError, compile_prompt, configure_offline, count_prompt_tokens, emit, normalize_text, read_message, verify_manifest
+from local_common import WorkerError, _unique_pairs, compile_prompt, configure_offline, count_prompt_tokens, emit, normalize_text, read_message, verify_manifest
 
 MODEL = 'qwen3.5:2b-q4_K_M'
 WIRE_LIMIT = 65536
 LINE_LIMIT = 32768
+MANIFEST_TYPE = 'application/vnd.docker.distribution.manifest.v2+json'
+MODEL_TYPE = 'application/vnd.ollama.image.model'
+MANIFEST_REFERENCE_TYPES = frozenset((
+    MANIFEST_TYPE,
+    'application/vnd.docker.distribution.manifest.list.v2+json',
+    'application/vnd.ollama.manifest.list.v2+json',
+    'application/vnd.oci.image.manifest.v1+json',
+    'application/vnd.oci.image.index.v1+json',
+))
 
 
 def digest_hex(value):
     if not isinstance(value, str):
         raise WorkerError('model_unavailable', 'Invalid model digest')
-    value = value.removeprefix('sha256:')
+    value = value.removeprefix('sha256:').lower()
     if not re.fullmatch(r'[0-9a-f]{64}', value):
         raise WorkerError('model_unavailable', 'Invalid model digest')
     return value
 
 
+def _legacy_anchor_matches(active, active_digest, active_size, legacy):
+    """Compare metadata only; the caller must first verify both sets of blobs."""
+    anchors = [e for e in legacy['layers'] if e.get('mediaType') in MANIFEST_REFERENCE_TYPES]
+    if (len(anchors) != 1 or anchors[0].get('mediaType') != MANIFEST_TYPE
+            or digest_hex(anchors[0]['digest']) != active_digest or anchors[0]['size'] != active_size):
+        return False
+    # Binding requires the same runnable payload, not merely a reachable SHA.
+    if any(active.get(field) != legacy.get(field) for field in ('config', 'runner', 'format')):
+        return False
+    return active['layers'] == [e for e in legacy['layers'] if e.get('mediaType') != MANIFEST_TYPE]
+
+
 def verify_ollama_model(directory, expected_digest):
-    """Verify the pinned local manifest and each referenced blob without loading weights."""
+    """Return the verified active SHA, with only direct legacy-anchor compatibility.
+
+    No manifest-list traversal or runner selection is supported. Named v2 links
+    are the sole symlink exception; all blobs and parent directories stay local.
+    """
     try:
+        pin = digest_hex(expected_digest)
         root = Path(directory).resolve(strict=True)
         if not root.is_dir():
             raise ValueError()
 
-        def local_file(parts):
+        def local_path(parts):
             path = root
             for part in parts:
                 path = path / part
                 if path.is_symlink():
                     raise ValueError()
+            return path
+
+        def local_file(parts):
+            path = local_path(parts)
             if not path.is_file():
                 raise ValueError()
             return path
 
-        manifest_path = local_file(('manifests', 'registry.ollama.ai', 'library', 'qwen3.5', '2b-q4_K_M'))
-        with manifest_path.open('rb') as f:
-            data = f.read(WIRE_LIMIT + 1)
-        if len(data) > WIRE_LIMIT or hashlib.sha256(data).hexdigest() != digest_hex(expected_digest):
-            raise ValueError()
-        manifest = json.loads(data)
-        if not isinstance(manifest, dict) or not isinstance(manifest.get('config'), dict) or not isinstance(manifest.get('layers'), list) or not manifest['layers']:
-            raise ValueError()
-        for entry in [manifest['config'], *manifest['layers']]:
-            if not isinstance(entry, dict):
-                raise ValueError()
-            digest = digest_hex(entry.get('digest'))
-            size = entry.get('size')
-            if not isinstance(size, int) or isinstance(size, bool) or size < 0:
-                raise ValueError()
-            blob = local_file(('blobs', 'sha256-' + digest))
-            h = hashlib.sha256()
-            total = 0
-            with blob.open('rb') as f:
-                for chunk in iter(lambda: f.read(1024 * 1024), b''):
-                    total += len(chunk)
-                    if total > size:
+        def read_manifest(path, linked=False):
+            filename_digest = None
+            if linked:
+                # Normalize lexically, not through resolve(), which hides chains.
+                target = path.parent / os.readlink(path)
+                walked = Path(target.anchor)
+                for part in target.parts[1:]:
+                    walked = walked / part
+                    if walked.is_symlink():
                         raise ValueError()
-                    h.update(chunk)
-            if total != size or h.hexdigest() != digest:
+                target = Path(os.path.normpath(target))
+                if target.parent != root / 'blobs' or not re.fullmatch(r'sha256-[0-9a-fA-F]{64}', target.name):
+                    raise ValueError()
+                path = local_file(('blobs', target.name))
+                filename_digest = target.name[7:].lower()
+            with path.open('rb') as f:
+                data = f.read(WIRE_LIMIT + 1)
+            digest = hashlib.sha256(data).hexdigest()
+            if len(data) > WIRE_LIMIT or (filename_digest is not None and digest != filename_digest):
                 raise ValueError()
-    except (OSError, ValueError, TypeError, UnicodeError, WorkerError):
+            manifest = json.loads(data, object_pairs_hook=_unique_pairs)
+            if (not isinstance(manifest, dict)
+                    or not isinstance(manifest.get('schemaVersion'), int)
+                    or isinstance(manifest.get('schemaVersion'), bool) or manifest['schemaVersion'] != 2
+                    or manifest.get('mediaType') != MANIFEST_TYPE or 'manifests' in manifest
+                    or not isinstance(manifest.get('config'), dict)
+                    or not isinstance(manifest.get('layers'), list)
+                    or not any(isinstance(e, dict) and e.get('mediaType') == MODEL_TYPE for e in manifest['layers'])):
+                raise ValueError()
+            return manifest, digest, len(data)
+
+        def verify_blobs(manifest):
+            for entry in [manifest['config'], *manifest['layers']]:
+                if not isinstance(entry, dict):
+                    raise ValueError()
+                digest = digest_hex(entry.get('digest'))
+                size = entry.get('size')
+                if not isinstance(size, int) or isinstance(size, bool) or size < 0:
+                    raise ValueError()
+                blob = local_file(('blobs', 'sha256-' + digest))
+                h = hashlib.sha256()
+                total = 0
+                with blob.open('rb') as f:
+                    for chunk in iter(lambda: f.read(1024 * 1024), b''):
+                        total += len(chunk)
+                        if total > size:
+                            raise ValueError()
+                        h.update(chunk)
+                if total != size or h.hexdigest() != digest:
+                    raise ValueError()
+
+        legacy_parts = ('manifests', 'registry.ollama.ai', 'library', 'qwen3.5', '2b-q4_K_M')
+        v2_parts = ('manifests-v2', 'ollama.com', 'library', 'qwen3.5', '2b-q4_K_M')
+        # Check parents even when the final name is missing. A dangling link is
+        # present, invalid v2 state, never permission to fall back to legacy.
+        v2 = local_path(v2_parts[:-1]) / v2_parts[-1]
+        has_v2 = os.path.lexists(v2)
+        active_path = v2 if has_v2 else local_file(legacy_parts)
+        if not active_path.is_symlink() and not active_path.is_file():
+            raise ValueError()
+        active, active_digest, active_size = read_manifest(active_path, linked=has_v2 and v2.is_symlink())
+        # Only the legacy compatibility document can carry its one direct anchor.
+        # Runnable manifests never select or retain other manifest references.
+        if any(isinstance(e, dict) and e.get('mediaType') in MANIFEST_REFERENCE_TYPES for e in active['layers']):
+            raise ValueError()
+        verify_blobs(active)
+        if pin == active_digest:
+            return active_digest
+        if not has_v2:
+            raise ValueError()
+
+        legacy, legacy_digest, _ = read_manifest(local_file(legacy_parts))
+        if legacy_digest != pin:
+            raise ValueError()
+        verify_blobs(legacy)
+        if not _legacy_anchor_matches(active, active_digest, active_size, legacy):
+            raise ValueError()
+        return active_digest
+    except (OSError, ValueError, TypeError, UnicodeError, RecursionError, WorkerError):
         raise WorkerError('model_unavailable', 'Ollama model verification failed') from None
 
 
@@ -130,6 +212,7 @@ class OllamaWorker:
         self.child = None
         self.runtime = None
         self.tokenizer = None
+        self.model_digest = None
         self.port = options.get('port', 11501)
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
 
@@ -153,7 +236,7 @@ class OllamaWorker:
         configure_offline()
         verify_manifest(o['tokenizerDir'], o['tokenizerManifest'])
         self.stage = 'ollama_model_integrity'
-        verify_ollama_model(o['modelsDir'], o['modelDigest'])
+        self.model_digest = verify_ollama_model(o['modelsDir'], o['modelDigest'])
         self.stage = 'ollama_dependencies'
         try:
             if importlib.metadata.version('transformers') != '4.57.6' or importlib.metadata.version('jinja2') != '3.1.6':
@@ -206,7 +289,7 @@ class OllamaWorker:
         self.stage = 'ollama_model_digest'
         tags = self.http('/api/tags', timeout=max(0.1, deadline - time.monotonic()))
         models = tags.get('models')
-        if not isinstance(models, list) or not any(isinstance(m, dict) and m.get('name') == MODEL and isinstance(m.get('digest'), str) and digest_hex(m['digest']) == digest_hex(o['modelDigest']) for m in models):
+        if not isinstance(models, list) or not any(isinstance(m, dict) and m.get('name') == MODEL and isinstance(m.get('digest'), str) and digest_hex(m['digest']) == self.model_digest for m in models):
             raise WorkerError('model_unavailable', 'Ollama model digest mismatch')
         self.stage = 'ollama_warmup'
         self.generate('', 0, timeout=max(0.1, deadline - time.monotonic()), allow_empty=True)

@@ -38,13 +38,17 @@ Windows supervisor в этом срезе отсутствует; Windows из �
   node server/llm/manifest.mjs /absolute/tokenizer /absolute/tokenizer-sha256.json
   ```
 
-- Полный `modelDigest` — SHA-256 **bytes локального manifest**, не сокращённый ID из списка:
+- Полный `modelDigest` — SHA-256 **bytes активного локального manifest**, не сокращённый ID из списка. У Ollama0.40.13 приоритетен `modelsDir/manifests-v2/ollama.com/library/qwen3.5/2b-q4_K_M`; при его отсутствии — старый `modelsDir/manifests/registry.ollama.ai/library/qwen3.5/2b-q4_K_M`:
 
   ```sh
+  shasum -a 256 /absolute/dedicated-ollama-models/manifests-v2/ollama.com/library/qwen3.5/2b-q4_K_M
+  # Только если canonical v2 отсутствует:
   shasum -a 256 /absolute/dedicated-ollama-models/manifests/registry.ollama.ai/library/qwen3.5/2b-q4_K_M
   ```
 
-Worker проверяет этот manifest и хеш/размер каждого model/config/projector/template blob до запуска runner, затем версии и digest HTTP API. До ready выполняет 3 коротких raw-пробы с русским/ASCII/emoji и сравнивает HF count с `prompt_eval_count` Ollama. Для каждого игрового ответа count также должен совпасть и быть ≤1792; отсутствующая/другая метрика отклоняет ответ. Реальная семантика `prompt_eval_count` при кешировании и полная tokenizer/GGUF-эквивалентность **не проверены**, поэтому эти проверки могут безопасно отказать даже на совместимом артефакте. Архивы и фактическое соответствие tokenizer/GGUF нужно проверить при подготовке; совпадение хешей и несколько проб не доказывают происхождение модели, универсальную эквивалентность или корректность её ответов.
+  Canonical v2 может быть ссылкой на blob. Worker допускает **только** конечную ссылку на regular-файл в том же `modelsDir/blobs/sha256-<digest>`, проверяет hash имени/bytes и отвергает цепочки/выход за root/symlink-родителей. Это не ослабляет запрет symlinks для HF tokenizer/MLX snapshot. Если конфиг создан старой инструкцией и pin указывает на legacy downgrade-anchor, он принимается лишь при ровно одной прямой проверенной hash+size связи anchor → active manifest и совпадении config/runner/format/payload layers. Другие manifest-ссылки и вложенные графы в этом срезе отклоняются. Старый pin не переписывается автоматически. Другой active manifest и неподдержанные manifest-list/ref формы дают unavailable, а не fallback.
+
+Worker проверяет активный manifest и хеш/размер каждого model/config/projector/template blob до запуска runner, затем версии и **проверенный active digest** HTTP API. Legacy-anchor и active digest не обязаны совпадать; без проверенной криптографической связи это отказ. До ready выполняет 3 коротких raw-пробы с русским/ASCII/emoji и сравнивает HF count с `prompt_eval_count` Ollama. Для каждого игрового ответа count также должен совпасть и быть ≤1792; отсутствующая/другая метрика отклоняет ответ. Реальная семантика `prompt_eval_count` при кешировании и полная tokenizer/GGUF-эквивалентность **не проверены**, поэтому эти проверки могут безопасно отказать даже на совместимом артефакте. Архивы и фактическое соответствие tokenizer/GGUF нужно проверить при подготовке; совпадение хешей и несколько проб не доказывают происхождение модели, универсальную эквивалентность или корректность её ответов.
 
 Порт `11501` должен быть свободен. CPU/GPU: `numGpu` по умолчанию 0; `threads` по умолчанию 2. Положительный `numGpu` — отдельный измеряемый профиль, не гарантия доступности ускорителя. Vision/projector в пакете Ollama не считается бесплатным для RAM; фактическую загрузку надо измерить.
 

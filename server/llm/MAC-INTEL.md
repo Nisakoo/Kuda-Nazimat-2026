@@ -145,7 +145,7 @@ node server/llm/manifest.mjs "$HOME/kuda-llm/tokenizer" "$HOME/kuda-llm/tokenize
 
 ## 5. Создать конфиг без ручных placeholders
 
-Если `server/config.json` уже существует, сначала сохранить свою копию и согласовать объединение. Следующий блок **откажется перезаписывать** его. Он получает SHA-256 из bytes подготовленного Ollama manifest и версию из ответа daemon, не из случайной строки CLI.
+Если `server/config.json` уже существует, сначала сохранить свою копию и согласовать объединение. Следующий блок **откажется перезаписывать** его. Он получает SHA-256 из bytes **активного** подготовленного Ollama manifest (canonical v2 приоритетен) и версию из ответа daemon, не из случайной строки CLI. Ранее созданный config с legacy-anchor pin сохраняется: адаптер сам проверяет его криптографическую связь с активным manifest, но не переписывает pin.
 
 ```sh
 "$HOME/kuda-llm/venv/bin/python3" - <<'PY'
@@ -158,7 +158,9 @@ if not exe:
 version = json.loads((base / 'ollama-version.json').read_text())['version']
 if not re.fullmatch(r'\d+\.\d+\.\d+', version):
     raise SystemExit('Expected stable Ollama x.y.z version')
-manifest = base / 'models/manifests/registry.ollama.ai/library/qwen3.5/2b-q4_K_M'
+manifest = base / 'models/manifests-v2/ollama.com/library/qwen3.5/2b-q4_K_M'
+if not manifest.exists() and not manifest.is_symlink():
+    manifest = base / 'models/manifests/registry.ollama.ai/library/qwen3.5/2b-q4_K_M'
 config = json.loads(Path('server/config.ollama.example.json').read_text())
 config['npc']['options'].update(
     python=str(base / 'venv/bin/python3'), executable=str(Path(exe).absolute()),
