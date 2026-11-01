@@ -1,0 +1,70 @@
+{
+  "passed": 6,
+  "failed": 8,
+  "cadence": [
+    {
+      "case": "render-MOVE-poses-four-pla-161ad-y-place-at-60-FPS-from-side",
+      "requestedFps": 60,
+      "simulatedFrames": 25,
+      "seconds": 15.11569999998808,
+      "actualFps": 1.653909511304122,
+      "completed": false
+    },
+    {
+      "case": "render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front",
+      "requestedFps": 30,
+      "simulatedFrames": 25,
+      "seconds": 15.36530000001192,
+      "actualFps": 1.6270427521740938,
+      "completed": false
+    },
+    {
+      "case": "render-MOVE-poses-four-pla-b6b77--place-at-60-FPS-from-front",
+      "requestedFps": 60,
+      "simulatedFrames": 26,
+      "seconds": 15.226399999976158,
+      "actualFps": 1.7075605527268896,
+      "completed": false
+    },
+    {
+      "case": "render-MOVE-poses-four-pla-b748f-y-place-at-30-FPS-from-side",
+      "requestedFps": 30,
+      "simulatedFrames": 25,
+      "seconds": 15.239200000017881,
+      "actualFps": 1.6405060633084851,
+      "completed": false
+    },
+    {
+      "case": "render-MOVE-poses-four-player-poses-at-30-FPS-from-front",
+      "requestedFps": 30,
+      "simulatedFrames": 25,
+      "seconds": 15.700200000017881,
+      "actualFps": 1.5923364033561054,
+      "completed": false
+    },
+    {
+      "case": "render-MOVE-poses-four-player-poses-at-30-FPS-from-side",
+      "requestedFps": 30,
+      "simulatedFrames": 24,
+      "seconds": 15.2665,
+      "actualFps": 1.5720695640782103,
+      "completed": false
+    },
+    {
+      "case": "render-MOVE-poses-four-player-poses-at-60-FPS-from-front",
+      "requestedFps": 60,
+      "simulatedFrames": 31,
+      "seconds": 15.420600000023843,
+      "actualFps": 2.0102979131779612,
+      "completed": false
+    },
+    {
+      "case": "render-MOVE-poses-four-player-poses-at-60-FPS-from-side",
+      "requestedFps": 60,
+      "simulatedFrames": 27,
+      "seconds": 15.133399999976158,
+      "actualFps": 1.7841331095485837,
+      "completed": false
+    }
+  ]
+}

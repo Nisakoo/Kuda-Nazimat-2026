@@ -1,0 +1,23 @@
+PICKUP_AT_ROLE2_SPAWN {"v":1,"type":"hand-result","requestId":"probe","ok":true,"action":"pickup","apple":{"id":"market-apple-1","mapId":"market","state":"held","holderId":"probe"}}
+{"x":0.8,"z":9,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.9,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.8,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.7,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.6,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.5,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.4,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.3,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.2,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8.1,"safe":true,"bodyClear":true}
+{"x":0.8,"z":8,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.9,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.8,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.7,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.6,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.5,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.4,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.3,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.2,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7.1,"safe":true,"bodyClear":true}
+{"x":0.8,"z":7,"safe":true,"bodyClear":true}
+{"x":0.8,"z":6.9,"safe":true,"bodyClear":true}

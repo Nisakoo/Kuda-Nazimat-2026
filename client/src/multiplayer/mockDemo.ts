@@ -2,6 +2,7 @@ import { GameWorld } from '../core/GameWorld';
 import type { Entity } from '../core/types';
 import type { Clock } from './NetworkAdapter';
 import { MockNetworkAdapter } from './MockNetworkAdapter';
+import { MockWorldLife } from './MockWorldLife';
 import { DEMO_NPCS } from '../shared/demo';
 import { DEMO_WORLD, SCIENCE_WORLD } from '../shared/demoWorld.generated';
 
@@ -10,6 +11,7 @@ export function createMockDemo(clock: Clock): MockNetworkAdapter {
   let world: GameWorld;
   let revision = 0;
   let chats = 0;
+  let life: MockWorldLife | null = null;
   return new MockNetworkAdapter(clock, (message, transport) => {
     if (message.type === 'join') {
       const spawn = { x: 0, y: 0, z: message.mapId === 'science' ? 38 : 6 };
@@ -18,7 +20,9 @@ export function createMockDemo(clock: Clock): MockNetworkAdapter {
         ...DEMO_NPCS.map((npc): Entity => ({ id: npc.id, character: { kind: 'npc', name: npc.name }, transform: { position: { x: npc.x, y: 0, z: npc.z }, rotationY: 0 }, interactable: { radius: 2.2, label: 'Поговорить' }, renderable: { assetId: npc.id } })),
       ];
       world = new GameWorld('local', entities); revision = 0;
+      life ??= new MockWorldLife(message.mapId, clock.now(), spawn);
       transport.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'mock-player', revision, snapshot: world.getSnapshot(), world: message.mapId === 'science' ? SCIENCE_WORLD : DEMO_WORLD });
+      transport.receiveWorldLife(life.snapshot(clock.now()));
     } else if (message.type === 'input' && world) {
       world.execute('mock-player', { type: 'move', direction: message.direction });
       world.execute('mock-player', { type: 'sprint', held: message.sprint });
@@ -38,5 +42,7 @@ export function createMockDemo(clock: Clock): MockNetworkAdapter {
       transport.receive({ v: 3, type: 'chat', requestId: message.requestId, messageId: `m${++chats}`, playerId: 'mock-player', name: 'Вы', text: message.text });
       transport.receive({ v: 3, type: 'chat', requestId: `peer${chats}`, messageId: `m${++chats}`, playerId: 'mock-peer', name: 'Тестовый участник', text: 'Сообщение получено тестовым транспортом.' }, 180);
     }
+  }, (message, transport) => {
+    life?.receive(message, transport, world?.getSnapshot().entities.find(entity => entity.id === 'mock-player'), clock.now());
   });
 }

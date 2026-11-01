@@ -37,6 +37,13 @@ async function readWorldFile(root: string, relative: string, mapId: string): Pro
 export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
   const root = path.resolve(source.worldDir);
   if (!(await stat(root).catch(() => null))?.isDirectory()) throw new Error(`worldDir не найден: ${root}. Соберите клиент (npm --prefix client run build) или укажите worldDir.`);
+  // Startup-only cache: maps reuse the same city chunks/models. Read each prepared file once,
+  // then release the buffers when loading finishes; the runtime file index stores metadata only.
+  const prepared = new Map<string, Promise<{ absolute: string; bytes: Buffer }>>();
+  const readPrepared = (relative: string, mapId: string) => {
+    const cached = prepared.get(relative); if (cached) return cached;
+    const pending = readWorldFile(root,relative,mapId); prepared.set(relative,pending); return pending;
+  };
   const maps = new Map<string, GameMap>();
   const files = new Map<string, { absolute: string; bytes: number; uses: FileUse[] }>();
   const addUse = (relative: string, absolute: string, bytes: number, use: FileUse): void => {
@@ -45,7 +52,7 @@ export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
   };
 
   for (const [mapId, manifestPath] of Object.entries(source.maps)) {
-    const manifestFile = await readWorldFile(root, manifestPath, mapId);
+    const manifestFile = await readPrepared(manifestPath, mapId);
     let raw: unknown;
     try { raw = JSON.parse(manifestFile.bytes.toString('utf8')); } catch { throw new WorldError(mapId, manifestPath, 'некорректный JSON'); }
     const bootstrap = parseWorldDescriptor(selfBootstrap(raw, manifestPath, manifestFile.bytes.length));
@@ -55,7 +62,7 @@ export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
 
     let total = manifestFile.bytes.length;
     for (const [assetPath, size] of Object.entries(manifest.assets)) {
-      const file = await readWorldFile(root, assetPath, mapId);
+      const file = await readPrepared(assetPath, mapId);
       if (file.bytes.length !== size.bytes) throw new WorldError(mapId, assetPath, `размер ${file.bytes.length} ≠ ${size.bytes}`);
       addUse(assetPath, file.absolute, size.bytes, { mapId, kind: 'model' });
       total += size.bytes;
@@ -64,25 +71,30 @@ export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
     const collisionCache = new Map<string, Uint8Array>();
     const collisionCells = new Map<string, { x: number; z: number }[]>();
     const resolution = manifest.collisionResolution;
-    for (const entry of manifest.chunks) {
-      const chunk = await readWorldFile(root, entry.url, mapId);
-      if (chunk.bytes.length !== entry.bytes) throw new WorldError(mapId, entry.url, `размер ${chunk.bytes.length} ≠ ${entry.bytes}`);
-      try { parseChunk(JSON.parse(chunk.bytes.toString('utf8')), entry); } catch (error) { throw new WorldError(mapId, entry.url, error instanceof Error ? error.message : 'некорректный чанк'); }
-      addUse(entry.url, chunk.absolute, entry.bytes, { mapId, kind: 'chunk', cell: { x: entry.x, z: entry.z } });
-      total += entry.bytes;
+    // Bounded startup IO, not 1024 sequential round trips or an unbounded Promise.all.
+    for (let offset = 0; offset < manifest.chunks.length; offset += 8) {
+      const batch = await Promise.all(manifest.chunks.slice(offset,offset+8).map(async entry => ({
+        entry, chunk: await readPrepared(entry.url,mapId), collisionFile: await readPrepared(entry.collisionUrl,mapId),
+      })));
+      for (const { entry, chunk, collisionFile } of batch) {
+        if (chunk.bytes.length !== entry.bytes) throw new WorldError(mapId, entry.url, `размер ${chunk.bytes.length} ≠ ${entry.bytes}`);
+        try { parseChunk(JSON.parse(chunk.bytes.toString('utf8')), entry); } catch (error) { throw new WorldError(mapId, entry.url, error instanceof Error ? error.message : 'некорректный чанк'); }
+        addUse(entry.url, chunk.absolute, entry.bytes, { mapId, kind: 'chunk', cell: { x: entry.x, z: entry.z } });
+        total += entry.bytes;
 
-      let collision = collisionCache.get(entry.collisionUrl);
-      if (!collision) {
-        const file = await readWorldFile(root, entry.collisionUrl, mapId);
-        if (file.bytes.length !== resolution * resolution || file.bytes.length !== entry.collisionBytes) throw new WorldError(mapId, entry.collisionUrl, `ожидалось ${resolution * resolution} байт`);
-        collision = new Uint8Array(file.bytes);
-        collisionCache.set(entry.collisionUrl, collision);
-        collisionCells.set(entry.collisionUrl, []);
-        files.set(entry.collisionUrl, files.get(entry.collisionUrl) ?? { absolute: file.absolute, bytes: file.bytes.length, uses: [] });
-        total += file.bytes.length;
+        let collision = collisionCache.get(entry.collisionUrl);
+        if (!collision) {
+          const file = collisionFile;
+          if (file.bytes.length !== resolution * resolution || file.bytes.length !== entry.collisionBytes) throw new WorldError(mapId, entry.collisionUrl, `ожидалось ${resolution * resolution} байт`);
+          collision = new Uint8Array(file.bytes);
+          collisionCache.set(entry.collisionUrl, collision);
+          collisionCells.set(entry.collisionUrl, []);
+          files.set(entry.collisionUrl, files.get(entry.collisionUrl) ?? { absolute: file.absolute, bytes: file.bytes.length, uses: [] });
+          total += file.bytes.length;
+        }
+        collisionCells.get(entry.collisionUrl)!.push({ x: entry.x, z: entry.z });
+        collisionByChunk.set(entry.id, collision);
       }
-      collisionCells.get(entry.collisionUrl)!.push({ x: entry.x, z: entry.z });
-      collisionByChunk.set(entry.id, collision);
     }
     for (const [url, cells] of collisionCells) files.get(url)!.uses.push({ mapId, kind: 'collision', cells });
 

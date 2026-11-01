@@ -5,12 +5,23 @@ import type { AccessContext, Clock, NetworkAdapter } from '../multiplayer/Networ
 import type { ClientMessage, NetworkState, ServerMessage, WorldDescriptor } from '../../../shared/protocol/types.ts';
 import { LIMITS } from '../../../shared/protocol/types.ts';
 import { MOVEMENT } from '../../../shared/movement/simulation.ts';
+import type { HandRequest, SceneStateMessage, WorldLifeServerMessage } from '../../../shared/world-life/types.ts';
+import { WORLD_LIFE_LIMITS } from '../../../shared/world-life/types.ts';
 
 export type ChatMessage = Extract<ServerMessage, { type: 'chat' }>;
+export interface CarryState {
+  readonly pending: boolean;
+  readonly error: string | null;
+  readonly heldItemId: string | null;
+  readonly hint: string | null;
+}
 export type OnlineNotice =
   | { readonly type: 'status'; readonly state: NetworkState }
   | { readonly type: 'joined'; readonly world: WorldDescriptor }
   | { readonly type: 'chat'; readonly message: ChatMessage }
+  | { readonly type: 'carry'; readonly state: CarryState }
+  | { readonly type: 'scene'; readonly state: SceneStateMessage }
+  | { readonly type: 'world'; readonly snapshot: WorldSnapshot; readonly origin: 'live' | 'snapshot' }
   | { readonly type: 'npc'; readonly targetId: string; readonly requestId: string; readonly text: string }
   | { readonly type: 'request-error'; readonly requestId: string; readonly message: string };
 type RequestType = 'join' | 'resync' | 'interact' | 'npc-question' | 'chat-send';
@@ -50,15 +61,28 @@ export class OnlineSession implements GameSession {
   private pathGuard: ((from: Vector3, to: Vector3) => boolean) | null = null;
   private disposed = false;
   private readonly unsubscribe: readonly (() => void)[];
+  private scene: SceneStateMessage | null = null;
+  get worldLife(): SceneStateMessage | null { return this.scene; }
+  private handPending: { readonly packet: HandRequest; readonly timer: number } | null = null;
+  private handError: string | null = null;
+  private readonly handPrefix: string;
+  get carryState(): CarryState {
+    const heldItemId = this.scene?.apples.find(apple => apple.state === 'held' && apple.holderId === this.id)?.id ?? null;
+    const hint = this.value.status !== 'connected' || !this.scene ? null : heldItemId ? 'Положить яблоко' : this.nearestApple() ? 'Поднять яблоко' : null;
+    return { pending: this.handPending !== null, error: this.handError, heldItemId, hint };
+  }
 
   constructor(private readonly network: NetworkAdapter, private readonly mapId: string, private readonly clock: Clock) {
-    this.unsubscribe = [network.subscribe(this.receive), network.subscribeState(this.connection)];
+    this.handPrefix = `h${clock.now().toString(36)}_${Math.random().toString(36).slice(2, 12)}`;
+    this.unsubscribe = [network.subscribe(this.receive), network.subscribeWorldLife(this.receiveWorldLife), network.subscribeState(this.connection)];
   }
   connect(context?: AccessContext): void { if (this.disposed) return; this.context = context; this.network.connect(context); }
   reconnect(): void { this.connect(this.context); }
   private readonly connection = (state: NetworkState): void => {
     if (this.disposed) return;
     this.clearPending('Связь прервана. Действие не будет отправлено повторно.');
+    this.clearHand(this.handPending ? 'Связь прервана. Действие не будет отправлено повторно.' : null);
+    this.scene = null;
     this.direction = { x: 0, z: 0 }; this.sprint = false; this.jumpId = 0; this.jumpCounter = 0; this.history = []; this.prepared = [];
     this.updates = []; this.updateOverflow = false;
     this.joinId = null; this.resyncId = null; this.revision = -1; this.sequence = 0; this.elapsed = 0;
@@ -68,6 +92,7 @@ export class OnlineSession implements GameSession {
       this.status({ status: 'connecting', error: null });
       this.joinId = this.request('join', (requestId) => ({ v: 3, type: 'join', requestId, mapId: this.mapId }));
     } else { if (state.status === 'unauthorized') this.context = undefined; this.status(state); }
+    this.publishCarry();
   };
   private status(state: NetworkState): void { this.value = Object.freeze({ ...state }); this.publish({ type: 'status', state: this.value }); }
 
@@ -86,6 +111,62 @@ export class OnlineSession implements GameSession {
       if (x === 0 && z === 0) this.flushInput();
     } else this.request('interact', (requestId) => ({ v: 3, type: 'interact', requestId, targetId: command.targetId }), command.targetId);
   }
+  private nearestApple(): string | null {
+    const position = this.getSnapshot().entities.find(entity => entity.id === this.id)?.transform?.position;
+    if (!position || !this.scene) return null;
+    const candidates = this.scene.apples.flatMap(apple => {
+      if (apple.state !== 'world' || apple.mapId !== this.mapId) return [];
+      const distance = Math.hypot(position.x - apple.position.x, position.y - apple.position.y, position.z - apple.position.z);
+      if (distance > WORLD_LIFE_LIMITS.pickupDistance || (this.pathGuard && !this.pathGuard(position, apple.position))) return [];
+      return [{ id: apple.id, distance }];
+    });
+    candidates.sort((a, b) => a.distance - b.distance || a.id.localeCompare(b.id));
+    return candidates[0]?.id ?? null;
+  }
+  /** Sends one intention only. Ownership changes exclusively through scene-state. */
+  carry(): string | null {
+    if (this.disposed || this.handPending) return null;
+    if (this.value.status !== 'connected' || !this.scene || this.resyncId) {
+      this.handError = 'Нет подтверждённого состояния мира. Повторите подключение.'; this.publishCarry(); return null;
+    }
+    const state = this.carryState;
+    const targetId = state.heldItemId ? null : this.nearestApple();
+    if (!state.heldItemId && !targetId) { this.handError = 'Рядом нет доступного яблока.'; this.publishCarry(); return null; }
+    const requestId = `${this.handPrefix}_${this.nextId()}`;
+    const packet: HandRequest = state.heldItemId ? { v: 1, type: 'hand', action: 'place', requestId } : { v: 1, type: 'hand', action: 'pickup', targetId: targetId!, requestId };
+    const timer = this.clock.set(() => {
+      this.clearHand('Сервер не подтвердил действие за 10 секунд. Ожидайте синхронизации; действие не повторяется автоматически.');
+      this.syncScene();
+    }, LIMITS.requestMs);
+    this.handPending = { packet, timer }; this.handError = null; this.publishCarry();
+    try { if (this.network.sendWorldLife(packet)) return requestId; } catch { /* report failed validation/send below */ }
+    this.clearHand('Не удалось отправить действие. Проверьте связь.'); return null;
+  }
+  private publishCarry(): void { this.publish({ type: 'carry', state: this.carryState }); }
+  private clearHand(error: string | null): void {
+    if (this.handPending) this.clock.clear(this.handPending.timer);
+    this.handPending = null; this.handError = error; this.publishCarry();
+  }
+  private syncScene(): void {
+    if (this.disposed || this.value.status !== 'connected') return;
+    try { this.network.sendWorldLife({ v: 1, type: 'scene-sync', requestId: `${this.handPrefix}_${this.nextId()}` }); } catch { /* transport reports invalid packets */ }
+  }
+  private readonly receiveWorldLife = (message: WorldLifeServerMessage): void => {
+    if (this.disposed || this.value.status !== 'connected' || !this.id) return;
+    if (message.type === 'scene-state') {
+      if (message.definition.mapId !== this.mapId) return;
+      if (this.scene?.sceneId === message.sceneId && (message.revision < this.scene.revision || message.serverTimeMs < this.scene.serverTimeMs)) return;
+      this.scene = message;
+      this.publish({ type: 'scene', state: message }); this.publishCarry();
+      return;
+    }
+    const pending = this.handPending;
+    if (!pending || pending.packet.requestId !== message.requestId) return;
+    if (message.ok && (message.action !== pending.packet.action || (pending.packet.action === 'pickup' && message.apple.id !== pending.packet.targetId))) return;
+    // A receipt can describe an earlier commit. Never patch current scene state from it.
+    this.clearHand(message.ok ? null : message.message);
+    this.syncScene();
+  };
   chat(text: string): string | null { return this.request('chat-send', (requestId) => ({ v: 3, type: 'chat-send', requestId, text: text.trim() })); }
   askNpc(targetId: string, text: string): string | null { return this.request('npc-question', (requestId) => ({ v: 3, type: 'npc-question', requestId, targetId, text: text.trim() }), targetId); }
   setMovementGuard(guard: (position: Vector3) => boolean, path?: (from: Vector3, to: Vector3) => boolean): void { this.guard = guard; this.pathGuard = path ?? null; }
@@ -162,10 +243,12 @@ export class OnlineSession implements GameSession {
     this.flushInput();
     this.resyncId = this.request('resync', (requestId) => ({ v: 3, type: 'resync', requestId, revision: Math.max(0, this.revision) }));
   }
-  private apply(snapshot: WorldSnapshot, revision: number): void {
+  private apply(snapshot: WorldSnapshot, revision: number, origin: 'live' | 'snapshot' = 'snapshot'): void {
     this.world.applySnapshot(snapshot); this.revision = revision;
+    if (this.scene) this.publishCarry();
     this.history.push({ time: this.clock.now(), snapshot: this.world.getSnapshot() }); this.history = this.history.slice(-8);
     const events = this.world.drainEvents(); for (const listener of this.listeners) listener(events);
+    this.publish({ type: 'world', snapshot: this.world.getSnapshot(), origin });
   }
   private readonly receive = (message: ServerMessage): void => {
     if (this.disposed) return;
@@ -173,7 +256,7 @@ export class OnlineSession implements GameSession {
       if (message.requestId !== this.joinId || this.pending.get(message.requestId)?.type !== 'join') return;
       this.finish(message.requestId); this.joinId = null; this.id = message.playerId;
       this.apply(message.snapshot, message.revision); this.status({ status: 'connected', error: null });
-      this.publish({ type: 'joined', world: message.world }); return;
+      this.publish({ type: 'joined', world: message.world }); this.syncScene(); return;
     }
     if (message.type === 'error') {
       const pending = this.finish(message.requestId);
@@ -220,7 +303,7 @@ export class OnlineSession implements GameSession {
       for (const id of message.remove) entities.delete(id);
       for (const entity of message.upsert) entities.set(entity.id, entity);
       if (entities.size > LIMITS.entities || !entities.get(this.id)?.transform) { this.resync(); return; }
-      this.apply({ tick: message.tick, entities: [...entities.values()] }, message.revision); return;
+      this.apply({ tick: message.tick, entities: [...entities.values()] }, message.revision, 'live'); return;
     }
   }
   subscribe(listener: (events: readonly WorldEvent[]) => void): () => void { if (this.disposed) return () => {}; this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
@@ -228,7 +311,7 @@ export class OnlineSession implements GameSession {
   private publish(notice: OnlineNotice): void { for (const listener of this.notices) listener(notice); }
   dispose(): void {
     if (this.disposed) return;
-    this.disposed = true; this.clearPending('Сессия завершена.');
+    this.disposed = true; this.clearPending('Сессия завершена.'); this.clearHand(null); this.scene = null;
     if (this.inputTimer !== null) this.clock.clear(this.inputTimer); this.inputTimer = null;
     for (const unsubscribe of this.unsubscribe) unsubscribe(); this.network.dispose();
     this.context = undefined; this.listeners.clear(); this.notices.clear(); this.history = []; this.updates = []; this.seenChat.clear(); this.direction = { x: 0, z: 0 };

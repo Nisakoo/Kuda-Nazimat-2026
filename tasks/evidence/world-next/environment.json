@@ -1,0 +1,21 @@
+{
+  "baseRevision": "87124f488feb02280234c52797e53ccd145e62e0",
+  "branch": "impl/next-006-010-011-015",
+  "platform": "linux",
+  "arch": "x64",
+  "kernel": "7.0.0-30-generic",
+  "cpu": "Intel Core Processor (Broadwell, IBRS)",
+  "cpuCount": 2,
+  "totalMemory": 4100702208,
+  "node": "v24.22.2",
+  "npm": "11.19.1",
+  "browser": "Chromium 156.0.8078.73 built on Debian GNU/Linux 12 (bookworm)",
+  "selectedModel": "openai/gpt-6.1-sol",
+  "reasoning": "high",
+  "configurationVerification": "Read-only Pocket runtime metadata: primary and all 4 delegated pi.agent documents confirm the selected model and thinkingLevel.",
+  "backend": "real HTTP/Socket.IO and temporary SQLite; deterministic test LLM only",
+  "physicalLan": "unverified: no second physical laptop",
+  "wifiOff": "unverified: no physical Wi-Fi interface under test",
+  "targetHardware": "unverified: Linux container with software rendering is not the target laptop",
+  "listening": "unverified: no human listening evidence"
+}

@@ -64,19 +64,60 @@ test('unloading while HTTP is pending prevents a late visual from appearing', as
   expect(await page.evaluate(() => window.renderHarness.stats().instances)).toBe(0);
 });
 
+test('NEXT data-only catalogue placement shares duplicate prefabs and releases their owners', async ({ page }, testInfo) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.evaluate(() => window.renderHarness.catalogueFrame());
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().pending)).toBe(0);
+  const loaded = await page.evaluate(() => window.renderHarness.stats());
+  expect(loaded.instances).toBe(6); expect(loaded.models).toBe(5); expect(loaded.errors).toEqual([]);
+  await page.screenshot({ path: testInfo.outputPath('catalogue-placement.png') });
+  await page.evaluate(() => window.renderHarness.unload('catalogue-preview'));
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().models)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().instances)).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners', async ({ page }, testInfo) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.evaluate(() => window.renderHarness.lifeFrame('cats'));
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().pending)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().entities.filter(id => id.startsWith('cat-')).length)).toBe(3);
+  await page.screenshot({ path: testInfo.outputPath('three-cat-states.png') });
+  await page.evaluate(() => window.renderHarness.lifeFrame('flock'));
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().entities.filter(id => id.startsWith('flock:')).length)).toBe(5);
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: testInfo.outputPath('shared-flock.png') });
+  const loaded = await page.evaluate(() => window.renderHarness.stats());
+  // The scheduled flock can expire while a software-rendered screenshot is captured.
+  expect(loaded.models).toBeGreaterThanOrEqual(4); expect(loaded.models).toBeLessThanOrEqual(5); expect(loaded.errors).toEqual([]);
+  await page.evaluate(() => window.renderHarness.unload('0_0'));
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().entities)).toEqual(['preview']);
+  await expect.poll(() => page.evaluate(() => window.renderHarness.stats().models)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
 test.describe('MOVE poses', () => {
-  for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player poses at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+  for (const carrying of [false, true]) for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player ${carrying ? 'pickup-carry-place' : 'poses'} at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
-    const running = page.evaluate(({ fps, yaw }) => window.renderHarness.movement(fps, yaw), { fps, yaw: view === 'front' ? 0 : Math.PI / 2 });
+    const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
     const { video, ...profile } = await running;
     const videoPath = testInfo.outputPath('movement.webm'); await writeFile(videoPath, Buffer.from(video, 'base64'));
     await testInfo.attach('movement', { path: videoPath, contentType: 'video/webm' });
     await testInfo.attach('cadence', { body: JSON.stringify(profile), contentType: 'application/json' });
+    await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+    console.log('Render cadence:', JSON.stringify(profile));
+    expect(profile.completed).toBe(true);
     expect(profile.actualFps).toBeGreaterThan(fps * .8);
     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
-    expect((await page.evaluate(() => window.renderHarness.stats())).entities).toHaveLength(4);
+    const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+    expect(entities.filter(id => id.startsWith('move-'))).toHaveLength(4);
+    if (carrying) {
+      expect(entities.filter(id => id.startsWith('apple-'))).toHaveLength(5);
+      expect(entities.filter(id => id.startsWith('cat-'))).toHaveLength(3);
+      expect(entities.filter(id => id.startsWith('pot-'))).toHaveLength(4);
+    }
     expect(errors).toEqual([]);
   });
 });

@@ -5,6 +5,7 @@ import type { Server as HttpServer } from 'node:http';
 import type { Vector3 } from '../../shared/world/types.ts';
 import type { Logger } from './common/logger.ts';
 import type { Clock, Scheduler } from './common/time.ts';
+import type { WorldLifeStore } from './game/worldLifePorts.ts';
 
 export interface PlayerIdentity { readonly accountId: string; readonly playerId: string; readonly displayName: string }
 
@@ -63,6 +64,7 @@ export interface GameConfig {
   readonly corsOrigins: readonly string[];
 }
 export interface GameDeps {
+  readonly worldLife?: WorldLifeStore;
   readonly babylon?: { enrolled(playerId: string): boolean; spawn(playerId: string): { mapId: string; position: Vector3; force: boolean } | null; entered(playerId: string): void };
   readonly sessions: SessionVerifier;
   readonly players: PlayerStore;

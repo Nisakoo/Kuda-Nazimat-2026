@@ -22,6 +22,7 @@
     mapId: 'demo', mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
     performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
+    carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: .3, audioStats: 'Источники: 0 · Буферы: 0 · Загрузки: 0 · Память: 0 байт',
   });
   const networkLabels = { unauthorized: 'Не авторизован', connecting: 'Подключение…', connected: 'Подключён', lost: 'Связь потеряна', error: 'Ошибка связи', disconnected: 'Отключён' };
   const marketMap = $derived(state.mapId === 'market');
@@ -69,14 +70,14 @@
       <button class="primary large" disabled={state.capture === 'requesting' || !state.worldReady} onclick={() => game.enterWorld()}>{state.capture === 'requesting' ? 'Захватываем мышь…' : state.captureError ? 'Повторить захват' : 'Начать прогулку'} <span aria-hidden="true">↗</span></button>
       {#if state.captureError || state.capture === 'requesting'}<button class="secondary capture-exit" onclick={() => game.leaveWorld()}>На главный экран</button>{/if}
       {#if state.market}<button class="secondary capture-exit" onclick={() => game.openMarketPanel('intro')}>О мире и управлении</button>{/if}
-      <div class="welcome-controls"><p><kbd>W A S D</kbd> движение относительно камеры</p><p><kbd>Space</kbd> прыжок · <kbd>Shift</kbd> спринт</p><p><kbd>E</kbd> разговор с персонажем</p><p><kbd>Мышь</kbd> обзор · колесо — масштаб</p><p><kbd>Esc</kbd> освободить курсор и открыть меню</p></div>
+      <div class="welcome-controls"><p><kbd>W A S D</kbd> движение относительно камеры</p><p><kbd>Space</kbd> прыжок · <kbd>Shift</kbd> спринт</p><p><kbd>E</kbd> разговор с персонажем</p>{#if state.mode !== 'local'}<p><kbd>F</kbd> поднять / положить яблоко · один предмет в руках</p>{/if}<p><kbd>Мышь</kbd> обзор · колесо — масштаб</p><p><kbd>Esc</kbd> освободить курсор и открыть меню</p></div>
       <p class="small subtle">{state.mode === 'online' ? 'Позиция и история разговоров сохраняются на сервере.' : 'Демо работает локально. Учебные ответы подготовлены заранее.'}</p>
     </section>
   {/if}
 
   {#if !error && state.screen === 'playing'}
     <div class="hud-top"><aside class="location glass"><p class="eyebrow">Вавилон</p><h1>{state.region}</h1><p>{state.babylon?.state?.profile ? `Козы пастуха · ${state.babylon.state.fed.length}/4` : state.market ? `Козы пастуха · ${state.market.fed.length}/4` : marketMap ? 'Торговцы рынка · пастух' : 'Лея — история · Марк — наука'}</p></aside>
-    {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p><p aria-label="Производительность">{state.performance}</p><p aria-label="Ресурсы сцены">{state.renderStats}</p></div>{/if}
+    {#if state.debug}<div class="debug glass"><output aria-label="Положение игрока">{state.coordinates}</output><p aria-label="Ресурсы оформления">{state.modelStats}</p><p aria-label="Кеш мира">{state.cacheStats}</p><p aria-label="Производительность">{state.performance}</p><p aria-label="Ресурсы сцены">{state.renderStats}</p><output aria-label="Звук">{state.audioStats}</output></div>{/if}
     </div>
     {#if state.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
     {#if state.phase === 'running' && !state.dialog && !state.chatOpen && !state.settingsOpen && !state.marketPanel && !state.babylonPanel}
@@ -85,6 +86,15 @@
     <div class="world-actions">{#if state.babylon?.state?.profile}<button class="quest-button glass babel-task" onclick={() => game?.openBabylonPanel('task')}>{state.babylon.state.task} · {state.babylon.state.fed.length}/4</button>{/if}{#if state.market}<button class="quest-button glass" onclick={() => game?.openMarketPanel('task')}>Козы пастуха · {state.market.fed.length}/4</button>{/if}<button class="chat-button glass" onclick={() => game?.openChat()}>Общение{state.chatMessages.length ? ` · ${state.chatMessages.length}` : ''}</button>
     {#if state.nearby && !state.dialog && state.phase === 'running'}
       <button class="interaction glass" onclick={() => game?.interact()}><kbd>E</kbd><span>{state.market ? 'Взаимодействовать' : 'Поговорить'}<span class="interaction-name">{state.nearby.name}</span></span></button>
+    {/if}
+    {#if state.phase === 'running' && !state.dialog && !state.chatOpen && !state.settingsOpen && !state.marketPanel && !state.babylonPanel}
+      <div class="carry-controls">
+        {#if state.mode !== 'local'}<output class="small glass" aria-label="Руки">{state.heldItemId ? 'В руках: яблоко' : 'Руки свободны'}</output>{/if}
+        {#if state.carryHint || state.carryPending}
+          <button class="glass" disabled={state.carryPending} onclick={() => game?.carry()} aria-label="Действие с предметом"><kbd>F</kbd> {state.carryPending ? 'Ждём подтверждение сервера…' : state.carryHint}</button>
+        {/if}
+        {#if state.carryError}<p class="capture-error glass" role="alert">{state.carryError}</p>{/if}
+      </div>
     {/if}</div>
     {#if state.visualError && state.phase === 'running' && !state.dialog}<p class="asset-warning glass" role="alert">{state.visualError}</p>{/if}
   {/if}
@@ -124,7 +134,7 @@
   {#if !error && game && state.dialog}
     <div class="modal-backdrop dialog-backdrop"><Dialog dialog={state.dialog} pending={state.dialogPending} error={state.dialogError} send={(text) => game.submitDialog(text)} close={() => game.closeDialog()} /></div>
   {/if}
-  {#if game && state.settingsOpen}<div class="modal-backdrop"><Settings mode={state.mode} config={game.config} error={state.settingsError} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} /></div>{/if}
+  {#if game && state.settingsOpen}<div class="modal-backdrop"><Settings mode={state.mode} config={game.config} error={state.settingsError} volume={state.volume} setVolume={(percent) => game.setVolume(percent)} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} /></div>{/if}
   {#if game && state.chatOpen}<div class="modal-backdrop"><Chat messages={state.chatMessages} error={state.chatError ?? state.networkError} canSend={state.mode !== 'local' && state.networkStatus === 'connected'} send={(text) => game.sendChat(text)} close={() => game.closeChat()} /></div>{/if}
 
   {#if game && state.market}{#key state.market.runId}<MarketPanel {game} market={state.market} panel={state.marketPanel} target={state.marketTarget} />{/key}{/if}

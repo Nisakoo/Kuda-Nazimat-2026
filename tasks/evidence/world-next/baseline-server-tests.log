@@ -1,0 +1,60 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/next-006-010-011-015-2723ff[39m
+
+ [32m✓[39m server/test/integration.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 5488[2mms[22m[39m
+   [33m[2m✓[22m[39m real HTTP auth, join, private world, periodic/grace save and NPC commit work together [33m 1097[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 jump/sprint are authoritative over a real socket; takeover and a released seat preserve stamina and SQLite saves support [33m 727[2mms[22m[39m
+   [33m[2m✓[22m[39m BABEL HTTP requires auth and the controlling seat, rejects forged ownership and cannot commit after takeover [33m 596[2mms[22m[39m
+   [33m[2m✓[22m[39m session expiry closes the real socket and rejects protected HTTP and old tokens [33m 910[2mms[22m[39m
+   [33m[2m✓[22m[39m takeover cancels a running NPC answer before SQLite commit and preserves the player [33m 1224[2mms[22m[39m
+   [33m[2m✓[22m[39m failed responder startup leaves real movement and chat available with a degraded health status [33m 432[2mms[22m[39m
+   [33m[2m✓[22m[39m an enrolled BABEL player can still use legacy chat and NPCs on the old maps [33m 498[2mms[22m[39m
+ [32m✓[39m server/test/babylon.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1033[2mms[22m[39m
+   [33m[2m✓[22m[39m bounds the dictionary, keeps editing possible at capacity and acknowledges the role spawn once [33m 347[2mms[22m[39m
+ [32m✓[39m server/test/movement.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 265[2mms[22m[39m
+ [32m✓[39m server/test/platform.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1096[2mms[22m[39m
+   [33m[2m✓[22m[39m the 52nd NPC answer is unavailable when SQLite fails, retaining exactly 50 committed records [33m 317[2mms[22m[39m
+ [32m✓[39m server/test/a-realtime.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 2364[2mms[22m[39m
+     [33m[2m✓[22m[39m joins with a valid snapshot and bootstrap, then syncs movement through deltas [33m 2134[2mms[22m[39m
+ [32m✓[39m server/test/application.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1780[2mms[22m[39m
+   [33m[2m✓[22m[39m inspect reads a running WAL database without secrets and backup restores a separate copy [33m 925[2mms[22m[39m
+   [33m[2m✓[22m[39m SIGTERM closes the process within ten seconds after saving through PlayerStore [33m 597[2mms[22m[39m
+ [32m✓[39m server/test/npc.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 64[2mms[22m[39m
+ [32m✓[39m server/test/a-world.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 174[2mms[22m[39m
+ [32m✓[39m server/test/migrations.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 166[2mms[22m[39m
+ [2m[90m↓[39m[22m server/test/a-real-world.test.ts [2m([22m[2m2 tests[22m[2m | [22m[33m2 skipped[39m[2m)[22m
+ [32m✓[39m server/test/contracts.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 1457[2mms[22m[39m
+   [33m[2m✓[22m[39m import rules reject a forbidden IO dependency in the domain [33m 1422[2mms[22m[39m
+ [32m✓[39m server/test/a-shared-protocol.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+ [32m✓[39m server/test/height.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [31m❯[39m server/test/building-height.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 16[2mms[22m[39m
+[31m   [31m×[31m authoritative market movement climbs the real stair, respects its rails and descends to the courtyard[39m[32m 13[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m server/test/building-height.test.ts[2m > [22mauthoritative market movement climbs the real stair, respects its rails and descends to the courtyard
+[31m[1mError[22m: Мир «market», файл maps/market/manifest.json: файл не найден или недоступен[39m
+[36m [2m❯[22m readWorldFile server/src/world/loader.ts:[2m33:17[22m[39m
+    [90m 31|[39m   if (!absolute.startsWith(root + path.sep)) throw new WorldError(mapI…
+    [90m 32|[39m   [35mtry[39m { [35mreturn[39m { absolute[33m,[39m bytes[33m:[39m [35mawait[39m [34mreadFile[39m(absolute) }[33m;[39m }
+    [90m 33|[39m   catch { throw new WorldError(mapId, relative, 'файл не найден или не…
+    [90m   |[39m                 [31m^[39m
+    [90m 34|[39m }
+    [90m 35|[39m
+[90m [2m❯[22m loadWorld server/src/world/loader.ts:[2m48:26[22m[39m
+[90m [2m❯[22m server/test/building-height.test.ts:[2m7:18[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m12 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (14)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m128 passed[39m[22m[2m | [22m[33m2 skipped[39m[90m (131)[39m
+[2m   Start at [22m 21:06:43
+[2m   Duration [22m 23.93s[2m (transform 1.59s, setup 0ms, import 3.84s, tests 13.96s, environment 6ms)[22m
+
+make: *** [Makefile:33: server-test] Error 1

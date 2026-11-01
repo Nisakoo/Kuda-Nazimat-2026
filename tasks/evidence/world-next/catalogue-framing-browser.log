@@ -1,0 +1,5 @@
+
+Running 1 test using 1 worker
+
+[1/1] e2e/render.spec.ts:67:1 › NEXT data-only catalogue placement shares duplicate prefabs and releases their owners
+  1 passed (18.7s)

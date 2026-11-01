@@ -1,0 +1,24 @@
+Command: cd client && npx tsc --noEmit
+Scope: observed run during concurrent implementation; not a final whole-branch acceptance claim.
+
+src/app/GameApp.ts(38,1): error TS6133: 'AudioOrigin' is declared but its value is never read.
+src/app/GameApp.ts(120,11): error TS6133: 'audioPrevious' is declared but its value is never read.
+src/app/GameApp.ts(121,11): error TS6133: 'audioMessageSequence' is declared but its value is never read.
+src/app/GameApp.ts(233,14): error TS2339: Property 'baselineAudioMessages' does not exist on type 'GameApp'.
+src/app/GameApp.ts(243,14): error TS2339: Property 'feedAudioMovement' does not exist on type 'GameApp'.
+src/app/GameApp.ts(301,80): error TS2339: Property 'feedAudioMovement' does not exist on type 'GameApp'.
+src/app/GameApp.ts(548,12): error TS2339: Property 'feedAudioMovement' does not exist on type 'GameApp'.
+src/app/GameApp.ts(554,12): error TS2339: Property 'audioMessage' does not exist on type 'GameApp'.
+src/app/GameApp.ts(560,14): error TS2339: Property 'audioMessage' does not exist on type 'GameApp'.
+../server/src/game/GameService.ts(45,5): error TS2412: Type 'WorldLifeStore | undefined' is not assignable to type 'WorldLifeStore' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'WorldLifeStore'.
+../server/src/game/World.ts(49,5): error TS2412: Type 'WorldLife | undefined' is not assignable to type 'WorldLife' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'WorldLife'.
+../server/src/game/index.ts(25,81): error TS2379: Argument of type '{ maxPlayers: number; disconnectGraceMs: number; broadcastEvery: number; initialSpawn: ((playerId: string) => { mapId: string; position: Vector3; force: boolean; } | null) | undefined; didSpawn: ((playerId: string) => void) | undefined; }' is not assignable to parameter of type 'GameSettings' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'initialSpawn' are incompatible.
+    Type '((playerId: string) => { mapId: string; position: Vector3; force: boolean; } | null) | undefined' is not assignable to type '(playerId: string) => { mapId: string; position: { x: number; y: number; z: number; }; force?: boolean; } | null'.
+      Type 'undefined' is not assignable to type '(playerId: string) => { mapId: string; position: { x: number; y: number; z: number; }; force?: boolean; } | null'.
+../server/src/game/index.ts(74,39): error TS2379: Argument of type '{ game: GameService; sessions: SessionVerifier; npc: NpcQuestions; clock: Clock; scheduler: Scheduler; logger: Logger; corsOrigins: readonly string[]; babylon: { ...; } | undefined; }' is not assignable to parameter of type 'GatewayDeps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'babylon' are incompatible.
+    Type '{ enrolled(playerId: string): boolean; spawn(playerId: string): { mapId: string; position: Vector3; force: boolean; } | null; entered(playerId: string): void; } | undefined' is not assignable to type '{ enrolled(playerId: string): boolean; }'.
+      Type 'undefined' is not assignable to type '{ enrolled(playerId: string): boolean; }'.

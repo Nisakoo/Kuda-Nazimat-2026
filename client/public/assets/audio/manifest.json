@@ -1,0 +1,70 @@
+{
+  "generator": "client/scripts/generate-world-audio.mjs",
+  "seed": 42015,
+  "format": "PCM16 mono WAV",
+  "files": [
+    {
+      "name": "wind",
+      "file": "wind.wav",
+      "bytes": 141164,
+      "frames": 70560,
+      "sampleRate": 22050,
+      "channels": 1,
+      "sha256": "20f7ee233ee8fed6af53944c6155103b79d8c4536956abd3bda32437c6856718"
+    },
+    {
+      "name": "birds",
+      "file": "birds.wav",
+      "bytes": 59580,
+      "frames": 29768,
+      "sampleRate": 22050,
+      "channels": 1,
+      "sha256": "78b7b6fe3e3dc7dd244033135c57d01792a9281d0764569f017ddd0adb47087d"
+    },
+    {
+      "name": "grass",
+      "file": "grass.wav",
+      "bytes": 75014,
+      "frames": 37485,
+      "sampleRate": 22050,
+      "channels": 1,
+      "sha256": "9a31d18419807fc1a2855f3fda46e9ee40ff0d72716743e6f239520f1816a6f1"
+    },
+    {
+      "name": "step",
+      "file": "step.wav",
+      "bytes": 8424,
+      "frames": 4190,
+      "sampleRate": 22050,
+      "channels": 1,
+      "sha256": "dc3df977a86f70d8fe4bfeedd57ccd1fcf2ab786278c8df803c9e06d47d88cac"
+    },
+    {
+      "name": "sprint",
+      "file": "sprint.wav",
+      "bytes": 6660,
+      "frames": 3308,
+      "sampleRate": 22050,
+      "channels": 1,
+      "sha256": "0625b9f6ce0eb052efd84ce1685623b4fe81173f53aa832bae53eea0f534b23d"
+    },
+    {
+      "name": "jump",
+      "file": "jump.wav",
+      "bytes": 12392,
+      "frames": 6174,
+      "sampleRate": 22050,
+      "channels": 1,
+      "sha256": "93344d07196cc6c678045304c420d616d14248bf6037cff54ffc2b8b8b8d094b"
+    },
+    {
+      "name": "mumble",
+      "file": "mumble.wav",
+      "bytes": 25180,
+      "frames": 12568,
+      "sampleRate": 22050,
+      "channels": 1,
+      "sha256": "5de9cc136e45ea8392224462f8c2c51ba9fed964e57b6c50eccc409ca9b9cdd3"
+    }
+  ]
+}

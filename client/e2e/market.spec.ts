@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { browserTestOrigin } from '../playwright.settings';
 import type { Page } from '@playwright/test';
 import { expectCapture } from './helpers';
 
@@ -55,7 +56,7 @@ test('market route buys goods, rejects wrong feed, streams pasture and finishes 
   test.setTimeout(120000);
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   const requests:string[]=[];page.on('request',r=>requests.push(r.url()));
-  await page.route('**/*',route=>new URL(route.request().url()).origin==='http://127.0.0.1:4173'?route.fallback():route.abort());
+  await page.route('**/*',route=>new URL(route.request().url()).origin===browserTestOrigin?route.fallback():route.abort());
   await page.route('**/config.json',route=>route.fulfill({json:{mapId:'market',debug:true,chunkRadius:0}}));
   await page.clock.install();await page.goto('/');
   await expect(page.getByRole('dialog',{name:'Добро пожаловать в Вавилон'})).toBeVisible();
@@ -82,7 +83,7 @@ test('market route buys goods, rejects wrong feed, streams pasture and finishes 
   await expect(page.getByRole('dialog',{name:'Спасибо за помощь!'})).toContainText('Все четыре козы сыты');
   await page.screenshot({path:'test-results/market-results.png'});
   const cache=(await page.getByLabel('Кеш мира').textContent())!.match(/^(\d+) \/ (\d+)/)!;expect(Number(cache[1])).toBeLessThanOrEqual(Number(cache[2]));
-  expect(errors).toEqual([]);expect(requests.every(url=>new URL(url).origin==='http://127.0.0.1:4173')).toBe(true);
+  expect(errors).toEqual([]);expect(requests.every(url=>new URL(url).origin===browserTestOrigin)).toBe(true);
 });
 
 test('client stone draft survives closing and vocabulary can be edited without moving the player',async({page})=>{

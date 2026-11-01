@@ -1,0 +1,213 @@
+{
+  "mapId": "market",
+  "seed": 170106,
+  "cats": [
+    {
+      "instanceId": "market-cat-sleep",
+      "behavior": "sleep",
+      "route": [
+        {
+          "x": -7,
+          "y": 0,
+          "z": 7
+        }
+      ],
+      "cycleMs": 6000,
+      "pauseMs": 0
+    },
+    {
+      "instanceId": "market-cat-walk",
+      "behavior": "walk",
+      "route": [
+        {
+          "x": -7,
+          "y": 0,
+          "z": -27
+        },
+        {
+          "x": -5,
+          "y": 0,
+          "z": -27
+        },
+        {
+          "x": -5,
+          "y": 0,
+          "z": -29
+        },
+        {
+          "x": -7,
+          "y": 0,
+          "z": -29
+        }
+      ],
+      "cycleMs": 24000,
+      "pauseMs": 4000
+    },
+    {
+      "instanceId": "market-cat-wash",
+      "behavior": "wash",
+      "route": [
+        {
+          "x": -31,
+          "y": 0,
+          "z": 8
+        }
+      ],
+      "cycleMs": 8000,
+      "pauseMs": 1000
+    }
+  ],
+  "pots": [
+    {
+      "id": "market-pot-1",
+      "templateId": "pushable-pot",
+      "position": {
+        "x": 5.2,
+        "y": 0,
+        "z": 4.6
+      },
+      "rotationY": 0,
+      "zone": {
+        "minX": 4.4,
+        "maxX": 7.3,
+        "minZ": 3.8,
+        "maxZ": 6.4
+      }
+    },
+    {
+      "id": "market-pot-2",
+      "templateId": "pushable-pot",
+      "position": {
+        "x": 6.6,
+        "y": 0,
+        "z": 4.6
+      },
+      "rotationY": 0,
+      "zone": {
+        "minX": 4.4,
+        "maxX": 7.3,
+        "minZ": 3.8,
+        "maxZ": 6.4
+      }
+    },
+    {
+      "id": "market-pot-3",
+      "templateId": "pushable-pot",
+      "position": {
+        "x": 6,
+        "y": 0,
+        "z": 5.3
+      },
+      "rotationY": 0,
+      "zone": {
+        "minX": 4.4,
+        "maxX": 7.3,
+        "minZ": 3.8,
+        "maxZ": 6.4
+      }
+    },
+    {
+      "id": "market-pot-4",
+      "templateId": "pushable-pot",
+      "position": {
+        "x": -3.7,
+        "y": 0,
+        "z": 7
+      },
+      "rotationY": 0,
+      "zone": {
+        "minX": -4.7,
+        "maxX": -2.7,
+        "minZ": 6,
+        "maxZ": 8
+      }
+    }
+  ],
+  "apples": [
+    {
+      "id": "market-apple-1",
+      "templateId": "pickup-apple",
+      "position": {
+        "x": 0.8,
+        "y": 0,
+        "z": 6.4
+      },
+      "rotationY": 0
+    },
+    {
+      "id": "market-apple-2",
+      "templateId": "pickup-apple",
+      "position": {
+        "x": -1.1,
+        "y": 0,
+        "z": 4.5
+      },
+      "rotationY": 0.5
+    },
+    {
+      "id": "market-apple-3",
+      "templateId": "pickup-apple",
+      "position": {
+        "x": 1.2,
+        "y": 0,
+        "z": 1.8
+      },
+      "rotationY": 1
+    },
+    {
+      "id": "market-apple-4",
+      "templateId": "pickup-apple",
+      "position": {
+        "x": 1,
+        "y": 0,
+        "z": -27
+      },
+      "rotationY": 1.5
+    },
+    {
+      "id": "market-apple-5",
+      "templateId": "pickup-apple",
+      "position": {
+        "x": -30,
+        "y": 0,
+        "z": 8
+      },
+      "rotationY": 2
+    }
+  ],
+  "flock": {
+    "assetId": "bird",
+    "count": 5,
+    "route": [
+      {
+        "x": 10,
+        "y": 14,
+        "z": -25
+      },
+      {
+        "x": 9,
+        "y": 14,
+        "z": -5
+      },
+      {
+        "x": 8,
+        "y": 14,
+        "z": 12
+      }
+    ],
+    "schedule": {
+      "periodMs": 120000,
+      "durationMs": 10000,
+      "offsetMs": 10000
+    }
+  },
+  "wind": {
+    "strength": 0.15,
+    "gustStrength": 0.35,
+    "schedule": {
+      "periodMs": 60000,
+      "durationMs": 3000,
+      "offsetMs": 5000
+    }
+  }
+}

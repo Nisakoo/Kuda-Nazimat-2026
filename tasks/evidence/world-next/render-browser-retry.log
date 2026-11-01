@@ -1,0 +1,203 @@
+
+> educational-world-client@0.1.0 test:render
+> playwright test --config playwright.render.config.ts --reporter=line --timeout=120000
+
+
+Running 13 tests using 1 worker
+
+[1/13] e2e/render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner
+[2/13] e2e/render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+[3/13] e2e/render.spec.ts:43:1 › a failed model load keeps frames running and a fresh attempt succeeds
+[4/13] e2e/render.spec.ts:54:1 › unloading while HTTP is pending prevents a late visual from appearing
+[5/13] e2e/render.spec.ts:67:1 › NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners
+  1) e2e/render.spec.ts:67:1 › NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 5
+    Received: 4
+
+      76 |   await page.screenshot({ path: testInfo.outputPath('shared-flock.png') });
+      77 |   const loaded = await page.evaluate(() => window.renderHarness.stats());
+    > 78 |   expect(loaded.models).toBe(5); expect(loaded.errors).toEqual([]);
+         |                         ^
+      79 |   await page.evaluate(() => window.renderHarness.unload('0_0'));
+      80 |   await expect.poll(() => page.evaluate(() => window.renderHarness.stats().entities)).toEqual(['preview']);
+      81 |   await expect.poll(() => page.evaluate(() => window.renderHarness.stats().models)).toBe(1);
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:78:25
+
+    Error Context: render-test-results/render-NEXT-shared-scene-f-9d0ae-eases-unloaded-chunk-owners/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-NEXT-shared-scene-f-9d0ae-eases-unloaded-chunk-owners/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-NEXT-shared-scene-f-9d0ae-eases-unloaded-chunk-owners/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[6/13] e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 30 FPS from front
+  2) e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 30 FPS from front ───────────────
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 120000ms exceeded.
+
+      86 |   for (const carrying of [false, true]) for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player ${carrying ? 'pickup-carry-place' : 'poses'} at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+      87 |     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    > 88 |     const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
+         |                          ^
+      89 |     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+      90 |     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+      91 |     const { video, ...profile } = await running;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:88:26
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-front/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-front/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-front/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[7/13] e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 30 FPS from side
+e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 30 FPS from side
+(node:114076) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 5)
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+  3) e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 30 FPS from side ────────────────
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 120000ms exceeded.
+
+      86 |   for (const carrying of [false, true]) for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player ${carrying ? 'pickup-carry-place' : 'poses'} at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+      87 |     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    > 88 |     const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
+         |                          ^
+      89 |     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+      90 |     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+      91 |     const { video, ...profile } = await running;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:88:26
+
+    Error: page.evaluate: Test timeout of 120000ms exceeded.
+
+      86 |   for (const carrying of [false, true]) for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player ${carrying ? 'pickup-carry-place' : 'poses'} at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+      87 |     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    > 88 |     const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
+         |                          ^
+      89 |     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+      90 |     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+      91 |     const { video, ...profile } = await running;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:88:26
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-side/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-side/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-side/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[8/13] e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 60 FPS from front
+  4) e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 60 FPS from front ───────────────
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 120000ms exceeded.
+
+      86 |   for (const carrying of [false, true]) for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player ${carrying ? 'pickup-carry-place' : 'poses'} at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+      87 |     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    > 88 |     const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
+         |                          ^
+      89 |     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+      90 |     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+      91 |     const { video, ...profile } = await running;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:88:26
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-front/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-front/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-front/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[9/13] e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 60 FPS from side
+  5) e2e/render.spec.ts:86:107 › MOVE poses › four player poses at 60 FPS from side ────────────────
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 120000ms exceeded.
+
+      86 |   for (const carrying of [false, true]) for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player ${carrying ? 'pickup-carry-place' : 'poses'} at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+      87 |     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    > 88 |     const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
+         |                          ^
+      89 |     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+      90 |     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+      91 |     const { video, ...profile } = await running;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:88:26
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-side/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-side/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-side/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[10/13] e2e/render.spec.ts:86:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front
+  6) e2e/render.spec.ts:86:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front ──
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 120000ms exceeded.
+
+      86 |   for (const carrying of [false, true]) for (const fps of [30, 60]) for (const view of ['front', 'side']) test(`four player ${carrying ? 'pickup-carry-place' : 'poses'} at ${fps} FPS from ${view}`, async ({ page }, testInfo) => {
+      87 |     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    > 88 |     const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
+         |                          ^
+      89 |     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+      90 |     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+      91 |     const { video, ...profile } = await running;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:88:26
+
+    Error: page.screenshot: Test timeout of 120000ms exceeded.
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+
+
+      88 |     const running = page.evaluate(({ fps, yaw, carrying }) => window.renderHarness.movement(fps, yaw, carrying), { fps, yaw: view === 'front' ? 0 : Math.PI / 2, carrying });
+      89 |     await page.waitForTimeout(1750); await page.screenshot({ path: testInfo.outputPath('sprint.png') });
+    > 90 |     await page.waitForTimeout(600); await page.screenshot({ path: testInfo.outputPath('jump.png') });
+         |                                                ^
+      91 |     const { video, ...profile } = await running;
+      92 |     const videoPath = testInfo.outputPath('movement.webm'); await writeFile(videoPath, Buffer.from(video, 'base64'));
+      93 |     await testInfo.attach('movement', { path: videoPath, contentType: 'video/webm' });
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:90:48
+
+    Error Context: render-test-results/render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────

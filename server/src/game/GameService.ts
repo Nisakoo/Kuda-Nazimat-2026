@@ -1,5 +1,8 @@
 import type { ServerMessage } from '../../../shared/protocol/types.ts';
 import type { Direction } from '../../../shared/world/types.ts';
+import type { HandRequest, HandResultMessage, SceneStateMessage } from '../../../shared/world-life/types.ts';
+import { handFailure } from '../../../shared/world-life/validate.ts';
+import type { WorldLifeStore } from './worldLifePorts.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
 import type { PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
@@ -16,6 +19,8 @@ interface Seat {
   channel: Channel | null;
   stream: AoiStream | null;
   grace: TimerHandle | null;
+  lifeRevision: number;
+  lifeSentAt: number;
 }
 
 export type JoinResult =
@@ -36,8 +41,10 @@ export class GameService {
   private readonly scheduler: Scheduler;
   private readonly settings: GameSettings;
   private readonly log: Logger;
+  private readonly lifeStore?: WorldLifeStore;
 
-  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger) {
+  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger, lifeStore?: WorldLifeStore) {
+    this.lifeStore = lifeStore;
     this.world = world; this.players = players; this.clock = clock; this.scheduler = scheduler; this.settings = settings; this.log = log;
     this.startedAt = clock.now().toString(36);
   }
@@ -51,11 +58,13 @@ export class GameService {
   attach(identity: PlayerIdentity, channel: Channel): boolean {
     if (!this.canAdmit(identity.accountId)) return false;
     let seat = this.seats.get(identity.accountId);
-    if (!seat) { seat = { identity, channel: null, stream: null, grace: null }; this.seats.set(identity.accountId, seat); }
+    if (!seat) { seat = { identity, channel: null, stream: null, grace: null, lifeRevision: -1, lifeSentAt: -Infinity }; this.seats.set(identity.accountId, seat); }
     if (seat.grace) { this.scheduler.clearTimeout(seat.grace); seat.grace = null; }
     const previous = seat.channel;
     seat.channel = channel;
     seat.stream = null;
+    seat.lifeRevision = -1;
+    seat.lifeSentAt = -Infinity;
     this.world.resetInput(identity.playerId);
     if (previous) previous.close(TAKEOVER_REASON);
     return true;
@@ -97,8 +106,8 @@ export class GameService {
     if (!current || current.mapId !== mapId || force) {
       if (current) this.world.remove(playerId);
       const saved = this.loadSaved(playerId);
-      const usable = !force && saved !== null && saved.mapId === mapId && map.isSafeSupport(saved.position.x, saved.position.z);
-      const spawn = initial?.mapId === mapId && map.isSafeSupport(initial.position.x, initial.position.z) ? initial.position : map.spawn;
+      const usable = !force && saved !== null && saved.mapId === mapId && this.world.isSafeSupport(mapId, saved.position);
+      const spawn = initial?.mapId === mapId && this.world.isSafeSupport(mapId, initial.position) ? initial.position : map.spawn;
       this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : spawn, rotationY: usable ? saved.rotationY : Math.PI });
     }
     if (force) {
@@ -113,6 +122,37 @@ export class GameService {
     seat.stream = stream;
     const snapshot = { tick: this.world.tick, entities };
     return { ok: true, message: (requestId) => ({ v: 3, type: 'joined', requestId, playerId, revision: stream.revision, snapshot, world: map.bootstrap }) };
+  }
+
+  syncLife(channel: Channel, periodic = false, cache?: Map<string, SceneStateMessage>, now = this.clock.now()): void {
+    const seat = this.joinedSeat(channel); const life = this.world.life;
+    if (!seat || !life) return;
+    const changed = seat.lifeRevision !== life.currentRevision();
+    if (periodic && !changed && now-seat.lifeSentAt < 1000) return;
+    const player = this.world.locate(seat.identity.playerId);
+    if (!player) return;
+    const packet = cache?.get(player.mapId) ?? life.snapshot(player.mapId, now);
+    if (!packet) return;
+    cache?.set(player.mapId,packet);
+    // Changed authoritative state must not be lost behind MOVE deltas. Only clock heartbeats are volatile.
+    channel.sendLife?.(packet, periodic && !changed);
+    seat.lifeRevision = packet.revision; seat.lifeSentAt = now;
+  }
+
+  hand(channel: Channel, request: HandRequest): HandResultMessage {
+    const seat = this.joinedSeat(channel);
+    if (!seat) return handFailure(request.requestId, 'NOT_READY', 'Сначала войдите в мир.');
+    const life = this.world.life; const store = this.lifeStore;
+    if (!life || !store) return handFailure(request.requestId, 'NOT_READY', 'Сцена недоступна.');
+    const player = this.world.locate(seat.identity.playerId)!;
+    try {
+      const { result, apples, changed } = store.execute(player.id, player.mapId, request, state => life.decideHand(player, request, state, this.world.placedPlayers(), this.world.isGrounded(player.id)));
+      life.setApples(apples, changed);
+      return result;
+    } catch (error) {
+      this.log.error('Не удалось сохранить переносимый предмет', { error: error instanceof Error ? error.message : String(error) });
+      return handFailure(request.requestId, 'UNAVAILABLE', 'Не удалось сохранить действие. Повторите с тем же requestId.');
+    }
   }
 
   input(channel: Channel, sequence: number, direction: Direction, preparedChunks: readonly string[], sprint = false, jumpId = 0): void {
@@ -159,10 +199,14 @@ export class GameService {
   tick(deltaSeconds: number): void {
     this.world.step(deltaSeconds, this.clock.now());
     if (this.world.tick % this.settings.broadcastEvery !== 0) return;
+    const scenes = new Map<string,SceneStateMessage>(); const now = this.clock.now();
     for (const seat of this.seats.values()) {
       if (!seat.channel || !seat.stream) continue;
+      const channel = seat.channel;
+      this.syncLife(channel, true, scenes, now);
+      if (seat.channel !== channel || !seat.stream) continue;
       const delta = seat.stream.diff(this.world.aoi(seat.identity.playerId));
-      if (delta) seat.channel.send({ v: 3, type: 'delta', tick: this.world.tick, ...delta });
+      if (delta) channel.send({ v: 3, type: 'delta', tick: this.world.tick, ...delta });
     }
   }
 

@@ -1,0 +1,50 @@
+{
+  "baseRevision": "87124f488feb02280234c52797e53ccd145e62e0",
+  "node": "v24.22.2",
+  "players": 4,
+  "durationMs": 61000,
+  "startupMs": 78583.23527,
+  "backend": "real generated world and temporary SQLite; explicit test LLM",
+  "steps": [
+    {
+      "p50": 1.316,
+      "p95": 25.739,
+      "max": 175.183,
+      "players": 4
+    }
+  ],
+  "deltas": 2402,
+  "scenePackets": 236,
+  "scenes": [
+    {
+      "sceneId": "scene_cajcko459yjkj31v",
+      "epochMs": 1793484936959,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    },
+    {
+      "sceneId": "scene_cajcko459yjkj31v",
+      "epochMs": 1793484936959,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    },
+    {
+      "sceneId": "scene_cajcko459yjkj31v",
+      "epochMs": 1793484936959,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    },
+    {
+      "sceneId": "scene_cajcko459yjkj31v",
+      "epochMs": 1793484936959,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    }
+  ],
+  "errors": [],
+  "targetHardware": "unverified: Linux container, not the target laptop"
+}

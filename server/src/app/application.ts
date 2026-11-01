@@ -9,6 +9,7 @@ import { BabylonService } from '../babylon/BabylonService.ts';
 import { testLanguagePort } from '../babylon/TestLanguagePort.ts';
 import type { LanguagePort } from '../babylon/ports.ts';
 import { sqliteBabylon } from '../persistence/babylon.ts';
+import { sqliteWorldLife } from '../persistence/worldLife.ts';
 import { randomId } from '../common/ids.ts';
 import { createAuthService } from '../auth/AuthService.ts';
 import { createResponder } from '../npc/adapters/index.ts';
@@ -39,7 +40,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     npc = createNpcDialogueService({ responder: createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler }), dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger: logger.child('npc') }, config.npc);
     await npc.start();
     const babylon = new BabylonService({ store: sqliteBabylon(db), language: languagePort, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, measure: (kind, durationMs, success) => logger.info('BABEL language operation', { kind, durationMs, success }) });
-    game = await createGame(config, { sessions: auth, players: stores.players, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger: logger.child('game') });
+    game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), npc, babylon, clock: systemClock, scheduler: systemScheduler, logger: logger.child('game') });
     const npcService = npc;
     http = createHttpServer(config, { auth, game, npcReady: () => npcService.ready(), logger: logger.child('http'), babylon, cancelBabylon: npc.cancelConnection });
     game.attach(http.server);

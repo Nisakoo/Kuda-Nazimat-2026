@@ -32,10 +32,24 @@ interface Visual {
   fallWeight: number;
   takeoff: number;
   landing: number;
+  handAction: 'pickup' | 'place' | null;
+  handTime: number;
 }
 
 export class EntityVisuals {
   private readonly visuals = new Map<EntityId, Visual>();
+  private held = new Map<string, string>();
+
+  /** Only confirmed changes trigger reach actions. Initial/reconnected state starts in the carry pose. */
+  setHands(held: ReadonlyMap<string, string>, transitions: boolean): void {
+    for (const [id, visual] of this.visuals) {
+      if (transitions && this.held.get(id) !== held.get(id)) {
+        visual.handAction = held.has(id) ? 'pickup' : 'place'; visual.handTime = 0;
+      } else if (!transitions) { visual.handAction = null; visual.handTime = .65; }
+    }
+    this.held = new Map(held);
+  }
+  handAnchor(id: string): Group | undefined { return this.visuals.get(id)?.rig?.hand; }
   constructor(private readonly scene: Scene, private readonly assets: SceneAssets, private readonly library?: GltfLibrary, private readonly report: (id: string, error: string | null) => void = () => {}, private readonly marketStyle = false) {}
   get ids(): readonly string[] { return [...this.visuals.keys()]; }
 
@@ -74,7 +88,7 @@ export class EntityVisuals {
 
   animate(alpha: number, _elapsed: number, delta = 0): void {
     const dt = Math.min(CHARACTER_MOTION.maxDelta, Math.max(0,delta));
-    for (const visual of this.visuals.values()) {
+    for (const [id, visual] of this.visuals) {
       const from = visual.previous.position; const to = visual.current.position;
       const oldX = visual.group.position.x; const oldZ = visual.group.position.z;
       const discontinuousPair = Math.hypot(to.x-from.x,to.y-from.y,to.z-from.z)>CHARACTER_MOTION.discontinuity;
@@ -105,7 +119,10 @@ export class EntityVisuals {
       const turn = dt>0 ? (visual.group.rotation.y-oldYaw)/dt : 0;
       visual.elapsed += dt;
       visual.rig?.pose(visual.phase,visual.weight,visual.elapsed,turn, { sprint: visual.sprintWeight, air: visual.airWeight, falling: visual.fallWeight,
-        takeoff: Math.sin(Math.PI*visual.takeoff/.1), landing: Math.sin(Math.PI*visual.landing/.14) });
+        takeoff: Math.sin(Math.PI*visual.takeoff/.1), landing: Math.sin(Math.PI*visual.landing/.14) },
+        { carrying: this.held.has(id), action: visual.handAction, progress: visual.handTime/.65 });
+      visual.handTime = Math.min(.65,visual.handTime+dt);
+      if (visual.handTime >= .65) visual.handAction = null;
       const name = visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
       visual.model?.animate(name,dt,name==='walk' ? Math.max(.2,visual.speed/3) : 1);
       visual.snap = false;
@@ -113,7 +130,7 @@ export class EntityVisuals {
   }
 
   position(id: EntityId | null) { return id ? this.visuals.get(id)?.group.position : undefined; }
-  dispose(): void { for (const id of this.visuals.keys()) this.remove(id); }
+  dispose(): void { for (const id of this.visuals.keys()) this.remove(id); this.held.clear(); }
 
   private remove(id: EntityId): void {
     const visual = this.visuals.get(id);
@@ -127,7 +144,7 @@ export class EntityVisuals {
     group.position.set(transform.position.x,transform.position.y,transform.position.z);
     group.rotation.y = transform.rotationY;
     const visual: Visual = { group, token, previous:transform, current:transform, animation:entity.animationState?.name??'idle', speedLimit:entity.movement?.speed??3, phase:0, weight:0, speed:0, elapsed:0, snap:true, controller:new AbortController(), model:null, rig:null, failed:false,
-      motion: entity.motion, observedTick: -1, sprintWeight: 0, airWeight: 0, fallWeight: 0, takeoff: 0, landing: 0 };
+      motion: entity.motion, observedTick: -1, sprintWeight: 0, airWeight: 0, fallWeight: 0, takeoff: 0, landing: 0, handAction: null, handTime: .65 };
     if (this.library?.has(entity.renderable!.assetId)) this.loadModel(entity.id,entity.renderable!.assetId,visual,entity,player);
     else this.addCharacter(visual,entity,player);
     return visual;

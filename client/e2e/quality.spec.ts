@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { browserTestOrigin } from '../playwright.settings';
 import { writeFile } from 'node:fs/promises';
 import { expectCapture } from './helpers';
 
@@ -10,7 +11,7 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route('**/*', (route) => {
     const url = new URL(route.request().url());
-    if (url.origin !== 'http://127.0.0.1:4173') { external.push(url.href); return route.abort(); }
+    if (url.origin !== browserTestOrigin) { external.push(url.href); return route.abort(); }
     if (url.pathname === '/config.json') return route.fulfill({ json: { mapId, debug: true } });
     return route.continue();
   });

@@ -1,0 +1,303 @@
+
+> educational-world-client@0.1.0 test:render
+> playwright test --config playwright.render.config.ts --reporter=line --timeout=120000
+
+
+Running 14 tests using 1 worker
+
+[1/14] e2e/render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner
+[2/14] e2e/render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+[3/14] e2e/render.spec.ts:43:1 › a failed model load keeps frames running and a fresh attempt succeeds
+[4/14] e2e/render.spec.ts:54:1 › unloading while HTTP is pending prevents a late visual from appearing
+[5/14] e2e/render.spec.ts:67:1 › NEXT data-only catalogue placement shares duplicate prefabs and releases their owners
+[6/14] e2e/render.spec.ts:80:1 › NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners
+[7/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from front
+Render cadence: {"requestedFps":30,"simulatedFrames":25,"seconds":15.700200000017881,"actualFps":1.5923364033561054,"completed":false}
+
+  1) e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from front ──────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-front/attachments/movement-4f72dc1d7fc0f5242cceb49b6ea86458dc5063b6.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-front/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-front/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-front/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[8/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from side
+Render cadence: {"requestedFps":30,"simulatedFrames":24,"seconds":15.2665,"actualFps":1.5720695640782103,"completed":false}
+
+  2) e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from side ───────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-side/attachments/movement-3e25cd236061cd0780ca5a53945d9a165e229cc4.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-side/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-side/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-30-FPS-from-side/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[9/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from front
+Render cadence: {"requestedFps":60,"simulatedFrames":31,"seconds":15.420600000023843,"actualFps":2.0102979131779612,"completed":false}
+
+  3) e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from front ──────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-front/attachments/movement-14a9d875a138787a401489dc6e98672a1ef291c0.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-front/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-front/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-front/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[10/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from side
+Render cadence: {"requestedFps":60,"simulatedFrames":27,"seconds":15.133399999976158,"actualFps":1.7841331095485837,"completed":false}
+
+  4) e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from side ───────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-side/attachments/movement-7e1d6c9474309aa6f9b18a849756d2342d9edd5d.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-side/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-side/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-player-poses-at-60-FPS-from-side/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[11/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front
+Render cadence: {"requestedFps":30,"simulatedFrames":25,"seconds":15.36530000001192,"actualFps":1.6270427521740938,"completed":false}
+
+  5) e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front ─
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front/attachments/movement-46241c980d42f5664017ef9591947769fd4c0853.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[12/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from side
+Render cadence: {"requestedFps":30,"simulatedFrames":25,"seconds":15.239200000017881,"actualFps":1.6405060633084851,"completed":false}
+
+  6) e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from side ──
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-b748f-y-place-at-30-FPS-from-side/attachments/movement-c203a0b8187be972c1280b7df3f6abbacb29d45d.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-pla-b748f-y-place-at-30-FPS-from-side/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-b748f-y-place-at-30-FPS-from-side/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-pla-b748f-y-place-at-30-FPS-from-side/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[13/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from front
+Render cadence: {"requestedFps":60,"simulatedFrames":26,"seconds":15.226399999976158,"actualFps":1.7075605527268896,"completed":false}
+
+  7) e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from front ─
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-b6b77--place-at-60-FPS-from-front/attachments/movement-daea11c45921b446c3df4608e32b2794ad0a9f41.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-pla-b6b77--place-at-60-FPS-from-front/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-b6b77--place-at-60-FPS-from-front/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-pla-b6b77--place-at-60-FPS-from-front/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[14/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from side
+Render cadence: {"requestedFps":60,"simulatedFrames":25,"seconds":15.11569999998808,"actualFps":1.653909511304122,"completed":false}
+
+  8) e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from side ──
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      109 |     await writeFile(testInfo.outputPath('cadence.json'), JSON.stringify(profile, null, 2));
+      110 |     console.log('Render cadence:', JSON.stringify(profile));
+    > 111 |     expect(profile.completed).toBe(true);
+          |                               ^
+      112 |     expect(profile.actualFps).toBeGreaterThan(fps * .8);
+      113 |     expect(profile.simulatedFrames).toBeGreaterThanOrEqual(fps * 4);
+      114 |     const entities = (await page.evaluate(() => window.renderHarness.stats())).entities;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:111:31
+
+    attachment #1: movement (video/webm) ───────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-161ad-y-place-at-60-FPS-from-side/attachments/movement-81de7e10fa4bdac912ac2d74cbccfaf93489a332.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: render-test-results/render-MOVE-poses-four-pla-161ad-y-place-at-60-FPS-from-side/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-MOVE-poses-four-pla-161ad-y-place-at-60-FPS-from-side/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-MOVE-poses-four-pla-161ad-y-place-at-60-FPS-from-side/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  8 failed
+    e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from front ───────────────
+    e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from side ────────────────
+    e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from front ───────────────
+    e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from side ────────────────
+    e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front ──
+    e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from side ───
+    e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from front ──
+    e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from side ───
+  6 passed (5.4m)

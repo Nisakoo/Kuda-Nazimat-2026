@@ -1,0 +1,300 @@
+
+Running 2 tests using 1 worker
+
+[1/2] e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+NEXT backend 2026-10-31T23:43:07.456Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+2026-10-31T23:43:07.458Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:43:07.458Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:43:07.459Z INFO [app] Сервер доступен {"url":"http://localhost:41827/"}
+
+NEXT pointer probe {"kind":"request","at":9113,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":9287,"focus":true,"visibility":"visible","active":true,"durationMs":172.2999999821186}
+
+NEXT pointer probe {"kind":"resolve","at":10210.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":11061.5,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":16228.90000000596,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":4401,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":4413.0999999940395,"focus":true,"visibility":"visible","active":true,"durationMs":10.200000017881393}
+
+NEXT pointer probe {"kind":"resolve","at":4429.0999999940395,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":5487,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":9545.59999999404,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":15065.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":15102.09999999404,"focus":true,"visibility":"visible","active":true,"durationMs":23.700000017881393}
+
+NEXT pointer probe {"kind":"resolve","at":15135.59999999404,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":15247.90000000596,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":19972.29999998212,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 2026-10-31T23:44:07.447Z INFO [game] Длительность шага, мс {"p50":0.3,"p95":2.461,"max":16.061,"players":4}
+
+NEXT pointer probe {"kind":"request","at":15144.5,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":15190.40000000596,"focus":true,"visibility":"visible","active":true,"durationMs":20.900000005960464}
+
+NEXT pointer probe {"kind":"resolve","at":15226.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":17380.80000001192,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":29933.30000001192,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":61598,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":61616.69999998808,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":63279.39999997616,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":100415.79999998212,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":100722.79999998212,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":100771.89999997616,"focus":true,"visibility":"visible","active":true}
+
+NEXT backend 2026-10-31T23:45:07.449Z INFO [game] Длительность шага, мс {"p50":0.44,"p95":5.121,"max":129.627,"players":4}
+
+NEXT pointer probe {"kind":"change","at":103571.09999999404,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT game error {"v":3,"type":"error","requestId":"server","code":"UNAUTHORIZED","message":"shutdown"}
+
+NEXT game error {"v":3,"type":"error","requestId":"server","code":"UNAUTHORIZED","message":"shutdown"}
+
+NEXT game error {"v":3,"type":"error","requestId":"server","code":"UNAUTHORIZED","message":"shutdown"}
+
+NEXT backend 2026-10-31T23:45:27.260Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+
+NEXT backend 2026-10-31T23:45:27.265Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:45:27.265Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:45:27.266Z INFO [app] Сервер доступен {"url":"http://localhost:41827/"}
+
+NEXT pointer probe {"kind":"request","at":18085.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":18101,"focus":true,"visibility":"visible","active":true,"durationMs":14.099999994039536}
+
+NEXT pointer probe {"kind":"resolve","at":20392.69999998808,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":20448,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT walk start {"axis":"x","target":0,"position":{"x":0,"z":12.749999999999954}}
+
+NEXT walk done {"axis":"x","target":0,"position":{"x":0,"z":12.749999999999954}}
+
+NEXT walk start {"axis":"z","target":-25,"position":{"x":0,"z":12.749999999999954}}
+
+NEXT backend 2026-10-31T23:46:27.244Z INFO [game] Длительность шага, мс {"p50":0.29,"p95":1.863,"max":52.025,"players":1}
+
+NEXT pointer probe {"kind":"visibility","at":213278.20000001788,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":187871.29999998212,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":167821.90000000596,"focus":true,"visibility":"hidden","active":true}
+
+  1) e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+
+    Error: No authoritative w progress from {"x":0,"z":12.749999999999954} toward z=-25
+
+    No authoritative w progress from {"x":0,"z":12.749999999999954} toward z=-25
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 36.74999999999996
+    Received:   15.900000000000107
+
+    Call Log:
+    - Timeout 30000ms exceeded while waiting on the predicate
+
+      176 |       await expect.poll(async () => direction * ((await position(page))[axis] - here), {
+      177 |         intervals: [50, 100], message: `No authoritative ${key} progress from ${JSON.stringify(await position(page))} toward ${axis}=${target}`,
+    > 178 |       }).toBeGreaterThan(distance > 1.5 ? distance - 1 : .12);
+          |          ^
+      179 |     } finally { await page.keyboard.up(key).catch(() => {}); }
+      180 |     await page.waitForTimeout(400);
+      181 |   }
+        at walk (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:178:10)
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:257:32
+
+    attachment #1: backend-log (text/plain) ────────────────────────────────────────────────────────
+    2026-10-31T23:43:07.456Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+    2026-10-31T23:43:07.458Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+    2026-10-31T23:43:07.458Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chu...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final-ui-0 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Не авторизован
+    Настройки
+
+    ЛОКАЛЬНЫЙ СЕРВЕР · ВАВИЛОН
+
+    Войти в мир
+
+    Выберите имя. Чтобы продолжить с сохранённого места, войдите под тем же именем.
+
+    Имя игрока
+
+    shutdown
+
+    Войти
+
+    Демонстрационный вход без пароля: любой участник может использовать это имя. Для другого серв...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: final-ui-1 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Подключён
+    Настройки
+    Меню Esc
+
+    ВАВИЛОН
+
+    Рынок Вавилона
+
+    Козы пастуха · 0/4
+
+    X 0.0 · Z -1.7 · Y 0.0
+
+    Модели: 9 · Экземпляры: 47
+
+    58803040 / 67108864 байт памяти · Чанки: 17 · Ожидание: 2 · Отложено: 0
+
+    FPS 1.0 · Кадр 1052.6 ms · P95 1609.2 ms · CPU 33.0 ms
+
+    Draw 731 · Гео...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: final-ui-2 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Не авторизован
+    Настройки
+
+    ЛОКАЛЬНЫЙ СЕРВЕР · ВАВИЛОН
+
+    Войти в мир
+
+    Выберите имя. Чтобы продолжить с сохранённого места, войдите под тем же именем.
+
+    Имя игрока
+
+    shutdown
+
+    Войти
+
+    Демонстрационный вход без пароля: любой участник может использовать это имя. Для другого серв...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #8: final-ui-3 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Не авторизован
+    Настройки
+
+    ЛОКАЛЬНЫЙ СЕРВЕР · ВАВИЛОН
+
+    Войти в мир
+
+    Выберите имя. Чтобы продолжить с сохранённого места, войдите под тем же именем.
+
+    Имя игрока
+
+    shutdown
+
+    Войти
+
+    Демонстрационный вход без пароля: любой участник может использовать это имя. Для другого серв...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+
+[2/2] e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+NEXT backend 2026-10-31T23:46:47.575Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+
+NEXT backend 2026-10-31T23:46:47.577Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:46:47.577Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:46:47.577Z INFO [app] Сервер доступен {"url":"http://localhost:43159/"}
+
+NEXT pointer probe {"kind":"request","at":9601,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":9708.300000011921,"focus":true,"visibility":"visible","active":true,"durationMs":106.2000000178814}
+
+NEXT pointer probe {"kind":"resolve","at":11817.199999988079,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":12724,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":18631.80000001192,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+  2) e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 30000ms exceeded while waiting on the predicate
+
+       7 | import { once } from 'node:events';
+       8 | async function expectCapture(page: Page, captured: boolean) {
+    >  9 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+         |                                                                                      ^
+      10 |   if (captured) {
+      11 |     await expect(page.getByLabel('Руки')).toBeVisible();
+      12 |     await expect(page.getByLabel('Состояние связи')).toHaveText('Подключён');
+        at expectCapture (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:9:86)
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:303:85
+
+    attachment #1: backend-log (text/plain) ────────────────────────────────────────────────────────
+    2026-10-31T23:46:47.575Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+    2026-10-31T23:46:47.577Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+    2026-10-31T23:46:47.577Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chu...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final-ui-0 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Подключён
+    Настройки
+
+    ДОБРО ПОЖАЛОВАТЬ В ВАВИЛОН
+
+    Рынок
+    Вавилона.
+
+    Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.
+
+    Сетевая игра использует локальный сервер.
+
+    Повторить подключение Выйти из сессии
+    Начать прогул...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+
+  2 failed
+    e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+    e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts

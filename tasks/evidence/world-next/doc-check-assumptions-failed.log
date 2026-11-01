@@ -1,0 +1,18 @@
+{
+  "files": 15,
+  "localLinksChecked": 178,
+  "errors": [
+    {
+      "file": "architecture.md",
+      "error": "Unexpected readiness/implementation metadata"
+    },
+    {
+      "file": "specs/client-input-ui.md",
+      "error": "Unexpected readiness/implementation metadata"
+    },
+    {
+      "file": "specs/world-next-stage.md",
+      "error": "Unexpected readiness/implementation metadata"
+    }
+  ]
+}

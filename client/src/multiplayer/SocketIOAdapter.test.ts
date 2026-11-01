@@ -30,6 +30,22 @@ it('never constructs a real transport before valid server authorization', () => 
   expect(s.adapter.send({ v: 3, type: 'join', requestId: 'r2', mapId: 'demo' })).toBe(false);
   s.adapter.dispose(); expect(s.clock.pending).toBe(0);
 });
+it('validates the separate authorized world-life channel and never retains hand actions offline', () => {
+  const s = setup(); const listener = vi.fn(); s.adapter.subscribeWorldLife(listener);
+  expect(s.adapter.sendWorldLife({ v: 1, type: 'scene-sync', requestId: 'offline' })).toBe(false);
+  s.adapter.connect(s.context); s.trigger('connect');
+  const packet = { v: 1 as const, type: 'hand' as const, requestId: 'h1', action: 'pickup' as const, targetId: 'apple-1' };
+  expect(s.adapter.sendWorldLife(packet)).toBe(true);
+  expect(s.socket.emit).toHaveBeenCalledWith('world-life', packet);
+  const rejection = { v: 1, type: 'hand-result', requestId: 'h1', ok: false, code: 'BLOCKED', message: 'Место занято.' };
+  s.trigger('world-life', rejection); expect(listener).toHaveBeenCalledWith(rejection);
+  s.socket.emit.mockImplementation(() => { s.socket.sendBuffer.push(packet); });
+  expect(s.adapter.sendWorldLife(packet)).toBe(false); expect(s.socket.sendBuffer).toEqual([]);
+  s.socket.connected = false; expect(s.adapter.sendWorldLife(packet)).toBe(false);
+  s.trigger('world-life', { ...rejection, hidden: true }); expect(s.adapter.state.status).toBe('error');
+  expect(s.socket.removeAllListeners).toHaveBeenCalled(); s.adapter.dispose(); expect(s.clock.pending).toBe(0);
+});
+
 it('bounds retry frequency and stops timers and subscribers on disposal', () => {
   const s = setup(); const listener = vi.fn(); s.adapter.subscribeState(listener);
   s.adapter.connect(s.context);

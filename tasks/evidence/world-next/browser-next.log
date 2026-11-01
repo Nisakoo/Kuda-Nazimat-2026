@@ -1,0 +1,49 @@
+
+Running 2 tests using 1 worker
+
+[1/2] e2e/world-next.spec.ts:101:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+  1) e2e/world-next.spec.ts:101:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+
+    Error: Server startup timeout
+
+      40 |   let output = '';
+      41 |   await new Promise<void>((done, reject) => {
+    > 42 |     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 15000);
+         |                                             ^
+      43 |     child.once('exit', code => { clearTimeout(timeout); reject(new Error(`Server exited ${code}: ${output}`)); });
+      44 |     child.stderr!.on('data', data => { output += data; });
+      45 |     child.stdout!.on('data', data => { output += data; if (output.includes('Сервер доступен')) { clearTimeout(timeout); done(); } });
+        at Timeout._onTimeout (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:42:45)
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: null
+
+      50 |   const exited = once(child, 'exit'); child.kill('SIGTERM');
+      51 |   const timer = setTimeout(() => child.kill('SIGKILL'), 11000);
+    > 52 |   const [code] = await exited; clearTimeout(timer); expect(code).toBe(0);
+         |                                                                  ^
+      53 | }
+      54 | test.beforeAll(async () => {
+      55 |   directory = await mkdtemp(join(tmpdir(), 'world-next-browser-'));
+        at stop (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:52:66)
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:63:29
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[2/2] e2e/world-next.spec.ts:177:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+  1 failed
+    e2e/world-next.spec.ts:101:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+  1 did not run

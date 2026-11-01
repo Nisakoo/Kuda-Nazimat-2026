@@ -3,7 +3,7 @@
   import type { ClientMode } from '../app/GameApp';
   import type { ClientConfig } from '../app/config';
   import { modal } from './modal';
-  const { mode, config, error, apply, close }: { mode: ClientMode; config: ClientConfig; error: string | null; apply: (mode: ClientMode, server: string, map: string, radius: number, debug: boolean) => boolean; close: () => void } = $props();
+  const { mode, config, error, volume, setVolume, apply, close }: { mode: ClientMode; config: ClientConfig; error: string | null; volume: number; setVolume: (percent: number) => void; apply: (mode: ClientMode, server: string, map: string, radius: number, debug: boolean) => boolean; close: () => void } = $props();
   let selected = $state<ClientMode>(untrack(() => mode));
   let server = $state(untrack(() => config.serverUrl));
   let map = $state(untrack(() => config.mapId));
@@ -21,6 +21,7 @@
     <label>Карта <input aria-label="Карта" bind:value={map} list="available-maps" maxlength="80" required /></label>
     <datalist id="available-maps"><option value="market">Рынок Вавилона</option><option value="demo">Площадь открытий</option><option value="science">Сады науки</option></datalist>
     <label>Радиус загрузки <select aria-label="Радиус загрузки" bind:value={radius}><option value={0}>Текущая область</option><option value={1}>Ближайшие области</option><option value={2}>Расширенный обзор</option></select></label>
+    <label>Громкость <input aria-label="Громкость" type="range" min="0" max="100" step="1" value={Math.round(volume * 100)} oninput={(event) => setVolume(Number(event.currentTarget.value))} /> <output>{Math.round(volume * 100)}%</output></label>
     <label class="debug-toggle"><input type="checkbox" bind:checked={debug} /> Диагностика</label>
     {#if error}<p role="alert" class="capture-error">{error}</p>{/if}
     <button type="submit">Применить и открыть карту</button>

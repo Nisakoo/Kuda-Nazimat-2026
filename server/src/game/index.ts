@@ -6,6 +6,8 @@ import { canAccess } from '../world/access.ts';
 import { loadWorld } from '../world/loader.ts';
 import { GameService } from './GameService.ts';
 import { DEFAULT_WORLD_SETTINGS, World } from './World.ts';
+import { WorldLife } from './WorldLife.ts';
+import { randomId } from '../common/ids.ts';
 
 const MAX_CATCH_UP = 5;
 const STATS_EVERY_MS = 60_000;
@@ -14,11 +16,15 @@ const STATS_EVERY_MS = 60_000;
 export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps): Promise<GameRuntime> => {
   if (config.tickHz % config.broadcastHz !== 0) throw new Error('tickHz должен делиться на broadcastHz');
   const loaded = await loadWorld({ worldDir: config.worldDir, maps: config.maps, contentDir: config.contentDir });
-  const world = new World(loaded.maps, loaded.npcs, { ...DEFAULT_WORLD_SETTINGS, aoiRadius: config.aoiRadius });
+  const life = new WorldLife(loaded.maps, deps.clock.now(), randomId('scene'));
+  if (life.catalogue().length && !deps.worldLife) throw new Error('World-life requires a durable store');
+  life.setApples(deps.worldLife?.initialize(life.catalogue()) ?? []);
+  life.validateSnapshots(deps.clock.now());
+  const world = new World(loaded.maps, loaded.npcs, { ...DEFAULT_WORLD_SETTINGS, aoiRadius: config.aoiRadius }, life);
   const log = deps.logger.child('game');
   const game = new GameService(world, deps.players, deps.clock, deps.scheduler, {
     maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery: config.tickHz / config.broadcastHz, initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
-  }, log);
+  }, log, deps.worldLife);
 
   const timers: TimerHandle[] = [];
   let gateway: { close(): Promise<void> } | null = null;

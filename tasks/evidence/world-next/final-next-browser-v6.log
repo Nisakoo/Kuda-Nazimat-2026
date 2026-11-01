@@ -1,0 +1,212 @@
+
+Running 2 tests using 1 worker
+
+[1/2] e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+NEXT backend 2026-10-31T23:51:21.251Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+2026-10-31T23:51:21.256Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:51:21.256Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:51:21.257Z INFO [app] Сервер доступен {"url":"http://localhost:44659/"}
+
+NEXT pointer probe {"kind":"request","at":17031.40000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":17236.09999999404,"focus":true,"visibility":"visible","active":true,"durationMs":188.59999999403954}
+
+NEXT pointer probe {"kind":"resolve","at":18475.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":19998.5,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":26914.90000000596,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":22743.40000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":22761.80000001192,"focus":true,"visibility":"visible","active":true,"durationMs":9.700000017881393}
+
+NEXT pointer probe {"kind":"resolve","at":24400.40000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":26182.90000000596,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 2026-10-31T23:52:21.226Z INFO [game] Длительность шага, мс {"p50":0.258,"p95":1.583,"max":20.727,"players":2}
+
+NEXT pointer probe {"kind":"change","at":46977.5,"focus":true,"visibility":"visible","active":false,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":29513.30000001192,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":29545.70000001788,"focus":true,"visibility":"visible","active":true,"durationMs":24}
+
+NEXT pointer probe {"kind":"resolve","at":29598.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":29765.40000000596,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":40190.90000000596,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 2026-10-31T23:53:21.226Z INFO [game] Длительность шага, мс {"p50":0.286,"p95":1.862,"max":18.874,"players":3}
+
+NEXT pointer probe {"kind":"request","at":37666.10000002384,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":37710.40000000596,"focus":true,"visibility":"visible","active":true,"durationMs":29.5}
+
+NEXT pointer probe {"kind":"resolve","at":39363.70000001788,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":41795.20000001788,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":51670.20000001788,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":139370.30000001192,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":139395.59999999404,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":139447.5,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 2026-10-31T23:54:21.280Z INFO [game] Длительность шага, мс {"p50":0.348,"p95":4.306,"max":39.064,"players":4}
+
+NEXT backend 2026-10-31T23:55:21.314Z INFO [game] Длительность шага, мс {"p50":0.359,"p95":7.422,"max":214.196,"players":3}
+
+NEXT pointer probe {"kind":"change","at":212750.59999999404,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"visibility","at":247788.59999999404,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":174081.90000000596,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":133873.5,"focus":true,"visibility":"hidden","active":true}
+
+  1) e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+
+    TimeoutError: page.screenshot: Timeout 30000ms exceeded.
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+
+
+      247 |   await carrier.keyboard.down('ShiftLeft'); await carrier.keyboard.down('s'); await carrier.waitForTimeout(400);
+      248 |   await carrier.keyboard.press('Space'); await carrier.waitForTimeout(300); await carrier.keyboard.up('s'); await carrier.keyboard.up('ShiftLeft');
+    > 249 |   await carrier.screenshot({ path: testInfo.outputPath('carry-move.png') });
+          |                 ^
+      250 |   await carrier.waitForTimeout(1000);
+      251 |   await carrier.keyboard.press('Escape'); await expectCapture(carrier, false);
+      252 |   await carrier.keyboard.down('f'); await carrier.keyboard.up('f');
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:249:17
+
+    attachment #1: backend-log (text/plain) ────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/backend-log-0d9a7330cb77b2ff49847176d98ac3aa85eb0c1c.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final-ui-0 (text/plain) ─────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-0-c4143dcfe5102ab4d48e5a081948e03f23987826.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: native-pointer-0 (application/json) ─────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-0-82ac619731d27365766ebb72edeb48236ce0f805.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: final-ui-1 (text/plain) ─────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-1-3194a9b26f2830cdbb71468ac42bdc44e96aa677.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: native-pointer-1 (application/json) ─────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-1-2cd5695125879b2b00a54677b9ea6ea0b60f530f.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: final-ui-2 (text/plain) ─────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-2-caad1ec9827e46dfa8dc53c71717bd787dff5072.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #7: native-pointer-2 (application/json) ─────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-2-db6f14445407ae75f4847714e36ba44e34c51ce9.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #8: final-ui-3 (text/plain) ─────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-3-79da7f6cd80a8a6080f446cfffdbfa739e59db15.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #9: native-pointer-3 (application/json) ─────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-3-b6f7ab0fc4b7692ffd62ccd7c61a7cd4e0b02fea.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+
+[2/2] e2e/world-next.spec.ts:282:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+e2e/world-next.spec.ts:282:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+NEXT backend 2026-10-31T23:55:42.548Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+2026-10-31T23:55:42.552Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:55:42.552Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:55:42.552Z INFO [app] Сервер доступен {"url":"http://localhost:36693/"}
+
+NEXT pointer probe {"kind":"request","at":23349.69999998808,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":23775,"focus":true,"visibility":"visible","active":true,"durationMs":417.90000000596046}
+
+NEXT pointer probe {"kind":"resolve","at":26102.79999998212,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":30468,"focus":true,"visibility":"visible","active":false,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":45100.40000000596,"focus":true,"visibility":"visible","active":false,"locked":false}
+
+NEXT backend 2026-10-31T23:56:42.532Z INFO [game] Длительность шага, мс {"p50":0.25,"p95":1.12,"max":30.433,"players":1}
+
+NEXT pointer probe {"kind":"request","at":24071.40000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":24178.40000000596,"focus":true,"visibility":"visible","active":true,"durationMs":87.60000002384186}
+
+NEXT pointer probe {"kind":"resolve","at":26639.29999998212,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":28874.40000000596,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 2026-10-31T23:57:42.534Z INFO [game] Длительность шага, мс {"p50":0.203,"p95":0.779,"max":24.902,"players":1}
+
+NEXT audio: muted jump is silent; opening settings
+
+NEXT pointer probe {"kind":"change","at":47703.29999998212,"focus":true,"visibility":"visible","active":false,"locked":false}
+
+NEXT audio: volume45; close settings and resume
+
+NEXT backend 2026-10-31T23:58:42.580Z INFO [game] Длительность шага, мс {"p50":0.231,"p95":0.987,"max":12.719,"players":1}
+
+NEXT pointer probe {"kind":"request","at":124964.5,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":130078.79999998212,"focus":true,"visibility":"visible","active":false}
+
+NEXT pointer probe {"kind":"change","at":135424.69999998808,"focus":true,"visibility":"visible","active":false,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":149404.5,"focus":true,"visibility":"visible","active":false,"locked":false}
+
+NEXT backend 2026-10-31T23:59:42.581Z INFO [game] Длительность шага, мс {"p50":0.207,"p95":0.834,"max":20.093,"players":1}
+
+NEXT backend 2026-10-31T23:59:59.631Z INFO [app] BABEL language operation {"kind":"chat","durationMs":23,"success":true}
+
+  2) e2e/world-next.spec.ts:282:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+
+    TimeoutError: page.waitForResponse: Timeout 30000ms exceeded while waiting for event "response"
+
+      323 |   await page.keyboard.press('Escape'); await activate(page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Общение', exact: true }));
+      324 |   const countMumbles = () => page.evaluate(() => window.worldAudioProbe.starts.filter(item => Math.abs(item.duration - .57) < .005).length);
+    > 325 |   const mumbleLoaded = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/mumble.wav') && response.ok());
+          |                             ^
+      326 |   await page.getByLabel('Сообщение группе').fill('Прогрев');
+      327 |   await activate(page.getByRole('button', { name: 'Отправить', exact: true }));
+      328 |   await (await mumbleLoaded).finished();
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:325:29
+
+    attachment #1: backend-log (text/plain) ────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/backend-log-83636e35e853019f9f5a2d24995e74d46b185a91.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final-ui-0 (text/plain) ─────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/final-ui-0-a6c4274dd220658aaeaa3b7a0cf179d85b67dd24.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: native-pointer-0 (application/json) ─────────────────────────────────────────────
+    test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/native-pointer-0-0c8c1c3a59197823a383513c3d1c8733d254e0d9.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+
+  2 failed
+    e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+    e2e/world-next.spec.ts:282:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts

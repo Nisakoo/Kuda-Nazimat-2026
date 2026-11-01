@@ -1,0 +1,1534 @@
+[
+  {
+    "direction": "client",
+    "valid": true,
+    "packet": {
+      "v": 1,
+      "type": "hand",
+      "requestId": "press-1",
+      "action": "pickup",
+      "targetId": "apple-1"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": true,
+    "packet": {
+      "v": 1,
+      "type": "hand",
+      "requestId": "press-2",
+      "action": "place"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": true,
+    "packet": {
+      "v": 1,
+      "type": "scene-sync",
+      "requestId": "sync-1"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 1,
+      "type": "hand",
+      "requestId": "press-1",
+      "action": "pickup",
+      "targetId": "apple-1",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 2,
+      "type": "hand",
+      "requestId": "press-1",
+      "action": "pickup",
+      "targetId": "apple-1"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 1,
+      "type": "hand",
+      "requestId": "press-2",
+      "action": "place",
+      "targetId": "apple-1"
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "packet": {
+      "v": 1,
+      "type": "scene-state",
+      "sceneId": "scene-test",
+      "revision": 0,
+      "serverTimeMs": 1000,
+      "epochMs": 1000,
+      "definition": {
+        "v": 1,
+        "mapId": "test",
+        "seed": 1701,
+        "templates": [
+          {
+            "id": "decor",
+            "assetId": "t",
+            "behavior": "static",
+            "animation": "idle"
+          },
+          {
+            "id": "pot",
+            "assetId": "t",
+            "behavior": "pushable",
+            "animation": "idle"
+          },
+          {
+            "id": "apple",
+            "assetId": "t",
+            "behavior": "pickup",
+            "animation": "idle"
+          },
+          {
+            "id": "cat",
+            "assetId": "t",
+            "behavior": "animated",
+            "animation": "idle"
+          }
+        ],
+        "instances": [
+          {
+            "id": "pot-1",
+            "templateId": "pot",
+            "position": {
+              "x": -4,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -5,
+              "maxX": -3,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-2",
+            "templateId": "pot",
+            "position": {
+              "x": -7,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -8,
+              "maxX": -6,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-3",
+            "templateId": "pot",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -11,
+              "maxX": -9,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-4",
+            "templateId": "pot",
+            "position": {
+              "x": -13,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -14,
+              "maxX": -12,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "apple-1",
+            "templateId": "apple",
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-2",
+            "templateId": "apple",
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-3",
+            "templateId": "apple",
+            "position": {
+              "x": -5,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-4",
+            "templateId": "apple",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-5",
+            "templateId": "apple",
+            "position": {
+              "x": -14,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-sleep",
+            "templateId": "cat",
+            "position": {
+              "x": -12,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-walk",
+            "templateId": "cat",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-wash",
+            "templateId": "cat",
+            "position": {
+              "x": -8,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          }
+        ],
+        "cats": [
+          {
+            "instanceId": "cat-sleep",
+            "behavior": "sleep",
+            "route": [
+              {
+                "x": -12,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-walk",
+            "behavior": "walk",
+            "route": [
+              {
+                "x": -10,
+                "y": 0,
+                "z": -5
+              },
+              {
+                "x": -9,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-wash",
+            "behavior": "wash",
+            "route": [
+              {
+                "x": -8,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          }
+        ],
+        "flock": {
+          "assetId": "t",
+          "count": 5,
+          "route": [
+            {
+              "x": -12,
+              "y": 12,
+              "z": -8
+            },
+            {
+              "x": 6,
+              "y": 12,
+              "z": -8
+            }
+          ],
+          "schedule": {
+            "periodMs": 120000,
+            "durationMs": 10000,
+            "offsetMs": 10000
+          }
+        },
+        "wind": {
+          "strength": 0.15,
+          "gustStrength": 0.35,
+          "schedule": {
+            "periodMs": 60000,
+            "durationMs": 3000,
+            "offsetMs": 5000
+          }
+        }
+      },
+      "pots": [
+        {
+          "id": "pot-1",
+          "position": {
+            "x": -4,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-2",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-3",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-4",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 1
+          }
+        }
+      ],
+      "apples": [
+        {
+          "id": "apple-1",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "apple-2",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "apple-3",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-4",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-5",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -14,
+            "y": 0,
+            "z": 6
+          }
+        }
+      ]
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "packet": {
+      "v": 1,
+      "type": "hand-result",
+      "requestId": "press-1",
+      "ok": true,
+      "action": "pickup",
+      "apple": {
+        "id": "apple-1",
+        "mapId": "test",
+        "state": "held",
+        "holderId": "p_test"
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "packet": {
+      "v": 1,
+      "type": "hand-result",
+      "requestId": "press-2",
+      "ok": false,
+      "code": "BLOCKED",
+      "message": "No safe place"
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 1,
+      "type": "hand-result",
+      "requestId": "press-1",
+      "ok": true,
+      "action": "pickup",
+      "apple": {
+        "id": "apple-1",
+        "mapId": "test",
+        "state": "world",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 1,
+      "type": "hand-result",
+      "requestId": "press-1",
+      "ok": true,
+      "action": "place",
+      "apple": {
+        "id": "apple-1",
+        "mapId": "test",
+        "state": "held",
+        "holderId": "p_test"
+      }
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 1,
+      "type": "scene-state",
+      "sceneId": "scene-test",
+      "revision": 0,
+      "serverTimeMs": 1000,
+      "epochMs": 1000,
+      "definition": {
+        "v": 1,
+        "mapId": "test",
+        "seed": 1701,
+        "templates": [
+          {
+            "id": "decor",
+            "assetId": "t",
+            "behavior": "static",
+            "animation": "idle"
+          },
+          {
+            "id": "pot",
+            "assetId": "t",
+            "behavior": "pushable",
+            "animation": "idle"
+          },
+          {
+            "id": "apple",
+            "assetId": "t",
+            "behavior": "pickup",
+            "animation": "idle"
+          },
+          {
+            "id": "cat",
+            "assetId": "t",
+            "behavior": "animated",
+            "animation": "idle"
+          }
+        ],
+        "instances": [
+          {
+            "id": "pot-1",
+            "templateId": "pot",
+            "position": {
+              "x": -4,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -5,
+              "maxX": -3,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-2",
+            "templateId": "pot",
+            "position": {
+              "x": -7,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -8,
+              "maxX": -6,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-3",
+            "templateId": "pot",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -11,
+              "maxX": -9,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-4",
+            "templateId": "pot",
+            "position": {
+              "x": -13,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -14,
+              "maxX": -12,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "apple-1",
+            "templateId": "apple",
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-2",
+            "templateId": "apple",
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-3",
+            "templateId": "apple",
+            "position": {
+              "x": -5,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-4",
+            "templateId": "apple",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-5",
+            "templateId": "apple",
+            "position": {
+              "x": -14,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-sleep",
+            "templateId": "cat",
+            "position": {
+              "x": -12,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-walk",
+            "templateId": "cat",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-wash",
+            "templateId": "cat",
+            "position": {
+              "x": -8,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          }
+        ],
+        "cats": [
+          {
+            "instanceId": "cat-sleep",
+            "behavior": "sleep",
+            "route": [
+              {
+                "x": -12,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-walk",
+            "behavior": "walk",
+            "route": [
+              {
+                "x": -10,
+                "y": 0,
+                "z": -5
+              },
+              {
+                "x": -9,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-wash",
+            "behavior": "wash",
+            "route": [
+              {
+                "x": -8,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          }
+        ],
+        "flock": {
+          "assetId": "t",
+          "count": 5,
+          "route": [
+            {
+              "x": -12,
+              "y": 12,
+              "z": -8
+            },
+            {
+              "x": 6,
+              "y": 12,
+              "z": -8
+            }
+          ],
+          "schedule": {
+            "periodMs": 120000,
+            "durationMs": 10000,
+            "offsetMs": 10000
+          }
+        },
+        "wind": {
+          "strength": 0.15,
+          "gustStrength": 0.35,
+          "schedule": {
+            "periodMs": 60000,
+            "durationMs": 3000,
+            "offsetMs": 5000
+          }
+        }
+      },
+      "pots": [
+        {
+          "id": "pot-1",
+          "position": {
+            "x": -4,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-2",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-3",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-4",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 1
+          }
+        }
+      ],
+      "apples": [
+        {
+          "id": "apple-1",
+          "mapId": "test",
+          "state": "held",
+          "holderId": "p_test"
+        },
+        {
+          "id": "apple-2",
+          "mapId": "test",
+          "state": "held",
+          "holderId": "p_test"
+        },
+        {
+          "id": "apple-3",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-4",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-5",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -14,
+            "y": 0,
+            "z": 6
+          }
+        }
+      ]
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 1,
+      "type": "scene-state",
+      "sceneId": "scene-test",
+      "revision": 0,
+      "serverTimeMs": 1000,
+      "epochMs": 1000,
+      "definition": {
+        "v": 1,
+        "mapId": "test",
+        "seed": 1701,
+        "templates": [
+          {
+            "id": "decor",
+            "assetId": "t",
+            "behavior": "static",
+            "animation": "idle"
+          },
+          {
+            "id": "pot",
+            "assetId": "t",
+            "behavior": "pushable",
+            "animation": "idle"
+          },
+          {
+            "id": "apple",
+            "assetId": "t",
+            "behavior": "pickup",
+            "animation": "idle"
+          },
+          {
+            "id": "cat",
+            "assetId": "t",
+            "behavior": "animated",
+            "animation": "idle"
+          }
+        ],
+        "instances": [
+          {
+            "id": "pot-1",
+            "templateId": "pot",
+            "position": {
+              "x": -4,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -5,
+              "maxX": -3,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-2",
+            "templateId": "pot",
+            "position": {
+              "x": -7,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -8,
+              "maxX": -6,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-3",
+            "templateId": "pot",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -11,
+              "maxX": -9,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-4",
+            "templateId": "pot",
+            "position": {
+              "x": -13,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -14,
+              "maxX": -12,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "apple-1",
+            "templateId": "apple",
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-2",
+            "templateId": "apple",
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-3",
+            "templateId": "apple",
+            "position": {
+              "x": -5,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-4",
+            "templateId": "apple",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-5",
+            "templateId": "apple",
+            "position": {
+              "x": -14,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-sleep",
+            "templateId": "cat",
+            "position": {
+              "x": -12,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-walk",
+            "templateId": "cat",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-wash",
+            "templateId": "cat",
+            "position": {
+              "x": -8,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          }
+        ],
+        "cats": [
+          {
+            "instanceId": "cat-sleep",
+            "behavior": "sleep",
+            "route": [
+              {
+                "x": -12,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-walk",
+            "behavior": "walk",
+            "route": [
+              {
+                "x": -10,
+                "y": 0,
+                "z": -5
+              },
+              {
+                "x": -9,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-wash",
+            "behavior": "wash",
+            "route": [
+              {
+                "x": -8,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          }
+        ],
+        "flock": {
+          "assetId": "t",
+          "count": 5,
+          "route": [
+            {
+              "x": -12,
+              "y": 12,
+              "z": -8
+            },
+            {
+              "x": 6,
+              "y": 12,
+              "z": -8
+            }
+          ],
+          "schedule": {
+            "periodMs": 120000,
+            "durationMs": 10000,
+            "offsetMs": 10000
+          }
+        },
+        "wind": {
+          "strength": 0.15,
+          "gustStrength": 0.35,
+          "schedule": {
+            "periodMs": 60000,
+            "durationMs": 3000,
+            "offsetMs": 5000
+          }
+        }
+      },
+      "pots": [
+        {
+          "id": "pot-1",
+          "position": {
+            "x": 20,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-2",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-3",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-4",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 1
+          }
+        }
+      ],
+      "apples": [
+        {
+          "id": "apple-1",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "apple-2",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "apple-3",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-4",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-5",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -14,
+            "y": 0,
+            "z": 6
+          }
+        }
+      ]
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 1,
+      "type": "scene-state",
+      "sceneId": "scene-test",
+      "revision": 0,
+      "serverTimeMs": 1000,
+      "epochMs": 1000,
+      "definition": {
+        "v": 1,
+        "mapId": "test",
+        "seed": 1701,
+        "templates": [
+          {
+            "id": "decor",
+            "assetId": "t",
+            "behavior": "static",
+            "animation": "idle"
+          },
+          {
+            "id": "pot",
+            "assetId": "t",
+            "behavior": "pushable",
+            "animation": "idle"
+          },
+          {
+            "id": "apple",
+            "assetId": "t",
+            "behavior": "pickup",
+            "animation": "idle"
+          },
+          {
+            "id": "cat",
+            "assetId": "t",
+            "behavior": "animated",
+            "animation": "idle"
+          }
+        ],
+        "instances": [
+          {
+            "id": "pot-1",
+            "templateId": "pot",
+            "position": {
+              "x": -4,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -5,
+              "maxX": -3,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-2",
+            "templateId": "pot",
+            "position": {
+              "x": -7,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -8,
+              "maxX": -6,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-3",
+            "templateId": "pot",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -11,
+              "maxX": -9,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "pot-4",
+            "templateId": "pot",
+            "position": {
+              "x": -13,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0,
+            "zone": {
+              "minX": -14,
+              "maxX": -12,
+              "minZ": -1,
+              "maxZ": 3
+            }
+          },
+          {
+            "id": "apple-1",
+            "templateId": "apple",
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-2",
+            "templateId": "apple",
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": 1
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-3",
+            "templateId": "apple",
+            "position": {
+              "x": -5,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-4",
+            "templateId": "apple",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "apple-5",
+            "templateId": "apple",
+            "position": {
+              "x": -14,
+              "y": 0,
+              "z": 6
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-sleep",
+            "templateId": "cat",
+            "position": {
+              "x": -12,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-walk",
+            "templateId": "cat",
+            "position": {
+              "x": -10,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          },
+          {
+            "id": "cat-wash",
+            "templateId": "cat",
+            "position": {
+              "x": -8,
+              "y": 0,
+              "z": -5
+            },
+            "rotationY": 0
+          }
+        ],
+        "cats": [
+          {
+            "instanceId": "cat-sleep",
+            "behavior": "sleep",
+            "route": [
+              {
+                "x": -12,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-walk",
+            "behavior": "walk",
+            "route": [
+              {
+                "x": -10,
+                "y": 0,
+                "z": -5
+              },
+              {
+                "x": -9,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          },
+          {
+            "instanceId": "cat-wash",
+            "behavior": "wash",
+            "route": [
+              {
+                "x": -8,
+                "y": 0,
+                "z": -5
+              }
+            ],
+            "cycleMs": 12000,
+            "pauseMs": 2000
+          }
+        ],
+        "flock": {
+          "assetId": "t",
+          "count": 5,
+          "route": [
+            {
+              "x": -12,
+              "y": 12,
+              "z": -8
+            },
+            {
+              "x": 6,
+              "y": 12,
+              "z": -8
+            }
+          ],
+          "schedule": {
+            "periodMs": 120000,
+            "durationMs": 10000,
+            "offsetMs": 10000
+          }
+        },
+        "wind": {
+          "strength": 0.15,
+          "gustStrength": 0.35,
+          "schedule": {
+            "periodMs": 60000,
+            "durationMs": 3000,
+            "offsetMs": 5000
+          }
+        }
+      },
+      "pots": [
+        {
+          "id": "pot-1",
+          "position": {
+            "x": -4,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-2",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-3",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "pot-4",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 1
+          }
+        }
+      ],
+      "apples": [
+        {
+          "id": "apple-1",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "apple-2",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": 1
+          }
+        },
+        {
+          "id": "apple-3",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-4",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -10,
+            "y": 0,
+            "z": 6
+          }
+        },
+        {
+          "id": "apple-5",
+          "mapId": "test",
+          "state": "world",
+          "position": {
+            "x": -14,
+            "y": 0,
+            "z": 6
+          }
+        }
+      ],
+      "untrusted": true
+    }
+  }
+]

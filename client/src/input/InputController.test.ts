@@ -36,7 +36,7 @@ describe('confirmed pointer lock and input intentions', () => {
     Object.defineProperty(surface, 'requestPointerLock', { configurable: true, value: vi.fn(() => { grant(); return Promise.resolve(); }) });
     actions = {
       canControl: () => allowed, cameraYaw: () => yaw,
-      move: vi.fn(), sprint: vi.fn(), jump: vi.fn(), clearInput: vi.fn(), look: vi.fn(), zoom: vi.fn(), interact: vi.fn(), menu: vi.fn(),
+      move: vi.fn(), sprint: vi.fn(), jump: vi.fn(), clearInput: vi.fn(), look: vi.fn(), zoom: vi.fn(), interact: vi.fn(), carry: vi.fn(), menu: vi.fn(),
       captured: vi.fn(), interrupted: vi.fn(), captureFailed: vi.fn(),
     };
     input = new InputController(surface, actions);
@@ -101,6 +101,43 @@ describe('confirmed pointer lock and input intentions', () => {
     expect(actions.sprint).toHaveBeenLastCalledWith(false);
     window.dispatchEvent(new Event('blur')); expect(actions.clearInput).toHaveBeenCalled();
     input.requestCapture(); input.sample(); expect(actions.jump).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses the physical F edge once, resets on interruption, and preserves MOVE', () => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', key: 'а' }));
+    expect(actions.carry).not.toHaveBeenCalled();
+    input.requestCapture();
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyW' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', key: 'а' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', repeat: true }));
+    input.sample();
+    expect(actions.carry).toHaveBeenCalledTimes(1);
+    expect(actions.move).toHaveBeenLastCalledWith({ x: 0, z: -1 });
+    window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyF' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF' }));
+    expect(actions.carry).toHaveBeenCalledTimes(2);
+    window.dispatchEvent(new Event('blur'));
+    expect(actions.clearInput).toHaveBeenCalled();
+    input.requestCapture();
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', repeat: true }));
+    expect(actions.carry).toHaveBeenCalledTimes(2);
+    window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyF' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF' }));
+    expect(actions.carry).toHaveBeenCalledTimes(3);
+  });
+
+  it('blocks F for text entry, modified keys, unavailable controls, and disposed input', () => {
+    input.requestCapture();
+    const field = document.createElement('textarea'); document.body.append(field);
+    field.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', bubbles: true }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', ctrlKey: true }));
+    allowed = false;
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF' }));
+    allowed = true;
+    input.dispose();
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF' }));
+    expect(actions.carry).not.toHaveBeenCalled();
   });
 
   it('does not enable movement or look while the request is pending', () => {

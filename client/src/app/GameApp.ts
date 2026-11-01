@@ -5,7 +5,7 @@ import type { GameSession } from '../session/GameSession';
 import { BabylonClient } from '../multiplayer/BabylonClient';
 import type { BabylonView } from '../multiplayer/BabylonClient';
 import type { BabylonAction } from '../../../shared/babylon/types.ts';
-import { MARKET_GOATS } from '../session/MarketSession';
+import { MARKET_GOATS, MARKET_PEOPLE } from '../session/MarketSession';
 import { MarketSession } from '../session/MarketSession';
 import type { MarketState, MarketItem, Stone } from '../session/MarketSession';
 import { MARKET_WORLD } from '../shared/marketWorld.generated';
@@ -34,6 +34,9 @@ import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../../../
 import { parseServerSession } from '../../../shared/protocol/validate.ts';
 import { guestName, requestGuestSession } from '../multiplayer/GuestAuth';
 import { FrameMetrics } from './FrameMetrics';
+import { WorldAudio } from '../audio/WorldAudio';
+import type { AudioOrigin } from '../audio/WorldAudio';
+import { babylonAudioChanges, babylonAudioHistory } from './audioPresentation';
 
 const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };
 export type BabylonPanel = 'setup' | 'languages' | 'intro' | 'task' | 'inventory' | 'stone' | 'words' | 'interaction' | 'chat';
@@ -103,12 +106,21 @@ export interface AppSnapshot {
   readonly renderStats: string;
   readonly stamina: number;
   readonly sprintBlocked: boolean;
+  readonly carryHint: string | null;
+  readonly carryPending: boolean;
+  readonly carryError: string | null;
+  readonly heldItemId: string | null;
+  readonly volume: number;
+  readonly audioStats: string;
 }
 
 /** Composition root; all UI/input commands cross this facade. */
 export class GameApp {
   private babylonClient: BabylonClient | null = null;
   private renderer: RenderAdapter | null = null;
+  private audio: WorldAudio | null = null;
+  private audioPrevious: WorldSnapshot | null = null;
+  private audioMessageSequence = 0;
   private modelAssets: AssetManager | null = null;
   private world: ChunkManager | null = null;
   private worldBudget = new WorldBudget();
@@ -148,6 +160,7 @@ export class GameApp {
     private readonly requestLogin = requestGuestSession,
   ) {
     if (config.mapId === 'market') this.camera = { yaw: 0, pitch: .5, distance: 18 };
+    this.audio = new WorldAudio(this.worldBudget);
     this.snapshot = Object.freeze({
       phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
       babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '',
@@ -159,6 +172,7 @@ export class GameApp {
       mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
       performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
+      carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: this.audio.volume, audioStats: this.audioDiagnostics(),
     });
   }
 
@@ -216,14 +230,25 @@ export class GameApp {
         this.session ??= this.createSession();
         if (this.session instanceof MarketSession) this.patch({ market: this.session.market, marketPanel: 'intro' });
         this.worldBudget = new WorldBudget();
+        this.audio?.dispose(); this.audio = new WorldAudio(this.worldBudget);
+        if (this.snapshot.volume !== this.audio.volume) this.patch({ volume: this.audio.volume });
+        this.baselineAudioMessages();
         const origin = this.worldRoot();
         const sizes = new Map(Object.entries(this.activeBootstrap.assets).map(([path, size]) => [new URL(path, origin).href, size]));
+        // The explicit synthetic backend shares these four local models, with the same budget guards.
+        if (this.mock) for (const name of ['cat', 'bird', 'pushable-pot', 'pickup-apple']) {
+          const path = `assets/models/market/${name}.glb`; const size = (MARKET_WORLD as WorldDescriptor).assets[path];
+          if (size) sizes.set(new URL(path, origin).href, size);
+        }
         this.modelAssets = new AssetManager(new HttpAssetSource(new URL('assets/models/', origin).href, this.httpAccess()), this.createMap !== null ? this.worldBudget : undefined, (url) => sizes.get(url));
         this.renderer = this.createRenderer(this.modelAssets);
         this.renderer.mount(host);
         this.renderer.setBuildingSymbols(this.snapshot.buildingSymbols);
+        if (this.mock) this.renderer.registerModels({ 'life-cat': 'market/cat.glb', 'life-bird': 'market/bird.glb', 'life-pot': 'market/pushable-pot.glb', 'life-apple': 'market/pickup-apple.glb' });
+        if (this.session instanceof OnlineSession) this.renderer.setSceneState(this.session.worldLife);
         if (this.config.session === 'local' || this.mock) this.renderer.registerModels({ 'demo-tablet': 'demo/tablet.glb', 'demo-tablet-json': 'demo/tablet.gltf' });
         this.previous = this.current = this.session.getSnapshot();
+        this.feedAudioMovement(this.current, 'snapshot');
         this.renderer.syncWorld(this.previous, this.current, this.session.playerId);
         this.presentCamera();
         this.unsubscribeSession ??= this.session.subscribe(this.onSessionEvents);
@@ -244,6 +269,7 @@ export class GameApp {
           jump: () => { this.session?.send({ type: 'jump' }); },
           clearInput: () => { this.session?.send({ type: 'clear-input' }); },
           interact: () => this.interact(),
+          carry: () => this.carry(),
           menu: () => this.toggleMenu(),
           captured: () => {
             if (this.session instanceof MarketSession) this.session.beginTour();
@@ -272,6 +298,7 @@ export class GameApp {
           beforeUpdate: () => this.input?.sample(),
           update: (delta) => {
             if (this.snapshot.phase !== 'running') return;
+            this.audio?.update(delta);
             if (this.world && !this.world.manifest) return;
             const localPosition = this.current?.entities.find(entity => entity.id === this.session?.playerId)?.transform?.position;
             if (this.world && this.session instanceof LocalSession && localPosition && !this.world.isPrepared(localPosition)) return;
@@ -279,6 +306,7 @@ export class GameApp {
             if (this.session instanceof OnlineSession) this.session.setPreparedChunks(this.world?.preparedChunks ?? []);
             this.session?.update(delta);
             this.current = this.session?.getSnapshot() ?? null;
+            if (!(this.session instanceof OnlineSession) && this.current) this.feedAudioMovement(this.current, 'live');
             if (this.previous && this.current) this.renderer?.syncWorld(this.previous, this.current, this.session?.playerId ?? null);
             this.updateHud();
             const player = this.current?.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
@@ -326,6 +354,7 @@ export class GameApp {
     if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.babylonPanel) return;
     this.patch({ capture: 'requesting', captureError: null });
     this.input.requestCapture();
+    void this.audio?.unlock();
   }
 
   stop(): void {
@@ -371,6 +400,12 @@ export class GameApp {
     if (this.snapshot.nearby) this.send({ type: 'interact', targetId: this.snapshot.nearby.id });
   }
 
+  carry(): void {
+    if (!this.canControl()) return;
+    if (this.session instanceof OnlineSession) this.session.carry();
+    else this.patch({ carryError: 'Переноска требует подключения к серверу или явно выбранной тестовой сети.' });
+  }
+
   closeDialog(): void {
     this.input?.stop();
     this.npcRequest = null;
@@ -383,8 +418,25 @@ export class GameApp {
     if (!dialog || !text.trim() || this.snapshot.dialogPending) return;
     if (this.session instanceof OnlineSession) {
       this.npcRequest = this.session.askNpc(dialog.npcId, text);
-      if (this.npcRequest) this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-18), { author: 'player', text: text.trim() }] }, dialogPending: true, dialogError: null });
-    } else this.patch({ dialog: answerDemoDialog(dialog, text) });
+      if (this.npcRequest) {
+        this.audioMessage(`npc-question:${this.npcRequest}`, `npc:${dialog.npcId}`, 'live');
+        this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-18), { author: 'player', text: text.trim() }] }, dialogPending: true, dialogError: null });
+      }
+    } else {
+      const answer = answerDemoDialog(dialog, text);
+      const pairId = `local-npc:${++this.audioMessageSequence}`;
+      this.audioMessage(`${pairId}:question`, `npc:${dialog.npcId}`, 'live');
+      this.audioMessage(`${pairId}:answer`, `npc:${dialog.npcId}`, 'live');
+      this.patch({ dialog: answer });
+    }
+  }
+
+  setVolume(percent: number): void {
+    if (this.snapshot.phase === 'disposed' || !Number.isFinite(percent)) return;
+    this.audio ??= new WorldAudio(this.worldBudget);
+    this.audio.setVolume(percent / 100);
+    void this.audio.unlock();
+    this.patch({ volume: this.audio.volume });
   }
 
   setDebug(debug: boolean): void {
@@ -509,12 +561,23 @@ export class GameApp {
       this.activeBootstrap = notice.world;
       this.patch({ screen: 'welcome', worldReady: false, capture: 'idle', captureError: null, dialog: null, chatOpen: false });
       this.setState('idle'); if (host) this.start(host);
+    } else if (notice.type === 'world') {
+      this.feedAudioMovement(notice.snapshot, notice.origin);
+    } else if (notice.type === 'scene') {
+      this.renderer?.setSceneState(notice.state);
+    } else if (notice.type === 'carry') {
+      const state = notice.state;
+      if (state.hint !== this.snapshot.carryHint || state.pending !== this.snapshot.carryPending || state.error !== this.snapshot.carryError || state.heldItemId !== this.snapshot.heldItemId) {
+        this.patch({ carryHint: state.hint, carryPending: state.pending, carryError: state.error, heldItemId: state.heldItemId });
+      }
     } else if (notice.type === 'chat') {
+      this.audioMessage(`chat:${notice.message.messageId}`, 'chat', this.snapshot.chatOpen ? 'live' : 'history');
       this.patch({ chatMessages: [...this.snapshot.chatMessages.slice(-49), { id: notice.message.messageId, name: notice.message.name, text: notice.message.text }] });
     } else if (notice.type === 'npc') {
       const dialog = this.snapshot.dialog;
       if (dialog?.npcId === notice.targetId && this.npcRequest === notice.requestId) {
         this.npcRequest = null;
+        this.audioMessage(`npc-answer:${notice.requestId}`, `npc:${notice.targetId}`, 'live');
         this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-19), { author: 'npc', text: notice.text }] }, dialogPending: false, dialogError: null });
       }
     } else if (notice.type === 'request-error') {
@@ -577,6 +640,7 @@ export class GameApp {
     this.lastMetrics = now;
     const stats = this.frameMetrics.stats; const render = this.renderer?.getDiagnostics(); const budget = this.worldBudget.stats;
     this.patch({ performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms`,
+      audioStats: this.audioDiagnostics(),
       renderStats: `Draw ${render?.drawCalls ?? 0} · Геометрии ${render?.geometries ?? 0} · Текстуры ${render?.textures ?? 0} · Ресурсы ${budget.resources} · Память ${budget.memory} / ${budget.memoryLimit} · Пик ${budget.peakBytes}` });
   }
 
@@ -609,13 +673,19 @@ export class GameApp {
       const dialog: DemoDialog | null = this.session instanceof OnlineSession
         ? target?.character?.kind === 'npc' ? { source: this.mock ? 'mock' : 'server', npcId: target.id, name: target.character.name, topic: target.interactable?.label ?? 'Разговор', questions: [], messages: [] } : null
         : openDemoDialog(event.targetId);
-      if (dialog) { this.input?.stop(); this.patch({ dialog, capture: 'idle', captureError: null }); }
+      if (dialog) {
+        if (!(this.session instanceof OnlineSession)) this.audioMessage(`local-dialog:${++this.audioMessageSequence}`, `npc:${dialog.npcId}`, 'live');
+        this.input?.stop(); this.patch({ dialog, capture: 'idle', captureError: null });
+      }
     }
   };
 
   openMarketPanel(panel: MarketPanel, target: string | null = null): void {
     if (!(this.session instanceof MarketSession)) return;
     this.input?.stop(); this.stop();
+    if (panel === 'interaction' && MARKET_PEOPLE.some(person => person.id === target)) {
+      this.audioMessage(`market-dialog:${++this.audioMessageSequence}`, 'market-npc', 'live');
+    }
     this.patch({ marketPanel: panel, marketTarget: target, market: this.session.market });
   }
   closeMarketPanel(): void {
@@ -650,6 +720,9 @@ export class GameApp {
       if (view.state && !view.state.profile) panel = 'setup';
       else if (view.state?.profile && (!before?.profile || panel === 'setup')) panel = view.state.introSeen ? null : 'intro';
       if (view.state?.party?.completed && before?.party && !before.party.completed) { this.input?.stop(); this.stop(); panel = 'task'; }
+      if (view.state) for (const event of babylonAudioChanges(before, view.state, panel, this.snapshot.babylonTarget)) {
+        this.audioMessage(event.id, event.stream, event.origin);
+      }
       this.patch({ babylon: view, babylonPanel: panel });
       if (view.state?.profile && !this.session && this.host) this.start(this.host);
     }, () => this.expireServerSession('Сессия истекла. Войдите снова.'));
@@ -678,6 +751,32 @@ export class GameApp {
     if (!clean) return;
     this.openBabylonPanel('words'); this.patch({ babylonWord: clean });
     void this.babylonAction({ type: 'suggest', word: clean });
+  }
+
+  private audioDiagnostics(): string {
+    const stats = this.audio?.stats;
+    return `Источники: ${stats?.sources ?? 0} · Буферы: ${stats?.buffers ?? 0} · Загрузки: ${stats?.pending ?? 0} · Память: ${stats?.reservedBytes ?? 0} байт`;
+  }
+
+  private feedAudioMovement(snapshot: WorldSnapshot, origin: AudioOrigin): void {
+    this.audio?.retainEntities(snapshot.entities.filter(entity => entity.character?.kind === 'player' && entity.transform && entity.motion).map(entity => entity.id));
+    const previous = this.audioPrevious;
+    for (const entity of snapshot.entities) {
+      if (!entity.transform || !entity.motion || entity.character?.kind !== 'player') continue;
+      const before = previous?.entities.find(candidate => candidate.id === entity.id)?.motion;
+      this.audio?.movement({ entityId: entity.id, tick: snapshot.tick, position: entity.transform.position,
+        grounded: entity.motion.grounded, sprinting: entity.motion.locomotion === 'sprint',
+        jumpStarted: origin === 'live' && before?.grounded === true && entity.motion.phase === 'rising' && entity.motion.verticalVelocity > 0,
+        origin });
+    }
+    this.audioPrevious = snapshot;
+  }
+  private audioMessage(id: string, stream: string, origin: AudioOrigin): void {
+    this.audio?.message({ id, stream, sequence: ++this.audioMessageSequence, origin });
+  }
+  private baselineAudioMessages(): void {
+    for (const message of this.snapshot.chatMessages) this.audioMessage(`chat:${message.id}`, 'chat', 'history');
+    for (const event of babylonAudioHistory(this.snapshot.babylon?.state)) this.audioMessage(event.id, event.stream, event.origin);
   }
 
   private updateHud(force = false): void {
@@ -747,10 +846,13 @@ export class GameApp {
     this.unsubscribeSession?.(); this.unsubscribeSession = null;
     this.session?.dispose(); this.session = null;
     this.network = null; this.activeBootstrap = null; this.npcRequest = null;
+    this.patch({ carryHint: null, carryPending: false, carryError: null, heldItemId: null });
     this.host = null;
   }
 
   private releaseScene(): void {
+    this.audio?.dispose(); this.audio = null; this.audioPrevious = null;
+    if (this.snapshot.debug) this.patch({ audioStats: this.audioDiagnostics() });
     this.loop?.dispose();
     this.loop = null;
     this.input?.dispose();

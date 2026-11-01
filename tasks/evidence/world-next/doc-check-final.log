@@ -1,0 +1,53 @@
+{
+  "files": 15,
+  "localLinksChecked": 183,
+  "metadata": [
+    {
+      "file": "architecture.md",
+      "status": "active",
+      "implementation": "partial"
+    },
+    {
+      "file": "specs/client-input-ui.md",
+      "status": "draft",
+      "implementation": "partial"
+    },
+    {
+      "file": "specs/protocol.md",
+      "status": "ready",
+      "implementation": "partial"
+    },
+    {
+      "file": "specs/server-persistence.md",
+      "status": "ready",
+      "implementation": "partial"
+    },
+    {
+      "file": "specs/shared-contracts.md",
+      "status": "ready",
+      "implementation": "partial"
+    },
+    {
+      "file": "specs/world-next-stage.md",
+      "status": "draft",
+      "implementation": "partial"
+    },
+    {
+      "file": "tasks/030-world-next-stage.md",
+      "status": "in-progress"
+    },
+    {
+      "file": "tasks/040-world-contract-server.md",
+      "status": "in-progress"
+    },
+    {
+      "file": "tasks/041-world-client.md",
+      "status": "in-progress"
+    },
+    {
+      "file": "tasks/042-world-audio.md",
+      "status": "in-progress"
+    }
+  ],
+  "errors": []
+}

@@ -11,6 +11,8 @@ import type { GameService } from '../game/GameService.ts';
 import type { Channel } from '../game/ports.ts';
 import { hashToken } from '../auth/AuthService.ts';
 import { TokenBucket } from './TokenBucket.ts';
+import type { WorldLifeServerMessage } from '../../../shared/world-life/types.ts';
+import { handFailure, parseWorldLifeClientMessage, WorldLifeError } from '../../../shared/world-life/validate.ts';
 
 export interface GatewayDeps {
   readonly babylon?: { enrolled(playerId: string): boolean };
@@ -28,6 +30,9 @@ const CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
 const INVALID_LIMIT = 10;
 const INVALID_WINDOW_MS = 10_000;
 const MAX_TIMER_MS = 2_147_000_000;
+const MAX_CONTROL_IDS = 4096;
+const MAX_OUTBOUND_PACKETS = 32;
+const MAX_OUTBOUND_BYTES = 1024 * 1024;
 
 class HandshakeError extends Error {
   readonly data: { code: ErrorCode; message: string };
@@ -75,9 +80,13 @@ class Connection implements Channel {
   private readonly usedRequestIds = new Set<string>();
   private readonly inputBucket: TokenBucket;
   private readonly chatBucket: TokenBucket;
+  private readonly lifeBucket: TokenBucket;
+  private readonly controlBucket: TokenBucket;
   private invalidTimes: number[] = [];
   private expiry: TimerHandle | null = null;
   private closed = false;
+  private outboundPackets = 0;
+  private outboundBytes = 0;
 
   constructor(socket: Socket, deps: GatewayDeps, log: Logger) {
     this.socket = socket; this.deps = deps; this.log = log;
@@ -86,18 +95,56 @@ class Connection implements Channel {
     this.expiresAt = socket.data.expiresAt as number;
     this.inputBucket = new TokenBucket(deps.clock, 30, 30);
     this.chatBucket = new TokenBucket(deps.clock, 1, 3);
+    this.lifeBucket = new TokenBucket(deps.clock, 5, 5);
+    this.controlBucket = new TokenBucket(deps.clock, 5, 10);
   }
 
   start(): void {
     if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
     this.scheduleExpiry();
     this.socket.on('game', (raw: unknown) => this.receive(raw));
+    this.socket.on('world-life', (raw: unknown) => this.receiveLife(raw));
+    this.socket.conn.on('drain', () => { this.outboundPackets = 0; this.outboundBytes = 0; });
     this.socket.on('disconnect', () => this.onDisconnect());
   }
 
-  send(message: ServerMessage): void { if (!this.closed) this.socket.emit('game', message); }
+  send(message: ServerMessage): void { this.sendPacket('game',message,false); }
+
+  sendLife(message: WorldLifeServerMessage, volatile = false): void { this.sendPacket('world-life',message,volatile); }
+
+  private sendPacket(event: 'game' | 'world-life', message: ServerMessage | WorldLifeServerMessage, volatile: boolean): void {
+    if (this.closed) return;
+    if (volatile) { this.socket.volatile.emit(event,message); return; }
+    const bytes = Buffer.byteLength(JSON.stringify(message),'utf8');
+    if (this.outboundPackets >= MAX_OUTBOUND_PACKETS || this.outboundBytes + bytes > MAX_OUTBOUND_BYTES) {
+      this.log.warn('Закрыто медленное соединение', { playerId: this.identity.playerId, packets: this.outboundPackets, bytes: this.outboundBytes });
+      this.closed = true;
+      // Force transport closure. Waiting for a drain here would retain an unread polling queue forever.
+      this.socket.conn.close(true);
+      return;
+    }
+    this.outboundPackets++; this.outboundBytes += bytes;
+    this.socket.emit(event,message);
+  }
 
   close(reason: string): void { this.fail('UNAUTHORIZED', reason); }
+
+  private receiveLife(raw: unknown): void {
+    if (this.deps.clock.now() >= this.expiresAt) { this.close('Сессия истекла.'); return; }
+    if (this.closed || !this.deps.game.isControlling(this)) return;
+    const candidate = raw && typeof raw === 'object' ? (raw as { requestId?: unknown }).requestId : undefined;
+    const requestId = typeof candidate === 'string' && /^[A-Za-z0-9_.:-]{1,80}$/.test(candidate) ? candidate : 'server';
+    if (!this.lifeBucket.take()) { this.sendLife(handFailure(requestId, 'RATE_LIMIT', 'Слишком часто.')); return; }
+    let request;
+    try { request = parseWorldLifeClientMessage(raw); }
+    catch (error) {
+      this.sendLife(handFailure(requestId, error instanceof WorldLifeError ? error.code : 'INVALID', 'Некорректный запрос живого мира.'));
+      this.countInvalid(); return;
+    }
+    if (!this.deps.game.identityOf(this)) { this.sendLife(handFailure(request.requestId, 'NOT_READY', 'Сначала войдите в мир.')); return; }
+    if (request.type === 'hand') this.sendLife(this.deps.game.hand(this, request));
+    this.deps.game.syncLife(this);
+  }
 
   private fail(code: ErrorCode, message: string): void {
     if (this.closed) return;
@@ -134,7 +181,11 @@ class Connection implements Channel {
       this.countInvalid();
       return;
     }
+    // MOVE is idempotent by its authoritative sequence, not an unbounded per-packet ID set.
+    if (message.type === 'input') { this.dispatch(message); return; }
+    if (!this.controlBucket.take()) { this.error(message.requestId, 'RATE_LIMIT', 'Слишком часто.'); return; }
     if (this.usedRequestIds.has(message.requestId)) { this.error(message.requestId, 'INVALID', 'Повтор requestId.'); return; }
+    if (this.usedRequestIds.size >= MAX_CONTROL_IDS) { this.fail('UNAVAILABLE', 'Достигнут лимит команд соединения. Подключитесь снова.'); return; }
     this.usedRequestIds.add(message.requestId);
     this.dispatch(message);
   }
@@ -150,7 +201,7 @@ class Connection implements Channel {
     const game = this.deps.game;
     if (message.type === 'join') {
       const result = game.join(this, message.mapId);
-      if (result.ok) this.send(result.message(message.requestId));
+      if (result.ok) { this.send(result.message(message.requestId)); game.syncLife(this); }
       else if (result.reason === 'unknown-map') this.error(message.requestId, 'INVALID', 'Неизвестная карта.');
       else if (result.reason === 'already-joined') this.error(message.requestId, 'INVALID', 'Вход в мир уже выполнен.');
       return;
@@ -164,6 +215,7 @@ class Connection implements Channel {
       case 'resync': {
         const snapshot = game.resync(this);
         if (snapshot) this.send(snapshot);
+        game.syncLife(this);
         return;
       }
       case 'interact': {

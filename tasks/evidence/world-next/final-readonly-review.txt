@@ -1,0 +1,11 @@
+Final read-only review by world-client (openai/gpt-6.1-sol, high reasoning)
+
+Result: No blocking defect found in this limited review.
+
+Reviewed server authority, persistence, gateway, and client pending-hand flow.
+- WorldLife.ts:133–158 uses authoritative grounding, distance, paths, occupied footprints, and pot-reset positions for placement.
+- persistence/worldLife.ts:13–55 checks the complete durable catalogue. Ownership and receipts share one SQLite transaction. Retry returns the receipt without restoring historical ownership. migrations/003.sql:10 enforces one holder slot.
+- realtime/gateway.ts:107–153 checks the controlling connection/session expiry, validates/rate-limits requests, combines reliable game/life output limits, and bounds request-ID storage.
+- OnlineSession.ts:132–180 permits one pending hand request, correlates receipts, handles timeout/disconnect, does not automatically replay, and displays ownership only from confirmed scene state.
+
+The reviewer did not rerun the coordinator's 284 client /159 server tests. The review does not change the failed native scenarios or 6-passed/8-failed render result. No edits, browser suites, commit, push, branch switch, or other-session stop were made.

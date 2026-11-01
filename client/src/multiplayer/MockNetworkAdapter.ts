@@ -1,15 +1,22 @@
 import type { AccessContext, Clock, NetworkAdapter } from './NetworkAdapter';
 import type { ClientMessage, NetworkState, ServerMessage } from '../../../shared/protocol/types.ts';
 import { parseClientMessage, parseServerMessage } from '../../../shared/protocol/validate.ts';
+import type { WorldLifeClientMessage, WorldLifeServerMessage } from '../../../shared/world-life/types.ts';
+import { parseWorldLifeClientMessage, parseWorldLifeServerMessage } from '../../../shared/world-life/validate.ts';
 
 /** Controlled test transport. No Socket.IO or real authentication is used here. */
 export class MockNetworkAdapter implements NetworkAdapter {
   private value: NetworkState = { status: 'unauthorized', error: null };
   private readonly messages = new Set<(message: ServerMessage) => void>();
   private readonly states = new Set<(state: NetworkState) => void>();
+  private readonly worldLife = new Set<(message: WorldLifeServerMessage) => void>();
   private readonly timers = new Set<number>();
   private disposed = false;
-  constructor(private readonly clock: Clock, private readonly onSend: (message: ClientMessage, transport: MockNetworkAdapter) => void = () => {}) {}
+  constructor(
+    private readonly clock: Clock,
+    private readonly onSend: (message: ClientMessage, transport: MockNetworkAdapter) => void = () => {},
+    private readonly onWorldLife: (message: WorldLifeClientMessage, transport: MockNetworkAdapter) => void = () => {},
+  ) {}
   get state(): NetworkState { return this.value; }
   connect(context?: AccessContext): void {
     if (this.disposed) return;
@@ -28,6 +35,22 @@ export class MockNetworkAdapter implements NetworkAdapter {
     try { message = parseServerMessage(raw); } catch { this.fail('Некорректное тестовое сообщение протокола.'); return; }
     this.later(() => { for (const listener of this.messages) listener(message); }, delay);
   }
+  sendWorldLife(message: WorldLifeClientMessage): boolean {
+    if (this.disposed || this.value.status !== 'connected') return false;
+    const parsed = parseWorldLifeClientMessage(message);
+    this.later(() => { try { this.onWorldLife(parsed, this); } catch { this.fail('Ошибка тестового обмена живого мира.'); } }, 40);
+    return true;
+  }
+  receiveWorldLife(raw: unknown, delay = 0): void {
+    if (this.disposed || this.value.status !== 'connected') return;
+    let message: WorldLifeServerMessage;
+    try { message = parseWorldLifeServerMessage(raw); } catch { this.fail('Некорректное тестовое сообщение живого мира.'); return; }
+    this.later(() => { for (const listener of this.worldLife) listener(message); }, delay);
+  }
+  subscribeWorldLife(listener: (message: WorldLifeServerMessage) => void): () => void {
+    if (this.disposed) return () => {};
+    this.worldLife.add(listener); return () => { this.worldLife.delete(listener); };
+  }
   drop(error = 'Тестовый разрыв связи.'): void { if (this.disposed) return; this.clear(); this.set('lost', error); }
   fail(error = 'Тестовая ошибка соединения.'): void { if (this.disposed) return; this.clear(); this.set('error', error); }
   disconnect(): void { this.clear(); if (!this.disposed) this.set('disconnected'); }
@@ -39,5 +62,5 @@ export class MockNetworkAdapter implements NetworkAdapter {
   subscribe(listener: (message: ServerMessage) => void): () => void { if (this.disposed) return () => {}; this.messages.add(listener); return () => { this.messages.delete(listener); }; }
   subscribeState(listener: (state: NetworkState) => void): () => void { if (this.disposed) return () => {}; this.states.add(listener); listener(this.value); return () => { this.states.delete(listener); }; }
   private set(status: NetworkState['status'], error: string | null = null): void { this.value = Object.freeze({ status, error }); for (const listener of this.states) listener(this.value); }
-  dispose(): void { if (this.disposed) return; this.disconnect(); this.disposed = true; this.messages.clear(); this.states.clear(); }
+  dispose(): void { if (this.disposed) return; this.disconnect(); this.disposed = true; this.messages.clear(); this.states.clear(); this.worldLife.clear(); }
 }

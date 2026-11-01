@@ -1,0 +1,11 @@
+{
+  "id": "catalogue-preview",
+  "objects": [
+    { "id": "catalogue-floor", "assetId": "floor", "transform": { "position": { "x": 0, "y": 0, "z": 0 }, "rotationY": 0 } },
+    { "id": "catalogue-bench-west", "assetId": "bench", "transform": { "position": { "x": -3, "y": 0, "z": 0 }, "rotationY": 0.7 } },
+    { "id": "catalogue-bench-east", "assetId": "bench", "transform": { "position": { "x": 3, "y": 0, "z": 0 }, "rotationY": -1.2 } },
+    { "id": "catalogue-cart", "assetId": "cart", "transform": { "position": { "x": -3, "y": 0, "z": -4 }, "rotationY": 1.5707963267948966 } },
+    { "id": "catalogue-scroll-table", "assetId": "scroll-table", "transform": { "position": { "x": 2, "y": 0, "z": -3 }, "rotationY": 0.35 } },
+    { "id": "catalogue-palm", "assetId": "palm", "transform": { "position": { "x": 6, "y": 0, "z": -6 }, "rotationY": 0.4 } }
+  ]
+}

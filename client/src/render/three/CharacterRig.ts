@@ -3,9 +3,11 @@ import type { SceneAssets } from './SceneAssets';
 import { footTarget, legAngles } from './CharacterMotion';
 import type { MovementPose } from './CharacterMotion';
 
+export interface HandPose { readonly carrying: boolean; readonly action: 'pickup' | 'place' | null; readonly progress: number }
 export interface CharacterRig {
   readonly root: Group;
-  pose(phase: number, weight: number, elapsed: number, turn: number, movement?: MovementPose): void;
+  readonly hand: Group;
+  pose(phase: number, weight: number, elapsed: number, turn: number, movement?: MovementPose, hand?: HandPose): void;
 }
 
 /** Original Babylonian traveller. All attachments share their parent's joint transform. */
@@ -44,8 +46,9 @@ export function createCharacter(assets: SceneAssets, color: string, market: bool
     const elbow = new Group(); elbow.name = 'elbow'; elbow.position.y = -.3; shoulder.add(elbow);
     add(elbow, 'capsule', skin, [0,-.12,0], [.25,.25,.25]);
     add(elbow, 'sphere', skin, [0,-.265,0], [.083,.10,.075]);
+    const hand = new Group(); hand.name = side < 0 ? 'hand-left' : 'hand-right'; hand.position.set(0,-.265,.055); elbow.add(hand);
     shoulder.rotation.z = side*.10;
-    return { shoulder, elbow, side };
+    return { shoulder, elbow, hand, side };
   });
   const legs = [-1,1].map(side => {
     const hip = new Group(); hip.name = side < 0 ? 'hip-left' : 'hip-right'; hip.position.set(side*.145,.85,0); root.add(hip);
@@ -59,7 +62,8 @@ export function createCharacter(assets: SceneAssets, color: string, market: bool
   });
   return {
     root,
-    pose: (phase, weight, elapsed, turn, movement = { sprint: 0, air: 0, falling: 0, takeoff: 0, landing: 0 }) => {
+    hand: arms[1]!.hand,
+    pose: (phase, weight, elapsed, turn, movement = { sprint: 0, air: 0, falling: 0, takeoff: 0, landing: 0 }, hand = { carrying: false, action: null, progress: 1 }) => {
       const { sprint, air, falling, takeoff, landing } = movement;
       const compression = landing * .11 + takeoff * .06;
       const gaitDrop = .06 + .1 * sprint;
@@ -69,10 +73,21 @@ export function createCharacter(assets: SceneAssets, color: string, market: bool
       torso.rotation.x = weight*(.035 + sprint*.12) + compression*.7 + air*.04;
       torso.rotation.z = Math.sin(phase)*weight*.025 - Math.max(-.07,Math.min(.07,turn*.035));
       head.rotation.y = Math.sin(elapsed*.7+seed)*.035*(1-weight);
+      // This additive upper-body action does not alter the authoritative root or MOVE gait.
+      const progress = Math.max(0,Math.min(1,hand.progress));
+      const reach = hand.action ? Math.sin(Math.PI * progress) : 0;
+      const carryWeight = hand.action === 'pickup' ? progress : hand.action === 'place' ? 1-progress : hand.carrying ? 1 : 0;
+      torso.rotation.x += reach*.42; torso.position.y -= reach*.12;
+      head.rotation.x = reach*.2;
       for (const { shoulder, elbow, side } of arms) {
         shoulder.rotation.x = Math.sin(phase+(side<0?0:Math.PI))*(.42+sprint*.28)*weight - air*(.65-falling*.25) - takeoff*.5;
         shoulder.rotation.z = side*(.10+Math.sin(elapsed*1.8+seed)*.012*(1-weight)+air*.2);
         elbow.rotation.x = -.12 - weight*(.20+sprint*.45) - air*.35;
+        if (side > 0 && (hand.carrying || hand.action)) {
+          shoulder.rotation.x += (-.28+Math.sin(phase)*weight*.06-shoulder.rotation.x)*carryWeight - reach*.5;
+          shoulder.rotation.z += (-.12-shoulder.rotation.z)*carryWeight;
+          elbow.rotation.x += (-.98-elbow.rotation.x)*carryWeight + reach*.7;
+        }
       }
       for (const { hip, knee, ankle, side } of legs) {
         const foot = footTarget(phase+(side<0?0:Math.PI),weight,sprint);

@@ -10,11 +10,17 @@ globalThis.FileReader ??= class { readAsArrayBuffer(blob) { blob.arrayBuffer().t
 const rootUrl = new URL('../public/assets/models/market/', import.meta.url);
 await mkdir(rootUrl, { recursive: true });
 const C = { sand:'#d7b989', cream:'#ecd3a7', light:'#f3dfb9', clay:'#b96c49', teal:'#478e88', dark:'#65503c', wood:'#8b603f', leaf:'#718253', olive:'#9a9d62', ochre:'#d6a64e', red:'#b54e3e', gold:'#e7bc57' };
-let root, collisions, clips;
+let root, collisions, clips, windIndex=0;
+// Keep flexible parts separate from baked masonry and collision geometry.
+function flexible(mesh, kind) {
+ const parent=mesh.parent,pivot=new Group();pivot.name=`wind-${kind}-${windIndex++}`;
+ pivot.position.copy(mesh.position);pivot.position.y-=kind==='grass'?.13:0;
+ mesh.position.sub(pivot.position);parent.add(pivot);pivot.add(mesh);return mesh;
+}
 const geometryPool=new Map();
 const batchedMaterial=new MeshStandardMaterial({vertexColors:true,roughness:1});
 function rotationTrack(name,times,angles) { return new QuaternionKeyframeTrack(name+'.quaternion',times,angles.flatMap(a=>[Math.sin(a/2),0,0,Math.cos(a/2)])); }
-function begin(name) { root = new Group(); root.name = name; collisions=[]; clips=[]; geometryPool.clear(); }
+function begin(name) { root = new Group(); root.name = name; collisions=[]; clips=[]; windIndex=0; geometryPool.clear(); }
 function part(geometry, color, x,y,z, sx=1,sy=1,sz=1, parent=root) {
   const mesh=new Mesh(geometry,new MeshStandardMaterial({color,roughness:1})); mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);parent.add(mesh);return mesh;
 }
@@ -36,8 +42,8 @@ function pot(x,y,z,s=1,color=C.clay,kind='jar',parent=root) {
 }
 function basket(x,y,z,s=1,filled=false,parent=root) {cyl(C.wood,x,y+.24*s,z,.28*s,.48*s,.4*s,parent);for(let i=0;i<4;i++)cyl(C.ochre,x,y+(.08+i*.12)*s,z,(.3+i*.025)*s,.03*s,(.3+i*.025)*s,parent);if(filled)for(let i=0;i<5;i++)ball(C.gold,x+Math.sin(i*2)*.18*s,y+.5*s,z+Math.cos(i*2)*.18*s,.14*s,.14*s,.14*s,parent);}
 function palm(x,z,h=5) {obstacle(x,z,.6,.6);for(let i=0;i<7;i++){const trunk=cyl(i%2?C.wood:'#a17b50',x+Math.sin(i*.3)*.15,(i+.5)*h/7,z,.19,h/7,.23);trunk.rotation.z=.04;}
-for(let i=0;i<7;i++){const angle=i*Math.PI*2/7;const leaf=ball(i%2?C.leaf:C.olive,x+Math.sin(angle)*1.15,h,z+Math.cos(angle)*1.15,.42,.13,1.8);leaf.rotation.y=angle;leaf.rotation.x=.2;}ball(C.wood,x,h-.15,z,.35,.3,.35);}
-function plant(x,z,s=1){box(C.sand,x,.25,z,s,.5,s);obstacle(x,z,s,s);for(let i=0;i<5;i++)ball(i%2?C.leaf:C.olive,x+Math.sin(i*3)*s*.2,.6+s*.25,z+Math.cos(i*3)*s*.2,s*.3,s*.45,s*.3);}
+for(let i=0;i<7;i++){const angle=i*Math.PI*2/7;const leaf=flexible(ball(i%2?C.leaf:C.olive,x+Math.sin(angle)*1.15,h,z+Math.cos(angle)*1.15,.42,.13,1.8),'leaf');leaf.rotation.y=angle;leaf.rotation.x=.2;}ball(C.wood,x,h-.15,z,.35,.3,.35);}
+function plant(x,z,s=1){box(C.sand,x,.25,z,s,.5,s);obstacle(x,z,s,s);for(let i=0;i<5;i++)flexible(ball(i%2?C.leaf:C.olive,x+Math.sin(i*3)*s*.2,.6+s*.25,z+Math.cos(i*3)*s*.2,s*.3,s*.45,s*.3),'leaf');}
 function house(x,z,w=5,h=3,d=4){
   obstacle(x,z,w,d);box(C.sand,x,h/2,z,w,h,d);
   // Large protruding masonry courses, with a shadowed entrance on the street facade.
@@ -47,12 +53,16 @@ function house(x,z,w=5,h=3,d=4){
   box(C.cream,x,2.15,z+d/2+.2,1.7,.3,.35);
   box(C.cream,x,h+.12,z,w+.3,.25,d+.3);band(x,h-.25,z+d/2+.12,w);
   for(const side of [-1,1]) {box(C.sand,x+side*(w/2-.1),h+.4,z,.28,.5,d);box(C.cream,x+side*(w/2-.1),h+.7,z,.36,.13,d+.15);}
-  for(let i=0;i<5;i++)ball(i%2?C.leaf:C.olive,x+w/2-.25,h-i*.38,z+d/2+.18,.3,.3,.15);
+  for(let i=0;i<5;i++)flexible(ball(i%2?C.leaf:C.olive,x+w/2-.25,h-i*.38,z+d/2+.18,.3,.3,.15),'leaf');
 }
 function table(x,z,w=3){box(C.wood,x,1,z,w,.18,1.5);for(const a of [-1,1])for(const b of [-1,1])box(C.dark,x+a*(w/2-.2),.48,z+b*.5,.18,.96,.18);obstacle(x,z,w,1.5);}
 function canopy(x,z,color){for(const a of [-1,1])for(const b of [-1,1]){box(C.wood,x+a*1.9,1.65,z+b*1.25,.14,3.3,.14);obstacle(x+a*1.9,z+b*1.25,.2,.2);}for(const a of [-1,1])box(C.dark,x,3.25,z+a*1.25,4.1,.15,.16);
-for(let i=0;i<6;i++){const panel=box(i%2?color:C.cream,x-1.65+i*.66,3.1-Math.sin((i+.5)/6*Math.PI)*.35,z,.68,.06,2.7);panel.rotation.z=(i-2.5)*.045;triangle(color,x-1.65+i*.66,2.85,z+1.36,.26);}
+for(let i=0;i<6;i++){const panel=flexible(box(i%2?color:C.cream,x-1.65+i*.66,3.1-Math.sin((i+.5)/6*Math.PI)*.35,z,.68,.06,2.7),'cloth');panel.rotation.z=(i-2.5)*.045;flexible(triangle(color,x-1.65+i*.66,2.85,z+1.36,.26),'cloth');}
 basket(x-1.5,2,z,.5);basket(x+1.5,2.1,z,.45);}
+function textileSign(x,y,z){
+ const g=new Group();g.name=`wind-sign-${windIndex++}`;g.position.set(x,y+2.4,z);root.add(g);
+ box(C.clay,0,-1.2,0,2.8,2.4,.1,g);for(let i=0;i<4;i++)band(0,-2+i*.45,.08,2.6,g);
+}
 function merchant(name,x,z,color=C.cream,action='idle'){
   const g=new Group();g.name=name;g.position.set(x,0,z);root.add(g);
   const skin='#c69770';
@@ -103,6 +113,13 @@ function horizon(){
   for(let i=0;i<6;i++) { const peak=ball(i%2?'#c5a38d':'#b99a88',-35+i*14,1,-48-(i%2)*6,13,9+(i%3)*3,9);peak.rotation.y=i*.7; }
   for(let i=0;i<5;i++) { const cloud=ball(i%2?'#f6ddbe':'#ead0b4',-28+i*14,13+(i%2)*3,-35-(i%3)*8,7,.7,2);cloud.rotation.y=.3; }
 }
+function bench(x,z){box(C.wood,x,.5,z,2,.16,.6);box(C.wood,x,.95,z-.25,2,.55,.12);for(const side of [-1,1])box(C.dark,x+side*.75,.25,z,.14,.5,.45);obstacle(x,z,2,.7);}
+function cart(x,z){
+ const parent=root,g=new Group();g.name='cart';g.position.set(x,0,z);parent.add(g);root=g;
+ box(C.wood,0,.65,0,1.8,.2,2.5);for(const side of [-1,1]){box(C.wood,side*.88,1,0,.12,.7,2.5);const wheel=cyl(C.dark,side*1.05,.55,.3,.58,.14);wheel.rotation.z=Math.PI/2;
+ for(let i=0;i<6;i++){const spoke=box(C.ochre,side*1.14,.55,.3,.07,.95,.08);spoke.rotation.x=i*Math.PI/3;}box(C.wood,side*.55,.7,1.9,.12,.12,1.7);}
+ pot(-.3,.8,.2,.8);basket(.4,.8,-.2,.8,true);root=parent;obstacle(x,z+.1,2.4,2.8);
+}
 function market(){begin('market');horizon();paving();house(-10,-5,6,3.5,6);house(9,-7,6,3.7,5);house(-6,-12,5,2.7,4);house(6,-14,5,3,4);
 // Wide passable visual steps; no obstacle rises into the walking capsule.
 for(let i=0;i<5;i++)box(i%2?C.light:C.cream,0,.02+i*.018,-10-i*.7,4.8,.13,.68);
@@ -111,29 +128,29 @@ table(-4.8,2,3.2);canopy(-4.8,2,C.ochre);box(C.teal,-4.8,.65,2.79,3.2,.7,.07);ba
 for(let tray=0;tray<3;tray++){box(C.dark,-5.8+tray,1.15,2,.9,.12,1.15);for(let i=0;i<10;i++){const color=[C.gold,C.red,C.wood][tray];ball(color,-6.05+tray+(i%3)*.24,1.27+Math.floor(i/6)*.18,1.65+Math.floor(i/3)%2*.32,.15,tray===2?.09:.16,tray===2?.25:.15);}}
 basket(-6.8,0,3.6,1,true);basket(-3.15,0,3.5,.75,true);pot(-6.7,0,4.9,1.3);merchant('fruit-seller',-4.5,.5,C.cream,'fruit');
 table(-4.8,-4.6,3);for(let i=0;i<4;i++){const color=[C.clay,C.ochre,C.teal,C.cream][i];const roll=cyl(color,-5.8+i*.65,1.3,-4.6,.24,1.15);roll.rotation.x=Math.PI/2;box(color,-5.8+i*.65,1.16,-3.9,.55,.12,.5);}
-box(C.clay,-4.8,2,-5.65,2.8,2.4,.1);for(let i=0;i<4;i++){band(-4.8,1.2+i*.45,-5.57,2.6);}merchant('fabric-seller',-3,-5.2,C.clay);
+textileSign(-4.8,.8,-5.65);merchant('fabric-seller',-3,-5.2,C.clay);
 table(4.9,1,3.2);canopy(4.9,1,C.teal);for(let i=0;i<5;i++)pot(3.7+i*.57,1.1,1,i%2?.55:.45,i%2?C.cream:C.clay,i%3?'jar':'bowl');
 for(let shelf=0;shelf<2;shelf++){box(C.wood,6.7,.85+shelf*.9,-.2,.65,.13,3.5);for(let i=0;i<4;i++)pot(6.7,.93+shelf*.9,-1.3+i*.75,.5,C.clay,i%2?'tall':'jar');}obstacle(6.7,-.2,.7,3.5);
-for(let i=0;i<3;i++)pot(5.2+i*.7,0,4.6+(i%2)*.7,1.1+i*.2,C.clay,i%2?'tall':'jar');obstacle(6,5,2.8,1.8);
+// These 3 ground vessels are dynamic instances. They have no baked mesh or bitmap obstacle.
 merchant('potter',4.6,-.5,C.cream,'pot');merchant('visitor',3,2.8,C.clay);
 // Cart, with visible spokes, parked clear of the stair approach.
-box(C.wood,4.8,.65,-8.8,1.8,.2,2.5);for(const side of [-1,1]){box(C.wood,4.8+side*.88,1,-8.8,.12,.7,2.5);const wheel=cyl(C.dark,4.8+side*1.05,.55,-8.5,.58,.14);wheel.rotation.z=Math.PI/2;for(let i=0;i<6;i++){const spoke=box(C.ochre,4.8+side*1.14,.55,-8.5,.07,.95,.08);spoke.rotation.x=i*Math.PI/3;}box(C.wood,4.8+side*.55,.7,-6.9,.12,.12,1.7);}obstacle(4.8,-8.7,2.4,2.8);pot(4.5,.8,-8.6,.8);basket(5.2,.8,-9,.8,true);
+cart(4.8,-8.8);
 box(C.sand,3.1,.35,-7,.75,.7,.75);box(C.cream,3.1,1,-7,.65,.65,.65);const glow=box('#f4b54c',3.1,1,-6.66,.28,.28,.03);glow.rotation.z=Math.PI/4;box(C.sand,3.1,1.4,-7,.95,.17,.95);obstacle(3.1,-7,.9,.9);
-palm(-8,7,5.5);palm(7,-10,6.5);plant(-7,-1);plant(8,3);pot(-3.7,0,7,1.4);obstacle(-3.7,7,1.4,1.4);
+palm(-8,7,5.5);palm(7,-10,6.5);plant(-7,-1);plant(8,3); // The fourth ground vessel is dynamic, not baked.
 }
 function pasture(){begin('pasture');horizon();box('#b2aa73',0,-.12,0,32,.2,32);box(C.cream,0,-.005,10,4,.08,12);
 for(const side of [-1,1]){house(side*6,12,5,2.8,4);plant(side*3.2,9);}
 // Fence has a broad south gate on the continuation of the market street.
 for(const z of [-10,6])for(let x=-10;x<=10;x+=2){if(z===6&&Math.abs(x)<3)continue;box(C.wood,x,.6,z,.16,1.2,.16);obstacle(x,z,.2,.2);if(x<10 && !(z===6&&x>=-4&&x<2)){for(const y of [.4,.85])box(C.wood,x+1,y,z,2,.12,.12);obstacle(x+1,z,2,.2);}}
 for(const side of [-1,1])for(let z=-10;z<6;z+=2){box(C.wood,side*10,.6,z,.16,1.2,.16);for(const y of [.4,.85])box(C.wood,side*10,y,z+1,.12,.12,2);obstacle(side*10,z+1,.2,2);}
-for(let i=0;i<35;i++){const x=Math.sin(i*19)*13,z=Math.cos(i*7)*12;if(Math.abs(x)<2&&z>5)continue;for(let j=0;j<2;j++){const grass=triangle(i%2?C.leaf:C.olive,x+j*.13,.13,z,.22);grass.rotation.y=i;}}
+for(let i=0;i<35;i++){const x=Math.sin(i*19)*13,z=Math.cos(i*7)*12;if(Math.abs(x)<2&&z>5)continue;for(let j=0;j<2;j++){const grass=flexible(triangle(i%2?C.leaf:C.olive,x+j*.13,.13,z,.22),'grass');grass.rotation.y=i;}}
 merchant('shepherd',-3,6,C.ochre);box(C.wood,-3.6,.85,6,.08,1.7,.08);
 goat('white-goat',-5,1,'#e8e0c9','bell');goat('black-goat',4,0,'#4d4943','horns');goat('spotted-goat',-4,-5,'#b76b3f','spots');goat('kid-goat',4,-5,'#b9bab1','kid');
 box(C.wood,0,.25,-8,2.5,.5,.8);box('#759e9a',0,.5,-8,2.2,.03,.6);obstacle(0,-8,2.5,.8);palm(-13,-9,4.5);palm(13,3,5);
 }
 function mainBuilding(){
  begin('main-building');
- const component=(name,build)=>{const parent=root,g=new Group();g.name=name;parent.add(g);root=g;build();root=parent;};
+ const component=(name,build)=>{const parent=root,g=new Group(),start=collisions.length;g.name=name;parent.add(g);root=g;build();root=parent;g.userData.collisions=collisions.slice(start);};
  // Build repeated props once at the origin. Cloned nodes share their exported mesh.
  const prefabs=new Map();
  const prop=(key,x,y,z,build,scale=1,heightScale=1)=>{
@@ -155,7 +172,6 @@ function mainBuilding(){
   const top=triangle(color,x,y+h*.77,z,w*.58);top.scale.y=h/(w*1.2);top.rotation.z=0;
  };
  const lantern=(x,z)=>prop('courtyard-lantern',x,0,z,()=>{const x=0,z=0;obstacle(x,z,.65,.65);box(C.sand,x,.17,z,.7,.34,.7);box(C.cream,x,.7,z,.52,.8,.52);box(C.teal,x,.49,z,.56,.1,.56);const light=box('#ffd48a',x,.82,z+.27,.25,.25,.025);light.rotation.z=Math.PI/4;box(C.light,x,1.16,z,.75,.13,.75);});
- const bench=(x,z)=>{box(C.wood,x,.5,z,2,.16,.6);box(C.wood,x,.95,z-.25,2,.55,.12);for(const side of [-1,1])box(C.dark,x+side*.75,.25,z,.14,.5,.45);obstacle(x,z,2,.7);};
  component('courtyard-ground',()=>{
   box('#cbb58e',0,-.13,0,32,.2,32);
   for(let i=0;i<8;i++){const p=box(i%3?C.cream:C.light,(i%2)*.08,.025,12.8-i*1.7,2.85,.09,1.5);p.rotation.y=(i%3-1)*.018;}
@@ -188,7 +204,7 @@ function mainBuilding(){
     if(i>0)pointed(side*w*.22,base+.5,z+d/2+.15,.55,Math.min(1.65,h-.85));
    }
    parapet(0,base+h,z,w-.12,d-.12);
-   if(i<4)for(const side of [-1,1])for(let leaf=0;leaf<4;leaf++)ball(leaf%2?C.leaf:C.olive,side*(w/2-.18),base+h-.25-leaf*.27,z+d/2+.14,.22,.3,.13);
+   if(i<4)for(const side of [-1,1])for(let leaf=0;leaf<4;leaf++)flexible(ball(leaf%2?C.leaf:C.olive,side*(w/2-.18),base+h-.25-leaf*.27,z+d/2+.14,.22,.3,.13),'leaf');
    if(i===4)pointed(0,base+.4,z+d/2+.17,.48,1.3,'#ecc384');
    base+=h;
   }
@@ -233,11 +249,54 @@ function mainBuilding(){
  });
 }
 
+function cat(){begin('cat');
+ const body=new Group();body.name='cat-body';body.position.y=.34;root.add(body);
+ ball('#c99b68',0,0,0,.24,.23,.43,body);ball(C.cream,0,-.03,.19,.20,.17,.22,body);
+ const head=new Group();head.name='cat-head';head.position.set(0,.16,.38);body.add(head);
+ ball('#c99b68',0,0,0,.23,.22,.20,head);ball(C.cream,0,-.075,.16,.13,.085,.07,head);
+ for(const side of [-1,1]){const ear=triangle('#c99b68',side*.15,.22,-.01,.16,head);ear.rotation.z=-side*.24;
+ triangle('#c67f74',side*.15,.22,.005,.085,head);const eye=new Group();eye.name=side<0?'cat-eye-left':'cat-eye-right';eye.position.set(side*.095,.025,.182);head.add(eye);ball('#384332',0,0,0,.038,.026,.018,eye);
+ for(const row of [-1,1]){const whisker=box(C.cream,side*.20,-.06+row*.026,.18,.17,.012,.012,head);whisker.rotation.z=side*row*.15;}}
+ ball('#67443c',0,-.055,.22,.031,.025,.024,head);
+ for(const side of [-1,1])for(const end of [-1,1]){const leg=new Group();leg.name=`cat-leg-${side}-${end}`;leg.position.set(side*.16,.30,end*.27);root.add(leg);
+ ball('#c99b68',0,-.10,0,.07,.18,.075,leg);ball(C.cream,0,-.255,.04,.075,.06,.105,leg);}
+ const tail=new Group();tail.name='cat-tail';tail.position.set(0,.35,-.37);root.add(tail);
+ for(let i=0;i<4;i++)ball(i%2?'#ad7749':'#c99b68',Math.sin(i*.5)*.13,i*.06,-i*.13,.067,.07,.10,tail);
+}
+function bird(){begin('bird');ball('#777a70',0,0,0,.10,.10,.26);ball('#b9b6a0',0,.06,.19,.10,.10,.12);const beak=triangle(C.ochre,0,.04,.33,.065);beak.rotation.x=Math.PI/2;
+ for(const side of [-1,1]){const wing=new Group();wing.name=side<0?'bird-wing-left':'bird-wing-right';wing.position.x=side*.07;root.add(wing);
+ const feather=ball('#6a7069',side*.25,0,-.04,.34,.035,.18,wing);feather.rotation.y=side*.25;}
+ const tail=triangle('#777a70',0,0,-.29,.14);tail.rotation.x=Math.PI/2;
+}
+function apple(){begin('pickup-apple');ball(C.red,0,.14,0,.145,.135,.14);for(const side of [-1,1])ball('#c35440',side*.057,.20,0,.087,.074,.10);
+ const stem=cyl(C.wood,0,.29,0,.018,.105,.014);stem.rotation.z=-.18;const leaf=ball(C.leaf,.065,.30,0,.085,.025,.035);leaf.rotation.z=.35;
+}
+// Catalogue exports call the same authoring functions as the locations. A placement needs only an asset ID and transform.
+const prefab=(name,build)=>()=>{begin(name);build();};
+const buildings=['courtyard-ground','stepped-building','main-portal','exterior-stair','courtyard-arch','rest-canopy','courtyard-plants','courtyard-lanterns','babel-symbols'];
+const exports=[['market',market],['pasture',pasture],['main-building',mainBuilding],['cat',cat],['bird',bird],['pushable-pot',prefab('pushable-pot',()=>pot(0,0,0,.6))],['pickup-apple',apple],
+ ['house',prefab('house',()=>house(0,0))],['wall',prefab('wall',()=>{box(C.sand,0,.55,0,4,1.1,.5);obstacle(0,0,4,.5);})],
+ ['fence',prefab('fence',()=>{for(const x of [-1,1])box(C.wood,x,.6,0,.16,1.2,.16);for(const y of [.4,.85])box(C.wood,0,y,0,2,.12,.12);obstacle(0,0,2,.2);})],
+ ['paving',prefab('paving',()=>box(C.cream,0,0,0,1.7,.08,1.9))],['table',prefab('table',()=>table(0,0))],
+ ['shelf',prefab('shelf',()=>{for(const y of [.85,1.75])box(C.wood,0,y,0,.65,.13,3.5);obstacle(0,0,.7,3.5);})],
+ ['crate',prefab('crate',()=>{box(C.wood,0,.22,0,.9,.44,.8);for(const z of [-.42,.42])box(C.dark,0,.22,z,.95,.12,.06);obstacle(0,0,.9,.8);})],
+ ['basket',prefab('basket',()=>basket(0,0,0,1,true))],['fruit',prefab('fruit',()=>ball(C.gold,0,.15,0,.15,.15,.15))],['dates',prefab('dates',()=>ball(C.wood,0,.09,0,.13,.09,.24))],
+ ['textile-sign',prefab('textile-sign',()=>textileSign(0,0,0))],['fabric-roll',prefab('fabric-roll',()=>{const roll=cyl(C.teal,0,.24,0,.24,1.15);roll.rotation.x=Math.PI/2;})],['canopy',prefab('canopy',()=>canopy(0,0,C.ochre))],
+ ['cart',prefab('cart',()=>cart(0,0))],['bench',prefab('bench',()=>bench(0,0))],['scroll-table',prefab('scroll-table',()=>{table(0,0,1.8);const scroll=cyl(C.light,0,1.18,0,.1,.8);scroll.rotation.z=Math.PI/2;})],
+ ['bowl',prefab('bowl',()=>pot(0,0,0,1,C.clay,'bowl'))],['jar',prefab('jar',()=>pot(0,0,0))],['palm',prefab('palm',()=>palm(0,0))],['planter',prefab('planter',()=>plant(0,0))],
+ ['vines',prefab('vines',()=>{for(let i=0;i<5;i++)flexible(ball(i%2?C.leaf:C.olive,0,-i*.3,0,.2,.24,.13),'leaf');})],
+ ['grass',prefab('grass',()=>{for(let i=0;i<3;i++)flexible(triangle(C.leaf,i*.12,.13,0,.22),'grass');})],
+ ['merchant',prefab('merchant',()=>merchant('merchant',0,0))],['shepherd',prefab('shepherd',()=>merchant('shepherd',0,0,C.ochre))],['goat',prefab('goat',()=>goat('goat',0,0,C.cream,'bell'))],
+ ...buildings.map(name=>[name,()=>{mainBuilding();const node=root.getObjectByName(name);if(!node)throw new Error(`Missing building part ${name}`);collisions=node.userData.collisions??[];node.removeFromParent();root=node;}]),
+ ...['courtyard-vessel','courtyard-planter','courtyard-palm','courtyard-lantern'].map(name=>[name,()=>{mainBuilding();const node=root.getObjectByName(name);node.removeFromParent();node.position.set(0,0,0);root=node;collisions=[];}])];
+
+export const MARKET_MODEL_IDS=exports.map(([name])=>name);
+
 // Merge static geometry with vertex colors, retaining named animated subgroups.
 function batch(group){for(const child of [...group.children])if(child.isGroup)batch(child);
 const geometries=[];for(const child of [...group.children]){if(!child.isMesh)continue;child.updateMatrix();const g=child.geometry.index?child.geometry.toNonIndexed():child.geometry.clone();g.applyMatrix4(child.matrix);g.deleteAttribute('uv');const count=g.attributes.position.count;const color=child.material.color;const colors=new Uint8Array(count*3);for(let i=0;i<count;i++)colors.set([Math.round(color.r*255),Math.round(color.g*255),Math.round(color.b*255)],i*3);g.setAttribute('color',new BufferAttribute(colors,3,true));geometries.push(g);group.remove(child);child.geometry.dispose();child.material.dispose();}
 if(geometries.length){const joined=mergeGeometries(geometries);const merged=mergeVertices(joined);joined.dispose();const hash=createHash('sha256');for(const key of Object.keys(merged.attributes).sort()){const attribute=merged.attributes[key];hash.update(key);hash.update(Buffer.from(attribute.array.buffer,attribute.array.byteOffset,attribute.array.byteLength));}if(merged.index)hash.update(Buffer.from(merged.index.array.buffer,merged.index.array.byteOffset,merged.index.array.byteLength));const key=hash.digest('hex');let shared=geometryPool.get(key);if(shared)merged.dispose();else{shared=merged;geometryPool.set(key,shared);}const mesh=new Mesh(shared,batchedMaterial);mesh.name=group.name+'-surface';group.add(mesh);for(const g of geometries)g.dispose();}}
-for(const [name,make] of [['market',market],['pasture',pasture],['main-building',mainBuilding]]){make();root.userData.collisions=collisions;
+for(const [name,make] of exports){make();root.userData.collisions=collisions;
 root.updateMatrixWorld(true);
 const ceilings=[];
 root.traverse(node=>{if(!node.isMesh)return;node.geometry.computeBoundingBox();const box=node.geometry.boundingBox.clone().applyMatrix4(node.matrixWorld);

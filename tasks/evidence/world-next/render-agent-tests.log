@@ -1,0 +1,21 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/next-006-010-011-015-2723ff/client[39m
+
+ [32m✓[39m src/render/three/CameraRaycast.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1585[2mms[22m[39m
+   [33m[2m✓[22m[39m matches exact mesh intersections for transformed indexed and nonindexed walls, roofs and material sides [33m 1468[2mms[22m[39m
+ [32m✓[39m src/render/three/MarketAssets.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1428[2mms[22m[39m
+     [33m[2m✓[22m[39m does not leave baked visual vessels at any of the 4 movable positions [33m 460[2mms[22m[39m
+     [33m[2m✓[22m[39m makes the full SCENE/BUILDING catalogue available through independent manifest models and declared budgets [33m 419[2mms[22m[39m
+ [32m✓[39m src/render/three/WorldLifeVisuals.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 452[2mms[22m[39m
+ [32m✓[39m src/render/three/GltfLibrary.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 271[2mms[22m[39m
+ [32m✓[39m src/render/three/CharacterRig.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 547[2mms[22m[39m
+ [32m✓[39m src/render/three/EntityVisuals.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 500[2mms[22m[39m
+ [32m✓[39m src/render/three/VisualChunks.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 170[2mms[22m[39m
+ [32m✓[39m src/render/three/VisualWind.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m src/render/three/CameraObstruction.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 176[2mms[22m[39m
+ [32m✓[39m src/render/three/CharacterMotion.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 61[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m      Tests [22m [1m[32m38 passed[39m[22m[90m (38)[39m
+[2m   Start at [22m 21:34:59
+[2m   Duration [22m 32.14s[2m (transform 2.72s, setup 0ms, import 9.04s, tests 5.36s, environment 17ms)[22m

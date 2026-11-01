@@ -1,5 +1,6 @@
 import type { Direction, Entity, Vector3 } from '../../../shared/world/types.ts';
 import type { GameMap } from '../world/GameMap.ts';
+import type { WorldLife } from './WorldLife.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
 import { MOVEMENT, initialMotion, motionStatus, recoverMotion, stepMotion } from '../../../shared/movement/simulation.ts';
 import type { MotionState, MovementEnvironment } from '../../../shared/movement/simulation.ts';
@@ -30,7 +31,8 @@ interface Player {
   sprint: boolean;
   jumpId: number;
 }
-export interface PlacedPlayer { readonly id: string; readonly name: string; readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
+import type { PlacedPlayer } from './ports.ts';
+export type { PlacedPlayer } from './ports.ts';
 export type InteractionCheck = { readonly ok: true; readonly npc: NpcDefinition } | { readonly ok: false; readonly reason: 'not-found' | 'too-far' };
 
 /** Authoritative headless world: players, NPCs, movement and visibility. Time arrives as arguments. */
@@ -41,8 +43,10 @@ export class World {
   private ticks = 0;
   private readonly maps: ReadonlyMap<string, GameMap>;
   private readonly settings: WorldSettings;
+  readonly life?: WorldLife;
 
-  constructor(maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[], settings: WorldSettings = DEFAULT_WORLD_SETTINGS) {
+  constructor(maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[], settings: WorldSettings = DEFAULT_WORLD_SETTINGS, life?: WorldLife) {
+    this.life = life;
     this.maps = maps;
     this.settings = settings;
     this.npcs = new Map(npcs.map((npc) => [npc.id, npc]));
@@ -51,11 +55,16 @@ export class World {
   get tick(): number { return this.ticks; }
 
   map(mapId: string): GameMap | undefined { return this.maps.get(mapId); }
+  isSafeSupport(mapId: string, position: Vector3): boolean {
+    const map = this.maps.get(mapId);
+    return !!map?.isSafeSupport(position.x,position.z) && (!this.life || this.life.clearPots(mapId,position,position));
+  }
   has(playerId: string): boolean { return this.players.has(playerId); }
 
   add(player: PlacedPlayer): void {
     const map = this.maps.get(player.mapId)!;
-    const position = { ...player.position, y: map.heightAt(player.position.x, player.position.z) };
+    const support = this.isSafeSupport(player.mapId, player.position) ? player.position : map.spawn;
+    const position = { ...support, y: map.heightAt(support.x, support.z) };
     const motion = { ...initialMotion(position), ...this.resting.get(player.id) };
     this.resting.delete(player.id);
     const p = { ...player, position, motion: { ...motion, safePosition: map.isSafeSupport(position.x, position.z) ? position : map.spawn }, sprint: false, jumpId: 0, intent: ZERO, intentAt: 0, applied: ZERO, prepared: new Set<string>(), lastSequence: 0, dirty: false };
@@ -74,6 +83,10 @@ export class World {
     const p = this.players.get(playerId);
     return p && { id: p.id, name: p.name, mapId: p.mapId, position: p.position, rotationY: p.rotationY };
   }
+
+  isGrounded(playerId: string): boolean { return this.players.get(playerId)?.motion.grounded === true; }
+
+  placedPlayers(): readonly PlacedPlayer[] { return [...this.players.keys()].map(id => this.locate(id)!); }
 
   /** A new connection restarts sequence numbering and readiness (PROTO v3). */
   resetInput(playerId: string): void {
@@ -109,7 +122,12 @@ export class World {
   private move(p: Player, dt: number, now: number): void {
     const stale = now - p.intentAt > this.settings.intentTimeoutMs;
     const previous = p.position;
-    p.motion = stepMotion(p.motion, { direction: stale ? ZERO : p.intent, sprint: !stale && p.sprint, jumpId: stale ? p.motion.jumpAck : p.jumpId }, dt, this.environment(p), this.settings.speed);
+    const intent = { direction: stale ? ZERO : p.intent, sprint: !stale && p.sprint, jumpId: stale ? p.motion.jumpAck : p.jumpId };
+    let next = stepMotion(p.motion, intent, dt, this.environment(p), this.settings.speed);
+    if (this.life && !this.life.tryPush(this.locate(p.id)!, next.position, this.placedPlayers(), p.prepared, p.motion.grounded && next.grounded)) {
+      next = stepMotion(p.motion, intent, dt, this.environment(p, true), this.settings.speed);
+    }
+    p.motion = next;
     p.position = p.motion.position;
     const dx = p.position.x - previous.x; const dz = p.position.z - previous.z;
     const speed = p.motion.locomotion === 'sprint' ? MOVEMENT.sprintSpeed : this.settings.speed;
@@ -119,9 +137,10 @@ export class World {
     if (dx !== 0 || dz !== 0 || p.position.y !== previous.y) p.dirty = true;
   }
 
-  private environment(p: Player): MovementEnvironment {
+  private environment(p: Player, dynamic = false): MovementEnvironment {
     const map = this.maps.get(p.mapId)!;
-    return { canTraverse: (a, b) => map.canTraverse(a, b, p.prepared), canOccupy: (v) => map.isWalkable(v.x, v.z),
+    const clear = (a: Vector3, b: Vector3) => !dynamic || !this.life || this.life.clearPots(p.mapId,a,b);
+    return { canTraverse: (a, b) => map.canTraverse(a, b, p.prepared) && clear(a,b), canOccupy: (v) => map.isWalkable(v.x, v.z) && clear(v,v),
       canRecover: (a, b) => map.canTraverse(a, b), heightAt: (x, z) => map.heightAt(x, z), ceilings: map.manifest.ceilingVolumes ?? [], ceilingsFor: (a, b) => map.ceilingsFor(a, b), spawn: map.spawn };
   }
 

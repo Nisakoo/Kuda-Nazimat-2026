@@ -9,6 +9,8 @@ import { GltfLibrary } from './GltfLibrary';
 import { VisualChunks } from './VisualChunks';
 import { CameraObstruction } from './CameraObstruction';
 import { damp } from './CharacterMotion';
+import type { SceneStateMessage } from '../../../../shared/world-life/types.ts';
+import { WorldLifeVisuals } from './WorldLifeVisuals';
 
 export class ThreeRenderer implements RenderAdapter {
   private renderer: WebGLRenderer | null = null;
@@ -24,6 +26,8 @@ export class ThreeRenderer implements RenderAdapter {
   private library: GltfLibrary | null = null;
   private chunks: VisualChunks | null = null;
   private lastElapsed = 0;
+  private life: WorldLifeVisuals | null = null;
+  private sceneState: SceneStateMessage | null = null;
   private focusHeight = .8;
   private sun: DirectionalLight | null = null;
   private readonly errors = new Map<string, string>();
@@ -55,6 +59,7 @@ export class ThreeRenderer implements RenderAdapter {
     this.library = new GltfLibrary(this.modelAssets);
     this.chunks = new VisualChunks(this.scene, this.library);
     this.visuals = new EntityVisuals(this.scene, this.assets, this.library, (id, error) => { if (error) this.errors.set(`entity:${id}`, error); else this.errors.delete(`entity:${id}`); }, this.marketStyle);
+    this.life = new WorldLifeVisuals(this.scene,this.library,this.visuals,(id,error)=>{if(error)this.errors.set(`life:${id}`,error);else this.errors.delete(`life:${id}`);});
     container.append(this.renderer.domElement);
   }
 
@@ -65,6 +70,7 @@ export class ThreeRenderer implements RenderAdapter {
 
   setCamera(view: CameraView): void { this.view = { ...view }; }
   setBuildingSymbols(visible: boolean): void { this.chunks?.setBuildingSymbols(visible); }
+  setSceneState(state: SceneStateMessage | null): void { this.sceneState = state; this.life?.setState(state,this.lastElapsed); }
   registerModels(models: Readonly<Record<string, string>>): void { this.library?.register(models); }
   async loadChunk(chunk: VisualChunk): Promise<void> {
     if (!this.chunks) throw new Error('Renderer is not mounted');
@@ -76,10 +82,10 @@ export class ThreeRenderer implements RenderAdapter {
     }
   }
   unloadChunk(id: string): void { this.chunks?.unload(id); this.errors.delete(`chunk:${id}`); }
-  retryFailedModels(): void { this.errors.clear(); this.visuals?.retryFailed(); }
+  retryFailedModels(): void { this.errors.clear(); this.visuals?.retryFailed(); this.life?.retryFailed(); }
   getDiagnostics(): RenderDiagnostics {
     const stats = this.library?.stats;
-    return { chunks: this.chunks?.ids ?? [], entities: this.visuals?.ids ?? [], models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
+    return { chunks: this.chunks?.ids ?? [], entities: [...this.visuals?.ids ?? [], ...this.life?.ids ?? []], models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
       pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
   }
 
@@ -98,7 +104,8 @@ export class ThreeRenderer implements RenderAdapter {
     this.lastElapsed = elapsedSeconds;
     this.library?.flush();
     this.visuals.animate(alpha, elapsedSeconds, delta);
-    this.chunks?.animate(delta);
+    this.life?.animate(elapsedSeconds,delta,this.chunks?.readyIds ?? []);
+    this.chunks?.animate(delta,this.life?.sceneTime(elapsedSeconds) ?? elapsedSeconds*1000,this.sceneState?.definition.wind);
     const position = this.visuals.position(this.playerId);
     if (position) this.target.copy(position);
     else this.target.set(0, 0, 0);
@@ -127,6 +134,7 @@ export class ThreeRenderer implements RenderAdapter {
   }
 
   dispose(): void {
+    this.life?.dispose(); this.life = null; this.sceneState = null;
     this.chunks?.dispose();
     this.visuals?.dispose();
     this.library?.dispose();

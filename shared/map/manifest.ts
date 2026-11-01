@@ -1,4 +1,6 @@
 import type { Vector3 } from '../world/types.ts';
+import type { WorldLifeDefinition } from '../world-life/types.ts';
+import { parseWorldLifeDefinition } from '../world-life/validate.ts';
 
 /** Format of prepared static world data (MAP), parsed identically by client and server. */
 export interface AssetSize { readonly bytes: number; readonly memory: number }
@@ -10,6 +12,7 @@ export interface ChunkEntry {
   readonly assets: readonly string[];
 }
 export interface WorldManifest {
+  readonly worldLife?: WorldLifeDefinition;
   readonly ceilingVolumes?: readonly CeilingVolume[];
   readonly heightSurfaces?: readonly HeightSurface[];
   readonly mapId: string; readonly version: number; readonly worldBytes: number;
@@ -89,7 +92,7 @@ export function parseManifest(raw: unknown, bootstrap: MapBootstrap): WorldManif
     const minX = (origin.x as number) + chunk.x * (value.chunkSize as number); const minZ = (origin.z as number) + chunk.z * (value.chunkSize as number);
     if (volume.minX < minX || volume.maxX > minX + (value.chunkSize as number) || volume.minZ < minZ || volume.maxZ > minZ + (value.chunkSize as number)) throw new Error('Ceiling outside owning chunk');
   }
-  return { mapId: text(value.mapId), version: 1, worldBytes: bootstrap.worldBytes, chunkSize: integer(value.chunkSize, 1), collisionResolution: integer(value.collisionResolution, 1), spawn: vector(value.spawn), origin: { x: integer(origin.x, -100_000), z: integer(origin.z, -100_000) }, chunks, models, assets, ...(heightSurfaces && { heightSurfaces }), ...(ceilingVolumes && { ceilingVolumes }) };
+  return { ...(value.worldLife !== undefined && { worldLife: parseWorldLifeDefinition(value.worldLife, models, text(value.mapId)) }), mapId: text(value.mapId), version: 1, worldBytes: bootstrap.worldBytes, chunkSize: integer(value.chunkSize, 1), collisionResolution: integer(value.collisionResolution, 1), spawn: vector(value.spawn), origin: { x: integer(origin.x, -100_000), z: integer(origin.z, -100_000) }, chunks, models, assets, ...(heightSurfaces && { heightSurfaces }), ...(ceilingVolumes && { ceilingVolumes }) };
 }
 
 /** Bootstrap a server derives from its own manifest; the client later checks the manifest against it. */
