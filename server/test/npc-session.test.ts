@@ -1,4 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
+import { PASTURE_ORIGIN } from '../../shared/city/catalogue.ts';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -143,7 +144,7 @@ it('NPC completed replay and delivery recheck range after caller authorization, 
 it('queued NPC role loss prevents LanguagePort execution', async () => {
   const f = await fixture();
   await f.call(f.first, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
-  await f.call(f.other, { type: 'enroll', size: 2, native: 'ru', learning: 'en' }); f.move(-3, -26);
+  await f.call(f.other, { type: 'enroll', size: 2, native: 'ru', learning: 'en' }); f.move(-3, PASTURE_ORIGIN.z + 6);
   const held = deferred<string>(), running = f.npc.generate(f.other.identity.playerId, 'blocker', async () => held.promise);
   const pending = f.call(f.first, { type: 'npc', targetId: 'shepherd', text: 'queued' });
   const failure = expect(pending).rejects.toMatchObject({ code: 'UNAVAILABLE' });

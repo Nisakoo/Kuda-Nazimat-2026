@@ -1,3 +1,5 @@
+import { PASTURE_ORIGIN } from '../../../shared/city/catalogue.ts';
+import { CityError, cityAction, cityView, discoverCity } from '../city/progress.ts';
 import { createHash } from 'node:crypto';
 import { EMPTY_INVENTORY } from '../../../shared/babylon/types.ts';
 import type { BabylonRequest, BabylonResult, BabylonState, BabylonErrorCode, ChatEntry, Language } from '../../../shared/babylon/types.ts';
@@ -32,7 +34,7 @@ export class BabylonService {
     const p = this.deps.store.profile(playerId), g = p?.groupId && this.deps.store.party(p.groupId);
     if (!g) return null;
     const role = g.members.find(m => m.id === playerId)!.role;
-    return { mapId: 'market', force: p!.spawnPending, position: g.size > 1 && role === 1 ? { x: 0, y: 0, z: -26 } : { x: (role - (g.size > 1 ? 2 : 1)) * 1.5, y: 0, z: 8 } };
+    return { mapId: 'market', force: p!.spawnPending, position: g.size > 1 && role === 1 ? { x: 0, y: 0, z: PASTURE_ORIGIN.z + 6 } : { x: (role - (g.size > 1 ? 2 : 1)) * 1.5, y: 0, z: 8 } };
   }
   entered(playerId: string): void {
     const { store } = this.deps;
@@ -42,6 +44,7 @@ export class BabylonService {
     if (scope && (!scope.sessionId || !scope.isActive())) fail('UNAUTHORIZED', 'Сессия истекла');
     const { store, language, now } = this.deps;
     const p = store.profile(identity.playerId), g = p?.groupId ? store.party(p.groupId) : null, open = store.openParty();
+    if (p && discoverCity(p, this.deps.location(identity.accountId))) store.saveProfile(identity.playerId, p);
     const role = g?.members.find(m => m.id === identity.playerId)?.role ?? 0;
     const partyPositions: BabylonState['partyPositions'][number][] = [];
     // Never enumerate the world. Resolve only this task's bounded member IDs.
@@ -69,7 +72,7 @@ export class BabylonService {
       }
     }
     return {
-      v: 2, playerId: identity.playerId, backend: language.mode, languages: language.languages,
+      v: 2, city: cityView(p, g, role), playerId: identity.playerId, backend: language.mode, languages: language.languages,
       profile: p ? { native: p.native, learning: p.learning } : null, introSeen: p?.introSeen ?? false,
       party: g ? { id: g.id, size: g.size, count: g.members.length, role, members: g.members, started: g.startedAt !== null, completed: g.completedAt !== null, seconds: g.startedAt === null ? 0 : Math.max(0, Math.floor(((g.completedAt ?? now()) - g.startedAt) / 1000)) } : null,
       availableParty: open ? { size: open.size, count: open.members.length } : null,
@@ -179,6 +182,10 @@ export class BabylonService {
       } else {
         const { profile: p, party: g, role } = this.player(identity);
         switch (a.type) {
+          case 'city-start': case 'city-step':
+            try { notice = cityAction(g, role, a, target => this.near(identity, target)); }
+            catch (error) { if (error instanceof CityError) fail('FORBIDDEN', error.message); throw error; }
+            break;
           case 'intro-seen': p.introSeen = true; break;
           case 'word-save': {
             if (a.id) {

@@ -2,6 +2,7 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { parseChunk, parseManifest, selfBootstrap } from '../../../shared/map/manifest.ts';
 import { parseWorldDescriptor } from '../../../shared/protocol/validate.ts';
+import { CITY_RESIDENTS } from '../../../shared/city/catalogue.ts';
 import { GameMap } from './GameMap.ts';
 import type { FileUse, WorldFile } from './access.ts';
 import { parseNpcContent } from './npcContent.ts';
@@ -108,6 +109,13 @@ export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
   let npcRaw: unknown;
   try { npcRaw = JSON.parse(await readFile(npcFile, 'utf8')); } catch { throw new Error(`Не удалось прочитать NPC-контент ${npcFile}`); }
   const npcs = parseNpcContent(npcRaw);
+  if (maps.get('market')?.manifest.models['city-gate']) {
+    for (const resident of CITY_RESIDENTS) {
+      if (resident.legacy || npcs.some(npc => npc.id === resident.id)) continue;
+      npcs.push({ id: resident.id, mapId: 'market', name: resident.name, topic: resident.topic, persona: resident.persona,
+        greeting: `Добро пожаловать. Я ${resident.name}.`, position: { x: resident.x, y: 0, z: resident.z }, rotationY: 0, interactionRadius: 2.5, assetId: `resident-${resident.id}` });
+    }
+  }
   for (const npc of npcs) {
     const map = maps.get(npc.mapId);
     if (!map) throw new Error(`NPC ${npc.id}: неизвестная карта ${npc.mapId}`);

@@ -1,3 +1,4 @@
+import { PASTURE_ORIGIN } from '../../shared/city/catalogue.ts';
 import { expect, it, vi } from 'vitest';
 import { once } from 'node:events';
 import { createAuthService } from '../src/auth/AuthService.ts';
@@ -16,7 +17,7 @@ it.each(['captured socket', 'range', 'role'] as const)('actual HTTP rechecks %s 
   const auth = createAuthService({ ...stores, clock, ttlMs: 60000 });
   const session = await auth.guest('Owner'), partner = await auth.guest('Partner');
   const verified = await auth.verify(session.token); if (!verified.ok) throw new Error('Missing fixture session');
-  let controlId = 'original-socket', location = { mapId: 'market', position: { x: -3, y: 0, z: -26 } }, ids = 0;
+  let controlId = 'original-socket', location = { mapId: 'market', position: { x: -3, y: 0, z: PASTURE_ORIGIN.z + 6 } }, ids = 0;
   const game: GameRuntime = {
     maps: [], attach() {}, activePlayers: () => 1, presence: () => [], closeSessions() {}, state: () => ({}), stats: () => null,
     async stop() {}, worldFile: () => ({ ok: false }), canAct: () => true, controlId: () => controlId,

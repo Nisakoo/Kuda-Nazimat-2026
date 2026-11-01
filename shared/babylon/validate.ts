@@ -34,6 +34,11 @@ export function parseBabylonRequest(value: unknown): BabylonRequest {
   let action: BabylonAction;
   switch (a.type) {
     case 'state': case 'intro-seen': case 'join': keys(a, ['type']); action = { type: a.type }; break;
+    case 'city-start': keys(a, ['type', 'questId']); action = { type: 'city-start', questId: id(a.questId) }; break;
+    case 'city-step':
+      keys(a, ['type', 'questId', 'step', 'choice', 'targetId']);
+      if (!Number.isSafeInteger(a.step) || (a.step as number) < 0 || (a.step as number) > 32) throw new Error('Неверный шаг');
+      action = { type: 'city-step', questId: id(a.questId), step: a.step as number, choice: id(a.choice), targetId: id(a.targetId) }; break;
     case 'create':
       keys(a, ['type', 'size', 'replacePartyId']);
       if (![1, 2, 3, 4].includes(a.size as number)) throw new Error('Неверный режим');
@@ -98,6 +103,19 @@ export function parseBabylonResult(value: unknown): import('./types.ts').Babylon
     if (m.error !== undefined) text(m.error, 500);
   }
   for (const raw of array(state.replies, 50)) { const r = record(raw); id(r.id); id(r.npcId); text(r.question, 500); text(r.text, 4000); language(r.language); }
+  if (state.city !== undefined) {
+    const city = record(state.city); keys(city, ['discovered','completed','quests','active']);
+    array(city.discovered, 15).forEach(id); array(city.completed, 32).forEach(id);
+    for (const value of array(city.quests,32)) { const q=record(value); keys(q,['id','title','giver','wave']);id(q.id);text(q.title,200);id(q.giver);number(q.wave,4); }
+    if (city.active !== null) {
+      const a=record(city.active);keys(a,['id','title','step','total','targetId','target','clue','instruction','canAct','options','targets']);
+      if(a.targets!==undefined)array(a.targets,8).forEach(id);
+      id(a.id);text(a.title,200);number(a.step,32);number(a.total,32);id(a.targetId);bool(a.canAct);text(a.instruction,500);
+      if(a.clue!==null)text(a.clue,2000);
+      if(a.target!==null){const t=record(a.target);keys(t,['x','z']);for(const c of [t.x,t.z])if(typeof c!=='number'||!Number.isFinite(c)||Math.abs(c)>1000000)throw new Error('Неверная цель города');}
+      for(const value of array(a.options,8)){const o=record(value);keys(o,['id','label']);id(o.id);text(o.label,500);}
+    }
+  }
   if (result.notice !== undefined) text(result.notice, 500);
   if (result.suggestion !== undefined) text(result.suggestion, 200);
   return result as unknown as import('./types.ts').BabylonResult;

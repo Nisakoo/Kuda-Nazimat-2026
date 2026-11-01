@@ -23,10 +23,11 @@ export type OnlineNotice =
   | { readonly type: 'carry'; readonly state: CarryState }
   | { readonly type: 'scene'; readonly state: SceneStateMessage }
   | { readonly type: 'world'; readonly snapshot: WorldSnapshot; readonly origin: 'live' | 'snapshot' }
+  | { readonly type: 'npc-partial'; readonly targetId: string; readonly requestId: string; readonly text: string }
   | { readonly type: 'npc'; readonly targetId: string; readonly requestId: string; readonly text: string }
   | { readonly type: 'request-error'; readonly requestId: string; readonly message: string };
 type RequestType = 'join' | 'resync' | 'interact' | 'npc-question' | 'chat-send';
-interface Pending { readonly type: RequestType; readonly timer: number; readonly targetId?: string }
+interface Pending { readonly type: RequestType; readonly timer: number; readonly targetId?: string; sequence?: number }
 interface Buffered { readonly time: number; readonly snapshot: WorldSnapshot }
 export interface RuntimeConfigRequest { readonly result: Promise<number>; cancel(): void }
 
@@ -182,7 +183,19 @@ export class OnlineSession implements GameSession {
     this.syncScene();
   };
   chat(text: string): string | null { return this.request('chat-send', (requestId) => ({ v: 3, type: 'chat-send', requestId, text: text.trim() })); }
-  askNpc(targetId: string, text: string): string | null { return this.request('npc-question', (requestId) => ({ v: 3, type: 'npc-question', requestId, targetId, text: text.trim() }), targetId); }
+  askNpc(targetId: string, text: string, stream = false): string | null {
+    if ([...this.pending.values()].some(request => request.type === 'npc-question')) return null;
+    return this.request('npc-question', requestId => ({ v: 3, type: 'npc-question', requestId, targetId, text: text.trim(), ...(stream ? { stream: true } : {}) }), targetId, stream);
+  }
+  cancelNpc(questionId: string): void {
+    if (this.pending.get(questionId)?.type !== 'npc-question') return;
+    this.finish(questionId);
+    this.sendNpcCancel(questionId);
+  }
+  private sendNpcCancel(questionId: string): void {
+    if (this.value.status !== 'connected') return;
+    try { this.network.send({ v: 3, type: 'npc-cancel', requestId: this.nextId(), questionId }); } catch { /* Disconnect/expiry still releases the server slot. */ }
+  }
   setMovementGuard(guard: (position: Vector3) => boolean, path?: (from: Vector3, to: Vector3) => boolean): void { this.guard = guard; this.pathGuard = path ?? null; }
   setPreparedChunks(ids: readonly string[]): void { this.prepared = [...ids].slice(0, 25); }
   update(deltaSeconds: number): void {
@@ -233,7 +246,7 @@ export class OnlineSession implements GameSession {
     return { previous: previous.snapshot, current: current.snapshot, alpha };
   }
   private nextId(): string { return `c${this.epoch}_${++this.requestCount}`; }
-  private request(type: RequestType, create: (requestId: string) => ClientMessage, targetId?: string): string | null {
+  private request(type: RequestType, create: (requestId: string) => ClientMessage, targetId?: string, stream = false): string | null {
     if (this.disposed || this.network.state.status !== 'connected' || (type !== 'join' && this.value.status !== 'connected')) { this.publish({ type: 'request-error', requestId: 'offline', message: 'Нет связи с миром. Действие не отправлено.' }); return null; }
     if (type === 'npc-question' && this.npcTimeoutMs === null) { this.publish({ type: 'request-error', requestId: 'npc-config', message: 'Настройки диалога недоступны. Проверьте связь и переподключитесь.' }); return null; }
     if (this.pending.size >= LIMITS.pending) { this.publish({ type: 'request-error', requestId: 'limit', message: 'Слишком много ожидающих действий.' }); return null; }
@@ -242,10 +255,11 @@ export class OnlineSession implements GameSession {
     const timer = this.clock.set(() => {
       const pending = this.pending.get(requestId); this.pending.delete(requestId);
       if (!pending) return;
+      if (pending.type === 'npc-question') this.sendNpcCancel(requestId);
       this.publish({ type: 'request-error', requestId, message: `Сервер не подтвердил действие за ${timeoutMs / 1000} секунд.` });
       if (pending.type === 'join' || pending.type === 'resync') this.status({ status: 'error', error: 'Не удалось синхронизировать мир. Повторите подключение.' });
     }, timeoutMs);
-    this.pending.set(requestId, { type, timer, ...(targetId ? { targetId } : {}) });
+    this.pending.set(requestId, { type, timer, ...(targetId ? { targetId } : {}), ...(stream ? { sequence: 0 } : {}) });
     try { if (this.network.send(create(requestId))) return requestId; } catch { /* invalid intent is surfaced below */ }
     this.finish(requestId);
     this.publish({ type: 'request-error', requestId, message: 'Не удалось отправить действие. Проверьте связь и длину сообщения.' });
@@ -293,6 +307,11 @@ export class OnlineSession implements GameSession {
       if (pending?.type !== 'interact' || pending.targetId !== message.targetId) return;
       this.finish(message.requestId);
       for (const listener of this.listeners) listener([{ type: 'interacted', actorId: this.id, targetId: message.targetId }]);
+    } else if (message.type === 'npc-partial') {
+      const pending = this.pending.get(message.requestId);
+      if (pending?.type !== 'npc-question' || pending.targetId !== message.targetId || pending.sequence === undefined || message.seq <= pending.sequence) return;
+      pending.sequence = message.seq;
+      this.publish({ type: 'npc-partial', requestId: message.requestId, targetId: message.targetId, text: message.text });
     } else if (message.type === 'npc-answer') {
       const pending = this.pending.get(message.requestId);
       if (pending?.type !== 'npc-question' || pending.targetId !== message.targetId) return;

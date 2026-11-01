@@ -11,7 +11,7 @@ import { parseBabylonRequest } from '../../shared/babylon/validate.ts';
 import type { BabylonAction } from '../../shared/babylon/types.ts';
 import type { TimerHandle } from '../src/common/time.ts';
 import { silentLogger } from '../src/common/logger.ts';
-import { NPCS } from '../src/babylon/content.ts';
+import { NPCS, localNpcPromptProfile } from '../src/babylon/content.ts';
 
 const cleanups: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const close of cleanups.splice(0).reverse()) await close(); });
@@ -74,6 +74,76 @@ it('borrows answer/translation from one responder, fixes learning language and p
   expect(Object.keys(translation).sort()).toEqual(['deadlineAt', 'requestKey', 'source', 'target', 'text']);
   expect(f.responder.start).toHaveBeenCalledTimes(1); expect(f.responder.stop).not.toHaveBeenCalled();
   await f.npc.stop(); expect(f.responder.stop).toHaveBeenCalledTimes(1);
+});
+
+it.each(['en', 'es'] as const)('projects only the public %s role for every NPC', async language => {
+  const f = await fixture();
+  const expected = {
+    'fruit-seller': language === 'en' ? ['fruit', 'dates'] : ['fruta', 'dátiles'],
+    'fabric-seller': language === 'en' ? ['cloth', 'patterns'] : ['telas', 'diseños'],
+    potter: language === 'en' ? ['clay', 'water'] : ['barro', 'agua'],
+    shepherd: language === 'en' ? ['shepherd', 'goats'] : ['pastor', 'cabras'],
+  };
+  const before = structuredClone(NPCS);
+  const person = f.people[0]!;
+  const context = { sessionId: person.scope.sessionId, player: person.identity, requestId: 'profile', requestKey: 'profile',
+    budget: { expired: () => false, deadlineAt: () => 101000 }, isActive: () => true, authorize: async () => true };
+  for (const [id, words] of Object.entries(expected)) {
+    // Even extra caller fields are not passed to the model.
+    const npc = { ...NPCS[id]!, privateGuide: 'secret goat guide', extra: 'private' };
+    await f.language.answer(npc, 'hello', language, [], new AbortController().signal, context);
+    const projected = f.responder.answer.mock.lastCall![0].npc;
+    expect(projected).toEqual(localNpcPromptProfile(id, language));
+    expect(projected).not.toBe(npc);
+    expect(Object.keys(projected).sort()).toEqual(['greeting', 'id', 'name', 'persona', 'topic']);
+    const text = JSON.stringify(projected).toLowerCase();
+    for (const word of words) expect(text).toContain(word);
+    expect(text).not.toMatch(/secret|guide|private|белая|white goat|cabra blanca|researcher|student/);
+    expect(projected.persona).toMatch(language === 'en' ? /^I am / : /^Soy /);
+    const otherRoles = language === 'en'
+      ? { 'fruit-seller': ['fabric seller', 'potter', 'shepherd'], 'fabric-seller': ['fruit seller', 'potter', 'shepherd'], potter: ['fruit seller', 'fabric seller', 'shepherd'], shepherd: ['fruit seller', 'fabric seller', 'potter'] }
+      : { 'fruit-seller': ['vendedora de telas', 'alfarero', 'pastor'], 'fabric-seller': ['vendedor de fruta', 'alfarero', 'pastor'], potter: ['vendedor de fruta', 'vendedora de telas', 'pastor'], shepherd: ['vendedor de fruta', 'vendedora de telas', 'alfarero'] };
+    for (const role of otherRoles[id as keyof typeof otherRoles]) expect(text).not.toContain(role);
+  }
+  for (const [id, canonical] of Object.entries(NPCS).filter(([id]) => !(id in expected))) {
+    await f.language.answer({ ...canonical, name: 'Untrusted replacement' }, 'hello', language, [], new AbortController().signal, context);
+    const projected = f.responder.answer.mock.lastCall![0].npc;
+    expect(projected).toMatchObject({ id, name: canonical.name, topic: canonical.topic, persona: canonical.persona });
+    expect(Object.keys(projected).sort()).toEqual(['greeting', 'id', 'name', 'persona', 'topic']);
+    expect(f.responder.answer.mock.lastCall![0].locale).toBe(language);
+  }
+  expect(NPCS).toEqual(before);
+  expect(() => localNpcPromptProfile('unknown', language)).toThrow('Unknown Babylon NPC');
+});
+
+it.each(['en', 'es'] as const)('rejects a Russian NPC reply for %s without saving, retrying, or changing account data', async language => {
+  const f = await fixture(), person = f.people[0]!;
+  if (language === 'es') await f.call(person, { type: 'languages', native: 'ru', learning: 'es' });
+  // Preserve an earlier turn and account data; a failed request must not reset either.
+  await f.call(person, { type: 'npc', targetId: 'potter', text: 'earlier' });
+  const history = f.store.npcReplies(person.identity.playerId, person.scope.sessionId);
+  const profile = structuredClone(f.store.profile(person.identity.playerId));
+  const party = structuredClone(f.store.party(profile!.groupId!));
+  f.responder.answer.mockClear();
+  f.responder.answer.mockResolvedValueOnce({ text: 'Здравствуйте! Я гончар, и я работаю с глиной.' });
+  await expect(f.call(person, { type: 'npc', targetId: 'potter', text: 'question' })).rejects.toMatchObject({ code: 'UNAVAILABLE' });
+  expect(f.responder.answer).toHaveBeenCalledTimes(1);
+  expect(f.store.npcReplies(person.identity.playerId, person.scope.sessionId)).toEqual(history);
+  expect(f.store.profile(person.identity.playerId)).toEqual(profile);
+  expect(f.store.party(profile!.groupId!)).toEqual(party);
+  expect(f.babel.state(person.identity, person.scope).replies).toEqual(history);
+});
+
+it('accepts Latin answers with Cyrillic names and leaves Russian translation alone', async () => {
+  const f = await fixture(), person = f.people[0]!;
+  f.responder.answer.mockResolvedValueOnce({ text: 'María and Иван ask about agua.' });
+  const result = await f.call(person, { type: 'npc', targetId: 'potter', text: 'hello' });
+  expect(result.state.replies.at(-1)?.text).toBe('María and Иван ask about agua.');
+  await f.call(person, { type: 'languages', native: 'ru', learning: 'es' });
+  f.responder.answer.mockResolvedValueOnce({ text: '¡Hola, María! Tengo agua en una jarra.' });
+  expect((await f.call(person, { type: 'npc', targetId: 'potter', text: 'hola' })).state.replies.at(-1)?.text).toBe('¡Hola, María! Tengo agua en una jarra.');
+  f.responder.translate.mockResolvedValueOnce({ text: 'вода' });
+  expect((await f.call(person, { type: 'suggest', word: 'water' })).suggestion).toBe('вода');
 });
 
 it('holds one physical reservation across sequential languages and rejects mixed ordinary/BABEL admission', async () => {

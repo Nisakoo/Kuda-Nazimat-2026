@@ -1,0 +1,44 @@
+
+Running 1 test using 1 worker
+
+(node:94677) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/1] e2e/city.spec.ts:72:1 › walks every district with real keyboard input, checks UI and captures at most seven images
+e2e/city.spec.ts:72:1 › walks every district with real keyboard input, checks UI and captures at most seven images
+WALK bakery segments 5
+
+WALK mill segments 2
+
+WALK garden segments 5
+
+WALK homes segments 2
+
+WALK palace segments 3
+
+WALK gardens segments 5
+
+WALK fountain segments 5
+
+WALK school segments 7
+
+WALK dye segments 2
+
+WALK tower segments 5
+
+WALK dock segments 6
+
+WALK gate segments 2
+
+WALK guest segments 2
+
+WALK pasture segments 13
+
+WALK gardens-recheck segments 9
+
+SHOT 6 gardens-fixed
+
+SHOT 7 map-390
+
+  1 passed (4.7m)

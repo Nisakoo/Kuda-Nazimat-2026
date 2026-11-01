@@ -142,7 +142,7 @@ PLAYWRIGHT_CHANNEL=chrome npm --prefix client run test:render
 
 Демо — 1024 чанка по 32 м, общие авторские GLB, тематические районы и уникальные видимые таблички. Collision bitmap получается из GLB, одинаковые BIN адресуются по SHA. Генерируемые JSON/BIN/bootstrap исключены из git; исходные модели и генератор сохранены. Небольшой bootstrap входит в JS, полный мир — нет. `models:generate` воспроизводит таблички GLB/glTF; экспорт окружения — `client/scripts/export-demo-scene.mjs` с локальным dev-сервером и Chrome.
 
-Клиент держит окно чанков вокруг игрока: для market по умолчанию 5×5 (25 чанков), для demo/science — 3×3. При движении новые ряды подгружаются, дальние освобождаются, модели между чанками общие. Процентного лимита кеша нет. Защита полезных данных 64 MiB сохраняет резерв до последнего CPU/GPU-владельца, включая pending; это не полный RSS браузера/драйвера. Диагностика показывает резерв памяти, готовые, загружаемые и отложенные чанки. Подробности — [MAP](specs/client-world-streaming.md) и [TASK-037](tasks/037-chunk-window.md).
+Клиент держит окно чанков вокруг игрока: для market по умолчанию радиус 2 (до 25 чанков; текущий компактный город — 16), для demo/science — 3×3. При движении новые ряды подгружаются, дальние освобождаются, модели между чанками общие. Процентного лимита кеша нет. Защита полезных данных 128 MiB сохраняет резерв до последнего CPU/GPU-владельца, включая pending; это не полный RSS браузера/драйвера. Диагностика показывает резерв памяти, готовые, загружаемые и отложенные чанки. Подробности — [MAP](specs/client-world-streaming.md) и [TASK-037](tasks/037-chunk-window.md).
 
 ## Конфигурация
 
@@ -193,6 +193,9 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 | 076 | [Клиент: выбор облика](tasks/076-client-avatar-selection.md) | [AVATAR](specs/client-avatar-select.md) | 073 |
 | 077 | [Клиент: визуальное соответствие](tasks/077-client-visual-fidelity.md) | [HUD](specs/client-game-hud.md) | 073, 074, 075 |
 | 078 | [Интеграция NPC с main](tasks/078-npc-main-sync.md) | [NPC-AI](specs/npc-character-behavior.md) | 070, 071, 072 |
+| 084 | [Барьер неправильного языка и роль NPC](tasks/084-npc-language-role-regression.md) | [NPC-AI](specs/npc-character-behavior.md) | 071, 072 |
+| 085 | [Бюджет замера памяти macOS](tasks/085-macos-memory-sample-budget.md) | [LLM](specs/server-llm-runtime.md) | 084 |
+| 086 | [Прямые ответы без подмены роли](tasks/086-npc-direct-grounded-replies.md) | [NPC-AI](specs/npc-character-behavior.md) | 084 |
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
 
@@ -257,3 +260,9 @@ make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=120 # при наличии prep
 Исправления паузы и компоновки окон: [TASK-061](tasks/061-window-polish.md); минимальный индикатор выносливости по центру: [TASK-063](tasks/063-stamina-center.md). Совместимость новых моделей/UI с переносом предметов, звуком и миграциями main проверяется в [TASK-062](tasks/062-ui-main-integration.md).
 
 Покрытие клиентских unit-тестов: `npm --prefix client run test:coverage` (V8; весь client/src, без тестов/генерированных данных). HTML: `client/coverage/index.html`. Измерение и границы: [TASK-064](tasks/064-client-test-coverage.md); Playwright в этот процент не включается.
+
+Компактный город всех четырёх волн: 128×128 м, 15 районов, 27 говорящих жителей; исходные рынок, пастбище и башня сохранены. Городские задания и открытые районы сохраняет сервер. Помощь, поток demo/science и формы смены пароля описаны с результатами проверок в [TASK-087](tasks/087-map-ui-completion.md); [7 снимков обхода](tasks/evidence/map-ui-completion/index.html) включают найденные и исправленные дефекты. Сценарии `client/playwright.city.config.ts` используют отдельную временную БД; повторный запуск не создаёт копий уже сохранённых снимков и не превышает лимит 7.
+
+Дальнейшее уплотнение города, более узкие дороги, тематические детали и гладкие ники с перекрытием стенами — [TASK-088](tasks/088-city-density-nameplates.md). Семь снимков выше относятся к предыдущей версии 160×160; для новой версии лимит сохранён, проверки выполняются без дополнительных снимков.
+
+Контур города теперь зигзагообразный, ширина суши около 111 м; техническая сетка остаётся 16 чанков. Пастбище перенесено к северной стене, кварталы и улицы получили разные повороты и смещения — [TASK-089](tasks/089-organic-city-layout.md).

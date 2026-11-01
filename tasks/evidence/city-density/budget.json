@@ -1,0 +1,12 @@
+{
+  "sizeMetres": [
+    128,
+    128
+  ],
+  "chunks": 16,
+  "worldBytes": 14181236,
+  "maxReservedBytesIncludingFourAvatarsAndAudio": 66507224,
+  "guardBytes": 134217728,
+  "note": "Conservative payload reservation, not measured browser RSS/GPU usage.",
+  "additionalScreenshots": 0
+}

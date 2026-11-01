@@ -91,7 +91,7 @@ it('enrolls a fixed group, starts only when full, restores roles/languages and h
   await expect(f.call(b, { type: 'enroll', size: 3, native: 'ru', learning: 'es' })).rejects.toMatchObject({ code: 'CONFLICT' });
   await f.call(b, { type: 'enroll', size: 2, native: 'ru', learning: 'es' });
   expect(f.service.state(a).party?.started).toBe(true); expect(f.service.state(b).goatGuide).toBeNull();
-  expect(f.service.spawn(a.playerId)?.position.z).toBe(-26); expect(f.service.spawn(b.playerId)?.position.z).toBe(8);
+  expect(f.service.spawn(a.playerId)?.position.z).toBe(-58); expect(f.service.spawn(b.playerId)?.position.z).toBe(8);
   const saved = await f.call(a, { type: 'word-save', word: 'goat', translation: 'коза', note: '<img onerror=alert(1)>' }, 'word1');
   const word = saved.state.words[0]!;
   await expect(f.call(b, { type: 'word-delete', id: word.id })).rejects.toMatchObject({ code: 'FORBIDDEN' });
@@ -180,9 +180,9 @@ it('validates authoritative location and role, keeps wrong food, completes solo 
   for (const item of ['red-fruit', 'yellow-fruit'] as const) await f.call(a, { ...buy, item });
   f.positions.set(a.accountId, { mapId: 'market', position: { x: 4.6, y: 0, z: -.5 } });
   await f.call(a, { type: 'buy', item: 'water', targetId: 'potter' });
-  f.positions.set(a.accountId, { mapId: 'market', position: { x: 4, y: 0, z: -32 } });
+  f.positions.set(a.accountId, { mapId: 'market', position: { x: 4, y: 0, z: -64 } });
   await f.call(a, { type: 'feed', item: 'dates', targetId: 'black-goat' }); expect(f.service.state(a).inventory.dates).toBe(1);
-  const feed = [['white-goat', 'dates', -5, -31], ['black-goat', 'red-fruit', 4, -32], ['spotted-goat', 'yellow-fruit', -4, -37], ['kid-goat', 'water', 4, -37]] as const;
+  const feed = [['white-goat', 'dates', -5, -63], ['black-goat', 'red-fruit', 4, -64], ['spotted-goat', 'yellow-fruit', -4, -69], ['kid-goat', 'water', 4, -69]] as const;
   for (const [targetId, item, x, z] of feed) { f.positions.set(a.accountId, { mapId: 'market', position: { x, y: 0, z } }); await f.call(a, { type: 'feed', item, targetId }); }
   f.restart(); expect(f.service.state(a).party?.completed).toBe(true); expect(f.service.state(a).taskTarget).toBeNull(); expect(f.service.state(a).fed).toHaveLength(4); expect(f.service.state(a).inventory.dates).toBe(0);
 });
@@ -217,7 +217,7 @@ it('suggests a translation and answers private NPC dialogue in the selected lang
   const f = fixture(), a = f.people[0]!;
   await f.call(a, { type: 'enroll', size: 1, native: 'ru', learning: 'en' });
   expect((await f.call(a, { type: 'suggest', word: 'goat' })).suggestion).toBe('коза');
-  f.positions.set(a.accountId, { mapId: 'market', position: { x: -3, y: 0, z: -26 } });
+  f.positions.set(a.accountId, { mapId: 'market', position: { x: -3, y: 0, z: -58 } });
   await f.call(a, { type: 'npc', targetId: 'shepherd', text: 'Какой корм нужен?' });
   expect(f.service.state(a, { sessionId: 'test-session', isActive: () => true }).replies[0]?.text).toContain('white goat');
   expect(f.service.state(f.people[1]!).replies).toEqual([]); expect(f.service.state(a).inventory.dates).toBe(0);
@@ -238,7 +238,7 @@ it('four roles share one FIFO with legacy NPC work, reject a second generation p
   expect(order).toEqual(['legacy', b.playerId, c.playerId, d.playerId]);
   f.positions.set(a.accountId, { mapId: 'market', position: { x: -4.5, y: 0, z: .5 } });
   await expect(f.call(a, { type: 'buy', item: 'dates', targetId: 'fruit-seller' })).rejects.toMatchObject({ code: 'FORBIDDEN' });
-  f.positions.set(b.accountId, { mapId: 'market', position: { x: -3, y: 0, z: -26 } });
+  f.positions.set(b.accountId, { mapId: 'market', position: { x: -3, y: 0, z: -58 } });
   await expect(f.call(b, { type: 'npc', targetId: 'shepherd', text: 'Список' })).rejects.toMatchObject({ code: 'FORBIDDEN' });
   for (const p of f.people) expect(parseBabylonResult({ v: 2, requestId: 'state', state: f.service.state(p) }).state.party?.role).toBe(f.people.indexOf(p) + 1);
 });

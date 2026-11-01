@@ -1,3 +1,4 @@
+import { PASTURE_GOATS, PASTURE_ORIGIN } from '../../../shared/city/catalogue';
 import type { Entity } from '../core/types';
 import { LocalSession } from './LocalSession';
 
@@ -9,17 +10,18 @@ export const MARKET_ITEMS = [
   { id: 'fabric', name: 'Бирюзовая ткань', seller: 'fabric-seller' },
 ] as const;
 export type MarketItem = typeof MARKET_ITEMS[number]['id'];
-export const MARKET_GOATS = [
-  { id: 'white-goat', name: 'Белая коза', feature: 'Колокольчик на шее', food: 'dates', x: -5, z: -31 },
-  { id: 'black-goat', name: 'Чёрная коза', feature: 'Длинные изогнутые рога', food: 'red-fruit', x: 4, z: -32 },
-  { id: 'spotted-goat', name: 'Рыжая коза', feature: 'Пятнистая шерсть', food: 'yellow-fruit', x: -4, z: -37 },
-  { id: 'kid-goat', name: 'Светло-серый козлёнок', feature: 'Маленький, без рогов', food: 'water', x: 4, z: -37 },
+const GOAT_PRESENTATION = [
+  { id: 'white-goat', name: 'Белая коза', feature: 'Колокольчик на шее' },
+  { id: 'black-goat', name: 'Чёрная коза', feature: 'Длинные изогнутые рога' },
+  { id: 'spotted-goat', name: 'Рыжая коза', feature: 'Пятнистая шерсть' },
+  { id: 'kid-goat', name: 'Светло-серый козлёнок', feature: 'Маленький, без рогов' },
 ] as const;
+export const MARKET_GOATS = PASTURE_GOATS.map(goat=>({...GOAT_PRESENTATION.find(presentation=>presentation.id===goat.id)!,...goat}));
 export const MARKET_PEOPLE = [
   { id: 'fruit-seller', name: 'Торговец фруктами', x: -4.5, z: .5 },
   { id: 'fabric-seller', name: 'Торговка тканями', x: -3, z: -5.2 },
   { id: 'potter', name: 'Гончар', x: 4.6, z: -.5 },
-  { id: 'shepherd', name: 'Пастух', x: -3, z: -26 },
+  { id: 'shepherd', name: 'Пастух', x: -3, z: PASTURE_ORIGIN.z + 6 },
 ] as const;
 export type StonePoint = readonly [number, number];
 export type Stone = readonly (readonly StonePoint[])[];

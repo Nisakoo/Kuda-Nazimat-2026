@@ -10,6 +10,8 @@
   import type { ItemId, Language, PartySize, Word } from '../../../shared/babylon/types';
   import { MARKET_ITEMS, MARKET_PEOPLE, MARKET_GOATS } from '../session/MarketSession';
   import ResidentChat from './ResidentChat.svelte';
+  import CityTasks from './CityTasks.svelte';
+  import { CITY_RESIDENTS } from '../../../shared/city/catalogue';
   import LearningText from './LearningText.svelte';
   import { modal } from './modal';
   import { inventoryShortcut } from './inventoryShortcut';
@@ -17,7 +19,7 @@
   const gameState = $derived(view.state);
   const suggestion = $derived(view.suggestion);
   const gameAvatar = $derived(view.state ? avatarId : null);
-  const actor = $derived([...MARKET_PEOPLE, ...MARKET_GOATS].find(a => a.id === target));
+  const actor = $derived([...MARKET_PEOPLE, ...MARKET_GOATS, ...CITY_RESIDENTS].find(a => a.id === target));
   const goat = $derived(MARKET_GOATS.find(a => a.id === target));
   const titles = { setup: 'Подготовка путешествия', languages: 'Ваши языки', intro: 'Добро пожаловать в Вавилон', task: 'Козы пастуха', inventory: 'Инвентарь', stone: 'Высечь камень', words: 'Мой словарь', interaction: 'Взаимодействие', chat: 'Чат с напарниками' };
   const labels: Record<Language, string> = { ru: 'Русский', en: 'English', es: 'Español' };
@@ -116,6 +118,7 @@
       {#if gameState.goatGuide}<p><LearningText text={gameState.goatGuide} learn={word => game.learnWord(word)} /></p>{/if}
       <p>Игроки: {gameState.party?.count}/{gameState.party?.size} · Ваша роль: {gameState.party?.role} · Накормлено: {gameState.fed.length}/4</p>
       {#if gameState.party?.completed}<h3>Спасибо за помощь!</h3><p>Время: {gameState.party.seconds} с · Камни: {gameState.stones.length} · Слова в вашем словаре: {gameState.words.length}</p>{/if}
+      <CityTasks {game} {view}/>
     {:else if panel === 'chat'}
       <p class="babel-muted babel-participants">Участники задания · {participants.length ? `${participants.join(', ')} и вы` : gameState.party ? 'вы' : 'ещё нет участников'}</p>
       <ol class="babel-chat" aria-label="История общения">{#each chatEntries as entry}{#if entry.kind === 'message'}{@const m = entry.message}<li class:outgoing={m.authorId === gameState.playerId}><span class="babel-avatar" aria-hidden="true">{m.authorName.slice(0, 1).toLocaleUpperCase()}</span><div class="babel-message"><strong>{m.authorId === gameState.playerId ? 'Вы' : m.authorName}</strong><div class="babel-bubble"><LearningText text={m.text} enabled={m.authorId !== gameState.playerId && m.language === gameState.profile?.learning} learn={word => game.learnWord(word)} />{#if m.authorId !== gameState.playerId && m.language === gameState.profile?.learning}<button class="babel-add-word babel-action-icon" onclick={() => game.learnWord(m.text)}><Icon name="plus" size={18}/> В словарь</button>{/if}</div><small>{m.translated ? 'Машинный перевод · ' : ''}{statuses[m.status]}{#if m.authorId === gameState.playerId && m.status === 'delivered'} ✓{/if}</small>{#if m.error}<p role="alert">{m.error}</p><button disabled={view.busy} onclick={() => void game.babylonAction({ type: 'chat', text: m.text }, m.id)}>Повторить отправку</button>{/if}</div></li>{:else}{@const stone = entry.stone}<li class:outgoing={stone.authorId === gameState.playerId}><span class="babel-avatar" aria-hidden="true">{stone.authorName.slice(0, 1).toLocaleUpperCase()}</span><div class="babel-message"><strong>{stone.authorId === gameState.playerId ? 'Вы' : stone.authorName}</strong><div class="babel-stone"><small>Рисунок на камне</small><StoneSurface strokes={stone.drawing} label={`Камень от ${stone.authorName}`} /></div></div></li>{/if}{/each}</ol>
@@ -138,6 +141,7 @@
       {#if goat}<p>{goat.feature}. {gameState.fed.includes(goat.id) ? 'Уже накормлена.' : 'Выберите корм из сумки.'}</p><button disabled={view.busy || !gameState.inventory[selected] || gameState.fed.includes(goat.id)} onclick={() => void game.babylonAction({ type: 'feed', targetId: goat.id, item: selected })}>Дать выбранный корм</button>
       {:else}
         <div class="market-items">{#each MARKET_ITEMS.filter(item => item.seller === target) as item}<button disabled={view.busy} onclick={() => void game.babylonAction({ type: 'buy', targetId: target!, item: item.id })}>Купить: {item.name}</button>{/each}</div>
+        <CityTasks {game} {view} {target}/>
         {#key target}<ResidentChat {game} {view} target={target!} name={actor?.name ?? 'Житель'} avatar={gameAvatar} />{/key}
       {/if}
     {:else if panel === 'stone'}

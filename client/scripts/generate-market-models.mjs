@@ -114,8 +114,10 @@ const tail=ball(color,0,1,-.65,.09,.2,.1,g);tail.rotation.x=-.8;
 clips.push(new AnimationClip('idle',5,[rotationTrack(head.name,[0,1,2,3,5],[0,.15,.4,.15,0])]));}
 function paving(){box('#c4a276',0,-.12,0,32,.2,32);for(let row=0;row<14;row++)for(let col=0;col<7;col++){const x=-5.5+col*1.85+(row%2)*.25,z=13.5-row*2.1;const m=box([C.sand,C.cream,C.light][(row+col)%3],x,-.005+(row%3)*.01,z,1.72,.09,1.95);m.rotation.y=((row*7+col)%5-2)*.025;}}
 function horizon(){
-  for(let i=0;i<6;i++) { const peak=ball(i%2?'#c5a38d':'#b99a88',-35+i*14,1,-48-(i%2)*6,13,9+(i%3)*3,9);peak.rotation.y=i*.7; }
-  for(let i=0;i<5;i++) { const cloud=ball(i%2?'#f6ddbe':'#ead0b4',-28+i*14,13+(i%2)*3,-35-(i%3)*8,7,.7,2);cloud.rotation.y=.3; }
+  // The former backdrop at z=-48 overlaps the expanded city's streets.
+  // Keep its shapes beyond the northern city boundary, including the pasture offset.
+  for(let i=0;i<6;i++) { const peak=ball(i%2?'#c5a38d':'#b99a88',-35+i*14,1,-168-(i%2)*6,13,9+(i%3)*3,9);peak.rotation.y=i*.7; }
+  for(let i=0;i<5;i++) { const cloud=ball(i%2?'#f6ddbe':'#ead0b4',-28+i*14,13+(i%2)*3,-155-(i%3)*8,7,.7,2);cloud.rotation.y=.3; }
 }
 function bench(x,z){box(C.wood,x,.5,z,2,.16,.6);box(C.wood,x,.95,z-.25,2,.55,.12);for(const side of [-1,1])box(C.dark,x+side*.75,.25,z,.14,.5,.45);obstacle(x,z,2,.7);}
 function cart(x,z){
@@ -143,7 +145,7 @@ box(C.sand,3.1,.35,-7,.75,.7,.75);box(C.cream,3.1,1,-7,.65,.65,.65);const glow=b
 palm(-8,7,5.5);palm(7,-10,6.5);plant(-7,-1);plant(8,3); // The fourth ground vessel is dynamic, not baked.
 }
 function pasture(){begin('pasture');horizon();box('#b2aa73',0,-.12,0,32,.2,32);box(C.cream,0,-.005,10,4,.08,12);
-for(const b of MARKET_MAP_BUILDINGS.filter(b=>b.area==='pasture'))house(b.x,b.z+32,b.width,b.height,b.depth);
+for(const b of MARKET_MAP_BUILDINGS.filter(b=>b.area==='pasture'))house(b.x,b.z+64,b.width,b.height,b.depth);
 for(const side of [-1,1])plant(side*3.2,9);
 // Fence has a broad south gate on the continuation of the market street.
 for(const z of [-10,6])for(let x=-10;x<=10;x+=2){if(z===6&&Math.abs(x)<3)continue;box(C.wood,x,.6,z,.16,1.2,.16);obstacle(x,z,.2,.2);if(x<10 && !(z===6&&x>=-4&&x<2)){for(const y of [.4,.85])box(C.wood,x+1,y,z,2,.12,.12);obstacle(x+1,z,2,.2);}}
@@ -151,6 +153,10 @@ for(const side of [-1,1])for(let z=-10;z<6;z+=2){box(C.wood,side*10,.6,z,.16,1.2
 for(let i=0;i<35;i++){const x=Math.sin(i*19)*13,z=Math.cos(i*7)*12;if(Math.abs(x)<2&&z>5)continue;for(let j=0;j<2;j++){const grass=flexible(triangle(i%2?C.leaf:C.olive,x+j*.13,.13,z,.22),'grass');grass.rotation.y=i;}}
 merchant('shepherd',-3,6,C.ochre);box(C.wood,-3.6,.85,6,.08,1.7,.08);
 goat('white-goat',-5,1,'#e8e0c9','bell');goat('black-goat',4,0,'#4d4943','horns');goat('spotted-goat',-4,-5,'#b76b3f','spots');goat('kid-goat',4,-5,'#b9bab1','kid');
+// A single shepherd's shelter, hay rack and stone-lined drinking place.
+for(let i=0;i<4;i++){const x=-12+(i%2)*1.1,z=9+Math.floor(i/2)*1.1;ball(C.ochre,x,.5,z,.55,.5,.55);for(let j=0;j<4;j++)box(C.cream,x-.35+j*.23,.85,z,.04,.18,.9);}obstacle(-11.5,9.5,2.2,2.2);
+for(const x of [-10,10])for(let z=-8;z<6;z+=4){cyl(C.ochre,x,.83,z,.12,.08);cyl(C.ochre,x,.45,z,.12,.08);}
+for(let i=0;i<9;i++){const angle=i*Math.PI/4.5;ball(C.sand,11+Math.sin(angle)*1.1,.25,10+Math.cos(angle)*1.1,.35,.25,.35);}cyl('#759e9a',11,.2,10,.9,.04);obstacle(11,10,2.5,2.5);
 box(C.wood,0,.25,-8,2.5,.5,.8);box('#759e9a',0,.5,-8,2.2,.03,.6);obstacle(0,-8,2.5,.8);palm(-13,-9,4.5);palm(13,3,5);
 }
 function mainBuilding(){

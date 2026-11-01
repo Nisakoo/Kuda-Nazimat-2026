@@ -4,16 +4,24 @@
   import { MARKET_MAP_BUILDINGS, MARKET_MAP_PALMS } from '../shared/marketMap.generated';
   import { modal } from './modal';
   import Icon from './Icon.svelte';
-  const { player, peers, goal, market, simulated, close, navigation }: { player: MapPlayer | null; peers: readonly MapPeer[]; goal: { x: number; z: number } | null; market: boolean; simulated: boolean; close: () => void; navigation?: Snippet } = $props();
+  import { CITY_LOCATIONS, CITY_BOUNDS, CITY_OUTLINE, CITY_RIVER_BANK, CITY_BASE_LOCATIONS, cityLocal, cityStreets } from '../../../shared/city/catalogue';
+  import type { CityState } from '../../../shared/city/types';
+  import type { Languages } from '../../../shared/babylon/types';
+  const { player, peers, goal, market, simulated, close, navigation, city, profile, learn }: { player: MapPlayer | null; peers: readonly MapPeer[]; goal: { x: number; z: number } | null; market: boolean; simulated: boolean; close: () => void; navigation?: Snippet; city?: CityState | undefined; profile?: Languages | undefined; learn?: (word: string, translation: string) => void } = $props();
   let zoom = $state(1);
+  let overview = $state(false);
+  let selectedPlace = $state<string | null>(null);
+  const selectedLocation = $derived(CITY_LOCATIONS.find(l => l.id === selectedPlace));
+  function toggleOverview() { overview = !overview; zoom = 1; center = overview ? project((CITY_BOUNDS.minX + CITY_BOUNDS.maxX)/2, (CITY_BOUNDS.minZ + CITY_BOUNDS.maxZ)/2) : { x: -5.2, z: -8 }; }
+  function focusPlace(x: number,z: number) { center = project(x,z); overview = false; zoom = .5; }
   function project(x: number, z: number) { return { x: (x-z)*.8660254, z: (x+z)*.5 }; }
   function facing(yaw: number) { return Math.atan2(.8660254*(Math.sin(yaw)-Math.cos(yaw)), -.5*(Math.sin(yaw)+Math.cos(yaw))) * 180 / Math.PI; }
   // Bounds cover the authored courtyard, market and pen with padding.
   let center = $state({ x: -5.2, z: -8 });
   let mapAspect = $state(2);
   const bounds = $derived.by(() => {
-    const height = 56 / zoom;
-    const width = Math.max(112, 56 * mapAspect) / zoom;
+    const height = (overview ? 148 : 56) / zoom;
+    const width = Math.max(overview ? 246 : 112, (overview ? 148 : 56) * mapAspect) / zoom;
     return { x: center.x - width / 2, z: center.z - height / 2, w: width, h: height };
   });
   function measureMap(node: SVGSVGElement) {
@@ -32,6 +40,10 @@
   }
   // The horizontal scroll starts at the same projected center as the viewBox.
   function centerScroll(node: HTMLElement) { node.scrollLeft = (node.scrollWidth - node.clientWidth) / 2; }
+  function districtPoints(id: string) {
+    const base = CITY_BASE_LOCATIONS.find(place => place.id === id)!;
+    return [[-11,-10],[9,-12],[12,-1],[6,12],[-9,11],[-13,2]].map(([x,z]) => { const p=cityLocal(id,x!,z!); const screen=project(base.x+p.x,base.z+p.z); return `${screen.x},${screen.z}`; }).join(' ');
+  }
   function roofPoints(b: { x: number; z: number; width: number; depth: number; height: number }, elevation = 0) {
     return ([[-1,-1], [1,-1], [1,1], [-1,1]] as const).map(([x,z]) => {
       const p = project(b.x + x * b.width / 2, b.z + z * b.depth / 2);
@@ -40,25 +52,47 @@
   }
 </script>
 <dialog use:modal class="map-dialog parchment" aria-labelledby="map-title" oncancel={(event) => { event.preventDefault(); close(); }}>
-  <div class="panel-top"><div><h2 id="map-title">Карта Вавилона</h2><p>Рынок и окрестности</p></div><button class="icon-button" aria-label="Закрыть" onclick={close}>×</button></div>
+  <div class="panel-top"><div><h2 id="map-title">Карта Вавилона</h2><p>{overview ? 'Весь город' : 'Рынок и окрестности'}</p></div><button class="icon-button" aria-label="Закрыть" onclick={close}>×</button></div>
   {#if market}
     <div class="map-viewport">
     <!-- svelte-ignore a11y_no_noninteractive_tabindex: keyboard users must be able to scroll the map. -->
-    <div class="map-frame" bind:this={mapFrame} use:centerScroll tabindex="0" role="region" aria-label="Карта: прокрутите по горизонтали для просмотра">
+    <div class="map-frame" class:overview bind:this={mapFrame} use:centerScroll tabindex="0" role="region" aria-label={overview ? 'Весь город' : 'Карта: прокрутите по горизонтали для просмотра'}>
       <svg class="world-map" use:measureMap viewBox={`${bounds.x} ${bounds.z} ${bounds.w} ${bounds.h}`} role="img" aria-label="Схема рынка и положение игрока">
         <defs>
+          <clipPath id="city-world-clip"><polygon points={CITY_OUTLINE.map(p=>p.join(',')).join(' ')}/></clipPath>
+          <clipPath id="city-map-clip"><polygon points={CITY_OUTLINE.map(([x,z])=>{const p=project(x,z);return `${p.x},${p.z}`;}).join(' ')}/></clipPath>
           <pattern id="map-tiles" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#e1caa1"/><path d="M0 0H2V2" fill="none" stroke="#cfb48d" stroke-width=".075"/></pattern>
           <pattern id="map-fields" width="5" height="4" patternUnits="userSpaceOnUse"><rect width="5" height="4" fill="#c5c59a"/><path d="m1 1 .4-.5m2 2 .4-.7" stroke="#9ca77b" stroke-width=".1"/></pattern>
           <linearGradient id="map-roof" x2=".9" y2="1"><stop stop-color="#fff0cd"/><stop offset="1" stop-color="#d8bb90"/></linearGradient>
           <filter id="map-shadow" x="-30%" y="-30%" width="170%" height="170%"><feDropShadow dx=".65" dy="1" stdDeviation=".5" flood-color="#796445" flood-opacity=".25"/></filter>
         </defs>
         <rect x="-1024" y="-1024" width="2048" height="2048" fill="url(#map-fields)"/>
+        {#if overview}
+          <g transform="matrix(.8660254 .5 -.8660254 .5 0 0)">
+            <polygon points={[[-80,-80],...CITY_RIVER_BANK,[-80,48]].map(p=>p.join(',')).join(' ')} fill="#69a2aa"/>
+            <polygon class="city-outline" points={CITY_OUTLINE.map(p=>p.join(',')).join(' ')} fill="#d4bf96" stroke="#a58b63" stroke-width="1.8" stroke-linejoin="round"/>
+            {#each CITY_BASE_LOCATIONS.filter(place=>!['market','pasture','tower'].includes(place.id)) as place}
+              {#each cityStreets(place.id) as street}
+                <polyline clip-path="url(#city-world-clip)" points={street.map(p=>`${place.x+p.x},${place.z+p.z}`).join(' ')} fill="none" stroke="#f1debb" stroke-width="2" stroke-linejoin="round"/>
+              {/each}
+            {/each}
+          </g>
+        {/if}
+        {#each CITY_LOCATIONS.filter(l => !['market','pasture','tower'].includes(l.id)) as place}
+          {@const p = project(place.x,place.z)}
+          {@const discovered = city?.discovered.includes(place.id) ?? false}
+          <polygon clip-path="url(#city-map-clip)" points={districtPoints(place.id)} fill={discovered ? '#d9bb89' : '#b7b6a6'} opacity=".45" stroke="#8b856a" stroke-width=".25"/>
+          <g transform={`translate(${p.x},${p.z})`} opacity={discovered ? 1 : .55}>
+            <text y="2" text-anchor="middle" style:font-size={overview ? '4px' : '3px'} fill="#294f50">{discovered ? place.name[profile?.learning ?? 'ru'] : '?'}</text>
+            <title>{discovered ? place.name[profile?.native ?? 'ru'] : 'Не исследовано'}</title>
+          </g>
+        {/each}
         <g transform="matrix(.8660254 .5 -.8660254 .5 0 0)">
         <path d="M-16 16V-16H16V16ZM-2-16V-26H2V-16Z" fill="url(#map-tiles)"/>
         <rect x="-48" y="-16" width="32" height="32" fill="#d4bf96" stroke="#b69c72" stroke-width=".4"/>
         <path d="M-32 15V-11M-32 9H-16" stroke="#f0dbb3" stroke-width="3" fill="none"/>
-        <rect x="-10" y="-42" width="20" height="16" rx=".5" fill="#b1bb86" stroke="#94734f" stroke-width=".4" stroke-dasharray=".8 .35"/>
-        <path d="M-2-26H2" stroke="#d7d6ab" stroke-width="1"/>
+        <rect x="-10" y="-74" width="20" height="16" rx=".5" fill="#b1bb86" stroke="#94734f" stroke-width=".4" stroke-dasharray=".8 .35"/>
+        <path d="M-2-58H2" stroke="#d7d6ab" stroke-width="1"/>
 
         {#each [{x:-4.8,z:2,color:'#c9974f'},{x:-4.8,z:-4.6,color:'#b67e59'},{x:4.9,z:1,color:'#609d94'}] as stall}
           <g filter="url(#map-shadow)"><rect x={stall.x-1.7} y={stall.z-1} width="3.4" height="2" rx=".1" fill={stall.color} stroke="#e8d4ac" stroke-width=".2"/><path d={`M${stall.x-.8} ${stall.z-1}v2m1 0v-2`} stroke="#efdbb5" stroke-width=".3"/></g>
@@ -92,7 +126,7 @@
         {/each}
         <!-- Presentation offsets keep labels clear of the usual task goal and spawn markers.
              They move only the text, not the underlying landmark or marker coordinates. -->
-        <text x={project(0,-36).x - .87} y={project(0,-36).z - 4.5} class="map-label">Загон</text><text x={project(0,11).x - 9.8} y={project(0,11).z - 3.5} class="map-label">Рынок</text><text x={project(-32,3).x} y={project(-32,3).z} class="map-label">Двор башни</text>
+        <text x={project(0,-68).x - .87} y={project(0,-68).z - 4.5} class="map-label">Загон</text><text x={project(0,11).x - 9.8} y={project(0,11).z - 3.5} class="map-label">Рынок</text><text x={project(-32,3).x} y={project(-32,3).z} class="map-label">Двор башни</text>
         {#if goal}<g transform={`translate(${project(goal.x,goal.z).x},${project(goal.x,goal.z).z})`}><path d="M0-2 1.7 0 0 2-1.7 0Z" fill="#086e70" stroke="#fff4d5" stroke-width=".4"/><title>Текущее задание</title></g>{/if}
         {#each peers as peer (peer.id)}<g transform={`translate(${project(peer.x,peer.z).x},${project(peer.x,peer.z).z})`}><circle r="1.25" fill="#bd6c50" stroke="#fff9e6" stroke-width=".35"/><text y="3.6" class="map-label">{peer.name}</text><title>Напарник: {peer.name}</title></g>{/each}
         {#if player}<g transform={`translate(${project(player.x,player.z).x},${project(player.x,player.z).z})`}><path d="M0-2.8-1.2-1.3H1.2Z" transform={`rotate(${facing(player.yaw)})`} fill="#086e70"/><circle r="1.25" fill="#168c91" stroke="#fffaf0" stroke-width=".35"/><text y="3.6" class="map-label">Вы</text></g>{/if}
@@ -102,12 +136,20 @@
     </div>
     <p class="map-disclaimer">Схема реальных областей · {simulated ? 'Тестовые сетевые данные, не сервер' : player?.authoritative ? 'Позиции с сервера' : 'Локальная демонстрация'}. Показаны только участники вашего задания.</p>
   {:else}<p>Схема доступна для рыночной области. Для этой карты иллюстрация ещё не подготовлена.</p>{/if}
-  <div class="map-controls"><p><span class="map-dot"></span> Вы <span class="map-dot partner"></span> Напарник <span class="map-diamond">◆</span> Задание</p><button class="secondary" disabled={!player || !market} onclick={centerPlayer}><Icon name="center" size={20}/> К игроку</button><button class="secondary" aria-label="Уменьшить карту" disabled={zoom <= .5 || !market} onclick={() => zoom = Math.max(.5, zoom - .25)}>−</button><button class="secondary" aria-label="Увеличить карту" disabled={zoom >= 3 || !market} onclick={() => zoom = Math.min(3, zoom + .25)}>+</button></div>
+  <div class="map-controls">{#if market}<button class="secondary" aria-pressed={overview} onclick={toggleOverview}>{overview ? 'Рынок и окрестности' : 'Весь город'}</button>{/if}<p><span class="map-dot"></span> Вы <span class="map-dot partner"></span> Напарник <span class="map-diamond">◆</span> Задание</p><button class="secondary" disabled={!player || !market} onclick={centerPlayer}><Icon name="center" size={20}/> К игроку</button><button class="secondary" aria-label="Уменьшить карту" disabled={zoom <= .5 || !market} onclick={() => zoom = Math.max(.5, zoom - .25)}>−</button><button class="secondary" aria-label="Увеличить карту" disabled={zoom >= 3 || !market} onclick={() => zoom = Math.min(3, zoom + .25)}>+</button></div>
 
+  {#if market && city}
+    <details class="city-map-index"><summary>Районы города · {city.discovered.length} / {CITY_LOCATIONS.length}</summary>
+      <ul>{#each CITY_LOCATIONS as place}<li><button class="secondary" title={city.discovered.includes(place.id) ? place.name[profile?.native ?? 'ru'] : 'Не исследовано'} onclick={() => { selectedPlace = place.id; focusPlace(place.x,place.z); }}>{city.discovered.includes(place.id) ? place.name[profile?.learning ?? 'ru'] : 'Не исследовано'} · {place.wave}</button></li>{/each}</ul>
+      {#if selectedLocation && city.discovered.includes(selectedLocation.id)}<p>{selectedLocation.name[profile?.learning ?? 'ru']} — {selectedLocation.name[profile?.native ?? 'ru']}</p>{#if learn && city.discovered.includes(selectedLocation.id)}<button class="secondary" onclick={() => learn?.(selectedLocation!.name[profile?.learning ?? 'ru'],selectedLocation!.name[profile?.native ?? 'ru'])}>В словарь</button>{/if}{/if}
+    </details>
+  {/if}
   {#if navigation}{@render navigation()}{/if}
 </dialog>
 
 <style>
+  .city-map-index ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; }
+  .city-map-index { margin-top: 12px; }
   .map-viewport { position: relative; }
   .map-north { pointer-events: none; }
   .world-map :global(.map-label) { font-size: 2.7px; stroke-width: .8px; }
@@ -115,6 +157,7 @@
   @media (max-width: 600px) {
     .map-frame { overflow-x: auto; overscroll-behavior-x: contain; }
     .map-viewport .map-frame .world-map { width: 600px; height: auto; aspect-ratio: 124 / 74; max-width: none; }
+    .map-viewport .map-frame.overview .world-map { width: 100%; max-width: 100%; }
     .world-map :global(.map-label) { font-size: 3.2px; stroke-width: .9px; }
   }
   .map-controls button :global(svg) { vertical-align: middle; }

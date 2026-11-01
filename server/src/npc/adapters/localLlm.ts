@@ -5,6 +5,7 @@ import type { Clock, Scheduler, TimerHandle } from '../../common/time.ts';
 import type { LocalTranslationRequest, NpcAnswerRequest, NpcDiagnostics, NpcResponder } from '../NpcResponder.ts';
 import { isNpcFailureCode, type NpcFailureCode } from '../failureCodes.ts';
 import { NPC_TIMING } from '../../../../shared/protocol/npcTiming.ts';
+import { hasObviousCyrillicReply } from '../targetLanguage.ts';
 
 type Backend = 'ollama' | 'mlx';
 type Deps = { clock: Clock; scheduler: Scheduler };
@@ -99,7 +100,7 @@ function emojiLike(text: string): boolean {
   return false;
 }
 function validTargetText(text: string): boolean {
-  return validUnicode(text) && [...text].length <= 800 && !emojiLike(text);
+  return validUnicode(text) && [...text].length <= 800 && !emojiLike(text) && !hasObviousCyrillicReply(text);
 }
 function boundedRequest(request: NpcAnswerRequest): NpcAnswerRequest | undefined {
   if (!request || !request.npc || !Array.isArray(request.history) || !['ru', 'en', 'es'].includes(request.locale) || !Number.isFinite(request.deadlineAt)) return;
@@ -129,9 +130,11 @@ function boundedTranslation(request: LocalTranslationRequest): Omit<LocalTransla
 }
 
 interface ProcessRow { pid: number; parent: number; group: number; rss: number; zombie: boolean }
-function processTable(run: typeof execFile = execFile): Promise<ProcessRow[]> {
+// Extra scheduling headroom for macOS RSS sampling only; cleanup probes keep 500 ms.
+const memorySampleTimeout = (platform: string): number => platform === 'darwin' ? 1500 : 500;
+function processTable(run: typeof execFile = execFile, timeout = 500): Promise<ProcessRow[]> {
   return new Promise((resolve, reject) => {
-    run('/bin/ps', ['-axo', 'pid=,ppid=,pgid=,rss=,stat='], { timeout: 500, maxBuffer: 1024 * 1024, encoding: 'utf8', env: { ...process.env, LC_ALL: 'C' } }, (error, stdout) => {
+    run('/bin/ps', ['-axo', 'pid=,ppid=,pgid=,rss=,stat='], { timeout, maxBuffer: 1024 * 1024, encoding: 'utf8', env: { ...process.env, LC_ALL: 'C' } }, (error, stdout) => {
       if (error) {
         const reason = error.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER' ? 'memory_sample_ps_limit'
           : error.killed ? 'memory_sample_ps_timeout' : 'memory_sample_ps_failed';
@@ -149,8 +152,8 @@ function processTable(run: typeof execFile = execFile): Promise<ProcessRow[]> {
     });
   });
 }
-async function memoryBytes(group: number, run: typeof execFile = execFile): Promise<number> {
-  const rows = await processTable(run);
+async function memoryBytes(group: number, run: typeof execFile = execFile, platform: string = process.platform): Promise<number> {
+  const rows = await processTable(run, memorySampleTimeout(platform));
   if (!rows.some((row) => row.pid === process.pid)) throw new Error('memory_sample_missing');
   // Conservatively count all of Node and its descendants, plus reparented owned group members.
   const included = new Set([process.pid]);
@@ -300,7 +303,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     try {
       const bytes = await Promise.race([
         runtime.memoryBytes(s.group!),
-        new Promise<never>((_resolve, reject) => { timer = scheduler.setTimeout(() => reject(new Error('memory_sample_deadline')), 600); }),
+        new Promise<never>((_resolve, reject) => { timer = scheduler.setTimeout(() => reject(new Error('memory_sample_deadline')), memorySampleTimeout(runtime.platform) + 100); }),
       ]);
       if (s.phase === 'stopping') return;
       if (!Number.isSafeInteger(bytes) || bytes <= 0) { fail(s, 'memory_sample_invalid'); return; }

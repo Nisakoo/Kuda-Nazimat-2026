@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { BudgetExhausted, WorldBudget } from './WorldBudget';
 
 describe('WorldBudget', () => {
+  it('admits resources above the old cap and rejects one byte beyond 128 MiB by default', () => {
+    const budget = new WorldBudget();
+    const first = budget.reserve('models', 0, 96 * 1024 * 1024);
+    const last = budget.reserve('audio-and-chunks', 0, 32 * 1024 * 1024);
+    expect(budget.stats.memory).toBe(128 * 1024 * 1024);
+    expect(() => budget.reserve('overflow', 0, 1)).toThrow(BudgetExhausted);
+    last.release(); first.release();
+    expect(budget.stats.memory).toBe(0);
+  });
   it('waits for pending decoder ownership before a new world starts reserving data', async () => {
     const budget = new WorldBudget(1000);
     const first = budget.reserve('a', 60, 100); const second = budget.reserve('a', 60, 100);

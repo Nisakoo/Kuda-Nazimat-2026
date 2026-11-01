@@ -61,7 +61,7 @@ export function createDemoScenery(assets: SceneAssets): Group {
       place('cylinder', '#8c7156', x + side * 1.65, 1.3, z + 1.7, 0.065, 2.6, 0.065);
     }
     place('roundedBox', npc.id === 'history-guide' ? '#b77652' : '#698f9d', x, 2.5, z + 1.1, 4, 0.13, 2.1);
-    const sign = assets.label(npc.id === 'history-guide' ? 'ДОМ ПИСЦА' : 'ДОМ ЗНАНИЙ', '#68513e');
+    const sign = assets.label(npc.id === 'history-guide' ? 'ДОМ ПИСЦА' : 'ДОМ ЗНАНИЙ');
     sign.position.set(x, 3.15, z);
     root.add(sign);
   }
