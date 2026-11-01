@@ -295,7 +295,7 @@ export class GameService {
   presence(): PlayerPresence[] {
     const now = this.clock.now();
     return [...this.seats.values()].map((seat) => ({
-      name: seat.identity.displayName, mapId: this.world.locate(seat.identity.playerId)?.mapId ?? null,
+      playerId: seat.identity.playerId, name: seat.identity.displayName, mapId: this.world.locate(seat.identity.playerId)?.mapId ?? null,
       connected: seat.channel !== null, releaseInMs: seat.releaseAt === null ? null : Math.max(0, seat.releaseAt - now),
       rttMs: seat.channel?.rttMs?.() ?? null, reconnects: Math.max(0, seat.attaches.filter((time) => now - time < 600_000).length - 1),
       seatedSeconds: Math.floor((now - seat.seatedAt) / 1000),

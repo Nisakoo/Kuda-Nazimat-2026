@@ -16,12 +16,13 @@ import { createAuthService, REVOKE_MESSAGES } from '../auth/AuthService.ts';
 import { createResponder } from '../npc/adapters/index.ts';
 import { createNpcDialogueService } from '../npc/NpcDialogueService.ts';
 import { createHttpServer } from '../http/server.ts';
-import { CounterWindow, evaluateHealth } from '../obs/health.ts';
+import { createOverview, type Overview } from '../obs/overview.ts';
 import type { Config } from './config.ts';
 
 /** Optional observability pieces from `createObservability`; tests run without them. */
 export interface AppObservability {
   readonly metrics: MetricsRegistry;
+  readonly runId?: string;
   readonly recorder?: { warnings(): readonly LogRecord[]; dump(reason: string): string | null };
   readonly process?: () => { eventLoopP99Ms: number };
   readonly setSnapshot?: (snapshot: () => unknown) => void;
@@ -37,17 +38,20 @@ function listenError(error: NodeJS.ErrnoException, port: number): Error {
   return error;
 }
 
-/** OBS-003 `app.start`: what runs and with which settings — never the monitoring token. */
+/** Server version from package.json for `app.start` and the admin screen. */
+function serverVersion(): string {
+  try { return (JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string }).version; } catch { return 'unknown'; }
+}
+
+/** OBS-003 `app.start`: what runs and with which settings; the config holds no secrets. */
 function startFields(config: Config): Record<string, unknown> {
-  let version = 'unknown', commit: string | undefined;
-  try { version = (JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string }).version; } catch { /* optional */ }
+  const version = serverVersion(); let commit: string | undefined;
   try {
     const git = new URL('../../../.git/', import.meta.url);
     const head = readFileSync(new URL('HEAD', git), 'utf8').trim();
     commit = (head.startsWith('ref: ') ? readFileSync(new URL(head.slice(5), git), 'utf8') : head).trim().slice(0, 12);
   } catch { /* not a git checkout */ }
-  const { monitoring, ...rest } = config;
-  return { env: config.env, version, commit, node: process.version, platform: `${process.platform} ${process.arch}`, pid: process.pid, config: { ...rest, monitoring: { ...monitoring, token: monitoring.token ? '[задан]' : null } } };
+  return { env: config.env, version, commit, node: process.version, platform: `${process.platform} ${process.arch}`, pid: process.pid, config };
 }
 
 /** `languagePort` overrides config.language for tests; production selects the adapter by config. */
@@ -80,6 +84,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   let languageReady = false;
   let game: Awaited<ReturnType<CreateGame>> | undefined;
   let http: ReturnType<typeof createHttpServer> | undefined;
+  let overview: Overview | undefined;
   const languageTime = metrics.histogram('babylon_language_ms', 'Длительность языковой операции BABEL', MS_BUCKETS);
   try {
     const responder = createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler });
@@ -108,31 +113,21 @@ export async function startApplication(config: Config, createGame: CreateGame, l
       for (const hash of hashes) npc!.cancelConnection('babel:' + hash);
     });
     const npcService = npc;
-    const counters = new CounterWindow();
-    const sample = () => counters.sample(Date.now(), {
-      timeouts: metrics.value('npc_requests_total', { outcome: 'timeout' }),
-      requests: metrics.value('npc_requests_total'),
-      dbErrors: metrics.value('db_errors_total'),
-      logDropped: metrics.value('log_dropped_total'),
-    });
-    sample();
-    const sampler = setInterval(sample, 30_000); sampler.unref();
-    const health = () => {
-      const stats = runtime.stats();
-      const requests = counters.delta('requests');
-      let diskFreeBytes: number | null = null;
-      try { const fs = statfsSync(dirname(config.dbPath)); diskFreeBytes = fs.bavail * fs.bsize; } catch { /* unknown */ }
-      return evaluateHealth({
-        tickP95Ms: stats?.tickP95Ms ?? null, broadcastP95Ms: stats?.broadcastP95Ms ?? null, eventLoopP99Ms: obs.process?.().eventLoopP99Ms ?? null,
-        npcReady: npcService.ready(), languageReady: language?.ready?.() ?? languageReady, timeoutShare: requests ? counters.delta('timeouts') / requests : null,
-        dbErrors5m: counters.delta('dbErrors'), logDropped5m: counters.delta('logDropped'), diskFreeBytes, players: runtime.presence(),
-      });
+    const diskFreeBytes = (): number | null => {
+      try { const fs = statfsSync(dirname(config.dbPath)); return fs.bavail * fs.bsize; } catch { return null; }
     };
+    metrics.gauge('disk_free_bytes', 'Свободное место на диске с БД', () => diskFreeBytes() ?? 0);
+    const view = overview = createOverview({
+      metrics, logger, runId: obs.runId ?? 'test', env: config.env, version: serverVersion(), maxPlayers: config.maxPlayers, maxUnfinished: config.npc.maxUnfinished,
+      presence: () => runtime.presence(), stats: () => runtime.stats(), npcReady: () => npcService.ready(), languageReady: () => language?.ready?.() ?? languageReady,
+      eventLoopP99Ms: () => obs.process?.().eventLoopP99Ms ?? null, diskFreeBytes, dbBytes: () => databaseBytes(config.dbPath),
+    });
     http = createHttpServer(config, {
       auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
-      operator: { languageReady: () => language?.ready?.() ?? languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
+      operator: { languageReady: () => language?.ready?.() ?? languageReady, health: view.health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null, overview: view },
+      clientPerf: (playerId, report) => view.perf.record(playerId, report),
     });
-    obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state() }));
+    obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state(), history: view.recent() }));
     game.attach(http.server);
     stores.sessions.prune(Date.now() - 86400000);
     await new Promise<void>((resolve, reject) => {
@@ -140,9 +135,9 @@ export async function startApplication(config: Config, createGame: CreateGame, l
       http!.server.once('error', failed);
       http!.server.listen(config.port, config.host, () => { http!.server.removeListener('error', failed); resolve(); });
     });
-    const stopSampler = () => clearInterval(sampler);
-    http.server.once('close', stopSampler);
+    http.server.once('close', view.stop);
   } catch (error) {
+    overview?.stop();
     log.error('app.start.failed', 'Запуск не удался', { error });
     http?.rejectNewRequests();
     try { await language?.stop?.().catch(() => {}); await npc?.stop(); } finally {
@@ -150,7 +145,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     }
     throw error;
   }
-  const runtime = game; const npcService = npc; const transport = http; const languageService = language!;
+  const runtime = game; const npcService = npc; const transport = http; const languageService = language!; const metricsView = overview!;
   const cleanup = setInterval(() => {
     try { stores.sessions.prune(Date.now() - 86400000); } catch (error) { log.error('db.transaction.failed', 'Не удалось очистить сессии', { operation: 'sessions.prune', error }); }
   }, 3600000);
@@ -159,6 +154,8 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   let stopping: Promise<void> | undefined;
   return {
     server: transport.server,
+    /** OBS-017 table for this run; main prints it at a clean shutdown. */
+    report: () => metricsView.report(),
     stop(reason = 'shutdown'): Promise<void> {
       if (stopping) return stopping;
       stopping = (async () => {

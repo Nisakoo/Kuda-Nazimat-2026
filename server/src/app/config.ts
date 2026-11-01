@@ -17,7 +17,7 @@ export interface Config extends GameConfig {
   /** passwordless enables `guest` and `dev` login (AUTH-001, AUTH-016); never in production. */
   auth: { maxSessions: number; passwordless: boolean };
   logs: LogsConfig;
-  monitoring: { token: string | null; pingIntervalMs: number; validateOutgoing: boolean };
+  monitoring: { pingIntervalMs: number; validateOutgoing: boolean };
   language: { adapter: string; options: Record<string, unknown> };
   npc: { adapter: string; maxConcurrent: number; maxUnfinished: number; timeoutMs: number; streamTimeoutMs: number; options: Record<string, unknown> };
 }
@@ -31,7 +31,7 @@ const defaults: Input = {
   disconnectGraceMs: 10000, saveIntervalMs: 10000, corsOrigins: [], logWorldAccess: false, clientDebug: false,
   auth: { maxSessions: 5, passwordless: false },
   logs: { consoleLevel: 'info', fileLevel: 'debug', dir: 'data/logs', maxFileMb: 20, maxTotalMb: 200, retentionDays: 14 },
-  monitoring: { token: null, pingIntervalMs: 5000, validateOutgoing: false },
+  monitoring: { pingIntervalMs: 5000, validateOutgoing: false },
   language: { adapter: 'test', options: {} },
   npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: NPC_TIMING.defaultMs, streamTimeoutMs: NPC_TIMING.defaultMs, options: {} },
 };
@@ -83,7 +83,6 @@ export function parseConfig(raw: unknown, path: string, env: Environment = 'deve
   if (typeof logs.dir !== 'string' || !logs.dir.trim()) throw new Error('Неверный logs.dir');
   integer(logs.maxFileMb, 'logs.maxFileMb', 1, 1024); integer(logs.maxTotalMb, 'logs.maxTotalMb', 1, 100000); integer(logs.retentionDays, 'logs.retentionDays', 1, 3650);
   if (logs.maxFileMb > logs.maxTotalMb) throw new Error('logs.maxFileMb > logs.maxTotalMb');
-  if (monitoring.token !== null && (typeof monitoring.token !== 'string' || monitoring.token.length < 32 || /\s/.test(monitoring.token))) throw new Error('monitoring.token: null или строка от 32 символов без пробелов');
   integer(monitoring.pingIntervalMs, 'monitoring.pingIntervalMs', 1000, 60000);
   if (typeof monitoring.validateOutgoing !== 'boolean') throw new Error('Неверный monitoring.validateOutgoing');
   if (typeof language.adapter !== 'string' || !language.adapter) throw new Error('Неверный language.adapter');
