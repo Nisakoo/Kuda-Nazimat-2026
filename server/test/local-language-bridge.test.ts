@@ -105,6 +105,13 @@ it.each(['en', 'es'] as const)('projects only the public %s role for every NPC',
       : { 'fruit-seller': ['vendedora de telas', 'alfarero', 'pastor'], 'fabric-seller': ['vendedor de fruta', 'alfarero', 'pastor'], potter: ['vendedor de fruta', 'vendedora de telas', 'pastor'], shepherd: ['vendedor de fruta', 'vendedora de telas', 'alfarero'] };
     for (const role of otherRoles[id as keyof typeof otherRoles]) expect(text).not.toContain(role);
   }
+  for (const [id, canonical] of Object.entries(NPCS).filter(([id]) => !(id in expected))) {
+    await f.language.answer({ ...canonical, name: 'Untrusted replacement' }, 'hello', language, [], new AbortController().signal, context);
+    const projected = f.responder.answer.mock.lastCall![0].npc;
+    expect(projected).toMatchObject({ id, name: canonical.name, topic: canonical.topic, persona: canonical.persona });
+    expect(Object.keys(projected).sort()).toEqual(['greeting', 'id', 'name', 'persona', 'topic']);
+    expect(f.responder.answer.mock.lastCall![0].locale).toBe(language);
+  }
   expect(NPCS).toEqual(before);
   expect(() => localNpcPromptProfile('unknown', language)).toThrow('Unknown Babylon NPC');
 });

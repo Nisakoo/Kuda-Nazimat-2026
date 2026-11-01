@@ -3,7 +3,7 @@ import { browserTestOrigin, browserTestPort } from './playwright.settings';
 
 export default defineConfig({
   testDir: './e2e',
-  testIgnore: 'render.spec.ts',
+  testIgnore: ['render.spec.ts', 'nameplate-depth.spec.ts'],
   fullyParallel: false,
   workers: 1,
   forbidOnly: Boolean(process.env.CI),

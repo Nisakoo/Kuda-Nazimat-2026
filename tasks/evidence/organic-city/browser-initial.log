@@ -1,0 +1,72 @@
+
+Running 5 tests using 1 worker
+
+(node:55262) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/5] e2e/city.spec.ts:75:1 › walks every district with real keyboard input, checks UI and captures at most seven images
+e2e/city.spec.ts:75:1 › walks every district with real keyboard input, checks UI and captures at most seven images
+WALK bakery segments 4
+
+WALK mill segments 9
+
+  1) e2e/city.spec.ts:75:1 › walks every district with real keyboard input, checks UI and captures at most seven images
+
+    Error: Blocked at {"x":-3.749999999999991,"z":7.099999999999987}, toward {"x":-6,"z":7} (mill)
+
+      58 |     while(Date.now()<deadline){await page.waitForTimeout(60);const remaining=(waypoint[axis]-position()[axis])*Math.sign(delta);if(remaining<.25)break;}
+      59 |     await page.keyboard.up(key);await page.waitForTimeout(140);
+    > 60 |     if(Math.abs(position()[axis]-before[axis])<.08)throw new Error(`Blocked at ${JSON.stringify(position())}, toward ${JSON.stringify(waypoint)} (${district})`);
+         |                                                          ^
+      61 |    }
+      62 |   }
+      63 |  }
+        at walk (/Users/nisakoo/Documents/competition-2026/client/e2e/city.spec.ts:60:58)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/city.spec.ts:89:80
+
+    Error Context: test-results/city/city-walks-every-district--4c47a-ptures-at-most-seven-images/error-context.md
+
+    Error Context: test-results/city/city-walks-every-district--4c47a-ptures-at-most-seven-images/error-context.md
+
+
+(node:60079) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[2/5] e2e/city.spec.ts:103:1 › whole-city overview fits narrow and wide screens without horizontal cropping
+[3/5] e2e/city.spec.ts:119:1 › city task UI starts at the resident, rejects the wrong recipe amount, and updates the HUD
+e2e/city.spec.ts:119:1 › city task UI starts at the resident, rejects the wrong recipe amount, and updates the HUD
+WALK bakery-task segments 4
+
+WALK mill-task segments 9
+
+  2) e2e/city.spec.ts:119:1 › city task UI starts at the resident, rejects the wrong recipe amount, and updates the HUD
+
+    Error: Blocked at {"x":-3.749999999999991,"z":6.949999999999985}, toward {"x":-6,"z":7} (mill-task)
+
+      58 |   for(const axis of ['x','z'] as const){
+      59 |    for(let correction=0;correction<6;correction++){
+    > 60 |     const before=position(),delta=waypoint[axis]-before[axis];if(Math.abs(delta)<.3)break;
+         |                                                          ^
+      61 |     const key=axis==='x'?(delta>0?'d':'a'):(delta>0?'s':'w');
+      62 |     await page.keyboard.down(key);const deadline=Date.now()+Math.abs(delta)/2*1000+5000;
+      63 |     while(Date.now()<deadline){await page.waitForTimeout(60);const remaining=(waypoint[axis]-position()[axis])*Math.sign(delta);if(remaining<.25)break;}
+        at walk (/Users/nisakoo/Documents/competition-2026/client/e2e/city.spec.ts:60:58)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/city.spec.ts:125:38
+
+    Error Context: test-results/city/city-city-task-UI-starts-a-1053c--amount-and-updates-the-HUD/error-context.md
+
+    Error Context: test-results/city/city-city-task-UI-starts-a-1053c--amount-and-updates-the-HUD/error-context.md
+
+
+(node:63335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[4/5] e2e/completion-contracts.spec.ts:45:1 › actual Socket.IO stream renders partial text, replaces it with the final, and cancels on close
+[5/5] e2e/completion-contracts.spec.ts:70:1 › production disables guest/dev and a forced temporary-password change issues a usable session
+  2 failed
+    e2e/city.spec.ts:75:1 › walks every district with real keyboard input, checks UI and captures at most seven images
+    e2e/city.spec.ts:119:1 › city task UI starts at the resident, rejects the wrong recipe amount, and updates the HUD
+  3 passed (1.8m)

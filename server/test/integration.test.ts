@@ -148,7 +148,7 @@ it('BABEL polling returns only task peer positions outside AOI and omits release
   expect(two.snapshot.entities.some(e => e.id === one.playerId)).toBe(false);
   const third = await connect(outsider.token); third.command('join', { mapId: 'market' }); const other = await third.wait(p => p.type === 'joined'); if (other.type !== 'joined') throw new Error();
   const state = parseBabylonResult(await (await post(b.token, { type: 'state' })).json()).state;
-  expect(state.partyPositions).toEqual([{ id: one.playerId, name: 'Task A', x: 0, z: -26 }]);
+  expect(state.partyPositions).toEqual([{ id: one.playerId, name: 'Task A', x: 0, z: -58 }]);
   expect(state.partyPositions.some(p => p.id === other.playerId)).toBe(false);
   expect(parseBabylonResult(await (await post(outsider.token, { type: 'state' })).json()).state.partyPositions).toEqual([]);
   expect((await post(b.token, { type: 'state', playerId: other.playerId })).status).toBe(400);

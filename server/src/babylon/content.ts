@@ -1,17 +1,15 @@
+import { CITY_RESIDENTS, PASTURE_GOATS, PASTURE_ORIGIN } from '../../../shared/city/catalogue.ts';
 import type { ItemId, Language } from '../../../shared/babylon/types.ts';
 import type { NpcProfile } from '../contracts.ts';
 export const ITEMS: Readonly<Record<ItemId, string>> = { dates: 'fruit-seller', 'red-fruit': 'fruit-seller', 'yellow-fruit': 'fruit-seller', water: 'potter', fabric: 'fabric-seller' };
-export const GOATS = [
-  { id: 'white-goat', food: 'dates', x: -5, z: -31 },
-  { id: 'black-goat', food: 'red-fruit', x: 4, z: -32 },
-  { id: 'spotted-goat', food: 'yellow-fruit', x: -4, z: -37 },
-  { id: 'kid-goat', food: 'water', x: 4, z: -37 },
-] as const;
+export const GOATS = PASTURE_GOATS;
+const CITY_NPCS = Object.fromEntries(CITY_RESIDENTS.filter(n => !n.legacy).map(n => [n.id, { id:n.id,name:n.name,topic:n.topic,persona:n.persona,greeting:`Добро пожаловать. Я ${n.name}.`,x:n.x,z:n.z }]));
 export const NPCS: Readonly<Record<string, NpcProfile & { x: number; z: number }>> = {
+  ...CITY_NPCS,
   'fruit-seller': { id: 'fruit-seller', name: 'Торговец фруктами', topic: 'Финики и фрукты', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Добро пожаловать!', x: -4.5, z: .5 },
   'fabric-seller': { id: 'fabric-seller', name: 'Торговка тканями', topic: 'Ткани и узоры', persona: 'Жительница древнего Вавилона, учебная реконструкция', greeting: 'Рассмотри ткани.', x: -3, z: -5.2 },
   potter: { id: 'potter', name: 'Гончар', topic: 'Глиняная посуда и вода', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Здесь есть вода в кувшине.', x: 4.6, z: -.5 },
-  shepherd: { id: 'shepherd', name: 'Пастух', topic: 'Козы', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Помоги накормить коз.', x: -3, z: -26 },
+  shepherd: { id: 'shepherd', name: 'Пастух', topic: 'Козы', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Помоги накормить коз.', x: -3, z: PASTURE_ORIGIN.z + 6 },
 };
 // Public prompt-only projections. Keep UI labels and the canonical world content above unchanged.
 const PROMPT_PROFILES: Readonly<Record<string, Readonly<Record<'en' | 'es', Omit<NpcProfile, 'id'>>>>> = {
@@ -35,7 +33,12 @@ const PROMPT_PROFILES: Readonly<Record<string, Readonly<Record<'en' | 'es', Omit
 
 export function localNpcPromptProfile(id: string, language: 'en' | 'es'): NpcProfile {
   const profile = PROMPT_PROFILES[id]?.[language];
-  if (!profile) throw new Error('Unknown Babylon NPC');
+  if (!profile) {
+    const resident = CITY_RESIDENTS.find(npc => npc.id === id && !npc.legacy);
+    if (!resident) throw new Error('Unknown Babylon NPC');
+    // Preserve the authored city identity until a localized projection is authored.
+    return { id, name: resident.name, topic: resident.topic, persona: resident.persona, greeting: language === 'en' ? 'Welcome!' : '¡Bienvenido!' };
+  }
   return { id, ...profile, persona: `${profile.persona} ${language === 'en' ? 'I live in ancient Babylon.' : 'Vivo en la antigua Babilonia.'}` };
 }
 

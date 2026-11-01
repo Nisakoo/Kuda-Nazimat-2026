@@ -373,7 +373,7 @@ describe('application lifecycle', () => {
     app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, network);
     const listener = vi.fn(); app.subscribe(listener); app.start(host);
     try {
-      const pending = app.register('Аня', 'registration-password');
+      const pending = app.login('Аня', 'register', 'registration-password');
       await vi.advanceTimersByTimeAsync(10000);
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authPending: false, authError: expect.stringContaining('Аккаунт мог быть создан') }));
       expect(listener.mock.lastCall?.[0].authError).toContain('Вход');
@@ -844,6 +844,13 @@ describe('application lifecycle', () => {
       expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(3);
       app.toggleMenu();
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ pauseOpen: true, phase: 'stopped' }));
+      app.openHelp();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ helpOpen: true, pauseOpen: true, phase: 'stopped' }));
+      key('Digit3'); key('Tab');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ helpOpen: true, mapOpen: false, marketPanel: null }));
+      expect(locked).toBeNull();
+      app.toggleMenu();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ helpOpen: false, pauseOpen: true, phase: 'stopped' }));
       app.openSettings(); app.toggleMenu();
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ settingsOpen: false, pauseOpen: true, phase: 'stopped' }));
       app.toggleMenu();

@@ -73,7 +73,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
     catch { error(res, 400, 'INVALID', 'Некорректное действие BABEL v2'); return; }
     const type = packet.action.type;
     if (type === 'state') context.route = '/api/babylon:state';
-    const gameplay = ['buy', 'feed', 'npc', 'chat', 'carve'].includes(type);
+    const gameplay = ['buy', 'feed', 'npc', 'chat', 'carve', 'city-start', 'city-step'].includes(type);
     if (gameplay && !deps.game.canAct?.(session.identity.accountId, sessionKey)) { error(res, 403, 'FORBIDDEN', 'Войдите в мир в этом окне, чтобы выполнить действие'); return; }
     const controlId = deps.game.controlId?.(session.identity.accountId, sessionKey) ?? null;
     if (gameplay && !controlId) { error(res, 403, 'FORBIDDEN', 'Нет управляющего соединения'); return; }

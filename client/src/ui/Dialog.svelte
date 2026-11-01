@@ -2,12 +2,12 @@
   import { onMount } from 'svelte';
   import type { DemoDialog } from '../session/demoDialogue';
   import { modal } from './modal';
-  const { dialog, send, close, pending = false, error = null }: { dialog: DemoDialog; send: (text: string) => void; close: () => void; pending?: boolean; error?: string | null } = $props();
+  const { dialog, send, close, pending = false, partial = '', error = null }: { dialog: DemoDialog; send: (text: string) => void; close: () => void; pending?: boolean; partial?: string; error?: string | null } = $props();
   let text = $state('');
   let input: HTMLInputElement;
   let history: HTMLDivElement;
   onMount(() => { input.focus(); });
-  $effect(() => { if (dialog.messages.length && history) history.scrollTop = history.scrollHeight; });
+  $effect(() => { if ((dialog.messages.length || partial) && history) history.scrollTop = history.scrollHeight; });
   function submit() { send(text); text = ''; input.focus(); }
 </script>
 
@@ -18,8 +18,9 @@
     {#each dialog.messages as message, index (index)}
       <p class:player-message={message.author === 'player'} class="message"><span>{message.author === 'player' ? 'Вы' : dialog.name}</span>{message.text}</p>
     {/each}
+    {#if pending && partial}<p class="message streaming-answer"><span>{dialog.name}</span>{partial}</p>{/if}
   </div>
-  {#if pending}<p class="small subtle">Ожидаем ответ…</p>{/if}
+  {#if pending}<p class="small subtle">{partial ? 'Житель отвечает…' : 'Ожидаем ответ…'}</p>{/if}
   {#if error}<p class="capture-error" role="alert">{error}</p>{/if}
   <div class="questions">{#each dialog.questions as question}<button class="question" onclick={() => send(question)}>{question}</button>{/each}</div>
   <form onsubmit={(event) => { event.preventDefault(); submit(); }}>

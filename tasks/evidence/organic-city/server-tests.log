@@ -1,0 +1,13 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /Users/nisakoo/Documents/competition-2026
+
+
+ Test Files  26 passed (26)
+      Tests  260 passed (260)
+   Start at  16:47:14
+   Duration  43.44s (transform 388ms, setup 0ms, import 1.40s, tests 40.07s, environment 2ms)
