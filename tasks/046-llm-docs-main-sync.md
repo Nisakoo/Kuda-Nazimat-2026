@@ -1,7 +1,7 @@
 ---
 id: TASK-046
 type: implementation-task
-status: in-progress
+status: done
 spec: ../specs/server-llm-runtime.md
 requirements: [LLM-001–015]
 related:
@@ -32,7 +32,7 @@ depends_on: []
 - [x] Одна GenerationQueue для NPC и BABEL; монотонный deadline не восстанавливается после rollback, pending слот не освобождается до окончания физического cleanup. HTTP metadata и клиентский timeout остаются согласованы, ordinary pending10с.
 - [x] main environment CLI/Make и LLM flags работают вместе; examples/defaults/guides согласованы. Production name-only UI не объявляется готовым: TASK-044 остаётся открытым. Client NPC streaming TASK-041 также не входит в этот срез.
 - [x] После semantic merge выполнить server/shared tests, client tests, Python fixtures, strict types/imports/build, relevant browser/integration/CLI checks и проверку docs. Фиксировать конкретные ошибки/недоступные проверки, не скрывать их как PASS.
-- [ ] Проверить diff against origin/main: изменения main не потеряны, версия wire3 не откатилась, main ref не менялся. Проверить чистоту worktree и безопасно опубликовать нашу ветку.
+- [x] Проверить diff against origin/main: изменения main не потеряны, версия wire3 не откатилась, main ref не менялся. Проверить чистоту worktree и безопасно опубликовать нашу ветку.
 
 ## Проверки и review
 
@@ -70,7 +70,11 @@ git diff --check
 - Browser итог остаётся **3/6**, а не общий PASS: scoped timeout PASS; три расширенных сценария не дошли до целевых assertions. Сохранённые traces не содержат recorded console/page/HTTP errors; причина задержек не установлена, регрессия или software rendering не доказаны. Расширенный UI retest остаётся отдельной незавершённой проверкой, не скрыт fixture/юнитами.
 - Независимый reviewer повторно подтвердил ограниченный BABEL fix и детерминированный AUTH fixture: новых static blockers не найдено.
 
-Публикация ещё не выполнена. `refs/heads/main` локально остаётся02eb786; worker/watchdog код не менялся. TASK017/018/045 остаются in-progress. TASK041/044 не закрывались.
+### Публикация
+
+Ветка npc-llm-clean-start опубликована: remote ed7532c291cb4c905a28764fea3e360feffc0a82 → b5cae464279597130b0dbf89fc2bf40f59439f95, с explicit `--force-with-lease=refs/heads/npc-llm-clean-start:ed7532c291cb4c905a28764fea3e360feffc0a82`. Перед push проверено, что remote main09fd771 и прежний tip нашей ветки не изменились. Последующая фиксация этого свидетельства — обычный fast-forward docs commit.
+
+Рабочее дерево было чистым;09fd771 является предком ветки. `refs/heads/main` локально остаётся02eb786; main не пушился. Backup backup/npc-llm-before-main-sync-20261101 остаётся302b814. Worker/watchdog код не менялся. TASK017/018/045 остаются in-progress. TASK041/044 не закрывались. Статус done относится только к ограниченному docs/rebase/проверочному срезу этой задачи; не обозначает зелёный расширенный browser suite или аппаратную квалификацию.
 
 ## Ограничения результата
 
