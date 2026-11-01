@@ -7,6 +7,7 @@ import type { Vector3 } from '../../../../shared/world/types.ts';
 import type { GltfLibrary, ModelInstance } from './GltfLibrary';
 import type { EntityVisuals } from './EntityVisuals';
 import { VisualWind } from './VisualWind';
+import { poseMillDrive } from './MillDrive';
 
 interface LifeVisual { readonly assetId: string; readonly group: Group; readonly abort: AbortController; model: ModelInstance | null; failed: boolean; positioned: boolean; wind: VisualWind | null }
 /** Market shares the existing grid. This is a visibility lookup, not a second chunk loader. */
@@ -98,6 +99,7 @@ export class WorldLifeVisuals {
       visual.group.position.y+=Math.abs(Math.sin(time*.006))*.025;
       for(const side of [-1,1])for(const end of [-1,1]){const leg=root.getObjectByName(`pack-leg-${side}-${end}`);if(leg)leg.rotation.x=Math.sin(time*.006+(side===end?0:Math.PI))*.32;}
       if(head)head.rotation.x=Math.sin(time*.003)*.04;
+      poseMillDrive(root,visual.group.position,visual.group.rotation.y,animal.route);
     }else{
       visual.group.rotation.y=yaw;
       const feeding=.5+.5*Math.sin(phase);

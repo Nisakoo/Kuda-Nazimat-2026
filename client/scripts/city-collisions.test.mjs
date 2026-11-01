@@ -62,7 +62,7 @@ test('generated fountain GLB blocks the bowl, not its empty square corners', asy
 
 test('generated mill GLB preserves thin canopy posts and an empty covered corner', async () => {
   const data = await district('mill');
-  assert.ok(blocked(data, 'mill', -3, -9), 'the visible 16 cm post has a collision');
+  assert.ok(blocked(data, 'mill', -5.4, -11.4), 'the relocated 16 cm post has a collision');
   assert.equal(blocked(data, 'mill', 2.45, -5.15), false, 'empty canopy corner stays traversable');
   assert.ok(blocked(data, 'mill', 0, -7), 'the actual millstone remains solid');
 });

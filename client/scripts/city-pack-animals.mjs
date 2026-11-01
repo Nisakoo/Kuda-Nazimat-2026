@@ -1,4 +1,4 @@
-import { Group, Mesh, MeshStandardMaterial, BoxGeometry, IcosahedronGeometry, CylinderGeometry, Color, BufferAttribute } from 'three';
+import { Group, Mesh, MeshStandardMaterial, BoxGeometry, IcosahedronGeometry, CylinderGeometry, TorusGeometry, Color, BufferAttribute } from 'three';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 
 /** Shared static pack-animal geometry. +Z faces forward, hooves stand on y=0. */
@@ -157,7 +157,7 @@ export function packAnimal(kind, x, z, api) {
 }
 
 
-/** Eight independently movable, batched parts; head is a child of the neck. */
+/** Batched movable parts; head is a child of the neck, mill drive belongs to the mule lease. */
 export function buildPackAnimal(kind) {
   const root = new Group(); root.name = `city-${kind}`;
   const parts = new Map(); let active;
@@ -181,6 +181,16 @@ export function buildPackAnimal(kind) {
     bead(color, x, y, z, rx, ry, rz) { geometry(new IcosahedronGeometry(1, 0), color, x, y, z, rx, ry, rz); },
     cylinder(color, x, y, z, r, h, top = r) { geometry(new CylinderGeometry(top, r, h, 10), color, x, y, z); },
   });
+  if(kind==='mule') {
+    part('pack-body',[0,0,0],null);
+    const hitch=new TorusGeometry(.085,.025,6,12);hitch.rotateY(Math.PI/2);
+    geometry(hitch,'#bba06c',.43,1.32,.18);
+    geometry(new BoxGeometry(.08,.24,.24),'#71513b',.38,1.27,.18);
+    // Unit-length members are positioned between the axle and hitch each frame.
+    part('pack-drive-arm',[0,0,0],null);geometry(new BoxGeometry(.16,.16,1),'#916a48',0,0,.5);
+    part('pack-drive-drop',[0,0,0],null);geometry(new BoxGeometry(.12,1,.12),'#71513b',0,.5,0);
+    part('pack-drive-hub',[0,0,0],null);geometry(new CylinderGeometry(.235,.235,.24,12),'#bba06c',0,0,0);
+  }
   const material = new MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 });
   for (const [name, entry] of parts) {
     const { group, pivot, parent } = entry; group.name = name;
