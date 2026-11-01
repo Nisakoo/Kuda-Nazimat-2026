@@ -193,9 +193,9 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 | 076 | [Клиент: выбор облика](tasks/076-client-avatar-selection.md) | [AVATAR](specs/client-avatar-select.md) | 073 |
 | 077 | [Клиент: визуальное соответствие](tasks/077-client-visual-fidelity.md) | [HUD](specs/client-game-hud.md) | 073, 074, 075 |
 | 078 | [Интеграция NPC с main](tasks/078-npc-main-sync.md) | [NPC-AI](specs/npc-character-behavior.md) | 070, 071, 072 |
-| 079 | [Барьер неправильного языка и роль NPC](tasks/079-npc-language-role-regression.md) | [NPC-AI](specs/npc-character-behavior.md) | 071, 072 |
-| 080 | [Бюджет замера памяти macOS](tasks/080-macos-memory-sample-budget.md) | [LLM](specs/server-llm-runtime.md) | 079 |
-| 081 | [Прямые ответы без подмены роли](tasks/081-npc-direct-grounded-replies.md) | [NPC-AI](specs/npc-character-behavior.md) | 079 |
+| 084 | [Барьер неправильного языка и роль NPC](tasks/084-npc-language-role-regression.md) | [NPC-AI](specs/npc-character-behavior.md) | 071, 072 |
+| 085 | [Бюджет замера памяти macOS](tasks/085-macos-memory-sample-budget.md) | [LLM](specs/server-llm-runtime.md) | 084 |
+| 086 | [Прямые ответы без подмены роли](tasks/086-npc-direct-grounded-replies.md) | [NPC-AI](specs/npc-character-behavior.md) | 084 |
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
 

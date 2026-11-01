@@ -1,10 +1,10 @@
 ---
-id: TASK-080
+id: TASK-085
 type: implementation-task
 status: in-progress
 spec: ../specs/server-llm-runtime.md
 requirements: [LLM-006–008]
-depends_on: [TASK-079]
+depends_on: [TASK-084]
 ---
 
 # Ограниченный бюджет замера памяти на macOS
@@ -28,4 +28,4 @@ depends_on: [TASK-079]
 
 `make server-test` завершился: 679 passed / 15 skipped / 45 files, `/tmp/npc080-server-tests.log`. При первоначальной публикации d45cd52 он ещё шёл в фоне; результат добавлен после завершения. Проверка на Mac остаётся открытой; статус in-progress.
 
-Настоящие Ollama/MLX, diagnose, модели и downloads на этой машине не запускались. Предыдущий общий Python-прогон TASK-079 с 1 failure не объявляется исправленным. Клиент, модельные профили, база и main не менялись.
+Настоящие Ollama/MLX, diagnose, модели и downloads на этой машине не запускались. Предыдущий общий Python-прогон TASK-084 с 1 failure не объявляется исправленным. Клиент, модельные профили, база и main не менялись.
