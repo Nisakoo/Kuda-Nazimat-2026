@@ -10,7 +10,7 @@ related:
   - spec: ../specs/protocol.md
     requirements: [PROTO-006, PROTO-008]
   - spec: ../specs/server-foundation.md
-    requirements: [SERVER-004]
+    requirements: [SERVER-003–004]
   - spec: ../specs/client-input-ui.md
     requirements: [UI-005]
 depends_on: [TASK-025]
@@ -42,7 +42,7 @@ scheduling_note: интегрированный v1-срез с явным выб
 
 ## Как читать исторические свидетельства
 
-Разделы ниже — хронология отдельных patches/прогонов. Указанные в старых разделах8–9с/клиент10с и «client/shared не менялись» относятся **только к тому этапу**, не к текущему состоянию. Последнее согласованное решение — раздел «Согласованное увеличение игрового deadline до30с»: server30с/clientNPC32с и минимальные правки client/shared. Новое решение не превращает старые timeout в успешные прогоны.
+Разделы ниже — хронология отдельных patches/прогонов. Указанные в старых разделах8–9с/клиент10с и «client/shared не менялись» относятся **только к тому этапу**, не к текущему состоянию. Затем был согласован раздел «Согласованное увеличение игрового deadline до30с»: server30с/clientNPC32с. Текущий этап — «Make NPC_TIMEOUT в секундах и согласование клиента»: целые секунды1–300 на один запуск, default30с, клиент узнаёт effective deadline с сервера и ждёт плюс2с. Старый30с hardcap/32с constant теперь исторические. Новое решение не превращает старые timeout в успешные прогоны.
 
 ## Диагностика первого запуска Intel Mac
 
@@ -164,6 +164,23 @@ scheduling_note: интегрированный v1-срез с явным выб
 - Независимый read-only review не нашёл blockers; по рекомендации добавлен regression нормальных Pythonvenv/executable symlinks, включённый в финальный full run. Importer повторно использует общий static helper, проверяет fatalUTF8 и distinct фиксированные CLIошибки. Публикация catalog/backup create-only0600, атомарная видимость через tempfile+link; ограничение2файлов/конкурентногоредактирования явно описано в PROFILES. Это статическая проверка уже доверенных подготовленных файлов, не новое доказательство происхождения/tokenizer equivalence/RAM/модельной работы.
 - Финальная **serial** проверка: `node --check server/llm/diagnose.mjs` PASS; `npm --prefix server run check` (strict TS/shared +51modules/147deps) PASS; `make server-test` **350passed/0skipped** (включая76profile,17import,5launch и39diagnostic tests); Python discovery **80passed**. Make test использует capture-Node fixture вместо game/model, dry-run demo/server проверяет forwarding без install/start. Real entrypoint в subprocess проверен **только отказом missingexplicitcatalog до game/model startup**. Diagnostic profile regression использует fake factory и tiny metadata, не inference.8shellblocks PROFILES проверены bash-n без исполнения; docs24specs/29tasks/238requirements и `git diff --check` PASS. Реальный CLIимпорт и возврат2B/ответ30с на Mac ещё не выполнялись здесь.
 - Client/shared/frozencontracts/game/realtime в этом срезе не менялись; клиент уже пересобран оператором на bb4d980, повторная сборка для этого startup-only patch не требуется. Модели/Ollama/MLX/realdiagnoseCLI на dev не запускались, веса не скачивались; TASK030/017/018 остаются неквалифицированными по реальному игровому/RAM/quality/OS gate.
+
+## Make NPC_TIMEOUT в секундах и согласование клиента
+
+- Пользователь уточнил требуемый интерфейс: задавать timeout **числом в секундах при запуске Make**, не редактировать несколько лимитов. Реализуем `make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=60` (также demo), CLI --npc-timeout60. Только целые1–300секунд, без s/m/floats/infinity; config timeoutMs сохраняет ms1–300000/default30000. Override in-memory на1запуск, без записи config/catalog. Это новый этап, supersedes исторический30с hardmax/клиент32с.
+- Изменения LLM-015/NPC-002/SERVER-003/004/PROTO-006/008/UI-005: effective deadline один от приёма включаяочередь; shared pure timing bounds/grace. Supervisor game/worker не режут минуту на30с, диагностический operatorCLI сохраняет свой30с requestdeadline. Static profiles/import сохраняют валидный timeout (legacy8→30 migration остаётся отдельным прежним переносом, не сброс60→30). Service monotonic/slot/memory/token/cancel сохраняются.
+- Публичный GET /api/game-config возвращает только npcTimeoutMs effectiveconfig; Nodeсервер ни runtime paths ни pins не отдаёт. Realclient получает metadata с actualserverUrl на каждом connect/reconnect, отбрасывает stale/aborted responses, до успеха/при ошибке блокирует только NPC с понятной ошибкой. Client pending=serverdeadline+2000мс; ordinary10с не меняется. HTTPadapter отдельно от headlesssession, mock/local продолжают deterministic defaults без HTTP. Игровыеwire shapes PROTO1/frozencontracts/realtime/game не меняются.
+- Acceptance: Make/CLI validation/precedence/no persistence; endpoint/CORS/no-store/no secrets; sharedmetadata parsebounds; 45сответ при60с принят,60сграница отменена и physicalcleanup/queuebudgetнеослаблены; Pythonremainingbudget>30 безactualruntime; client62сwait и обычные10с, fetchwrongurl/error/abort/disconnect/reconnect/races; types/import/build/client+server/Python/docs/browser relevantfixtures. Настоящие модели/weights/realCLI на dev запрещены; на Mac послеоднойновойclientсборки timeout меняется черезMakeбезпересборки.
+
+### Evidence этапа NPC_TIMEOUT
+
+- Серийно `npm --prefix server run check` PASS (strictTS/shared,52modules/153deps); `make server-test` **370passed/0skipped**; Python `/tmp/tokenizer-check.q9QYYJ/runtime/python/bin/python3 -B -m unittest discover -s server/llm -p 'test_*.py'` **83passed**. Никакие настоящие модели/runtime/diagnosticCLI/weights на dev не запускались.
+- `make client-test` **175passed** после дополнительного path-prefix regression; `npm --prefix client run check` PASS (Svelte0errors/0warnings,TS/core); `npm --prefix client run check:imports` PASS (89modules/245deps); `npm --prefix client run build` PASS, только прежний предупреждающий chunk>500kB.
+- Shared pure timing contract/HTTP: invalidshape/numbers/unknownkeys rejected; endpoint отдаёт60000 из effectiveconfig, no-store/allowlistedCORS, ни options ни pins. Makecapture передаёт строку60 какenvdata; launchпарсер превращает60→60000,приоритетCLI/env и no-persistence проверены. Config профили и importer сохраняют пользовательские60000bytes; legacy8000migrationнеподменяетдругиесроки.
+- Clientfixtures: NPC45сresponseпри60с принят,62сpendingграница/lateanswer; ordinary10с; metadataизactualserverURL/pathprefix, max1KiB/5с, stalledfetch/bodycancel, malformed/error/pending friendlydialogerror/noNPCpacket, chat/joinнеблокируются, reconnectrefresh иstaleresponse/disposeignored. Nodefixturesобоихbackend:45сaccept/60сreject/cleanup, default30/diagnostic30, общийmax300, monotonicrollback/queuebudget/commitguard. PythonHTTPtimeoutбольше30, prefillconsume/rollback/invalidbudget проверены.
+- Read-only independentreview: blockingdefectsневыявлены; предложенные3regressionsпоUI/error/reconnect/stalledbodyдобавлены. Parentтакжеисправилroot-onlymetadataURL, сохранивподдержанныйauth/socketpathprefix, добавилregression. Docs/YAML/requirementIDs/DAG/local links и `git diff --check` PASS.
+- Scoped real Chromium `cd client && npx playwright test e2e/npc-timeout.spec.ts` **1passed** (повторно после последней prefixправки,19.5с): реальный HTTP/auth/onlineUI bootstrap, envKUDA_NPC_TIMEOUT60 переопределяет config15000→public60000, actualclientfetch60000, readyUI,0page/consoleerrors. Fixture использует толькоscripted responder, HOMEвtempdir безвнешнихкаталогов, cleanupserver/SQLite/temp подтверждён. Это не actualLLM/NPCgeneration и не полная UI/e2eacceptance.
+- Реальныеgameответы/качество/RAM/burst/p95/hardware по-прежнему **непроверены**, TASK030/017/018необъявляютсяdone. Полныйисторическийnetwork.spec.ts с settingscheckbox/select failures невыдаётсязаPASS; новый scopedbrowsercheck указан отдельно выше.
 
 ## Результат
 

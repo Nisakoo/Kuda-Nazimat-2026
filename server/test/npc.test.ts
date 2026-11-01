@@ -17,7 +17,7 @@ function service(responder: NpcResponder, options = { maxConcurrent: 1, maxUnfin
   const npc = createNpcDialogueService({ ...time, responder, dialogue: stores.dialogue, logger: { ...silentLogger, error: (message, fields) => errors.push({ message, fields }) } }, options);
   return { npc, stores, errors };
 }
-function heldDeadlineFixture() {
+function heldDeadlineFixture(timeoutMs = 30000) {
   const state = { wall: 100000, mono: 0 };
   const timers = new Map<TimerHandle, { callback: () => void; ms: number }>();
   const time = {
@@ -34,7 +34,7 @@ function heldDeadlineFixture() {
     answer: (request, signal) => new Promise(resolve => calls.push({ request, signal, finish: resolve })),
   };
   // These timers are deliberately never delivered. Only clock checks can reject late work.
-  return { ...service(responder, { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000 }, time), state, calls, timers };
+  return { ...service(responder, { maxConcurrent: 1, maxUnfinished: 4, timeoutMs }, time), state, calls, timers };
 }
 it.each([false, true])('preserves only 10 s after a 20 s queue wait, with rollback=%s and held timers', async (rollback) => {
   const { npc, stores, state, calls, timers } = heldDeadlineFixture(); await npc.start();
@@ -66,6 +66,27 @@ it.each([29999, 30000, 30001])('checks monotonic time before committing at %i ms
   expect(await pending).toEqual(elapsed < 30000 ? { ok: true, text: 'Ответ' } : { ok: false, reason: 'timeout' });
   expect(calls[0]!.signal.aborted).toBe(elapsed >= 30000);
   expect(stores.dialogue.history('p1', 'n')).toHaveLength(elapsed < 30000 ? 1 : 0);
+  expect(timers.size).toBe(0); await npc.stop();
+});
+it.each([45000, 59999, 60000, 60001])('uses the configured 60 s deadline at %i ms without timer delivery or a new budget after rollback', async (elapsed) => {
+  const { npc, stores, state, calls, timers } = heldDeadlineFixture(60000); await npc.start();
+  const pending = npc.ask(question()); state.wall -= 120000; state.mono = elapsed;
+  expect(calls[0]!.request.deadlineAt).toBe(160000);
+  calls[0]!.finish({ text: 'Ответ' });
+  expect(await pending).toEqual(elapsed < 60000 ? { ok: true, text: 'Ответ' } : { ok: false, reason: 'timeout' });
+  expect(stores.dialogue.history('p1', 'n')).toHaveLength(elapsed < 60000 ? 1 : 0);
+  expect(calls[0]!.signal.aborted).toBe(elapsed >= 60000);
+  expect(timers.size).toBe(0); await npc.stop();
+});
+it('passes only 15 s after a 45 s queue wait under the configured 60 s budget', async () => {
+  const { npc, state, calls, timers } = heldDeadlineFixture(60000); await npc.start();
+  const first = npc.ask(question('1')); const second = npc.ask(question('2'));
+  expect([...timers.values()].map(timer => timer.ms)).toEqual([60000, 60000]);
+  state.mono = 45000; state.wall -= 120000;
+  calls[0]!.finish({ text: 'Первый' }); expect((await first).ok).toBe(true);
+  expect(calls[1]!.request.deadlineAt - state.wall).toBe(15000);
+  state.mono = 60000; calls[1]!.finish({ text: 'Поздний' });
+  expect(await second).toEqual({ ok: false, reason: 'timeout' });
   expect(timers.size).toBe(0); await npc.stop();
 });
 it.each([2000, 10000])('rechecks the budget after a synchronous history read consumes %i ms before dispatch', async (readMs) => {

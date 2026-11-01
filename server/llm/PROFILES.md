@@ -10,6 +10,8 @@ make server BACKEND=ollama MODEL=0.8b
 make server BACKEND=mlx MODEL=2b
 ```
 
+Timeout задаётся отдельно **числом секунд**: `make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=60` (целые1–300, очередь включена). Без него используется config/default30с. Override не сохраняется; после однократной новой client-сборки повторная сборка для смены срока не нужна — [TIMEOUT.md](TIMEOUT.md).
+
 Это **выбор на один запуск**, не переписывание игрового config или сохранённой пары. `BACKEND` и `MODEL` задаются вместе. Поддержаны ровно3пары, не произвольные registry tags. MLX работает только на macOS/Apple Silicon; Intel не переключается автоматически на Ollama.
 
 Без аргументов:
@@ -55,7 +57,7 @@ export PATH="$HOME/kuda-llm/tools/node-v24.22.2-darwin-x64/bin:$HOME/kuda-llm/to
 make llm-import
 ```
 
-**Этот importer создаёт новый `~/kuda-llm/profiles.json` (0600), выбирает Ollama/2B и при необходимости меняет только `npc.timeoutMs: 8000 → 30000` в активном `server/config.json`.** Перед изменением config сохраняет исходные bytes в create-only0600 `~/kuda-llm/config-before-profiles.json`. Если timeout уже30000, config не переписывается. Никакие другие поля server config, весовые файлы, tokenizer, digest/pins не изменяются. Не восстанавливается целиком старый2Bconfig с8с deadline.
+**Этот importer создаёт новый `~/kuda-llm/profiles.json` (0600), выбирает Ollama/2B и при необходимости меняет только `npc.timeoutMs: 8000 → 30000` в активном `server/config.json`.** Перед изменением config сохраняет исходные bytes в create-only0600 `~/kuda-llm/config-before-profiles.json`. Если timeout уже30000 или другой допустимый (например60000), config не переписывается; legacy8000→30000 — единственное явно описанное исключение. Никакие другие поля server config, весовые файлы, tokenizer, digest/pins не изменяются. Не восстанавливается целиком старый2Bconfig с8с deadline.
 
 Источники — существующий `server/config.json` и сохранённый ранее `~/kuda-llm/config-before-08b.json`. Выбранный2Bпрофиль должен быть среди подготовленных источников. Подготовленный0.8B остаётся доступен вторым профилем, если присутствует в activeconfig. Это перенос уже доверенных локальных настроек, не проверка происхождения модели и не repin. Проверяются структура/пары/options и статическая доступность локальных файлов; полные hash/version/tokenizer/ownership/RAM проверки по-прежнему выполняет worker при запуске.
 
@@ -76,7 +78,7 @@ node server/src/cli/importLlmProfiles.ts \
 make server
 ```
 
-Лог `Выбран профиль NPC` покажет backend/model/CPU или GPU-параметры/timeout30000 без вывода путей, digest или секретов. Затем дождаться `NPC готов к вопросам`. Отдельный `ollama serve` не нужен. Открыть/перезагрузить страницу игры, отправить один вопрос и сохранить operational timing/UIответ. На Mac уже собран новый клиент с32с NPC pending; если это ещё не сделано, сначала `npm --prefix client run build` (см. [MAC-30S.md](MAC-30S.md)).
+Лог `Выбран профиль NPC` покажет backend/model/CPU или GPU-параметры/timeout30000 без вывода путей, digest или секретов. Затем дождаться `NPC готов к вопросам`. Отдельный `ollama serve` не нужен. Открыть/перезагрузить страницу игры, отправить один вопрос и сохранить operational timing/UIответ. Прежний клиент с фиксированным32с pending недостаточен для минутного срока. После этого обновления один раз выполнить `npm --prefix client run build` и перезагрузить страницу; новая сборка узнаёт timeout от сервера и ждёт плюс2с. Дальше изменение NPC_TIMEOUT не требует сборки — [TIMEOUT](TIMEOUT.md).
 
 ## Формат внешнего каталога
 

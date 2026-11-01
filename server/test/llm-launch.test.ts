@@ -3,10 +3,12 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { promisify } from 'node:util';
-import { afterEach, expect, it } from 'vitest';
-import { launchArguments } from '../src/app/launch.ts';
+import { afterEach, expect, it, vi } from 'vitest';
+import { launchArguments, loadLaunchConfig } from '../src/app/launch.ts';
 import { defaultConfigPath } from '../src/app/config.ts';
 
+const home = vi.hoisted(() => `/tmp/kuda-launch-home-${process.pid}-${Math.random().toString(16).slice(2)}`);
+vi.mock('node:os', async (original) => ({ ...await original<typeof import('node:os')>(), homedir: () => home }));
 const run = promisify(execFile);
 const directories: string[] = [];
 afterEach(async () => { for (const directory of directories.splice(0)) await rm(directory, { recursive: true, force: true }); });
@@ -33,6 +35,24 @@ it('rejects incomplete, ambiguous and unsupported selections before any runtime'
   expect(() => launchArguments([], { KUDA_LLM_MODEL: '2b' })).toThrow();
 });
 
+it('reads timeout as whole seconds from Make or CLI and never accepts suffixes or fractions', () => {
+  expect(launchArguments([], { KUDA_NPC_TIMEOUT: '60' }).npcTimeoutMs).toBe(60000);
+  expect(launchArguments(['--npc-timeout', '120'], { KUDA_NPC_TIMEOUT: '60' }).npcTimeoutMs).toBe(120000);
+  expect(launchArguments([], { KUDA_NPC_TIMEOUT: '' }).npcTimeoutMs).toBeUndefined();
+  for (const value of ['0', '-1', '1.5', '60s', '1m', '301', 'Infinity', 'NaN', '1e2', '060']) {
+    expect(() => launchArguments([], { KUDA_NPC_TIMEOUT: value })).toThrow('NPC_TIMEOUT');
+  }
+  expect(launchArguments(['--npc-timeout', '300'], {}).npcTimeoutMs).toBe(300000);
+});
+it('applies the timeout override only in memory and preserves config bytes', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'kuda-timeout-launch-')); directories.push(root);
+  const configPath = join(root, 'config.json');
+  const original = JSON.stringify({ npc: { timeoutMs: 15000 } }); await writeFile(configPath, original);
+  expect((await loadLaunchConfig(['--config', configPath, '--npc-timeout', '60'], {})).config.npc.timeoutMs).toBe(60000);
+  expect((await loadLaunchConfig(['--config', configPath], {})).config.npc.timeoutMs).toBe(15000);
+  expect(await readFile(configPath, 'utf8')).toBe(original);
+});
+
 it('the real entrypoint fails before game startup for an explicit missing catalog, without launching a model', async () => {
   const root = await mkdtemp(join(tmpdir(), 'kuda-launch-refused-')); directories.push(root);
   const configPath = join(root, 'config.json'); await writeFile(configPath, '{}');
@@ -54,10 +74,10 @@ it('the real entrypoint fails before game startup for an explicit missing catalo
 it('Make forwards profile values as environment data, and server never installs/builds/downloads', async () => {
   const root = await mkdtemp(join(tmpdir(), 'kuda-launch-')); directories.push(root);
   const capture = join(root, 'capture.mjs'); const output = join(root, 'captured.json');
-  await writeFile(capture, `import {writeFileSync} from 'node:fs'; writeFileSync(process.env.CAPTURE_OUTPUT,JSON.stringify({args:process.argv.slice(2),backend:process.env.KUDA_LLM_BACKEND,model:process.env.KUDA_LLM_MODEL,profiles:process.env.KUDA_LLM_PROFILES}));`);
-  await run('make', ['server', `NODE=${process.execPath} ${capture}`, 'BACKEND=ollama', 'MODEL=2b', 'LLM_PROFILES=/tmp/local profiles.json'],
+  await writeFile(capture, `import {writeFileSync} from 'node:fs'; writeFileSync(process.env.CAPTURE_OUTPUT,JSON.stringify({args:process.argv.slice(2),backend:process.env.KUDA_LLM_BACKEND,model:process.env.KUDA_LLM_MODEL,profiles:process.env.KUDA_LLM_PROFILES,timeout:process.env.KUDA_NPC_TIMEOUT}));`);
+  await run('make', ['server', `NODE=${process.execPath} ${capture}`, 'BACKEND=ollama', 'MODEL=2b', 'LLM_PROFILES=/tmp/local profiles.json', 'NPC_TIMEOUT=60'],
     { cwd: resolve(import.meta.dirname, '../..'), env: { ...process.env, CAPTURE_OUTPUT: output } });
-  expect(JSON.parse(await readFile(output, 'utf8'))).toEqual({ args: ['server/src/app/main.ts'], backend: 'ollama', model: '2b', profiles: '/tmp/local profiles.json' });
+  expect(JSON.parse(await readFile(output, 'utf8'))).toEqual({ args: ['server/src/app/main.ts'], backend: 'ollama', model: '2b', profiles: '/tmp/local profiles.json', timeout: '60' });
   const { stdout } = await run('make', ['-n', 'server', 'BACKEND=ollama', 'MODEL=0.8b'], { cwd: resolve(import.meta.dirname, '../..') });
   expect(stdout).toContain('server/src/app/main.ts');
   expect(stdout).not.toMatch(/npm|install|ollama\s+(?:pull|serve)|run build/);

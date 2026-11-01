@@ -4,6 +4,7 @@ import type { Logger } from '../common/logger.ts';
 import type { NpcResponder } from './NpcResponder.ts';
 import type { DialogueStore } from './ports.ts';
 import { isNpcFailureCode } from './failureCodes.ts';
+import { NPC_TIMING } from '../../../shared/protocol/npcTiming.ts';
 
 interface Job {
   question: NpcQuestion; deadline: number; monotonicDeadline: number; controller: AbortController; running: boolean; settled: boolean;
@@ -41,7 +42,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
       const sample = responder.diagnostics?.();
       if (!sample || !['preparing', 'prefill', 'decoding', 'complete'].includes(sample.stage)) return;
       const fields: Record<string, string | number> = { reason, stage: sample.stage };
-      for (const [key, max] of [['elapsedMs', 120000], ['promptTokens', 1792], ['firstTokenMs', 120000], ['outputChunks', 4096]] as const) {
+      for (const [key, max] of [['elapsedMs', NPC_TIMING.maxMs], ['promptTokens', 1792], ['firstTokenMs', NPC_TIMING.maxMs], ['outputChunks', 4096]] as const) {
         const value = sample[key];
         if (value !== undefined) {
           if (!Number.isSafeInteger(value) || value < 0 || value > max) return;

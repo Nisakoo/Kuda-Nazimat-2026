@@ -87,15 +87,15 @@ it('auth creates opaque hash-only sessions, preserves identity and expires at bo
 it('validates configuration keys, types, paths and scheduler bounds', () => {
   const path = '/tmp/config/config.json'; const config = parseConfig({}, path);
   expect(config.clientDir).toBe('/tmp/client/dist'); expect(config.npc.timeoutMs).toBe(30000);
-  for (const input of [{ typo: true }, { port: '8080' }, { npc: { timeoutMs: 30001 } }, { npc: { extra: 1 } }, { maps: { market: '../secret' } }, { corsOrigins: ['*'] }, { defaultMap: 'missing' }, { logWorldAccess: 1 }]) expect(() => parseConfig(input, path)).toThrow();
+  for (const input of [{ typo: true }, { port: '8080' }, { npc: { timeoutMs: 300001 } }, { npc: { extra: 1 } }, { maps: { market: '../secret' } }, { corsOrigins: ['*'] }, { defaultMap: 'missing' }, { logWorldAccess: 1 }]) expect(() => parseConfig(input, path)).toThrow();
 });
 
-it('accepts the 30 s game deadline, shorter legacy values and the unchanged minimum only as safe integers', () => {
+it('accepts shared game deadlines up to 300 s and shorter legacy values only as safe integers', () => {
   const path = '/tmp/config.json';
-  for (const timeoutMs of [1, 8000, 9000, 10000, 30000]) {
+  for (const timeoutMs of [1, 8000, 9000, 10000, 30000, 60000, 300000]) {
     expect(parseConfig({ npc: { timeoutMs } }, path).npc.timeoutMs).toBe(timeoutMs);
   }
-  for (const timeoutMs of [0, -1, 30001, 30000.5, 1.5, NaN, Infinity, '30000', null]) {
+  for (const timeoutMs of [0, -1, 300001, 30000.5, 1.5, NaN, Infinity, '30000', null]) {
     expect(() => parseConfig({ npc: { timeoutMs } }, path)).toThrow('npc.timeoutMs');
   }
 });

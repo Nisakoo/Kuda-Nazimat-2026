@@ -34,11 +34,11 @@ related:
 - **SERVER-003:** Сервер раздаёт по HTTP:
   - готовую сборку клиента из `clientDir` по `/`, публично;
   - `GET /config.json` — публичную конфигурацию клиента `{session: "online", serverUrl: null, mapId: <defaultMap>, chunkRadius: null, debug: false}`, сформированную из конфигурации сервера; файл `config.json` из сборки клиента не отдаётся;
-  - `/api/*` — [AUTH](server-auth.md) и `GET /api/health`;
+  - `/api/*` — [AUTH](server-auth.md), `GET /api/health` и публичный `GET /api/game-config` (только effective npcTimeoutMs, no-store/обычный CORS, без model options/путей/pins/секретов);
   - `/world/*` — данные мира только с проверками [SERVER-WORLD](server-world.md).
 
   Из `clientDir` не отдаются пути `maps/` и `assets/models/`: данные мира не должны быть публичными в обход `/world/`. Статические ответы ограничены `clientDir`, без directory listing и выхода за корень; неизвестный путь — 404. Браузерный клиент не требует установки ПО.
-- **SERVER-004:** Конфигурация — JSON-файл (по умолчанию `server/config.json`, путь меняется аргументом `--config`) поверх документированных значений по умолчанию. Неизвестные ключи и неверные типы — ошибка запуска. Для игрового запуска дополнительно доступны `--backend`/`--model` (только вместе) и `--profiles`; Make передаёт соответствующие BACKEND/MODEL/LLM_PROFILES как environment data. Подготовленный внешний каталог по LLM-015 заменяет только npc.adapter/options в effective config на один запуск; отсутствие каталога без явного выбора сохраняет старый config. Повреждённый/явно отсутствующий профиль не вызывает fallback. Минимальный набор:
+- **SERVER-004:** Конфигурация — JSON-файл (по умолчанию `server/config.json`, путь меняется аргументом `--config`) поверх документированных значений по умолчанию. Неизвестные ключи и неверные типы — ошибка запуска. Для игрового запуска дополнительно доступны `--backend`/`--model` (только вместе) и `--profiles`; Make передаёт соответствующие BACKEND/MODEL/LLM_PROFILES как environment data. Подготовленный внешний каталог по LLM-015 заменяет только npc.adapter/options в effective config на один запуск; отсутствие каталога без явного выбора сохраняет старый config. Повреждённый/явно отсутствующий профиль не вызывает fallback. Общий NPC deadline можно переопределить на один запуск целыми секундами1–300: `make server NPC_TIMEOUT=60` / `make demo NPC_TIMEOUT=60`, env KUDA_NPC_TIMEOUT или CLI `--npc-timeout 60` (CLI приоритетнее env). Без override npc.timeoutMs остаётся из config/default30000мс, config допускает1–300000мс. Override не пишет config/profile. Некорректное значение даёт earlyfail, не clamp/fallback. Минимальный набор:
 
   | Ключ | По умолчанию | Смысл |
   |---|---|---|

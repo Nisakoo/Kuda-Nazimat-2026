@@ -4,6 +4,7 @@ import hashlib
 import http.client
 import importlib.metadata
 import json
+import math
 import os
 import re
 import signal
@@ -517,15 +518,24 @@ class OllamaWorker:
         return text
 
     def answer(self, request):
+        began = time.monotonic()
+        wall = time.time()
+        # Node validates the shared global bound and owns absolute cancellation.
+        # Only direct internal fixtures omit deadlineAt (their default is 10 s).
+        deadline = request.get('deadlineAt', (wall + 10) * 1000)
+        if isinstance(deadline, bool) or not isinstance(deadline, (int, float)) or not math.isfinite(deadline):
+            raise WorkerError('invalid_message', 'Invalid answer deadline')
+        budget = deadline / 1000 - wall
+        if not math.isfinite(budget) or budget <= 0:
+            raise WorkerError('invalid_message', 'Expired answer deadline')
         prompt = compile_prompt(request, self.tokenizer)
         tokens = count_prompt_tokens(prompt, self.tokenizer)
         # Operational prefill means waiting for first text, including HTTP setup.
         emit({'type': 'progress', 'stage': 'prefill', 'promptTokens': tokens})
-        # The supervisor owns the absolute deadline (up to 30 s game / operator
-        # probe). Do not let the old 10 s socket default cut the probe short.
-        # Missing deadline keeps the existing internal fixture default only.
-        remaining = (request.get('deadlineAt', (time.time() + 10) * 1000) / 1000) - time.time()
-        timeout = max(0.001, min(30, remaining))
+        # Preparation consumes the existing budget; a wall rollback cannot renew it.
+        timeout = min(deadline / 1000 - time.time(), budget - (time.monotonic() - began))
+        if not math.isfinite(timeout) or timeout <= 0:
+            raise WorkerError('invalid_message', 'Expired answer deadline')
         return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True)
 
     def stop(self):

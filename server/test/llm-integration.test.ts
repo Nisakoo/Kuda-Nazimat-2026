@@ -103,13 +103,14 @@ describe('configured game LLM integration without real models', () => {
     expect(info).toHaveBeenLastCalledWith('Этапы ответа NPC', { reason: 'timeout', stage: 'decoding', elapsedMs: 100, promptTokens: 80, firstTokenMs: 40, outputChunks: 3 });
     expect(JSON.stringify(info.mock.calls)).not.toContain('private'); await service.stop();
   });
-  it.each(['throws', 'bad-stage', 'unsafe-count', 'negative', 'missing-elapsed'])('ignores invalid timing (%s) without changing delivery', async (mode) => {
+  it.each(['throws', 'bad-stage', 'unsafe-count', 'negative', 'missing-elapsed', 'excessive-elapsed', 'excessive-first-token'])('ignores invalid timing (%s) without changing delivery', async (mode) => {
     const info = vi.fn();
     const responder: NpcResponder = {
       async start() {}, async stop() {}, status: () => 'ready', async answer() { return { text: 'Ответ' }; },
       diagnostics() {
         if (mode === 'throws') throw new Error('private');
-        const value = { stage: mode === 'bad-stage' ? 'private stage' : 'complete', elapsedMs: 10,
+        const value = { stage: mode === 'bad-stage' ? 'private stage' : 'complete', elapsedMs: mode === 'excessive-elapsed' ? 300001 : 10,
+          firstTokenMs: mode === 'excessive-first-token' ? 300001 : 5,
           outputChunks: mode === 'unsafe-count' ? 4097 : mode === 'negative' ? -1 : 1 };
         if (mode === 'missing-elapsed') delete (value as Partial<typeof value>).elapsedMs;
         return value as NonNullable<ReturnType<NonNullable<NpcResponder['diagnostics']>>>;
@@ -119,16 +120,16 @@ describe('configured game LLM integration without real models', () => {
     await service.start(); expect(await service.ask(q())).toEqual({ ok: true, text: 'Ответ' });
     expect(info).toHaveBeenCalledExactlyOnceWith('NPC готов к вопросам', { status: 'ready' }); await service.stop();
   });
-  it('logs bounded timing after a successful committed answer', async () => {
+  it.each([[50, 20], [200000, 150000], [300000, 300000]])('logs bounded timing (%i/%i ms) after a successful committed answer', async (elapsedMs, firstTokenMs) => {
     const info = vi.fn(); const store = memoryStores();
     const responder: NpcResponder = {
       async start() {}, async stop() {}, status: () => 'ready', async answer() { return { text: 'Ответ' }; },
-      diagnostics: () => ({ stage: 'complete', elapsedMs: 50, promptTokens: 80, firstTokenMs: 20, outputChunks: 4 }),
+      diagnostics: () => ({ stage: 'complete', elapsedMs, promptTokens: 80, firstTokenMs, outputChunks: 4 }),
     };
     const service = createNpcDialogueService({ ...deps, responder, dialogue: store.dialogue, logger: { ...silentLogger, info } }, config);
     await service.start(); expect(await service.ask(q())).toEqual({ ok: true, text: 'Ответ' });
     expect(store.dialogue.history('p', 'n')).toHaveLength(1);
-    expect(info).toHaveBeenLastCalledWith('Этапы ответа NPC', { reason: 'completed', stage: 'complete', elapsedMs: 50, promptTokens: 80, firstTokenMs: 20, outputChunks: 4 });
+    expect(info).toHaveBeenLastCalledWith('Этапы ответа NPC', { reason: 'completed', stage: 'complete', elapsedMs, promptTokens: 80, firstTokenMs, outputChunks: 4 });
     await service.stop();
   });
   it('reports an idle backend failure immediately and recovers once without replaying a question', async () => {

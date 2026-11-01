@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { Clock, Scheduler, TimerHandle } from '../../common/time.ts';
 import type { NpcAnswerRequest, NpcDiagnostics, NpcResponder } from '../NpcResponder.ts';
 import { isNpcFailureCode, type NpcFailureCode } from '../failureCodes.ts';
+import { NPC_TIMING } from '../../../../shared/protocol/npcTiming.ts';
 
 type Backend = 'ollama' | 'mlx';
 type Deps = { clock: Clock; scheduler: Scheduler };
@@ -14,7 +15,6 @@ export interface LocalLlmResponder extends NpcResponder {
 }
 const LIMIT = 64 * 1024;
 const TEXT_LIMIT = 16 * 1024;
-const ANSWER_CEILING_MS = 30000;
 const SOFT_RSS = 3_500_000_000;
 const failures = new Set<Failure>(['model_unavailable', 'runner_mismatch', 'tokenizer_unavailable', 'resource_limit', 'input_too_long', 'output_limit']);
 
@@ -198,7 +198,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
   let answerAccepted = false;
   const elapsed = () => {
     const value = (diagnosticEnd ?? runtime.monotonicNow()) - diagnosticBegan;
-    return Number.isFinite(value) ? Math.max(0, Math.min(120000, Math.floor(value))) : 0;
+    return Number.isFinite(value) ? Math.max(0, Math.min(NPC_TIMING.maxMs, Math.floor(value))) : 0;
   };
   const freezeDiagnostic = () => { if (diagnostic && diagnosticEnd === undefined) diagnosticEnd = runtime.monotonicNow(); };
   const delay = (ms: number) => new Promise<void>((resolve) => scheduler.setTimeout(resolve, ms));
@@ -408,7 +408,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
       const began = runtime.monotonicNow();
       diagnosticBegan = began; diagnosticEnd = undefined; answerAccepted = false;
       diagnostic = backend === 'ollama' ? { stage: 'preparing', elapsedMs: 0 } : undefined;
-      const remaining = Math.min(ANSWER_CEILING_MS, request.deadlineAt - clock.now());
+      const remaining = request.deadlineAt - clock.now();
       let timer: TimerHandle | undefined;
       const abort = () => fail(s, 'aborted');
       const promise = new Promise<{ text: string }>((resolve, reject) => {
@@ -420,7 +420,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
         };
       });
       if (signal.aborted) { fail(s, 'aborted'); return promise; }
-      if (!Number.isFinite(remaining) || remaining <= 0) { fail(s, 'timeout'); return promise; }
+      if (!Number.isFinite(remaining) || remaining <= 0 || remaining > NPC_TIMING.maxMs) { fail(s, 'timeout'); return promise; }
       signal.addEventListener('abort', abort, { once: true });
       timer = scheduler.setTimeout(() => fail(s, 'timeout'), remaining);
       s.outputBytes = 0; s.messageCount = 0; s.stderrBytes = 0;

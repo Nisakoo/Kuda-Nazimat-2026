@@ -76,8 +76,9 @@ describe('one-time profile import (static fixtures only)', () => {
     expect(second.status).toBe(0);
     await stat(envPath);
   });
-  it('leaves already-30-second base bytes unchanged', async () => {
-    const f = await fixture(30000); await importLlmProfiles(args(f));
+  it.each([1, 9000, 30000, 60000, 300000])('preserves valid %i ms base bytes and reports the actual timeout', async (timeout) => {
+    const f = await fixture(timeout);
+    expect((await importLlmProfiles(args(f))).timeoutMs).toBe(timeout);
     expect(await readFile(f.configPath, 'utf8')).toBe(f.original);
     await expect(stat(f.migrationBackup)).rejects.toThrow();
   });
@@ -93,7 +94,7 @@ describe('one-time profile import (static fixtures only)', () => {
     if (kind === 'digest') { f.backup.npc.options.modelDigest = 'bad'; await writeFile(f.backup2bPath, JSON.stringify(f.backup)); }
     if (kind === 'path') { f.backup.npc.options.executable = join(f.home, 'missing'); await writeFile(f.backup2bPath, JSON.stringify(f.backup)); }
     if (kind === 'symlink') { await rm(f.backup2bPath); await symlink(f.configPath, f.backup2bPath); }
-    if (kind === 'timeout') { f.active.npc.timeoutMs = 9000; await writeFile(f.configPath, JSON.stringify(f.active)); }
+    if (kind === 'timeout') { f.active.npc.timeoutMs = 300001; await writeFile(f.configPath, JSON.stringify(f.active)); }
     const before = await readFile(f.configPath, 'utf8');
     await expect(importLlmProfiles(args(f))).rejects.toThrow();
     expect(await readFile(f.configPath, 'utf8')).toBe(before);

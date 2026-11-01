@@ -8,11 +8,12 @@ NODE ?= node
 export KUDA_LLM_BACKEND = $(BACKEND)
 export KUDA_LLM_MODEL = $(MODEL)
 export KUDA_LLM_PROFILES = $(LLM_PROFILES)
+export KUDA_NPC_TIMEOUT = $(NPC_TIMEOUT)
 
 .PHONY: help client client-test
 
 help:
-	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the LAN server' 'make server-test  Run server/shared tests' 'make demo         Prepare client/world and start server' 'make server BACKEND=ollama MODEL=2b   Use a prepared profile for one run' 'make llm-import   Import existing local profiles and select Ollama 2B (no downloads)' 'NODE=/path/to/node and LLM_PROFILES=/path/to/profiles.json are optional overrides'  'See README.md for installation, type checks, build and browser checks.'
+	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the LAN server' 'make server-test  Run server/shared tests' 'make demo         Prepare client/world and start server' 'make server BACKEND=ollama MODEL=2b   Use a prepared profile for one run' 'make server NPC_TIMEOUT=60   NPC deadline in whole seconds (1-300), including queue' 'make llm-import   Import existing local profiles and select Ollama 2B (no downloads)' 'NODE=/path/to/node and LLM_PROFILES=/path/to/profiles.json are optional overrides'  'See README.md for installation, type checks, build and browser checks.'
 
 client:
 ifeq ($(strip $(CLIENT_RUN_CMD)),)

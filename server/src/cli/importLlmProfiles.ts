@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { defaultConfigPath, parseConfig } from '../app/config.ts';
 import { parseLlmProfiles, validatePreparedLlmProfile } from '../app/llmProfiles.ts';
+import { NPC_TIMING } from '../../../shared/protocol/npcTiming.ts';
 
 const LIMIT = 64 * 1024;
 type Options = { configPath?: string; backup2bPath?: string; profilesPath?: string; home?: string };
@@ -85,7 +86,7 @@ export async function importLlmProfiles(options: Options = {}): Promise<{ profil
   let active: ReturnType<typeof extract>;
   try { original = await source(configPath); active = extract(original, configPath); }
   catch { throw new ImportFailure('invalid_config'); }
-  if (active.timeout !== 8000 && active.timeout !== 30000) throw new Error('Timeout requires review');
+  // Only the documented legacy 8 s configuration migrates. Other valid budgets stay unchanged.
   if (active.timeout === 8000) await absent(migrationBackup, 'backup_collision');
   let backup: ReturnType<typeof extract> | undefined;
   try { backup = extract(await source(backup2bPath), backup2bPath); }
@@ -109,7 +110,7 @@ export async function importLlmProfiles(options: Options = {}): Promise<{ profil
   let replacement: Buffer | undefined;
   if (active.timeout === 8000) {
     const npc = active.raw.npc as Record<string, unknown>;
-    replacement = Buffer.from(`${JSON.stringify({ ...active.raw, npc: { ...npc, timeoutMs: 30000 } }, null, 2)}\n`);
+    replacement = Buffer.from(`${JSON.stringify({ ...active.raw, npc: { ...npc, timeoutMs: NPC_TIMING.defaultMs } }, null, 2)}\n`);
     parseConfig(JSON.parse(replacement.toString('utf8')), configPath);
   }
   await privateDirectory(dirname(profilesPath));
@@ -128,7 +129,7 @@ export async function importLlmProfiles(options: Options = {}): Promise<{ profil
   // The timeout migration may remain if catalog publication fails; it does not switch models.
   try { await createOnly(profilesPath, catalogBytes); }
   catch (error) { if ((error as NodeJS.ErrnoException).code === 'EEXIST') throw new ImportFailure('destination_exists'); throw error; }
-  return { profilesPath, profiles: profiles.length, timeoutMs: 30000 };
+  return { profilesPath, profiles: profiles.length, timeoutMs: active.timeout === 8000 ? NPC_TIMING.defaultMs : active.timeout };
 }
 
 function argumentsFrom(args: string[]): Options {

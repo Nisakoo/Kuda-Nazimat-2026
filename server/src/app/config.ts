@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { GameConfig } from '../contracts.ts';
+import { NPC_TIMING, validNpcTimeoutMs } from '../../../shared/protocol/npcTiming.ts';
 
 export interface Config extends GameConfig {
   host: string; port: number; clientDir: string; defaultMap: string; dbPath: string;
@@ -15,7 +16,7 @@ const defaults: Config = {
   defaultMap: 'market', contentDir: 'content', dbPath: 'data/game.sqlite', maxPlayers: 4,
   sessionTtlMs: 43200000, tickHz: 20, broadcastHz: 10, aoiRadius: 64, staticChunkRadius: 3,
   disconnectGraceMs: 10000, saveIntervalMs: 10000, corsOrigins: [], logWorldAccess: false,
-  npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000, options: {} },
+  npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: NPC_TIMING.defaultMs, options: {} },
 };
 export function record(value: unknown, key: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Неверный объект: ${key}`);
@@ -45,9 +46,10 @@ export function parseConfig(raw: unknown, path: string): Config {
   })) throw new Error('Неверный corsOrigins');
   if (typeof npc.adapter !== 'string' || !npc.adapter) throw new Error('Неверный npc.adapter');
   record(npc.options, 'npc.options');
-  for (const [key, max] of [['maxConcurrent', 2], ['maxUnfinished', 4], ['timeoutMs', 30000]] as const) {
+  for (const [key, max] of [['maxConcurrent', 2], ['maxUnfinished', 4]] as const) {
     if (!Number.isSafeInteger(npc[key]) || npc[key] < 1 || npc[key] > max) throw new Error(`Неверный npc.${key}`);
   }
+  if (!validNpcTimeoutMs(npc.timeoutMs)) throw new Error('Неверный npc.timeoutMs');
   if (npc.maxConcurrent > npc.maxUnfinished) throw new Error('npc.maxConcurrent > maxUnfinished');
   if (['ollama', 'mlx'].includes(npc.adapter) && npc.maxConcurrent !== 1) throw new Error('Локальная LLM поддерживает только npc.maxConcurrent: 1; профиль 2 ещё не квалифицирован');
   return { ...config, clientDir: resolve(dirname(path), config.clientDir), worldDir: resolve(dirname(path), config.worldDir), contentDir: resolve(dirname(path), config.contentDir), dbPath: resolve(dirname(path), config.dbPath) };

@@ -40,11 +40,11 @@ async function listen(host = '127.0.0.1'): Promise<{ server: Server; port: numbe
 async function close(server: Server) {
   if (server.listening) await new Promise<void>((yes, no) => server.close((error) => error ? no(error) : yes()));
 }
-async function fixture(overrides: Record<string, unknown> = {}) {
+async function fixture(overrides: Record<string, unknown> = {}, timeoutMs = 8000) {
   const game = await listen(); const native = await listen();
   const dir = await mkdtemp(join(tmpdir(), 'llm-diagnostic-')); dirs.push(dir);
   const configPath = join(dir, 'config.json');
-  const config = { port: game.port, contentDir, npc: { adapter: 'ollama', timeoutMs: 8000, options: { port: native.port } }, ...overrides };
+  const config = { port: game.port, contentDir, npc: { adapter: 'ollama', timeoutMs, options: { port: native.port } }, ...overrides };
   await writeFile(configPath, JSON.stringify(config));
   await close(game.server); await close(native.server);
   return { configPath, dir, gamePort: game.port, nativePort: native.port, original: JSON.stringify(config) };
@@ -138,7 +138,7 @@ describe('operator diagnostic (fake responders only; no models or worker process
     [{ npc: { adapter: 'mlx', options: {} } }, 'adapter_required'],
     [{ npc: { adapter: 'scripted', options: {} } }, 'adapter_required'],
     [{ npc: { adapter: 'ollama', options: { port: 'secret-path' } } }, 'config_invalid'],
-    [{ npc: { adapter: 'ollama', timeoutMs: 30001, options: {} } }, 'config_invalid'],
+    [{ npc: { adapter: 'ollama', timeoutMs: 300001, options: {} } }, 'config_invalid'],
     [{ port: 0 }, 'config_invalid'],
   ])('refuses invalid adapter/config with a fixed error (%j)', async (overrides, code) => {
     const f = await fixture(overrides); const h = harness();
@@ -171,8 +171,8 @@ describe('operator diagnostic (fake responders only; no models or worker process
     expect(h.factory).not.toHaveBeenCalled();
   });
 
-  it('asks exactly once with the existing profile, empty history and a separate 30s deadline; stops and leaves config unchanged', async () => {
-    const f = await fixture(); const h = harness();
+  it('asks exactly once with the existing profile, empty history and a separate 30s deadline even with 60s game config; stops and leaves config unchanged', async () => {
+    const f = await fixture({}, 60000); const h = harness();
     h.responder.answer.mockImplementation(async (request) => {
       expect(request.deadlineAt - Date.now()).toBeGreaterThanOrEqual(29900);
       expect(request.deadlineAt - Date.now()).toBeLessThanOrEqual(30000);

@@ -233,9 +233,9 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
     const next = responder.answer({ ...answerRequest(), question: 'stall' }, controller.signal);
     const rejected = expect(next).rejects.toThrow('aborted');
     expect(responder.diagnostics?.()).toEqual({ stage: 'preparing', elapsedMs: 0 });
-    mono = 200000; expect(responder.diagnostics?.()?.elapsedMs).toBe(120000);
-    controller.abort(); mono = 300000;
-    await rejected; expect(responder.diagnostics?.()).toEqual({ stage: 'preparing', elapsedMs: 120000 });
+    mono = 400000; expect(responder.diagnostics?.()?.elapsedMs).toBe(300000);
+    controller.abort(); mono = 500000;
+    await rejected; expect(responder.diagnostics?.()).toEqual({ stage: 'preparing', elapsedMs: 300000 });
     await responder.start(); expect(responder.diagnostics?.()).toBeUndefined();
   });
   it('accepts coalesced private progress plus one terminal answer, but MLX supplies no fabricated timing', async () => {
@@ -365,20 +365,41 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
       await responder.stop();
     }
   });
-  it.each(['ollama', 'mlx'] as const)('%s uses the fixed 30 s game ceiling after rollback and accepts answers beyond 9 s', async (backend) => {
-    for (const after of [20000, 29999, 30000, 30001]) {
+  it.each(['ollama', 'mlx'] as const)('%s follows each request budget after rollback, including 60 s game and 30 s diagnostic/default deadlines', async (backend) => {
+    for (const [budget, after] of [[60000, 45000], [60000, 59999], [60000, 60000], [60000, 60001], [30000, 29999], [30000, 30000], [300000, 299999], [300000, 300000]] as const) {
       let mono = 0; let wall = Date.now();
       const { responder, events, pid, releaseAnswer } = fixture(backend, 'normal', { monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
       await responder.start();
-      const pending = responder.answer({ ...answerRequest(), question: 'deadline-gate', deadlineAt: wall + 120000 }, new AbortController().signal);
-      const assertion = after >= 30000 ? expect(pending).rejects.toThrow(/^timeout$/) : expect(pending).resolves.toEqual({ text: 'Ответ' });
+      const pending = responder.answer({ ...answerRequest(), question: 'deadline-gate', deadlineAt: wall + budget }, new AbortController().signal);
+      const assertion = after >= budget ? expect(pending).rejects.toThrow(/^timeout$/) : expect(pending).resolves.toEqual({ text: 'Ответ' });
       await until(() => events().some(event => event.type === 'answer'));
       wall -= 60000; mono = after; releaseAnswer();
       await assertion;
-      if (after >= 30000) { expect(alive(pid())).toBe(false); expect(responder.status()).toBe('unavailable'); }
+      if (after >= budget) { expect(alive(pid())).toBe(false); expect(responder.status()).toBe('unavailable'); }
       else expect(responder.status()).toBe('ready');
       await responder.stop();
     }
+  });
+  it.each(['ollama', 'mlx'] as const)('%s fails closed before dispatch for a request above the shared 300 s bound', async (backend) => {
+    const wall = Date.now();
+    const { responder, events, pid } = fixture(backend, 'normal', {}, {}, { ...deps, clock: { now: () => wall } });
+    await responder.start();
+    await expect(responder.answer({ ...answerRequest(), deadlineAt: wall + 300001 }, new AbortController().signal)).rejects.toThrow('timeout');
+    expect(events().filter(event => event.type === 'answer')).toEqual([]);
+    expect(alive(pid())).toBe(false); expect(responder.status()).toBe('unavailable');
+  });
+  it('keeps honest first-token and elapsed diagnostics beyond 120 s within the global bound', async () => {
+    let mono = 0; const wall = Date.now();
+    const { responder, releaseProgress } = fixture('ollama', 'normal', { monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
+    await responder.start();
+    const pending = responder.answer({ ...answerRequest(), question: 'progress-live', deadlineAt: wall + 300000 }, new AbortController().signal);
+    await until(() => responder.diagnostics?.()?.stage === 'prefill');
+    mono = 150000; releaseProgress('decode');
+    await until(() => responder.diagnostics?.()?.stage === 'decoding');
+    expect(responder.diagnostics?.()).toMatchObject({ firstTokenMs: 150000, elapsedMs: 150000 });
+    mono = 200000; releaseProgress('complete');
+    await expect(pending).resolves.toEqual({ text: 'Ответ' });
+    expect(responder.diagnostics?.()).toMatchObject({ firstTokenMs: 150000, elapsedMs: 200000 });
   });
   it('times out partial/no output without accepting a truncated answer', async () => {
     for (const question of ['partial', 'stall']) {

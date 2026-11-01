@@ -551,6 +551,48 @@ describe('application lifecycle', () => {
     } finally { now.mockRestore(); stats.mockRestore(); }
   });
 
+  it.each(['pending', 'failed'] as const)('shows a dialog error and sends no NPC request when metadata is %s', async (state) => {
+    vi.useFakeTimers(); app.dispose();
+    const sent: string[] = [];
+    const load = () => state === 'pending' ? new Promise<number>(() => {}) : Promise.reject(new Error('unavailable'));
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null,
+      (_mock, _url, clock) => {
+        const adapter = new MockNetworkAdapter(clock, (message, peer) => {
+          sent.push(message.type);
+          if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [
+            { id: 'p1', character: { kind: 'player', name: 'Player' }, transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 } },
+            { id: 'guide', character: { kind: 'npc', name: 'Guide' }, transform: { position: { x: 0, y: 0, z: 1 }, rotationY: 0 }, interactable: { radius: 2, label: 'Talk' } },
+          ] }, world: DEMO_WORLD });
+          if (message.type === 'interact') peer.receive({ v: 3, type: 'interacted', requestId: message.requestId, targetId: message.targetId });
+        });
+        const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' }); return adapter;
+      }, undefined, load);
+    const listener = vi.fn(); app.subscribe(listener);
+    try {
+      app.start(host); app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 });
+      await vi.advanceTimersByTimeAsync(100); app.send({ type: 'interact', targetId: 'guide' }); await vi.advanceTimersByTimeAsync(100);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ dialog: expect.objectContaining({ npcId: 'guide' }) }));
+      app.submitDialog('Question'); await vi.advanceTimersByTimeAsync(100);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ dialogPending: false, dialogError: expect.stringContaining('недоступны') }));
+      expect(sent).not.toContain('npc-question');
+    } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
+  it('passes the configured server URL to runtime metadata and cancels it on restart', async () => {
+    vi.useFakeTimers(); app.dispose();
+    const signals: AbortSignal[] = [];
+    const load = vi.fn((_url: string, signal: AbortSignal) => { signals.push(signal); return new Promise<number>(() => {}); });
+    app = new GameApp(parseConfig({ session: 'online', serverUrl: 'http://real.local:7777' }, 'http://school.local'), createRenderer, undefined, null,
+      (_mock, _url, clock) => { const adapter = new MockNetworkAdapter(clock); const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' }); return adapter; }, undefined, load);
+    try {
+      app.start(host); app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(load).toHaveBeenCalledWith('http://real.local:7777', expect.any(AbortSignal));
+      app.restart(host); expect(signals[0]!.aborted).toBe(true);
+      await vi.advanceTimersByTimeAsync(0); expect(load).toHaveBeenCalledTimes(2);
+    } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
   it('supports unsubscribing and clears subscriptions on dispose', () => {
     const listener = vi.fn();
     const unsubscribe = app.subscribe(listener);

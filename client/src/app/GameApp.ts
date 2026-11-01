@@ -45,6 +45,7 @@ import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../../../
 import { parseServerSession } from '../../../shared/protocol/validate.ts';
 import { guestName, requestGuestSession } from '../multiplayer/GuestAuth';
 import { requestPasswordSession, revokeSession } from '../multiplayer/PasswordAuth';
+import { requestRuntimeConfig } from '../multiplayer/RuntimeConfig';
 import { FrameMetrics } from './FrameMetrics';
 import { WorldAudio } from '../audio/WorldAudio';
 import type { AudioOrigin } from '../audio/WorldAudio';
@@ -194,6 +195,7 @@ export class GameApp {
     private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
     private readonly createNetwork: (mock: boolean, url: string, clock: Clock) => NetworkAdapter = (mock, url, clock) => mock ? createMockDemo(clock) : new SocketIOAdapter(url, clock),
     private readonly requestLogin = requestGuestSession,
+    private readonly loadRuntimeConfig = requestRuntimeConfig,
   ) {
     if (config.mapId === 'market') this.camera = { yaw: 0, pitch: .5, distance: 18 };
     this.audio = new WorldAudio(this.worldBudget);
@@ -244,7 +246,11 @@ export class GameApp {
           if (!this.snapshot.babylon?.state?.party || this.entryPending || this.requiresAvatar) return;
         }
         this.network = this.createNetwork(this.mock, this.config.serverUrl, browserClock);
-        const online = new OnlineSession(this.network, this.config.mapId, browserClock);
+        const serverUrl = this.config.serverUrl;
+        const online = new OnlineSession(this.network, this.config.mapId, browserClock, this.mock ? undefined : () => {
+          const controller = new AbortController();
+          return { result: this.loadRuntimeConfig(serverUrl, controller.signal), cancel: () => controller.abort() };
+        });
         this.session = online;
         online.setMovementGuard(() => false);
         this.unsubscribeSession = online.subscribe(this.onSessionEvents);
@@ -685,7 +691,8 @@ export class GameApp {
         this.patch({ dialog: { ...dialog, messages: [...dialog.messages.slice(-19), { author: 'npc', text: notice.text }] }, dialogPending: false, dialogError: null });
       }
     } else if (notice.type === 'request-error') {
-      if (this.npcRequest === notice.requestId) { this.npcRequest = null; this.patch({ dialogPending: false, dialogError: notice.message }); }
+      if (notice.requestId === 'npc-config' && this.snapshot.dialog) this.patch({ dialogPending: false, dialogError: notice.message });
+      else if (this.npcRequest === notice.requestId) { this.npcRequest = null; this.patch({ dialogPending: false, dialogError: notice.message }); }
       else if (this.snapshot.chatOpen) this.patch({ chatError: notice.message });
       else this.patch({ networkError: notice.message });
     }
