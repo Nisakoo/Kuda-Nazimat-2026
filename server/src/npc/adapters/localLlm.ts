@@ -131,6 +131,7 @@ export const memoryBytesForTest = memoryBytes;
 
 /** Internal fixture seam. Never read these values from operator configuration. */
 interface Runtime {
+  answerCeilingMs: 9000 | 30000;
   workerPath: string;
   workerPrefix?: readonly string[];
   platform: string;
@@ -164,15 +165,26 @@ interface Session {
 
 export function localLlm(backend: Backend, options: Record<string, unknown>, deps: Deps): LocalLlmResponder {
   return build(backend, validate(backend, options), deps, {
+    answerCeilingMs: 9000,
     workerPath: fileURLToPath(new URL(`../../../llm/${backend}_worker.py`, import.meta.url)),
     platform: process.platform, arch: process.arch, monotonicNow: () => performance.now(), memoryBytes, groupAlive,
   });
 }
 export const ollama = (options: Record<string, unknown>, deps: Deps): LocalLlmResponder => localLlm('ollama', options, deps);
 export const mlx = (options: Record<string, unknown>, deps: Deps): LocalLlmResponder => localLlm('mlx', options, deps);
+/** Operator-only, offline-from-the-game probe. Never registered as a game adapter
+ * or selected by config. All ownership, memory, cancellation and IPC guards stay.
+ */
+export function ollamaDiagnostic(options: Record<string, unknown>, deps: Deps): LocalLlmResponder {
+  return build('ollama', validate('ollama', options), deps, {
+    answerCeilingMs: 30000,
+    workerPath: fileURLToPath(new URL('../../../llm/ollama_worker.py', import.meta.url)),
+    platform: process.platform, arch: process.arch, monotonicNow: () => performance.now(), memoryBytes, groupAlive,
+  });
+}
 export function localLlmForTest(backend: Backend, options: Record<string, unknown>, deps: Deps, runtime: Partial<Runtime> & Pick<Runtime, 'workerPath'>): LocalLlmResponder {
   return build(backend, validate(backend, options), deps, {
-    platform: process.platform, arch: process.arch, monotonicNow: () => performance.now(), memoryBytes, groupAlive, ...runtime,
+    answerCeilingMs: 9000, platform: process.platform, arch: process.arch, monotonicNow: () => performance.now(), memoryBytes, groupAlive, ...runtime,
   });
 }
 
@@ -397,7 +409,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
       const began = runtime.monotonicNow();
       diagnosticBegan = began; diagnosticEnd = undefined; answerAccepted = false;
       diagnostic = backend === 'ollama' ? { stage: 'preparing', elapsedMs: 0 } : undefined;
-      const remaining = Math.min(9000, request.deadlineAt - clock.now());
+      const remaining = Math.min(runtime.answerCeilingMs, request.deadlineAt - clock.now());
       let timer: TimerHandle | undefined;
       const abort = () => fail(s, 'aborted');
       const promise = new Promise<{ text: string }>((resolve, reject) => {

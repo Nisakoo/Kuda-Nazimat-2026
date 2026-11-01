@@ -500,7 +500,12 @@ class OllamaWorker:
         tokens = count_prompt_tokens(prompt, self.tokenizer)
         # Operational prefill means waiting for first text, including HTTP setup.
         emit({'type': 'progress', 'stage': 'prefill', 'promptTokens': tokens})
-        return self.generate(prompt, 128, expected_tokens=tokens, progress=True)
+        # The supervisor owns the absolute deadline (9 s game / 30 s operator
+        # probe). Do not let the old 10 s socket default cut the probe short.
+        # Missing deadline keeps the existing internal fixture default only.
+        remaining = (request.get('deadlineAt', (time.time() + 10) * 1000) / 1000) - time.time()
+        timeout = max(0.001, min(30, remaining))
+        return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True)
 
     def stop(self):
         if self.child is not None:

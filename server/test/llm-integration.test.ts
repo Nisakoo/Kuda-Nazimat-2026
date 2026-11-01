@@ -24,6 +24,7 @@ describe('configured game LLM integration without real models', () => {
       expect(() => createResponder(adapter, {}, deps)).toThrow(); // strict options, not a scripted fallback
     }
     expect(() => createResponder('auto', {}, deps)).toThrow('Неизвестный');
+    expect(() => createResponder('ollamaDiagnostic', {}, deps)).toThrow('Неизвестный');
     expect(parseConfig({ npc: { adapter: 'scripted', maxConcurrent: 2 } }, '/tmp/config.json').npc.maxConcurrent).toBe(2);
   });
   it.each([

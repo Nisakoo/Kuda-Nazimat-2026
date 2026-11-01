@@ -155,7 +155,7 @@ for (const backend of ['ollama', 'mlx'] as const) {
       }
       for (const invalid of [null, [], 3]) expect(() => localLlm(backend, invalid as unknown as Record<string, unknown>, deps)).toThrow();
       for (const runnerVersion of ['latest', '1', 'v1.2.3', '1.2.3.dev1', '', undefined]) expect(() => localLlm(backend, { ...valid, runnerVersion }, deps)).toThrow();
-      for (const extra of ['workerPath', 'workerPrefix', 'runtime', 'endpoint', 'backend', 'modelPath', 'sampleMemory', 'platform']) expect(() => localLlm(backend, { ...valid, [extra]: true }, deps)).toThrow('Unknown');
+      for (const extra of ['workerPath', 'workerPrefix', 'runtime', 'endpoint', 'backend', 'modelPath', 'sampleMemory', 'platform', 'answerCeilingMs']) expect(() => localLlm(backend, { ...valid, [extra]: true }, deps)).toThrow('Unknown');
       for (const threads of [0, 65, 1.5, '2', null, undefined]) expect(() => localLlm(backend, { ...valid, threads }, deps)).toThrow();
       for (const startupTimeoutMs of [0, 120001, 0.5, '1000', null, undefined]) expect(() => localLlm(backend, { ...valid, startupTimeoutMs }, deps)).toThrow();
       expect(() => localLlm(backend, { ...valid, threads: 64, startupTimeoutMs: 120000 }, deps)).not.toThrow();
@@ -346,6 +346,17 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
       // Cleanup needs a moving monotonic clock only for escalation; this worker honors stop.
       await rejected; expect(alive(pid())).toBe(false); expect(responder.status()).toBe('unavailable');
       await responder.stop();
+    }
+  });
+  it('limits the explicit operator probe to 30 s without changing the default game ceiling', async () => {
+    for (const after of [20000, 30001]) {
+      let mono = 0; const wall = Date.now();
+      const { responder, events } = fixture('ollama', 'normal', { answerCeilingMs: 30000, monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
+      await responder.start();
+      const pending = responder.answer({ ...answerRequest(), deadlineAt: wall + 120000 }, new AbortController().signal);
+      const assertion = after > 30000 ? expect(pending).rejects.toThrow(/^timeout$/) : expect(pending).resolves.toEqual({ text: 'Ответ: Вопрос' });
+      await until(() => events().some(event => event.type === 'answer')); mono = after;
+      await assertion; await responder.stop();
     }
   });
   it('times out partial/no output without accepting a truncated answer', async () => {
