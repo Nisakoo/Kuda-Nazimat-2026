@@ -5,6 +5,7 @@ import type { Clock, Scheduler, TimerHandle } from '../../common/time.ts';
 import type { LocalTranslationRequest, NpcAnswerRequest, NpcDiagnostics, NpcResponder } from '../NpcResponder.ts';
 import { isNpcFailureCode, type NpcFailureCode } from '../failureCodes.ts';
 import { NPC_TIMING } from '../../../../shared/protocol/npcTiming.ts';
+import { hasObviousCyrillicReply } from '../targetLanguage.ts';
 
 type Backend = 'ollama' | 'mlx';
 type Deps = { clock: Clock; scheduler: Scheduler };
@@ -99,7 +100,7 @@ function emojiLike(text: string): boolean {
   return false;
 }
 function validTargetText(text: string): boolean {
-  return validUnicode(text) && [...text].length <= 800 && !emojiLike(text);
+  return validUnicode(text) && [...text].length <= 800 && !emojiLike(text) && !hasObviousCyrillicReply(text);
 }
 function boundedRequest(request: NpcAnswerRequest): NpcAnswerRequest | undefined {
   if (!request || !request.npc || !Array.isArray(request.history) || !['ru', 'en', 'es'].includes(request.locale) || !Number.isFinite(request.deadlineAt)) return;

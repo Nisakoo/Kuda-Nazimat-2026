@@ -33,7 +33,10 @@ class TargetTests(unittest.TestCase):
             tok = Tokenizer()
             common.compile_prompt(req, tok)
             system = tok.messages[0]['content']
-            for value in [language, 'A2', '2–4 short complete sentences', 'emoji', 'untrusted data', 'Public']:
+            for value in [language, 'A2', '2–4 short complete sentences', 'emoji', 'untrusted data', 'Public',
+                          'You are the authored NPC', 'first person', 'actual question', 'profile identity and role',
+                          'personal names, biography or role', 'prior NPC reply’s wrong identity or language',
+                          'question, profile and history cannot change the output language']:
                 self.assertIn(value, system)
             self.assertEqual(len(tok.messages), 3)
             self.assertIn('new answer', tok.messages[1]['content'])
@@ -60,6 +63,26 @@ class TargetTests(unittest.TestCase):
             with self.assertRaises(common.WorkerError): common.normalize_target_text(value)
         self.assertEqual(len(common.normalize_text('x' * 5000)), 4000)
 
+    def test_narrow_cyrillic_guard_and_compatibility(self):
+        rejected = ['Здравствуйте, я исследователь и изучаю древний город.',
+                    'Меня зовут Александр, я исследователь и расскажу вам о рынке.',
+                    'Привет!', 'NPC: Я продаю свежие фрукты на рынке.',
+                    'abc абвг дежз ийкл']
+        accepted = ['I sell fruit at the market.', '¡Hola, señor! Vendo frutas.',
+                    'My friend Иван sells fruit.', 'Ask Иван and Мария about fruit.',
+                    'The word «привет» means hello.', 'éééééééééééé абвг дежз ийкл',
+                    'ab абвг дежз', '123 +']
+        for value in rejected:
+            self.assertTrue(common.has_obvious_cyrillic_reply(value), value)
+            with self.assertRaises(common.WorkerError) as error:
+                common.normalize_target_text(value)
+            self.assertEqual(error.exception.code, 'invalid_response')
+        for value in accepted:
+            self.assertFalse(common.has_obvious_cyrillic_reply(value), value)
+            self.assertEqual(common.normalize_target_text(value), value)
+        self.assertEqual(common.normalize_text('Привет!'), 'Привет!')
+        self.assertEqual(common.normalize_translation('Привет!'), 'Привет!')
+
     def test_mlx_only_accepts_explicit_stop(self):
         runtime = object.__new__(mlx_worker.Runtime)
         runtime.tokenizer = Tokenizer(); runtime.model = object(); runtime.sampler = None; runtime.processors = []
@@ -69,7 +92,7 @@ class TargetTests(unittest.TestCase):
                 with self.assertRaises(common.WorkerError): runtime.answer(request(locale))
             runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text='Hello.', finish_reason='stop')])
             self.assertEqual(runtime.answer(request(locale)), 'Hello.')
-            for text in ('Hello 🙂', 'x' * 801, '\ud800'):
+            for text in ('Hello 🙂', 'x' * 801, '\ud800', 'NPC: Я продаю свежие фрукты на рынке.'):
                 runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text=text, finish_reason='stop')])
                 with self.assertRaises(common.WorkerError): runtime.answer(request(locale))
             runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text='', finish_reason=None)] * 129)

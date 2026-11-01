@@ -1,5 +1,7 @@
 import type { LanguagePort, LanguageCallContext } from './ports.ts';
 import type { NpcResponder } from '../npc/NpcResponder.ts';
+import { hasObviousCyrillicReply } from '../npc/targetLanguage.ts';
+import { localNpcPromptProfile } from './content.ts';
 
 export interface BorrowedLanguageRuntime {
   readonly responder: NpcResponder;
@@ -48,9 +50,10 @@ export function createLocalLanguagePort(runtime: BorrowedLanguageRuntime): Langu
         const deadlineAt = context.budget.deadlineAt();
         const result = await responder.answer({
           requestKey: JSON.stringify([context.requestKey, 'npc', npc.id]), playerId: context.player.playerId,
-          playerName: context.player.displayName, npc, question, locale: language, deadlineAt,
+          playerName: context.player.displayName, npc: localNpcPromptProfile(npc.id, language), question, locale: language, deadlineAt,
           history: history.slice(-6).map(({ question, text }) => ({ question, answer: text })),
         }, signal);
+        if (hasObviousCyrillicReply(result.text)) throw new Error('NPC reply does not match target script');
         return await deliver(signal, context, result.text);
       } finally { runtime.observeRuntimeFailure(); }
     },

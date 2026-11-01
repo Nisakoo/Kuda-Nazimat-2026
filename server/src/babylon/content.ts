@@ -13,6 +13,32 @@ export const NPCS: Readonly<Record<string, NpcProfile & { x: number; z: number }
   potter: { id: 'potter', name: 'Гончар', topic: 'Глиняная посуда и вода', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Здесь есть вода в кувшине.', x: 4.6, z: -.5 },
   shepherd: { id: 'shepherd', name: 'Пастух', topic: 'Козы', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Помоги накормить коз.', x: -3, z: -26 },
 };
+// Public prompt-only projections. Keep UI labels and the canonical world content above unchanged.
+const PROMPT_PROFILES: Readonly<Record<string, Readonly<Record<'en' | 'es', Omit<NpcProfile, 'id'>>>>> = {
+  'fruit-seller': {
+    en: { name: 'Fruit seller', topic: 'Dates and fruit', persona: 'I am a fruit seller. I sell dates and fruit.', greeting: 'Welcome!' },
+    es: { name: 'Vendedor de fruta', topic: 'Dátiles y fruta', persona: 'Soy vendedor de fruta. Vendo dátiles y fruta.', greeting: '¡Bienvenido!' },
+  },
+  'fabric-seller': {
+    en: { name: 'Fabric seller', topic: 'Cloth and patterns', persona: 'I am a fabric seller. I sell cloth. I know about patterns.', greeting: 'Look at the cloth.' },
+    es: { name: 'Vendedora de telas', topic: 'Telas y diseños', persona: 'Soy vendedora de telas. Vendo telas. Conozco los diseños.', greeting: 'Mira las telas.' },
+  },
+  potter: {
+    en: { name: 'Potter', topic: 'Clay pots and water', persona: 'I am a potter. I work with clay pots and water.', greeting: 'There is water in a jug.' },
+    es: { name: 'Alfarero', topic: 'Vasijas de barro y agua', persona: 'Soy alfarero. Trabajo con vasijas de barro y agua.', greeting: 'Hay agua en una jarra.' },
+  },
+  shepherd: {
+    en: { name: 'Shepherd', topic: 'Goats', persona: 'I am a shepherd. I care for goats.', greeting: 'Help feed the goats.' },
+    es: { name: 'Pastor', topic: 'Cabras', persona: 'Soy pastor. Cuido las cabras.', greeting: 'Ayuda a alimentar a las cabras.' },
+  },
+};
+
+export function localNpcPromptProfile(id: string, language: 'en' | 'es'): NpcProfile {
+  const profile = PROMPT_PROFILES[id]?.[language];
+  if (!profile) throw new Error('Unknown Babylon NPC');
+  return { id, ...profile, persona: `${profile.persona} ${language === 'en' ? 'I live in ancient Babylon.' : 'Vivo en la antigua Babilonia.'}` };
+}
+
 export const TASK_TITLE: Readonly<Record<Language, string>> = { ru: 'Козы пастуха', en: 'The Shepherd’s Goats', es: 'Las cabras del pastor' };
 export const GUIDE: Record<Language, string> = {
   ru: 'Белая коза с колокольчиком — финики. Чёрная с длинными рогами — красные плоды. Рыжая пятнистая — жёлтые фрукты. Маленький серый козлёнок — вода в кувшине.',
