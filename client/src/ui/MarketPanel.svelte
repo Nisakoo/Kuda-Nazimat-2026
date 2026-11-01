@@ -4,6 +4,7 @@
   import { MARKET_GOATS, MARKET_ITEMS, MARKET_PEOPLE } from '../session/MarketSession';
   import type { MarketState, StonePoint, Word } from '../session/MarketSession';
   import { modal } from './modal';
+  import StoneSurface from './StoneSurface.svelte';
   import { inventoryShortcut } from './inventoryShortcut';
   const { game, market, panel, target, navigation }: { game: GameApp; market: MarketState; panel: MarketPanel | null; target: string | null; navigation?: Snippet } = $props();
   const actor = $derived([...MARKET_PEOPLE, ...MARKET_GOATS].find(actor => actor.id === target));
@@ -11,6 +12,7 @@
   const titles = { intro: 'Добро пожаловать в Вавилон', task: 'Козы пастуха', inventory: 'Ваша сумка', stone: 'Высечь камень', words: 'Личный словарь', interaction: 'Взаимодействие', results: 'Спасибо за помощь!' };
   let draft = $state<StonePoint[][]>([]);
   let drawing = $state(false);
+  let carved = $state<readonly (readonly StonePoint[])[] | null>(null);
   let word = $state(''); let translation = $state(''); let note = $state(''); let editId = $state<number | undefined>(); let wordError = $state('');
   function edit(entry: Word) { word = entry.word; translation = entry.translation; note = entry.note; editId = entry.id; }
   function save() { if (game.marketSaveWord(word, translation, note, editId)) { word = ''; translation = ''; note = ''; editId = undefined; wordError = ''; } else wordError = 'Заполните слово и перевод. Лимит локального словаря — 64 записи.'; }
@@ -50,11 +52,9 @@
         {/if}
       {:else if panel === 'stone'}
         <p>Рисуйте мышью. Штрихи нельзя стереть; закрытие окна сохраняет черновик. После высечения рисунок неизменен.</p>
-        <svg class="stone-canvas" viewBox="0 0 320 320" role="img" aria-label="Камень для рисунка" onpointerdown={begin} onpointermove={move} onpointerup={() => drawing = false} onpointercancel={() => drawing = false} onlostpointercapture={() => drawing = false}>
-          {#each draft as stroke}<polyline points={stroke.map(p=>p.join(',')).join(' ')} fill="none" stroke="#65503c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />{/each}
-        </svg>
-        <button disabled={!draft.length || market.stones.length >= 8} onclick={() => { if (game.marketCarve(draft)) draft = []; }}>Высечь · {market.stones.length}/8</button>
-        <div class="stone-history">{#each market.stones as stone, index}<figure><svg viewBox="0 0 320 320" role="img" aria-label={`Высеченный камень ${index+1}`}>{#each stone as stroke}<polyline points={stroke.map(p=>p.join(',')).join(' ')} fill="none" stroke="#65503c" stroke-width="4" stroke-linecap="round" />{/each}</svg><figcaption>Камень {index+1}</figcaption></figure>{/each}</div>
+        <StoneSurface strokes={draft} label="Камень для рисунка" {drawing} {carved} onbegin={begin} onmove={move} onend={() => drawing = false} />
+        <button disabled={!draft.length || market.stones.length >= 8} onclick={() => { drawing = false; if (game.marketCarve(draft)) { carved = draft; draft = []; } }}>Высечь · {market.stones.length}/8</button>
+        <div class="stone-history">{#each market.stones as stone, index}<figure><StoneSurface strokes={stone} label={`Высеченный камень ${index+1}`} /><figcaption>Камень {index+1}</figcaption></figure>{/each}</div>
       {:else if panel === 'words'}
         <p>Запишите слово на изучаемом языке и свой перевод. Автоматический перевод здесь не подключён.</p>
         <form class="settings-form" onsubmit={event => { event.preventDefault(); save(); }}>

@@ -50,6 +50,75 @@ async function withinViewport(page: Page) {
   expect(problems).toEqual([]);
 }
 
+for (const reducedMotion of [false, true]) test(`stone engraving preserves strokes and safely retries a lost acknowledgement (reduced motion: ${reducedMotion})`, async ({ page }) => {
+  test.setTimeout(120000);
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.emulateMedia({ reducedMotion: reducedMotion ? 'reduce' : 'no-preference' });
+  const author = reducedMotion ? 'Резчик-тихо' : 'Резчик';
+  await enroll(page, author);
+  await dock(page, 'Чат');
+  await page.getByRole('button', { name: 'Нарисовать камень' }).click();
+  const canvas = page.getByLabel('Камень для рисунка');
+  const box = (await canvas.boundingBox())!;
+  const at = (x: number, y: number) => ({ x: box.x + box.width * x / 320, y: box.y + box.height * y / 320 });
+  const outline = [[128, 73], [192, 73], [185, 103], [185, 122], [207, 148], [216, 184], [208, 220], [188, 247], [132, 247], [112, 220], [104, 184], [113, 148], [135, 122], [135, 103], [128, 73]];
+  for (const stroke of [outline, [[132, 103], [188, 103]], [[110, 184], [211, 184]], [[115, 210], [205, 210]], [[214, 139], [238, 137], [250, 155], [246, 182], [220, 196]]]) {
+    const start = at(stroke[0]![0]!, stroke[0]![1]!); await page.mouse.move(start.x, start.y); await page.mouse.down();
+    for (const point of stroke.slice(1)) { const next = at(point[0]!, point[1]!); await page.mouse.move(next.x, next.y, { steps: 3 }); }
+    const count = await canvas.locator('.stone-chip').count();
+    expect(count).toBeLessThanOrEqual(24);
+    if (reducedMotion) expect(count).toBe(0); else expect(count).toBeGreaterThan(0);
+    await page.mouse.up();
+  }
+  const dot = at(160, 155); await page.mouse.click(dot.x, dot.y);
+  const points = await canvas.locator('polyline').evaluateAll(nodes => nodes.map(node => node.getAttribute('points')));
+  expect(points).toHaveLength(6);
+  await expect(canvas.locator('.stone-chip')).toHaveCount(0);
+  await screenshot(page, `stone-draft-${reducedMotion ? 'reduced' : '1280'}.png`);
+  await page.keyboard.press('Escape');
+  await dock(page, 'Чат'); await page.getByRole('button', { name: 'Нарисовать камень' }).click();
+  expect(await canvas.locator('polyline').evaluateAll(nodes => nodes.map(node => node.getAttribute('points')))).toEqual(points);
+  const requests: { requestId: string; action: { drawing: number[][][] } }[] = [];
+  await page.route('**/api/babylon', async route => {
+    const body = route.request().postDataJSON();
+    if (body?.action?.type !== 'carve') return route.continue();
+    requests.push(body);
+    if (requests.length === 1) { await route.fetch(); await route.abort('connectionfailed'); }
+    else await route.continue();
+  });
+  await page.getByRole('button', { name: /^Высечь ·/ }).click();
+  const retry = page.getByRole('button', { name: /^Повторить высечение/ });
+  await expect(retry).toBeEnabled();
+  await expect(canvas.locator('.stone-flash')).toHaveCount(0);
+  expect(await canvas.locator('polyline').evaluateAll(nodes => nodes.map(node => node.getAttribute('points')))).toEqual(points);
+  await retry.click();
+  if (!reducedMotion) await expect(canvas.locator('.stone-flash')).toHaveCount(1);
+  else await expect(canvas.locator('.stone-flash')).toHaveCount(0);
+  await expect(canvas.locator('polyline')).toHaveCount(0);
+  expect(requests).toHaveLength(2);
+  expect(requests[1]).toEqual(requests[0]);
+  expect(requests[0]!.action.drawing.at(-1)).toHaveLength(1);
+  const stone = page.getByLabel(`Камень от ${author}`);
+  await expect(stone).toHaveCount(1);
+  expect(await stone.locator('polyline').evaluateAll(nodes => nodes.map(node => node.getAttribute('points')))).toEqual(points);
+  await screenshot(page, `stone-history-${reducedMotion ? 'reduced' : '1280'}.png`);
+  for (const [width, height] of [[390, 844], [640, 480]]) {
+    await page.setViewportSize({ width: width!, height: height! }); await withinViewport(page);
+    await page.getByRole('button', { name: /^Высечь ·/ }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole('button', { name: /^Высечь ·/ })).toBeInViewport();
+    if (!reducedMotion) await screenshot(page, `stone-history-${width}.png`);
+  }
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await dock(page, 'Чат');
+  await expect(stone).toHaveCount(1);
+  expect((await stone.boundingBox())!.width).toBeLessThanOrEqual(180);
+  expect(await stone.locator('polyline').evaluateAll(nodes => nodes.map(node => node.getAttribute('points')))).toEqual(points);
+  await screenshot(page, `stone-chat-${reducedMotion ? 'reduced' : '1280'}.png`);
+  await page.setViewportSize({ width: 390, height: 844 }); await withinViewport(page);
+  if (!reducedMotion) await screenshot(page, 'stone-chat-390.png');
+  expect(errors).toEqual([]);
+});
+
 test('confirmed appearance enters the real world, changes live and keeps the held jug', async ({ page }) => {
   test.setTimeout(240000);
   await avatarWorldScenario(page, origin, evidence);

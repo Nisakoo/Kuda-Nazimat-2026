@@ -39,7 +39,7 @@ dialog.babel-panel:not([open]) { display: none; }
 .babel-message small { color: #657d80; }
 .babel-bubble { text-align: left; background: #e9dac8; padding: 10px 14px; border-radius: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .outgoing .babel-bubble { background: #d4e2d3; }
-.babel-stone svg { display: block; width: min(180px, 100%); background: #dac095; border-radius: 6px; }
+.babel-stone { width: 180px; max-width: 100%; }
 .babel-panel .babel-compose { display: flex; align-items: end; gap: 8px; border-top: 1px solid #e9d5b6; padding-top: 12px; }
 .babel-compose label { flex: 1; min-width: 0; }
 .babel-panel .babel-compose textarea { min-height: 44px; height: 44px; }

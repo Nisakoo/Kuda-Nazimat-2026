@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+  <defs>
+    <linearGradient id="edge" x2=".65" y2="1"><stop stop-color="#eee0be"/><stop offset=".45" stop-color="#c6ad83"/><stop offset="1" stop-color="#806b4e"/></linearGradient>
+    <linearGradient id="face" x2=".8" y2="1"><stop stop-color="#daccad"/><stop offset=".5" stop-color="#c5b28b"/><stop offset="1" stop-color="#ae9872"/></linearGradient>
+    <radialGradient id="light" cx=".3" cy=".18" r=".9"><stop stop-color="#fff6d6" stop-opacity=".35"/><stop offset="1" stop-color="#665238" stop-opacity=".12"/></radialGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".035 .055" numOctaves="4" seed="24" result="noise"/>
+      <feDiffuseLighting in="noise" surfaceScale="2.3" diffuseConstant=".8" lighting-color="#e4d1ad"><feDistantLight azimuth="225" elevation="48"/></feDiffuseLighting>
+      <feBlend in="SourceGraphic" mode="soft-light"/>
+    </filter>
+    <filter id="pores" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="2" seed="9"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <clipPath id="outline"><path d="M17 3 91 0 163 4 238 1 305 9 318 29 315 112 320 184 315 295 299 316 223 320 151 316 67 320 12 308 1 281 5 199 0 120 4 24Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#outline)">
+    <rect width="320" height="320" fill="url(#edge)"/>
+    <path d="M20 13 93 10 164 13 237 10 298 17 309 32 306 113 311 184 305 290 294 305 222 310 151 306 69 310 21 299 11 279 15 199 10 120 13 28Z" fill="url(#face)" filter="url(#grain)"/>
+    <rect width="320" height="320" fill="url(#light)"/>
+    <rect width="320" height="320" filter="url(#pores)" opacity=".12" style="mix-blend-mode:multiply"/>
+    <path d="m17 13 41 6 34-7m145 0 59 6 12 15M12 119l4 79-5 79" fill="none" stroke="#fff0cc" stroke-opacity=".55" stroke-width="2"/>
+    <path d="m22 299 46 10 82-3 73 4 71-5 11-16 5-104" fill="none" stroke="#705a3e" stroke-opacity=".45" stroke-width="2"/>
+    <g fill="none" stroke-linejoin="bevel" stroke-linecap="round">
+      <path d="m6 57 28 8 14-8 12 14m-26-6 4 19M268 9l-8 22 13 19-5 12m-8-31-18 5M319 238l-23-7-13 15-22-3m35-12-4-15M51 316l12-25-7-11 12-14" stroke="#f3dfb7" stroke-width="2" opacity=".45" transform="translate(1 1)"/>
+      <path d="m6 57 28 8 14-8 12 14m-26-6 4 19M268 9l-8 22 13 19-5 12m-8-31-18 5M319 238l-23-7-13 15-22-3m35-12-4-15M51 316l12-25-7-11 12-14" stroke="#806c4d" stroke-width="1" opacity=".42"/>
+      <path d="m73 110 20-4 12 3m105 79 18 4 9-6M99 246l16 2" stroke="#8d795a" stroke-width=".7" opacity=".25"/>
+    </g>
+  </g>
+</svg>

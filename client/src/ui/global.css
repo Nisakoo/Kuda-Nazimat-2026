@@ -119,10 +119,8 @@ button.question { font-weight: 500; background: #fffefa; border: 1px solid #cfdd
 .market-items button { flex: 1 1 150px; }
 .market-items .selected { outline: 2px solid #246d61; outline-offset: 2px; }
 .market-notice { padding: 12px; background: #e1eadc; border-radius: 8px; }
-.stone-canvas { display: block; width: min(100%, 320px); max-height: 320px; aspect-ratio: 1; margin: 12px auto; border: 2px solid #ac8b62; border-radius: 12px; background: #dac095; touch-action: none; cursor: crosshair; }
 .stone-history { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 16px; }
 .stone-history figure { margin: 0; width: 110px; font-size: 12px; }
-.stone-history svg { background: #dac095; border-radius: 8px; }
 .word-list, .goat-list { padding-left: 20px; }
 .word-list li { margin-block: 16px; }
 .market-results { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
