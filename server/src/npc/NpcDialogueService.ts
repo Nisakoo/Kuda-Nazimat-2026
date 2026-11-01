@@ -16,13 +16,25 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
   let active = 0; let available = false; let stopped = false;
   let recoveryTimer: TimerHandle | undefined;
   let starting: Promise<void> | undefined;
+  let runtimeFailureLogged = true;
   const backendReady = () => responder.status?.() !== 'unavailable';
+  function logRuntimeFailure(): void {
+    if (stopped || runtimeFailureLogged) return;
+    const failure = responder.lastFailure?.();
+    // Explicit cancellation/shutdown is normal, not an inference failure.
+    if (failure === 'aborted' || failure === 'stopped') return;
+    runtimeFailureLogged = true;
+    logger.error('NpcResponder недоступен во время игры', { code: isNpcFailureCode(failure) ? failure : 'unavailable' });
+  }
   async function startResponder(): Promise<void> {
     if (starting) return starting;
     const operation = (async () => {
-      try { await responder.start(); available = !stopped && backendReady(); }
+      try {
+        await responder.start(); available = !stopped && backendReady();
+        if (available) runtimeFailureLogged = false;
+      }
       catch {
-        available = false;
+        available = false; runtimeFailureLogged = true;
         const code = responder.lastFailure?.();
         logger.error('NpcResponder недоступен: проверьте локальные пакеты, модель, платформу и профиль', { code: isNpcFailureCode(code) ? code : 'unavailable' });
       }
@@ -53,6 +65,9 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
   function abort(job: Job, reason: 'cancelled' | 'timeout'): void {
     if (job.controller.signal.aborted) return;
     job.controller.abort(); settle(job, { ok: false, reason });
+    if (reason === 'timeout' && job.running && responder.status) {
+      logger.error('Истёк deadline ответа NPC', { code: 'timeout' });
+    }
     if (!job.running) { remove(job); pump(); }
     else job.stuck = scheduler.setTimeout(() => logger.error('NPC не завершился после abort', { playerId: job.question.player.playerId }), 2000);
   }
@@ -71,7 +86,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
       if (!job.controller.signal.aborted) settle(job, { ok: false, reason: 'unavailable' });
     } finally {
       active--; remove(job);
-      if (!backendReady()) { available = false; failQueued(); scheduleRecovery(); }
+      if (!backendReady()) { logRuntimeFailure(); available = false; failQueued(); scheduleRecovery(); }
       pump();
     }
   }
@@ -90,6 +105,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
     ready: () => available && !stopped && backendReady(),
     ask(question) {
       if (!available || stopped || !backendReady()) {
+        if (!backendReady()) logRuntimeFailure();
         available = false; failQueued(); scheduleRecovery();
         return Promise.resolve({ ok: false, reason: 'unavailable' });
       }

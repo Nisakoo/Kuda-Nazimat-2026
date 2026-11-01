@@ -62,6 +62,81 @@ describe('configured game LLM integration without real models', () => {
     expect(store.dialogue.history('p', 'n')).toHaveLength(1);
     await service.stop(); await vi.advanceTimersByTimeAsync(10000); expect(service.ready()).toBe(false);
   });
+  it.each([
+    ['ollama_token_count_mismatch', 'ollama_token_count_mismatch'],
+    ['resource_limit', 'resource_limit'],
+    ['secret body /Users/private/path', 'unavailable'],
+  ])('logs a safe runtime failure once per outage, including after recovery (%s)', async (failure, expected) => {
+    vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'unavailable';
+    const error = vi.fn();
+    const responder: NpcResponder = {
+      async start() { status = 'ready'; }, async stop() { status = 'unavailable'; }, status: () => status,
+      lastFailure: () => failure,
+      async answer() { status = 'unavailable'; throw new Error('secret exception and prompt'); },
+    };
+    const stores = memoryStores();
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: stores.dialogue, logger: { ...silentLogger, error } }, config);
+    await service.start();
+    expect(await service.ask(q())).toEqual({ ok: false, reason: 'unavailable' });
+    for (let i = 0; i < 3; i++) expect(await service.ask(q('p2', String(i)))).toEqual({ ok: false, reason: 'unavailable' });
+    expect(error).toHaveBeenCalledExactlyOnceWith('NpcResponder недоступен во время игры', { code: expected });
+    expect(JSON.stringify(error.mock.calls)).not.toContain('secret');
+    expect(stores.dialogue.history('p', 'n')).toEqual([]);
+    await vi.advanceTimersByTimeAsync(2000); expect(service.ready()).toBe(true);
+    expect(await service.ask(q())).toEqual({ ok: false, reason: 'unavailable' });
+    expect(error).toHaveBeenCalledTimes(2);
+    await service.stop();
+  });
+  it('logs an idle backend failure on admission without flooding repeated unavailable questions', async () => {
+    vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'ready'; const error = vi.fn();
+    const responder: NpcResponder = {
+      async start() {}, async stop() {}, status: () => status, lastFailure: () => 'memory_unavailable',
+      answer: vi.fn(async () => ({ text: 'must not run' })),
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, config);
+    await service.start(); status = 'unavailable';
+    await service.ask(q()); await service.ask(q('p2'));
+    expect(responder.answer).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledExactlyOnceWith('NpcResponder недоступен во время игры', { code: 'memory_unavailable' });
+    await service.stop();
+  });
+  it.each(['cancelled', 'timeout'] as const)('distinguishes normal cancellation from an active timeout (%s)', async (reason) => {
+    vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'ready'; const error = vi.fn();
+    const responder: NpcResponder = {
+      async start() {}, async stop() { status = 'unavailable'; }, status: () => status, lastFailure: () => 'aborted',
+      answer: (_request, signal) => new Promise<{ text: string }>((_resolve, reject) => {
+        signal.addEventListener('abort', () => { status = 'unavailable'; reject(new Error('secret cancelled computation')); }, { once: true });
+      }),
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, { ...config, timeoutMs: 100 });
+    await service.start(); const pending = service.ask(q());
+    if (reason === 'cancelled') service.cancelConnection('cp');
+    await vi.advanceTimersByTimeAsync(100);
+    expect(await pending).toEqual({ ok: false, reason });
+    await service.ask(q('p2'));
+    if (reason === 'timeout') expect(error).toHaveBeenCalledExactlyOnceWith('Истёк deadline ответа NPC', { code: 'timeout' });
+    else expect(error).not.toHaveBeenCalled();
+    await service.stop();
+  });
+  it('does not suppress a later outage when a timed-out responder remained ready', async () => {
+    vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'ready'; let failure = 'timeout'; let shouldFail = false;
+    const error = vi.fn();
+    const responder: NpcResponder = {
+      async start() {}, async stop() {}, status: () => status, lastFailure: () => failure,
+      answer: (_request, signal) => new Promise<{ text: string }>((_resolve, reject) => {
+        if (shouldFail) { status = 'unavailable'; failure = 'resource_limit'; reject(new Error('private failure')); return; }
+        signal.addEventListener('abort', () => reject(new Error('private timeout')), { once: true });
+      }),
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, { ...config, timeoutMs: 100 });
+    await service.start(); const first = service.ask(q()); await vi.advanceTimersByTimeAsync(100);
+    expect(await first).toEqual({ ok: false, reason: 'timeout' }); expect(service.ready()).toBe(true);
+    expect(error).toHaveBeenCalledExactlyOnceWith('Истёк deadline ответа NPC', { code: 'timeout' });
+    shouldFail = true;
+    expect(await service.ask(q('p', 'next'))).toEqual({ ok: false, reason: 'unavailable' });
+    expect(error).toHaveBeenNthCalledWith(2, 'NpcResponder недоступен во время игры', { code: 'resource_limit' });
+    expect(error).toHaveBeenCalledTimes(2); await service.stop();
+  });
   it('clears queued jobs on physical backend failure, commits none, and does not start a restart loop', async () => {
     vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'ready'; let fail!: (error: Error) => void;
     let starts = 0;
