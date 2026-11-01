@@ -140,7 +140,7 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 
 Сервер — `server/` этого репозитория: **Node 24, TypeScript strict, Socket.IO, node:sqlite, Vitest**, модульный монолит с чистыми слоями (домен → сервисы → адаптеры, единственный composition root). Общий исполняемый контракт клиента и сервера (протокол v3, сущности, формат карты, проходимость) — корневой `shared/`. Сервер и клиент используют игровой PROTO v3; UI входа и защищённые загрузки согласованы с сервером.
 
-Спеки: [SERVER](specs/server-foundation.md), [SHARED](specs/shared-contracts.md), [PROTO](specs/protocol.md), [AUTH](specs/server-auth.md), [SERVER-WORLD](specs/server-world.md), [REALTIME](specs/server-realtime.md), [STORE](specs/server-persistence.md), [NPC v1 и порт NpcResponder](specs/server-npc-dialogue.md), [офлайн-мультиплеер](specs/offline-multiplayer.md).
+Спеки: [SERVER](specs/server-foundation.md), [SHARED](specs/shared-contracts.md), [PROTO](specs/protocol.md), [AUTH](specs/server-auth.md), [SERVER-WORLD](specs/server-world.md), [REALTIME](specs/server-realtime.md), [STORE](specs/server-persistence.md), [NPC v1 и порт NpcResponder](specs/server-npc-dialogue.md), [офлайн-мультиплеер](specs/offline-multiplayer.md), [наблюдаемость](specs/server-observability.md), [вход с паролем и отзывом сессий](specs/server-auth.md). Окружения: `make server` — development (вход по имени и автовход), `make start` — production (только пароль).
 
 | № | Задача | Спека | Зависит от |
 |---|---|---|---|
@@ -155,6 +155,9 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 | 016 | [Офлайн-мультиплеер: LAN, Wi-Fi, один компьютер](tasks/016-system-demo.md) | [OFFLINE](specs/offline-multiplayer.md) | 013, 014, 026 |
 | 040 | [Сервер: поток NPC и модельные порты](tasks/040-npc-stream-model-ports.md) | [NPC](specs/server-npc-dialogue.md), [PROTO-007](specs/protocol.md) | 014, 025, 032 |
 | 041 | [Клиент: потоковый ответ NPC (передача от сервера)](tasks/041-client-npc-stream.md) | [PROTO-007](specs/protocol.md) | 040 · клиент |
+| 042 | [Сервер: пароли, сессии с отзывом, окружения](tasks/042-server-auth-sessions.md) | [AUTH](specs/server-auth.md), SERVER-009 | 012, 016 |
+| 043 | [Сервер: логи, метрики, экран ведущего](tasks/043-server-observability.md) | [OBS](specs/server-observability.md) | 016 |
+| 044 | [Клиент: пароли и отчёты (передача от сервера)](tasks/044-client-auth-observability-handoff.md) | AUTH, OBS-011 | 042, 043 · клиент |
 | 015 | [Сервер: локальные NPC (v2)](tasks/015-server-ai.md) | [AI](specs/server-ai.md) | 011, 014, 017, 025 |
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
@@ -188,7 +191,7 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 
 `make help` показывает команды; CLIENT_RUN_CMD/CLIENT_TEST_CMD можно переопределить, пустые значения и ошибки не скрываются. Серверные решения по runtime, входу и сохранениям — в серверных спеках; локальный ИИ — в AI/LLM.
 
-После rebase сохранены [GAME — Вавилон](specs/game-babylon.md) и [MARKET — рыночная демо-сцена](specs/demo-scene-market.md), а также [экраны входа и выбора режима](specs/client-auth-screens.md) и [игровой интерфейс](specs/client-game-hud.md), [выбор облика](specs/client-avatar-select.md) (draft). Клиентская часть рынка реализована в [TASK-022](tasks/022-market-client-demo.md); серверное совместное задание (механики BABEL/SCENE) реализовано отдельным HTTP-дополнением PROTO-009; реальная LLM остаётся внешней интеграцией. `npc-question`/`npc-answer` — NPC-контракт v1; потоковый подконтракт PROTO-007 — v2 и требует отдельной реализации на клиенте и сервере.
+После rebase сохранены [GAME — Вавилон](specs/game-babylon.md) и [MARKET — рыночная демо-сцена](specs/demo-scene-market.md), а также [экраны входа и выбора режима](specs/client-auth-screens.md) и [игровой интерфейс](specs/client-game-hud.md), [выбор облика](specs/client-avatar-select.md), [разговор с жителем](specs/client-npc-chat.md) (draft). Клиентская часть рынка реализована в [TASK-022](tasks/022-market-client-demo.md); серверное совместное задание (механики BABEL/SCENE) реализовано отдельным HTTP-дополнением PROTO-009; реальная LLM остаётся внешней интеграцией. `npc-question`/`npc-answer` — NPC-контракт v1; потоковый подконтракт PROTO-007 — v2 и требует отдельной реализации на клиенте и сервере.
 
 Номера TASK-017/018 из main принадлежат [runtime MLX/Ollama](tasks/017-local-llm-runtime.md) и [LLM-квалификации](tasks/018-npc-llm-qualification.md). Клиентские демо перенумерованы в [TASK-019](tasks/019-client-playable-demo.md) и [TASK-020](tasks/020-client-babylon-controls.md), чтобы ID не повторялись.
 

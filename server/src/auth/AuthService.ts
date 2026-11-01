@@ -1,7 +1,11 @@
-import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import type { Clock } from '../common/time.ts';
-import type { PlayerIdentity, SessionVerifier } from '../contracts.ts';
-import type { AccountStore, PasswordCredential, SessionStore } from './ports.ts';
+import type { Logger } from '../common/logger.ts';
+import { MetricsRegistry, type Metrics } from '../common/metrics.ts';
+import type { SessionCheck, SessionVerifier } from '../contracts.ts';
+import { NameTakenError, type AccountStore, type RevokeReason, type SessionStore } from './ports.ts';
+import { HashQueueFullError, PasswordHasher, checkPassword, temporaryPassword } from './password.ts';
+import { LoginLockout, WindowLimiter } from './limits.ts';
 
 export function hashToken(token: string): string { return createHash('sha256').update(token).digest('hex'); }
 export function validName(value: unknown): string | null {
@@ -9,150 +13,205 @@ export function validName(value: unknown): string | null {
   const name = value.trim();
   return name.length >= 1 && name.length <= 32 ? name : null;
 }
-/** Do not trim, normalize, truncate, or echo passwords. Bound UTF-8 work as well as length. */
-export function validPassword(value: unknown): value is string {
-  return typeof value === 'string' && value.length >= 8 && value.length <= 128 && Buffer.byteLength(value, 'utf8') <= 512;
-}
+const TOKEN = /^[A-Za-z0-9_-]{43}$/;
+const TEMP_PASSWORD_MS = 24 * 3_600_000;
+
+/** AUTH-006 error codes with their HTTP status; `message` is ready to show to the player. */
+export const AUTH_STATUS = { INVALID: 400, CREDENTIALS: 401, NAME_TAKEN: 409, PASSWORD_REQUIRED: 403, PASSWORD_CHANGE_REQUIRED: 403, DISABLED: 403, RATE_LIMIT: 429, UNAVAILABLE: 503 } as const;
+export type AuthErrorCode = keyof typeof AUTH_STATUS;
 export class AuthError extends Error {
-  readonly code: 'INVALID' | 'INVALID_CREDENTIALS' | 'NAME_TAKEN' | 'RATE_LIMIT' | 'FULL';
-  readonly status: number;
-  constructor(code: AuthError['code']) {
-    const messages = {
-      INVALID: 'Введите имя длиной 1–32 символа и пароль длиной 8–128 символов',
-      INVALID_CREDENTIALS: 'Неверное имя или пароль',
-      NAME_TAKEN: 'Имя уже занято',
-      RATE_LIMIT: 'Слишком частые попытки. Повторите позже',
-      FULL: 'Сервер заполнен: в мире уже 4 игрока.',
-    };
-    super(messages[code]); this.name = 'AuthError'; this.code = code;
-    this.status = { INVALID: 400, INVALID_CREDENTIALS: 401, NAME_TAKEN: 409, RATE_LIMIT: 429, FULL: 503 }[code];
-  }
-}
-export function parseCredentials(value: unknown): { name: string; password: string } {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new AuthError('INVALID');
-  const record = value as Record<string, unknown>;
-  const name = validName(record.name);
-  if (Object.keys(record).length !== 2 || !Object.hasOwn(record, 'name') || !Object.hasOwn(record, 'password') || !name || !validPassword(record.password)) throw new AuthError('INVALID');
-  return { name, password: record.password };
+  readonly code: AuthErrorCode;
+  readonly retryAfterSeconds: number | undefined;
+  constructor(code: AuthErrorCode, message: string, retryAfterSeconds?: number) { super(message); this.code = code; this.retryAfterSeconds = retryAfterSeconds; }
 }
 
-/** Fixed windows, bounded key memory, fail closed instead of evicting active limits. */
-class AttemptLimits {
-  private readonly entries = new Map<string, { start: number; attempts: number }>();
-  private readonly clock: Clock;
-  constructor(clock: Clock) { this.clock = clock; }
-  take(source: string, nameKey: string): void {
-    const now = this.clock.now();
-    for (const [key, entry] of this.entries) if (now - entry.start >= 60_000 || now < entry.start) this.entries.delete(key);
-    // Digest caller strings so neither IP length nor name length can grow stored keys.
-    const keys = [[`s:${hashToken(source)}`, 20], [`n:${hashToken(nameKey)}`, 10]] as const;
-    for (const [key, limit] of keys) {
-      const entry = this.entries.get(key);
-      if (entry && entry.attempts >= limit) throw new AuthError('RATE_LIMIT');
-    }
-    const missing = keys.filter(([key]) => !this.entries.has(key)).length;
-    if (this.entries.size + missing > 2048) throw new AuthError('RATE_LIMIT');
-    for (const [key] of keys) {
-      const entry = this.entries.get(key);
-      if (entry) entry.attempts++;
-      else this.entries.set(key, { start: now, attempts: 1 });
-    }
-  }
-}
+/** Text the closed game connection shows for each revocation reason (AUTH-012). */
+export const REVOKE_MESSAGES: Readonly<Record<RevokeReason, string>> = {
+  logout: 'Вы вышли из игры.',
+  'password-changed': 'Пароль изменён. Войдите снова.',
+  'password-reset': 'Ведущий выдал новый пароль. Войдите снова.',
+  operator: 'Ведущий завершил сессию.',
+  limit: 'Слишком много входов в этот аккаунт: старая сессия завершена.',
+};
 
-// scrypt-v1: 32 MiB nominal memory; maxmem includes implementation overhead.
-const SCRYPT = { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 } as const;
-function derive(password: string, salt: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    scrypt(password, Buffer.from(salt, 'hex'), 64, SCRYPT, (error, key) => error ? reject(error) : resolve(key));
-  });
+export interface ServerSession { readonly token: string; readonly expiresAt: number }
+export interface AuthDeps {
+  readonly accounts: AccountStore; readonly sessions: SessionStore; readonly clock: Clock; readonly ttlMs: number;
+  readonly maxSessions?: number;
+  /** AUTH-001: guest and dev login; false in production. */
+  readonly passwordless?: boolean;
+  readonly hasher?: PasswordHasher; readonly logger?: Logger; readonly metrics?: Metrics;
 }
-const dummyCredential: PasswordCredential = { salt: '00'.repeat(16), passwordHash: '00'.repeat(64) };
-export interface AuthSession { readonly token: string; readonly expiresAt: number }
-export interface AuthService extends SessionVerifier {
-  guest(name: string, clientKey?: string): AuthSession;
-  register(name: string, password: string, clientKey?: string): Promise<AuthSession>;
-  login(name: string, password: string, clientKey?: string): Promise<AuthSession>;
-  logout(token: string): void;
-  state(identity: PlayerIdentity): { requiresAvatar: boolean };
-  onRevoked(listener: (sessionKey: string) => void): () => void;
-}
-export function createAuthService(accounts: AccountStore, sessions: SessionStore, clock: Clock, ttlMs: number, options: { canAdmit?(accountId: string | null): boolean } = {}): AuthService {
-  const limits = new AttemptLimits(clock);
-  const revoked = new Set<(sessionKey: string) => void>();
-  function admit(identity: PlayerIdentity | null): void {
-    if (options.canAdmit && !options.canAdmit(identity?.accountId ?? null)) throw new AuthError('FULL');
-  }
-  let hashing = 0;
-  async function passwordKey(password: string, salt: string): Promise<Buffer> {
-    // No unbounded queue of expensive crypto work, even across many source addresses.
-    if (hashing >= 2) throw new AuthError('RATE_LIMIT');
-    hashing++;
-    try { return await derive(password, salt); }
-    finally { hashing--; }
-  }
-  function attempt(name: unknown, clientKey: string): string {
-    const normalized = validName(name);
-    limits.take(clientKey, normalized?.toLowerCase() ?? '');
-    if (!normalized) throw new AuthError('INVALID');
-    return normalized;
-  }
-  function issue(identity: PlayerIdentity): AuthSession {
-    admit(identity);
+export type AuthService = ReturnType<typeof createAuthService>;
+
+export function createAuthService(deps: AuthDeps) {
+  const { accounts, sessions, clock, ttlMs } = deps;
+  const maxSessions = deps.maxSessions ?? 5;
+  const passwordless = deps.passwordless ?? true;
+  const hasher = deps.hasher ?? new PasswordHasher();
+  const log = deps.logger;
+  const metrics = deps.metrics ?? new MetricsRegistry();
+  const attempts = metrics.counter('auth_attempts_total', 'Попытки входа по способу и исходу');
+  const revocations = metrics.counter('auth_sessions_revoked_total', 'Отозванные сессии по причине');
+  const lockouts = metrics.counter('auth_locks_total', 'Блокировки имени после неудачных попыток');
+  const perIp = new WindowLimiter(clock, 30, 60_000);
+  const registrations = new WindowLimiter(clock, 10, 3_600_000);
+  const lockout = new LoginLockout(clock);
+  let revoked: (tokenHashes: readonly string[], reason: RevokeReason) => void = () => {};
+
+  const notify = (hashes: readonly string[], reason: RevokeReason, fields: Record<string, unknown>): void => {
+    if (!hashes.length) return;
+    revocations.inc({ reason }, hashes.length);
+    log?.info('auth.session.revoked', 'Сессии отозваны', { ...fields, reason, count: hashes.length });
+    revoked(hashes, reason);
+  };
+  const limitIp = (ip: string, method: string): void => {
+    const wait = perIp.hit(ip);
+    if (wait) { attempts.inc({ method, outcome: 'rate_limited' }); log?.warn('http.rate_limited', 'Слишком частые попытки входа с адреса', { ip, method }); throw new AuthError('RATE_LIMIT', 'Слишком частые попытки. Подождите немного.', wait); }
+  };
+  const nameOf = (raw: unknown): string => { const name = validName(raw); if (!name) throw new AuthError('INVALID', 'Введите имя длиной 1–32 символа без управляющих символов.'); return name; };
+  const passwordOf = (raw: unknown, name: string, field = 'Пароль'): string => {
+    const checked = checkPassword(raw, name);
+    if (!checked.ok) throw new AuthError('INVALID', field === 'Пароль' ? checked.message : `Новый пароль: ${checked.message.charAt(0).toLowerCase()}${checked.message.slice(1)}`);
+    return checked.password;
+  };
+  const failed = (key: string, ip: string, method: string, reason: string, countFailure: boolean): never => {
+    attempts.inc({ method, outcome: reason });
+    if (countFailure && lockout.fail(key)) { lockouts.inc(); log?.warn('auth.locked', 'Имя временно заблокировано после неудачных попыток', { nameKey: key, ip }); }
+    log?.warn('auth.login.failed', 'Неудачная попытка входа', { nameKey: key, ip, method, reason });
+    throw new AuthError('CREDENTIALS', 'Неверное имя или пароль.');
+  };
+  const locked = (key: string, method: string): void => {
+    const wait = lockout.retryAfter(key);
+    if (wait) { attempts.inc({ method, outcome: 'locked' }); throw new AuthError('RATE_LIMIT', 'Слишком много неудачных попыток. Попробуйте позже или попросите ведущего.', wait); }
+  };
+  const hashing = async <T>(work: () => Promise<T>): Promise<T> => {
+    try { return await work(); }
+    catch (error) { if (error instanceof HashQueueFullError) throw new AuthError('UNAVAILABLE', 'Сервер занят. Попробуйте войти через несколько секунд.'); throw error; }
+  };
+  const issue = (identity: { accountId: string; playerId: string; displayName: string }, ip: string, method: string): ServerSession => {
     const now = clock.now();
     const token = randomBytes(32).toString('base64url');
+    const sessionId = randomBytes(9).toString('base64url');
     const expiresAt = now + ttlMs;
-    sessions.create({ tokenHash: hashToken(token), accountId: identity.accountId, createdAt: now, expiresAt });
+    sessions.create({ tokenHash: hashToken(token), accountId: identity.accountId, createdAt: now, expiresAt, id: sessionId, ip });
+    notify(sessions.enforceLimit(identity.accountId, maxSessions, now), 'limit', { accountId: identity.accountId });
+    attempts.inc({ method, outcome: 'ok' });
+    log?.info(`auth.${method}`, 'Вход выполнен', { accountId: identity.accountId, playerId: identity.playerId, name: identity.displayName, ip, sessionId });
     return { token, expiresAt };
-  }
-  return {
-    guest(name, clientKey = 'local') {
-      const normalized = attempt(name, clientKey);
-      const found = accounts.findByName(normalized.toLowerCase());
-      if (found?.credential) throw new AuthError('INVALID_CREDENTIALS');
-      admit(found?.identity ?? null);
-      const identity = found?.identity ?? accounts.findOrCreate(normalized, normalized.toLowerCase(), clock.now());
-      return issue(identity);
+  };
+  const requirePasswordless = (method: string): void => {
+    if (!passwordless) { attempts.inc({ method, outcome: 'disabled' }); throw new AuthError('DISABLED', 'Вход без пароля выключен на этом сервере.'); }
+  };
+  const passwordlessLogin = (name: string, ip: string, method: 'guest' | 'dev'): ServerSession => {
+    const key = name.toLowerCase();
+    const existing = accounts.find(key);
+    if (existing?.passwordHash) { attempts.inc({ method, outcome: 'password_required' }); throw new AuthError('PASSWORD_REQUIRED', 'У этого имени есть пароль. Войдите с паролем.'); }
+    return issue(existing?.identity ?? accounts.findOrCreate(name, key, clock.now()), ip, method);
+  };
+
+  const service = {
+    /** AUTH-006 `GET /api/auth/mode`. */
+    mode: () => ({ password: true, guest: passwordless, dev: passwordless }),
+    onRevoked(listener: (tokenHashes: readonly string[], reason: RevokeReason) => void): void { revoked = listener; },
+
+    async guest(rawName: unknown, ip = 'unknown'): Promise<ServerSession> {
+      requirePasswordless('guest'); limitIp(ip, 'guest');
+      return passwordlessLogin(nameOf(rawName), ip, 'guest');
     },
-    async register(name, password, clientKey = 'local') {
-      const normalized = attempt(name, clientKey);
-      if (!validPassword(password)) throw new AuthError('INVALID');
-      const nameKey = normalized.toLowerCase();
-      if (accounts.findByName(nameKey)) throw new AuthError('NAME_TAKEN');
-      admit(null);
-      const salt = randomBytes(16).toString('hex');
-      const passwordHash = (await passwordKey(password, salt)).toString('hex');
-      admit(null);
-      const identity = accounts.createPassword(normalized, nameKey, clock.now(), { salt, passwordHash });
-      if (!identity) throw new AuthError('NAME_TAKEN');
-      return issue(identity);
+    /** AUTH-016: development/test autologin; `dev` when no name is given. */
+    async dev(rawName: unknown, ip = 'unknown'): Promise<ServerSession> {
+      requirePasswordless('dev');
+      return passwordlessLogin(rawName === undefined ? 'dev' : nameOf(rawName), ip, 'dev');
     },
-    async login(name, password, clientKey = 'local') {
-      const normalized = attempt(name, clientKey);
-      if (!validPassword(password)) throw new AuthError('INVALID');
-      const found = accounts.findByName(normalized.toLowerCase());
-      // Unknown names and guests perform the same KDF as password accounts.
-      const credential = found?.credential ?? dummyCredential;
-      if (!/^[a-f0-9]{32}$/.test(credential.salt) || !/^[a-f0-9]{128}$/.test(credential.passwordHash)) throw new Error('Invalid stored credential');
-      const actual = await passwordKey(password, credential.salt);
-      const matches = timingSafeEqual(actual, Buffer.from(credential.passwordHash, 'hex'));
-      if (!found?.credential || !matches) throw new AuthError('INVALID_CREDENTIALS');
-      return issue(found.identity);
+    async register(rawName: unknown, rawPassword: unknown, ip = 'unknown'): Promise<ServerSession> {
+      limitIp(ip, 'register');
+      const name = nameOf(rawName); const password = passwordOf(rawPassword, name);
+      const wait = registrations.hit(ip);
+      if (wait) { attempts.inc({ method: 'register', outcome: 'rate_limited' }); throw new AuthError('RATE_LIMIT', 'Слишком много регистраций с этого устройства. Подождите.', wait); }
+      if (accounts.find(name.toLowerCase())) { attempts.inc({ method: 'register', outcome: 'name_taken' }); throw new AuthError('NAME_TAKEN', 'Это имя уже занято. Выберите другое.'); }
+      const hash = await hashing(() => hasher.hash(password));
+      try { return issue(accounts.create(name, name.toLowerCase(), hash, clock.now()), ip, 'register'); }
+      catch (error) { if (error instanceof NameTakenError) throw new AuthError('NAME_TAKEN', 'Это имя уже занято. Выберите другое.'); throw error; }
     },
-    logout(token) {
-      if (/^[A-Za-z0-9_-]{43}$/.test(token)) {
-        const key = hashToken(token);
-        sessions.revoke(key);
-        for (const listener of revoked) listener(key);
+    async login(rawName: unknown, rawPassword: unknown, ip = 'unknown'): Promise<ServerSession> {
+      limitIp(ip, 'login');
+      const name = nameOf(rawName); const key = name.toLowerCase();
+      if (typeof rawPassword !== 'string' || !rawPassword) throw new AuthError('INVALID', 'Введите пароль.');
+      locked(key, 'login');
+      const record = accounts.find(key);
+      const result = await hashing(() => hasher.verify(rawPassword.normalize('NFC'), record?.passwordHash ?? null));
+      if (!record || !result.ok) return failed(key, ip, 'login', record ? 'credentials' : 'unknown', true);
+      if (record.mustChangePassword) {
+        if ((record.tempPasswordExpiresAt ?? 0) <= clock.now()) return failed(key, ip, 'login', 'temp_expired', false);
+        attempts.inc({ method: 'login', outcome: 'change_required' });
+        throw new AuthError('PASSWORD_CHANGE_REQUIRED', 'Это временный пароль. Придумайте свой.');
       }
+      lockout.succeed(key);
+      if (result.needsRehash) accounts.setPassword(record.identity.accountId, await hashing(() => hasher.hash(rawPassword.normalize('NFC'))), { mustChange: false, tempExpiresAt: null }, clock.now());
+      return issue(record.identity, ip, 'login');
     },
-    onRevoked(listener) { revoked.add(listener); return () => { revoked.delete(listener); }; },
-    state(identity) { return { requiresAvatar: accounts.requiresAvatar(identity.accountId) }; },
-    async verify(token) {
-      if (!/^[A-Za-z0-9_-]{43}$/.test(token)) return { ok: false };
+    /** Own password with the current (or temporary) one; ends every other session of the account. */
+    async changePassword(rawName: unknown, rawPassword: unknown, rawNew: unknown, ip = 'unknown'): Promise<ServerSession> {
+      limitIp(ip, 'password');
+      const name = nameOf(rawName); const key = name.toLowerCase();
+      if (typeof rawPassword !== 'string' || !rawPassword) throw new AuthError('INVALID', 'Введите текущий пароль.');
+      const next = passwordOf(rawNew, name, 'Новый пароль');
+      locked(key, 'password');
+      const record = accounts.find(key);
+      const result = await hashing(() => hasher.verify(rawPassword.normalize('NFC'), record?.passwordHash ?? null));
+      if (!record || !result.ok) return failed(key, ip, 'password', record ? 'credentials' : 'unknown', true);
+      if (record.mustChangePassword && (record.tempPasswordExpiresAt ?? 0) <= clock.now()) return failed(key, ip, 'password', 'temp_expired', false);
+      lockout.succeed(key);
+      accounts.setPassword(record.identity.accountId, await hashing(() => hasher.hash(next)), { mustChange: false, tempExpiresAt: null }, clock.now());
+      log?.info('auth.password.changed', 'Пароль изменён', { accountId: record.identity.accountId, ip });
+      notify(sessions.revoke({ accountId: record.identity.accountId }, 'password-changed', clock.now()), 'password-changed', { accountId: record.identity.accountId });
+      return issue(record.identity, ip, 'login');
+    },
+    /** AUTH-009: idempotent; never reveals whether the token was valid. */
+    logout(token: string): void {
+      if (!TOKEN.test(token)) return;
+      const hash = hashToken(token);
+      const session = sessions.find(hash);
+      const hashes = sessions.revoke({ tokenHash: hash }, 'logout', clock.now());
+      if (hashes.length) log?.info('auth.logout', 'Выход из игры', { accountId: session?.identity.accountId, sessionId: session?.sessionId });
+      notify(hashes, 'logout', { accountId: session?.identity.accountId });
+    },
+    async verify(token: string): Promise<SessionCheck> {
+      if (!TOKEN.test(token)) return { ok: false };
       const session = sessions.find(hashToken(token));
-      if (!session || session.expiresAt <= clock.now()) return { ok: false };
-      return { ok: true, ...session };
+      if (!session || session.revokedAt !== null || session.expiresAt <= clock.now()) return { ok: false };
+      return { ok: true, identity: session.identity, expiresAt: session.expiresAt, sessionId: session.sessionId };
+    },
+
+    /** AUTH-010 operator actions; the caller has already checked loopback and CSRF. */
+    operator: {
+      async resetPassword(rawName: unknown): Promise<{ name: string; temporaryPassword: string; expiresAt: number }> {
+        const record = accounts.find(nameOf(rawName).toLowerCase());
+        if (!record) throw new AuthError('INVALID', 'Аккаунт не найден.');
+        const password = temporaryPassword(); const now = clock.now();
+        accounts.setPassword(record.identity.accountId, await hashing(() => hasher.hash(password)), { mustChange: true, tempExpiresAt: now + TEMP_PASSWORD_MS }, now);
+        lockout.unlock(record.identity.displayName.toLowerCase());
+        log?.info('auth.operator.action', 'Ведущий выдал временный пароль', { action: 'reset-password', name: record.identity.displayName, accountId: record.identity.accountId });
+        notify(sessions.revoke({ accountId: record.identity.accountId }, 'password-reset', now), 'password-reset', { accountId: record.identity.accountId });
+        return { name: record.identity.displayName, temporaryPassword: password, expiresAt: now + TEMP_PASSWORD_MS };
+      },
+      revoke(rawName: unknown): number {
+        const record = accounts.find(nameOf(rawName).toLowerCase());
+        if (!record) throw new AuthError('INVALID', 'Аккаунт не найден.');
+        const hashes = sessions.revoke({ accountId: record.identity.accountId }, 'operator', clock.now());
+        log?.info('auth.operator.action', 'Ведущий завершил сессии', { action: 'revoke', name: record.identity.displayName, accountId: record.identity.accountId, count: hashes.length });
+        notify(hashes, 'operator', { accountId: record.identity.accountId });
+        return hashes.length;
+      },
+      unlock(rawName: unknown): boolean {
+        const name = nameOf(rawName);
+        const unlocked = lockout.unlock(name.toLowerCase());
+        log?.info('auth.operator.action', 'Ведущий снял блокировку входа', { action: 'unlock', name, unlocked });
+        return unlocked;
+      },
+      list: () => accounts.list(clock.now()),
     },
   };
+  return service satisfies SessionVerifier;
 }

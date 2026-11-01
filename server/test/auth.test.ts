@@ -1,165 +1,194 @@
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
-import { afterEach, describe, expect, it } from 'vitest';
-import { createAuthService, hashToken, parseCredentials, validPassword } from '../src/auth/AuthService.ts';
-import { sqliteAuthStores } from '../src/persistence/authentication.ts';
-import { applyMigrations, loadMigrations } from '../src/persistence/migrate.ts';
+import { describe, expect, it } from 'vitest';
+import { scryptSync, randomBytes } from 'node:crypto';
+import { AuthError, createAuthService, hashToken } from '../src/auth/AuthService.ts';
+import { HashQueueFullError, PasswordHasher, checkPassword, temporaryPassword } from '../src/auth/password.ts';
+import { memoryLogger } from '../src/common/logger.ts';
+import type { RevokeReason } from '../src/auth/ports.ts';
+import { memoryStores } from './memory.ts';
+import { setup } from './harness.ts';
 
-const cleanups: (() => void)[] = [];
-afterEach(() => { for (const cleanup of cleanups.splice(0).reverse()) cleanup(); });
-function fixture(path = ':memory:') {
-  const db = new DatabaseSync(path); cleanups.push(() => db.close());
-  db.exec('PRAGMA foreign_keys = ON');
-  applyMigrations(db, loadMigrations(), 0);
-  let now = 100;
-  const stores = sqliteAuthStores(db);
-  const auth = createAuthService(stores.accounts, stores.sessions, { now: () => now }, 1000);
-  return { db, ...stores, auth, advance(ms: number) { now += ms; } };
+function service(options: { passwordless?: boolean; maxSessions?: number } = {}) {
+  const stores = memoryStores(); let now = 1_000_000; const logger = memoryLogger();
+  const clock = { now: () => now };
+  const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock, ttlMs: 3_600_000, logger, passwordless: options.passwordless ?? false, ...(options.maxSessions ? { maxSessions: options.maxSessions } : {}) });
+  const revoked: { hashes: readonly string[]; reason: RevokeReason }[] = [];
+  auth.onRevoked((hashes, reason) => revoked.push({ hashes, reason }));
+  return { auth, stores, logger, revoked, advance: (ms: number) => { now += ms; } };
 }
-const password = 'correct horse battery staple';
+const code = async (promise: Promise<unknown>) => { try { await promise; return 'ok'; } catch (error) { return error instanceof AuthError ? error.code : String(error); } };
 
-describe('password authentication', () => {
-  it('registers with salted scrypt, case-insensitive identity, strict response and hashed session', async () => {
-    const { auth, db } = fixture();
-    const a = await auth.register('  Аня  ', password);
-    const b = await auth.register('Борис', password);
-    expect(Object.keys(a).sort()).toEqual(['expiresAt', 'token']);
-    expect(a.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
-    expect(a.expiresAt).toBe(1100);
-    const rows = db.prepare('SELECT * FROM account_credentials').all();
-    expect(rows).toHaveLength(2);
-    expect(rows[0]!.salt).not.toBe(rows[1]!.salt);
-    expect(rows[0]!.password_hash).not.toBe(rows[1]!.password_hash);
-    expect(JSON.stringify(rows)).not.toContain(password);
-    expect(db.prepare('SELECT token_hash FROM sessions').all().map((r) => r.token_hash)).toContain(hashToken(a.token));
-    expect(JSON.stringify(db.prepare('SELECT * FROM sessions').all())).not.toContain(a.token);
-    const login = await auth.login('аня', password);
-    const first = await auth.verify(a.token); const next = await auth.verify(login.token);
-    expect(first.ok && next.ok && first.identity).toEqual(next.ok && next.identity);
-    expect(first.ok && first.identity.displayName).toBe('Аня');
-    expect(login.token).not.toBe(a.token);
-    expect(await auth.verify(b.token)).toMatchObject({ ok: true });
+describe('passwords (AUTH-007, 008)', () => {
+  it('checks length, control characters and the name; temporary passwords avoid look-alikes', () => {
+    expect(checkPassword('12345', 'Аня').ok).toBe(false);
+    expect(checkPassword('аня', 'Аня').ok).toBe(false);
+    expect(checkPassword('Аня123', 'аня123').ok).toBe(false);
+    expect(checkPassword('пароль\u0007', 'Аня').ok).toBe(false);
+    expect(checkPassword('x'.repeat(129), 'Аня').ok).toBe(false);
+    expect(checkPassword('секрет12', 'Аня')).toEqual({ ok: true, password: 'секрет12' });
+    for (let i = 0; i < 20; i++) expect(temporaryPassword()).toMatch(/^[a-km-zA-HJ-NP-Z2-9]{10}$/);
   });
 
-  it('rejects wrong password, unknown account, guest password login and guest bypass', async () => {
-    const { auth, db, accounts } = fixture();
-    await auth.register('Protected', password);
-    await expect(auth.login('protected', 'wrong password')).rejects.toMatchObject({ code: 'INVALID_CREDENTIALS' });
-    await expect(auth.login('unknown', password)).rejects.toMatchObject({ code: 'INVALID_CREDENTIALS' });
-    expect(() => auth.guest('PROTECTED')).toThrow('Неверное имя или пароль');
-    expect(() => accounts.findOrCreate('Protected', 'protected', 100)).toThrow('Password account');
-    auth.guest('Guest');
-    await expect(auth.login('Guest', password)).rejects.toMatchObject({ code: 'INVALID_CREDENTIALS' });
-    await expect(auth.register('guest', password)).rejects.toMatchObject({ code: 'NAME_TAKEN' });
-    expect(db.prepare('SELECT COUNT(*) AS n FROM sessions').get()!.n).toBe(2);
-    expect(db.prepare('SELECT COUNT(*) AS n FROM account_credentials').get()!.n).toBe(1);
+  it('stores scrypt with salt and parameters, verifies in constant shape and asks to rehash weaker parameters', async () => {
+    const hasher = new PasswordHasher();
+    const [a, b] = [await hasher.hash('секрет12'), await hasher.hash('секрет12')];
+    expect(a).toMatch(/^scrypt\$32768\$8\$1\$[\w-]{22}\$[\w-]{43}$/); expect(a).not.toBe(b);
+    expect(await hasher.verify('секрет12', a)).toEqual({ ok: true, needsRehash: false });
+    expect(await hasher.verify('другой12', a)).toEqual({ ok: false, needsRehash: false });
+    expect(await hasher.verify('секрет12', null)).toEqual({ ok: false, needsRehash: false });
+    const salt = randomBytes(16); const weak = `scrypt$16384$8$1$${salt.toString('base64url')}$${scryptSync('секрет12', salt, 32, { N: 16384, r: 8, p: 1 }).toString('base64url')}`;
+    expect(await hasher.verify('секрет12', weak)).toEqual({ ok: true, needsRehash: true });
   });
 
-  it('does not claim a name won by a guest while registration hashes asynchronously', async () => {
-    const { auth, accounts } = fixture();
-    const registration = auth.register('Race', password);
-    const guest = auth.guest('race');
-    await expect(registration).rejects.toMatchObject({ code: 'NAME_TAKEN' });
-    expect(accounts.findByName('race')!.credential).toBeNull();
-    expect(await auth.verify(guest.token)).toMatchObject({ ok: true });
+  it('bounds concurrent hashing and fails fast when the queue waits too long', async () => {
+    const hasher = new PasswordHasher(1, 5);
+    const results = await Promise.allSettled([hasher.hash('a-password'), hasher.hash('b-password'), hasher.hash('c-password')]);
+    expect(results.filter((r) => r.status === 'rejected' && r.reason instanceof HashQueueFullError).length).toBeGreaterThan(0);
+    expect(results[0]!.status).toBe('fulfilled');
+  });
+});
+
+describe('AuthService (AUTH-001–016)', () => {
+  it('S5: registers with a password, refuses a taken name and answers unknown names like wrong passwords', async () => {
+    const { auth, stores, logger } = service();
+    const session = await auth.register('Аня', 'секрет12', '10.0.0.1');
+    expect(Object.keys(session)).toEqual(['token', 'expiresAt']);
+    expect(stores.accounts.find('аня')!.passwordHash).toMatch(/^scrypt\$/);
+    expect(await code(auth.register('аня', 'другой12'))).toBe('NAME_TAKEN');
+    const wrong = await auth.login('Аня', 'неверно12').catch((e: AuthError) => e);
+    const unknown = await auth.login('Никто', 'неверно12').catch((e: AuthError) => e);
+    expect([wrong, unknown].map((e) => (e as AuthError).code)).toEqual(['CREDENTIALS', 'CREDENTIALS']);
+    expect((wrong as AuthError).message).toBe((unknown as AuthError).message);
+    expect((await auth.verify((await auth.login('аня', 'секрет12')).token)).ok).toBe(true);
+    const text = JSON.stringify(logger.records);
+    expect(text).not.toContain('секрет12'); expect(text).not.toContain(session.token); expect(text).not.toContain(hashToken(session.token));
+    expect(logger.records.map((r) => r.event)).toEqual(expect.arrayContaining(['auth.register', 'auth.login', 'auth.login.failed']));
   });
 
-  it('creates only one account in concurrent same-name registrations', async () => {
-    const { auth, db } = fixture();
-    const outcomes = await Promise.allSettled([auth.register('Race', password), auth.register('race', password)]);
-    expect(outcomes.filter((o) => o.status === 'fulfilled')).toHaveLength(1);
-    expect(outcomes.filter((o) => o.status === 'rejected')).toMatchObject([{ reason: { code: 'NAME_TAKEN' } }]);
-    for (const table of ['accounts', 'players', 'account_credentials', 'sessions']) expect(db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get()!.n).toBe(1);
+  it('AUTH-001/016: production refuses passwordless login; development offers guest and dev; a password account needs its password', async () => {
+    const prod = service({ passwordless: false });
+    expect(prod.auth.mode()).toEqual({ password: true, guest: false, dev: false });
+    expect(await code(prod.auth.guest('Аня'))).toBe('DISABLED'); expect(await code(prod.auth.dev(undefined))).toBe('DISABLED');
+    const dev = service({ passwordless: true });
+    expect(dev.auth.mode()).toEqual({ password: true, guest: true, dev: true });
+    const [auto, boris] = [await dev.auth.dev(undefined), await dev.auth.dev('Борис')];
+    const [a, b] = [await dev.auth.verify(auto.token), await dev.auth.verify(boris.token)];
+    expect(a.ok && a.identity.displayName).toBe('dev'); expect(b.ok && b.identity.displayName).toBe('Борис');
+    await dev.auth.register('Вера', 'секрет12');
+    expect(await code(dev.auth.guest('вера'))).toBe('PASSWORD_REQUIRED');
+    expect(await code(dev.auth.dev('Вера'))).toBe('PASSWORD_REQUIRED');
   });
 
-  it('keeps pending appearance durable and preserves completed and legacy accounts after reopening', async () => {
-    const directory = mkdtempSync(join(tmpdir(), 'babel-auth-')); cleanups.unshift(() => rmSync(directory, { recursive: true, force: true }));
-    const path = join(directory, 'auth.sqlite');
-    const first = fixture(path);
-    const result = await first.auth.register('Pending', password);
-    const check = await first.auth.verify(result.token);
-    if (!check.ok) throw new Error('Expected authenticated session');
-    expect(first.auth.state(check.identity)).toEqual({ requiresAvatar: true });
-    first.auth.guest('Legacy');
-    const second = fixture(path);
-    expect(second.auth.state(check.identity)).toEqual({ requiresAvatar: true });
-    const resumed = await second.auth.login('pending', password);
-    expect(await second.auth.verify(resumed.token)).toMatchObject({ ok: true, identity: check.identity });
-    second.db.prepare('UPDATE players SET avatar_id = ? WHERE id = ?').run('dan', check.identity.playerId);
-    expect(second.auth.state(check.identity)).toEqual({ requiresAvatar: false });
-    expect(first.auth.state(check.identity)).toEqual({ requiresAvatar: false });
-    second.auth.logout(result.token);
-    expect(await first.auth.verify(result.token)).toEqual({ ok: false });
-    expect(await second.auth.verify(resumed.token)).toMatchObject({ ok: true });
-    const legacy = second.accounts.findByName('legacy')!;
-    expect(second.auth.state(legacy.identity)).toEqual({ requiresAvatar: false });
+  it('S7: five failures lock the name even for the right password, other names still work, unlock lifts it', async () => {
+    const { auth, logger, advance } = service();
+    await auth.register('Аня', 'секрет12', '10.0.0.2'); await auth.register('Борис', 'секрет34', '10.0.0.3');
+    for (let i = 0; i < 5; i++) expect(await code(auth.login('Аня', 'неверно12', '10.0.0.4'))).toBe('CREDENTIALS');
+    const locked = await auth.login('Аня', 'секрет12', '10.0.0.5').catch((e: AuthError) => e) as AuthError;
+    expect(locked.code).toBe('RATE_LIMIT'); expect(locked.retryAfterSeconds).toBe(900);
+    expect(await code(auth.login('Борис', 'секрет34', '10.0.0.4'))).toBe('ok');
+    expect(logger.records.some((r) => r.event === 'auth.locked')).toBe(true);
+    expect(auth.operator.unlock('аня')).toBe(true);
+    expect(await code(auth.login('Аня', 'секрет12'))).toBe('ok');
+    // A second lock within the hour after the previous one lasts an hour.
+    for (let i = 0; i < 5; i++) await code(auth.login('Аня', 'неверно12'));
+    advance(16 * 60_000); for (let i = 0; i < 5; i++) await code(auth.login('Аня', 'неверно12'));
+    expect(((await auth.login('Аня', 'секрет12').catch((e: AuthError) => e)) as AuthError).retryAfterSeconds).toBeGreaterThan(3000);
   });
 
-  it('revokes only the requested session and rejects expiry/malformed tokens', async () => {
-    const { auth, advance } = fixture();
-    const a = await auth.register('Name', password);
-    const b = await auth.login('name', password);
-    auth.logout(a.token);
-    expect(await auth.verify(a.token)).toEqual({ ok: false });
-    expect(await auth.verify(b.token)).toMatchObject({ ok: true });
-    auth.logout(a.token); auth.logout('invalid');
-    expect(await auth.verify('invalid')).toEqual({ ok: false });
-    expect(await auth.verify('x'.repeat(43))).toEqual({ ok: false });
-    advance(1000);
-    expect(await auth.verify(b.token)).toEqual({ ok: false });
+  it('AUTH-013: per-IP requests are limited across names', async () => {
+    const { auth } = service({ passwordless: true });
+    for (let i = 0; i < 30; i++) expect(await code(auth.guest(`Игрок${i}`, '10.9.9.9'))).toBe('ok');
+    expect(await code(auth.guest('Лишний', '10.9.9.9'))).toBe('RATE_LIMIT');
+    expect(await code(auth.guest('Другой', '10.9.9.8'))).toBe('ok');
   });
 
-  it('validates exact bodies and password bounds without mutating the password', () => {
-    expect(parseCredentials({ name: ' Name ', password: ' leading space ' })).toEqual({ name: 'Name', password: ' leading space ' });
-    expect(validPassword('x'.repeat(128))).toBe(true);
-    expect(validPassword('x'.repeat(129))).toBe(false);
-    for (const value of [null, [], { name: 'Name' }, { name: 'Name', password: 'short' }, { name: 'Name', password, extra: true }, { name: 'x'.repeat(33), password }, { name: 'bad\nname', password }, { name: 'Name', password: 12345678 }]) expect(() => parseCredentials(value)).toThrow();
+  it('S8: a temporary password forces a change, then only the new password works and the temporary one expires', async () => {
+    const { auth, revoked, advance } = service();
+    const first = await auth.register('Вера', 'секрет12');
+    const reset = await auth.operator.resetPassword('вера');
+    expect(reset.name).toBe('Вера'); expect(reset.temporaryPassword).toHaveLength(10);
+    expect(revoked).toEqual([{ hashes: [hashToken(first.token)], reason: 'password-reset' }]);
+    expect((await auth.verify(first.token)).ok).toBe(false);
+    expect(await code(auth.login('Вера', reset.temporaryPassword))).toBe('PASSWORD_CHANGE_REQUIRED');
+    expect(await code(auth.changePassword('Вера', reset.temporaryPassword, 'короткий'))).toBe('ok');
+    expect(await code(auth.login('Вера', reset.temporaryPassword))).toBe('CREDENTIALS');
+    expect(await code(auth.login('Вера', 'короткий'))).toBe('ok');
+    const again = await auth.operator.resetPassword('Вера'); advance(24 * 3_600_000 + 1);
+    expect(await code(auth.login('Вера', again.temporaryPassword))).toBe('CREDENTIALS');
+    expect(await code(auth.operator.resetPassword('Никто'))).toBe('INVALID');
   });
 
-  it('limits attempts per name, per source and expires windows', async () => {
-    const { auth, advance } = fixture();
-    for (let i = 0; i < 10; i++) auth.guest('same', `source-${i}`);
-    expect(() => auth.guest('same', 'other')).toThrow('Слишком частые попытки');
-    for (let i = 0; i < 20; i++) auth.guest(`different-${i}`, 'one-source');
-    expect(() => auth.guest('next', 'one-source')).toThrow('Слишком частые попытки');
-    advance(60_000);
-    expect(auth.guest('same', 'one-source').token).toHaveLength(43);
-    await expect(auth.login('same', 'too short'.slice(0, 7), 'invalid')).rejects.toMatchObject({ code: 'INVALID' });
+  it('AUTH-009/012: logout and password change revoke; logout is idempotent and silent for unknown tokens', async () => {
+    const { auth, revoked } = service();
+    const a = await auth.register('Аня', 'секрет12'); const b = await auth.login('Аня', 'секрет12');
+    auth.logout(a.token); auth.logout(a.token); auth.logout('garbage'); auth.logout('x'.repeat(43));
+    expect(revoked).toEqual([{ hashes: [hashToken(a.token)], reason: 'logout' }]);
+    expect((await auth.verify(a.token)).ok).toBe(false); expect((await auth.verify(b.token)).ok).toBe(true);
+    const c = await auth.changePassword('Аня', 'секрет12', 'новый-пароль');
+    expect(revoked.at(-1)).toEqual({ hashes: [hashToken(b.token)], reason: 'password-changed' });
+    expect((await auth.verify(b.token)).ok).toBe(false); expect((await auth.verify(c.token)).ok).toBe(true);
+    expect(auth.operator.revoke('аня')).toBe(1); expect((await auth.verify(c.token)).ok).toBe(false);
   });
 
-  it('bounds limiter key memory and hash concurrency with fail-closed overload', async () => {
-    const { auth, advance } = fixture();
-    for (let i = 0; i < 1024; i++) auth.guest(`name-${i}`, `source-${i}`);
-    expect(() => auth.guest('overflow', 'overflow')).toThrow('Слишком частые попытки');
-    advance(60_000);
-    const one = auth.register('one', password); const two = auth.register('two', password);
-    await expect(auth.register('three', password)).rejects.toMatchObject({ code: 'RATE_LIMIT' });
-    await Promise.all([one, two]);
-    await expect(auth.register('three', password)).resolves.toMatchObject({ token: expect.any(String) });
+  it('AUTH-002: at most maxSessions active sessions, the oldest is revoked with reason limit', async () => {
+    const { auth, revoked } = service({ maxSessions: 2 });
+    const sessions = [await auth.register('Аня', 'секрет12')];
+    for (let i = 0; i < 2; i++) sessions.push(await auth.login('Аня', 'секрет12'));
+    expect(revoked).toEqual([{ hashes: [hashToken(sessions[0]!.token)], reason: 'limit' }]);
+    expect((await Promise.all(sessions.map((s) => auth.verify(s.token)))).map((check) => check.ok)).toEqual([false, true, true]);
+    const listed = auth.operator.list();
+    expect(listed).toEqual([expect.objectContaining({ name: 'Аня', hasPassword: true, mustChangePassword: false, activeSessions: 2 })]);
+    expect(JSON.stringify(listed)).not.toContain('scrypt');
+  });
+});
+
+describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
+  it('serves the auth API with exact bodies, codes and Retry-After', async () => {
+    const { post, origin } = await setup({ auth: { passwordless: false } });
+    expect(await (await fetch(`${origin}/api/auth/mode`)).json()).toEqual({ password: true, guest: false, dev: false });
+    expect(await post('/api/auth/guest', { name: 'Аня' })).toMatchObject({ status: 403, body: { error: { code: 'DISABLED' } } });
+    const registered = await post('/api/auth/register', { name: 'Аня', password: 'секрет12' });
+    expect(registered.status).toBe(201); expect(Object.keys(registered.body!)).toEqual(['token', 'expiresAt']);
+    expect(await post('/api/auth/register', { name: 'аня', password: 'секрет12' })).toMatchObject({ status: 409, body: { error: { code: 'NAME_TAKEN' } } });
+    expect(await post('/api/auth/login', { name: 'Аня', password: 'секрет12', extra: 1 })).toMatchObject({ status: 400 });
+    expect(await post('/api/auth/login', { name: 'Аня', password: 'плохой-пароль' })).toMatchObject({ status: 401, body: { error: { code: 'CREDENTIALS', message: 'Неверное имя или пароль.' } } });
+    for (let i = 0; i < 4; i++) await post('/api/auth/login', { name: 'Аня', password: 'плохой-пароль' });
+    const locked = await post('/api/auth/login', { name: 'Аня', password: 'секрет12' });
+    expect(locked).toMatchObject({ status: 429, body: { error: { code: 'RATE_LIMIT', retryAfterSeconds: 900 } } }); expect(locked.headers.get('retry-after')).toBe('900');
+    expect((await post('/api/auth/unknown', {})).status).toBe(404);
   });
 
-  it('rolls back account/player creation when credential insertion fails', () => {
-    const { accounts, db } = fixture();
-    expect(() => accounts.createPassword('Broken', 'broken', 1, { salt: 'invalid', passwordHash: '00'.repeat(64) })).toThrow();
-    expect(db.prepare('SELECT COUNT(*) AS n FROM accounts').get()!.n).toBe(0);
-    expect(db.prepare('SELECT COUNT(*) AS n FROM players').get()!.n).toBe(0);
+  it('S6/S9: logout and operator revoke close the live socket with a reason; CSRF-less actions are refused', async () => {
+    const { post, connect, origin, port } = await setup();
+    const anya = (await post('/api/auth/dev', { name: 'Аня' })).body as { token: string };
+    const client = await connect(anya.token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
+    const logout = await fetch(`${origin}/api/auth/logout`, { method: 'POST', headers: { Authorization: `Bearer ${anya.token}` } });
+    expect(logout.status).toBe(204);
+    expect(await client.wait((p) => p.type === 'error' && p.requestId === 'server')).toMatchObject({ code: 'UNAUTHORIZED', message: 'Вы вышли из игры.' });
+    expect((await fetch(`${origin}/world/maps/test/manifest.json`, { headers: { Authorization: `Bearer ${anya.token}` } })).status).toBe(401);
+    expect((await fetch(`${origin}/api/auth/logout`, { method: 'POST', headers: { Authorization: `Bearer ${anya.token}` } })).status).toBe(204);
+    const boris = (await post('/api/auth/dev', { name: 'Борис' })).body as { token: string };
+    const other = await connect(boris.token); other.command('join', { mapId: 'test' }); await other.wait((p) => p.type === 'joined');
+    const self = `http://127.0.0.1:${port}`;
+    expect((await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: self })).status).toBe(403);
+    expect((await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: 'http://evil.test', 'X-Operator': '1' })).status).toBe(403);
+    expect(other.packets.some((p) => p.type === 'error')).toBe(false);
+    expect(await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: self, 'X-Operator': '1' })).toMatchObject({ status: 200, body: { revoked: 1 } });
+    expect(await other.wait((p) => p.type === 'error' && p.requestId === 'server')).toMatchObject({ message: 'Ведущий завершил сессию.' });
+    const reset = await post('/api/operator/actions/reset-password', { name: 'Борис' }, { Origin: self, 'X-Operator': '1' });
+    expect(reset.body).toMatchObject({ name: 'Борис', temporaryPassword: expect.stringMatching(/^\w{10}$/) });
+    expect(await post('/api/auth/login', { name: 'Борис', password: reset.body!.temporaryPassword })).toMatchObject({ status: 403, body: { error: { code: 'PASSWORD_CHANGE_REQUIRED' } } });
+    expect(await post('/api/auth/password', { name: 'Борис', password: reset.body!.temporaryPassword, newPassword: 'свой-пароль' })).toMatchObject({ status: 200 });
   });
 
-  it('upgrades old guests without adding passwords or changing identity and position', async () => {
-    const db = new DatabaseSync(':memory:'); cleanups.push(() => db.close());
-    db.exec('PRAGMA foreign_keys = ON');
-    const migrations = loadMigrations(); applyMigrations(db, migrations.slice(0, 2), 1);
-    db.prepare('INSERT INTO accounts VALUES (?, ?, ?, ?)').run('a_old', 'Old', 'old', 1);
-    db.prepare('INSERT INTO players (id,account_id,map_id,x,y,z,rotation_y,updated_at) VALUES (?,?,?,?,?,?,?,?)').run('p_old', 'a_old', 'demo', 1, 2, 3, 0.5, 1);
-    applyMigrations(db, migrations, 2);
-    const stores = sqliteAuthStores(db); const auth = createAuthService(stores.accounts, stores.sessions, { now: () => 3 }, 1000);
-    const session = auth.guest('OLD');
-    expect(await auth.verify(session.token)).toMatchObject({ ok: true, identity: { accountId: 'a_old', playerId: 'p_old', displayName: 'Old' } });
-    expect(stores.accounts.requiresAvatar('a_old')).toBe(false);
-    await expect(auth.register('old', password)).rejects.toMatchObject({ code: 'NAME_TAKEN' });
-    expect(db.prepare('SELECT x,y,z,rotation_y FROM players').get()).toMatchObject({ x: 1, y: 2, z: 3, rotation_y: 0.5 });
-    expect(db.prepare('SELECT COUNT(*) AS n FROM account_credentials').get()!.n).toBe(0);
+  it('S10: a session that floods /world/* gets 429 and stays valid', async () => {
+    const { post, connect, origin } = await setup();
+    const { token } = (await post('/api/auth/dev', {})).body as { token: string };
+    const client = await connect(token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
+    const headers = { Authorization: `Bearer ${token}` };
+    const statuses: number[] = [];
+    for (let i = 0; i < 400; i++) statuses.push((await fetch(`${origin}/world/maps/test/manifest.json`, { method: 'HEAD', headers })).status);
+    expect(statuses.filter((s) => s === 200).length).toBeGreaterThanOrEqual(300); expect(statuses).toContain(429);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect((await fetch(`${origin}/world/maps/test/manifest.json`, { headers })).status).toBe(200);
   });
 });

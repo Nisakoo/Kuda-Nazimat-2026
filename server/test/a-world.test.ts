@@ -109,8 +109,8 @@ describe('AOI stream (PROTO-008 §3)', () => {
     stream.reset([a]);
     expect(stream.diff([a])).toBeNull();
     const moved = { ...a, transform: { position: { x: 1, y: 0, z: 0 }, rotationY: 0 } };
-    expect(stream.diff([moved, { id: 'b' }])).toEqual({ revision: 1, baseRevision: 0, upsert: [moved, { id: 'b' }], remove: [] });
-    expect(stream.diff([moved])).toEqual({ revision: 2, baseRevision: 1, upsert: [], remove: ['b'] });
+    expect(stream.diff([moved, { id: 'b' }])).toMatchObject({ revision: 1, baseRevision: 0, upsert: [moved, { id: 'b' }], remove: [] });
+    expect(stream.diff([moved])).toEqual({ revision: 2, baseRevision: 1, upsert: [], remove: ['b'], bytes: 0 });
   });
 });
 
@@ -146,6 +146,6 @@ describe('spawn placement (REALTIME-010 / S8)', () => {
     const channel: Channel = { id: 'c', sessionKey: 'k', send() {}, close() {} };
     game.attach({ playerId: 'p', accountId: 'p', displayName: 'P' }, channel); game.join(channel, 'test');
     expect(world.locate('p')).toMatchObject({ position: { x: -3, z: 2 }, rotationY: 0.25 });
-    expect(chooseSpawn(SPAWN, () => false, [])).toEqual({ position: SPAWN, rotationY: Math.PI });
+    expect(chooseSpawn(SPAWN, () => false, [])).toEqual({ position: SPAWN, rotationY: Math.PI, fallback: true });
   });
 });

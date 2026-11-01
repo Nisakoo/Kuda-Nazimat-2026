@@ -6,6 +6,7 @@ import type { Vector3 } from '../../shared/world/types.ts';
 import type { AvatarId } from '../../shared/avatar/types.ts';
 import type { ToolId } from '../../shared/equipment/types.ts';
 import type { Logger } from './common/logger.ts';
+import type { Metrics } from './common/metrics.ts';
 import type { Clock, Scheduler } from './common/time.ts';
 
 export interface PlayerIdentity { readonly accountId: string; readonly playerId: string; readonly displayName: string }
@@ -13,12 +14,9 @@ export interface PlayerIdentity { readonly accountId: string; readonly playerId:
 // ── Implemented by part B, consumed by part A ──────────────────────────────
 
 /** AUTH-003: token check for the Socket.IO handshake. */
-export type SessionCheck = { readonly ok: true; readonly identity: PlayerIdentity; readonly expiresAt: number } | { readonly ok: false };
-export interface SessionVerifier {
-  verify(token: string): Promise<SessionCheck>;
-  state?(identity: PlayerIdentity): { requiresAvatar: boolean };
-  onRevoked?(listener: (sessionKey: string) => void): () => void;
-}
+/** sessionId is the public session id for logs (AUTH-002), never the token. */
+export type SessionCheck = { readonly ok: true; readonly identity: PlayerIdentity; readonly expiresAt: number; readonly sessionId?: string } | { readonly ok: false };
+export interface SessionVerifier { verify(token: string): Promise<SessionCheck>; state?(identity: PlayerIdentity): { requiresAvatar: boolean } }
 
 /** STORE-001/003: saved player position. */
 export interface SavedPosition { readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
@@ -64,7 +62,11 @@ export interface WorldFile { readonly absolutePath: string; readonly bytes: numb
 export type WorldFileAccess = { readonly ok: true; readonly file: WorldFile } | { readonly ok: false };
 
 /** OFFLINE-010: who holds a seat, for the operator screen; no tokens, texts or positions. */
-export interface PlayerPresence { readonly name: string; readonly mapId: string | null; readonly connected: boolean; readonly releaseInMs: number | null }
+export interface PlayerPresence {
+  readonly name: string; readonly mapId: string | null; readonly connected: boolean; readonly releaseInMs: number | null;
+  /** OBS-010: median Engine.IO heartbeat RTT of the last minute, reconnects in 10 min, seconds since the seat was taken. */
+  readonly rttMs: number | null; readonly reconnects: number; readonly seatedSeconds: number;
+}
 
 export interface MapSummary { readonly mapId: string; readonly worldBytes: number; readonly chunks: number }
 
@@ -92,6 +94,11 @@ export interface GameDeps {
   readonly clock: Clock;
   readonly scheduler: Scheduler;
   readonly logger: Logger;
+  readonly metrics?: Metrics;
+  /** Engine.IO heartbeat interval, also the RTT sampling period (OBS-010). */
+  readonly pingIntervalMs?: number;
+  /** OBS-005: validate every outgoing packet (development). */
+  readonly validateOutgoing?: boolean;
 }
 export interface GameRuntime {
   canAdmit?(accountId: string): boolean;
@@ -108,6 +115,12 @@ export interface GameRuntime {
   attach(server: HttpServer): void;
   activePlayers(): number;
   presence(): readonly PlayerPresence[];
+  /** AUTH-012: closes every game connection of these sessions (token hashes) with the given message. */
+  closeSessions(tokenHashes: readonly string[], message: string): void;
+  /** Seats, connections and queue counters for incident dumps (OBS-004); no names or texts. */
+  state(): Record<string, unknown>;
+  /** Last minute p95 of the step and broadcast interval (OBS-010); null before the first minute. */
+  stats(): { readonly tickP95Ms: number; readonly broadcastP95Ms: number; readonly players: number } | null;
   /** SERVER-005: closes connections and saves positions. */
   stop(reason: string): Promise<void>;
 }

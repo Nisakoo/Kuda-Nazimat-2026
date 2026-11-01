@@ -16,6 +16,26 @@ npm --prefix server run check
 
 `check:platform` проверяет типы набора B, чистый shared без DOM/Node и импорты всех модулей. Это промежуточная проверка; обязательный полный `check` после интеграции A также проходит.
 
+## Окружения (SERVER-009)
+
+| | development (по умолчанию) | production | test |
+|---|---|---|---|
+| Как запустить | `make server`, `npm --prefix server start` | `make start`, `npm --prefix server run start:prod`, `--env production` | `--env test`, автотесты |
+| Вход | имя без пароля, автовход `POST /api/auth/dev`, а также пароль | только пароль | как development |
+| БД | `data/dev.sqlite` | `data/game.sqlite` | `data/test.sqlite` |
+| Консоль / файл логов | debug / debug | info / debug | warn / выключен |
+| Прочее | CORS для Vite `:5173`, `/config.json` с `debug: true`, проверка исходящих пакетов | — | — |
+
+Окружение выбирается `--env` или `APP_ENV`, порт — `--port` или `PORT`, адрес — `HOST`; итог: defaults → пресет → `config.json` → переменные → аргументы. Включить вход без пароля в production нельзя — сервер не стартует. CLI принимают те же флаги: `npm --prefix server run inspect -- --env production`.
+
+## Аккаунты и пароли (AUTH)
+
+Пароль — от 6 символов, хранится как scrypt. Пять неверных попыток блокируют имя на 15 минут (повторно — на час); выход отзывает сессию сразу, смена пароля — все сессии. Забыл пароль — ведущий выдаёт временный на `/operator` или `npm --prefix server run auth -- reset-password <имя> --env production`; игрок входит с ним и задаёт свой. `auth -- list` — аккаунты без хешей, `auth -- revoke <имя>` — завершить сессии.
+
+## Логи и мониторинг (OBS)
+
+Журнал — `data/logs/server-*.jsonl` (JSON на строку: `ts`, `level`, `event`, `msg`, `playerId`, `sessionId`, …), ротация 20 МБ, всего ≤200 МБ и ≤14 дней. При первой ошибке и по кнопке «Сохранить отчёт» на `/operator` бортовой самописец пишет `incident-*.jsonl` с последними 5000 событиями и снимком метрик — это главный источник для плавающих ошибок. Пароли, токены, хеши и тексты игроков в журнал не попадают. Метрики — `GET /metrics` (Prometheus) и `/api/operator/metrics`; Prometheus + Grafana с дашбордом — [ops/monitoring](../ops/monitoring/README.md).
+
 Запуск из корня ([OFFLINE](../specs/offline-multiplayer.md)):
 
 ```sh

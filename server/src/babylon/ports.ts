@@ -35,5 +35,5 @@ export interface LanguagePort {
   answer(npc: NpcProfile, question: string, language: Language, history: readonly NpcReply[], signal: AbortSignal): Promise<string>;
 }
 /** Same queue as v1 NPCs: one reservation covers all target languages of a message. */
-export type Generate = (playerId: string, connectionId: string, work: (signal: AbortSignal, deadline: number) => Promise<string>) => Promise<NpcAnswer>;
+export type Generate = (playerId: string, connectionId: string, work: (signal: AbortSignal, deadline: number) => Promise<string>, options?: { readonly requestId?: string; readonly kind?: string }) => Promise<NpcAnswer>;
 export interface BabylonLocation { mapId: string; position: { x: number; y: number; z: number } }

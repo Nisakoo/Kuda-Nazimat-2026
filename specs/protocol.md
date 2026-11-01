@@ -133,7 +133,8 @@ related:
 4. **Ввод.** Сервер применяет последнее намерение до следующего `input`. Если `input` нет 250 ms, намерение обнуляется: клиент шлёт `input` через volatile emit, и потерянная «остановка» не должна двигать игрока бесконечно. `input` с `sequence` ≤ последнего принятого игнорируется. Превышение частоты `input` отбрасывается молча, без `error`.
 5. **Дубликаты.** Повтор уже использованного в соединении requestId получает `error INVALID` и не даёт второго эффекта.
 6. **HTTP `/world/*`.** Клиент считает 401/403 потерей сессии и закрывает её. Поэтому 401/403 означают только отказ сессии. Ресурс вне допустимой области или неизвестный путь возвращают 404.
-7. **Ответ входа.** `POST /api/auth/register`, `/api/auth/login` и совместимый demo `/api/auth/guest` (AUTH-006) возвращают ровно `{token, expiresAt}`: клиентский `parseServerSession` отклоняет лишние поля. Обязательный first-avatar передаётся отдельно через Bearer `GET /api/auth/state` → `{requiresAvatar:boolean}`; pending password account не может выполнить join. `POST /api/auth/logout` отзывает текущую сессию и закрывает только соответствующий transport; парольный аккаунт не допускает guest-вход. Регистрация при заполненном сервере отклоняется до создания аккаунта, существующий управляющий игрок сохраняет право takeover.
+7. **Ответ входа.** `POST /api/auth/guest`, а также `register`, `login` и `password` (AUTH-006) возвращают ровно `{token, expiresAt}`: клиентский `parseServerSession` отклоняет лишние поля. Ошибки входа, выход и отзыв сессии — [AUTH](server-auth.md); отзыв доходит до игрового канала как `error {requestId: "server", code: "UNAUTHORIZED"}` с причиной.
+Обязательный выбор облика передаётся отдельно через Bearer `GET /api/auth/state` → `{requiresAvatar:boolean}`; парольный аккаунт без облика не может выполнить join.
 
 Детальное поведение сервера — [REALTIME](server-realtime.md), [AUTH](server-auth.md), [SERVER-WORLD](server-world.md), [NPC](server-npc-dialogue.md).
 

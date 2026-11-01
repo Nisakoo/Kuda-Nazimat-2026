@@ -3,14 +3,15 @@ import { Server } from 'socket.io';
 import type { Socket } from 'socket.io';
 import { SERVER_REQUEST_ID } from '../../../shared/protocol/types.ts';
 import type { ClientMessage, ErrorCode, ServerMessage } from '../../../shared/protocol/types.ts';
-import { ProtocolError, parseClientMessage, peekRequestId } from '../../../shared/protocol/validate.ts';
+import { ProtocolError, parseClientMessage, parseServerMessage, peekRequestId } from '../../../shared/protocol/validate.ts';
 import type { Logger } from '../common/logger.ts';
+import { MetricsRegistry, type Counter, type Metrics } from '../common/metrics.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { NpcAnswer, NpcQuestions, PlayerIdentity, SessionVerifier } from '../contracts.ts';
 import type { GameService } from '../game/GameService.ts';
 import type { Channel } from '../game/ports.ts';
 import { hashToken } from '../auth/AuthService.ts';
-import { TokenBucket } from './TokenBucket.ts';
+import { TokenBucket } from '../common/TokenBucket.ts';
 import { PartialThrottle } from './PartialThrottle.ts';
 
 export interface GatewayDeps {
@@ -21,8 +22,15 @@ export interface GatewayDeps {
   readonly clock: Clock;
   readonly scheduler: Scheduler;
   readonly logger: Logger;
+  readonly metrics?: Metrics;
   readonly corsOrigins: readonly string[];
+  /** Engine.IO heartbeat; also the RTT sample period (OBS-010). Default 25 s as in Socket.IO. */
+  readonly pingIntervalMs?: number;
+  /** OBS-005: every outgoing packet passes parseServerMessage (development). */
+  readonly validateOutgoing?: boolean;
 }
+
+interface GatewayMetrics { readonly packetsIn: Counter; readonly packetsOut: Counter; readonly invalid: Counter; readonly limited: Counter; readonly handshakes: Counter }
 
 const PACKET_LIMIT = 262144 + 4096;
 const CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
@@ -43,34 +51,45 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
     path: '/socket.io',
     serveClient: false,
     maxHttpBufferSize: PACKET_LIMIT,
+    ...(deps.pingIntervalMs ? { pingInterval: deps.pingIntervalMs } : {}),
     ...(deps.corsOrigins.length ? { cors: { origin: [...deps.corsOrigins] } } : {}),
   });
   const log = deps.logger.child('realtime');
+  const registry = deps.metrics ?? new MetricsRegistry();
+  const metrics: GatewayMetrics = {
+    packetsIn: registry.counter('realtime_packets_in_total', 'Игровые пакеты клиента по типу'),
+    packetsOut: registry.counter('realtime_packets_out_total', 'Игровые пакеты сервера по типу'),
+    invalid: registry.counter('realtime_invalid_packets_total', 'Отклонённые пакеты клиента'),
+    limited: registry.counter('realtime_rate_limited_total', 'Пакеты, отброшенные лимитами, по типу'),
+    handshakes: registry.counter('realtime_handshakes_total', 'Handshake по результату'),
+  };
   const nsp = io.of('/game');
+  registry.gauge('realtime_connections', 'Открытые соединения /game', () => nsp.sockets.size);
 
   nsp.use((socket, next) => {
+    const reject = (code: ErrorCode, message: string, reason: string) => {
+      metrics.handshakes.inc({ result: code });
+      log.info('realtime.handshake.rejected', 'Подключение отклонено', { code, reason, ip: socket.handshake.address });
+      next(new HandshakeError(code, message));
+    };
     const auth = socket.handshake.auth as { version?: unknown; token?: unknown } | undefined;
-    if (auth?.version !== 3) { next(new HandshakeError('VERSION', 'Несовместимая версия игрового протокола.')); return; }
-    if (typeof auth.token !== 'string' || auth.token.length > 512) { next(new HandshakeError('UNAUTHORIZED', 'Нужна серверная сессия.')); return; }
+    if (auth?.version !== 3) { reject('VERSION', 'Несовместимая версия игрового протокола.', `version ${String(auth?.version)}`); return; }
+    if (typeof auth.token !== 'string' || auth.token.length > 512) { reject('UNAUTHORIZED', 'Нужна серверная сессия.', 'no token'); return; }
     deps.sessions.verify(auth.token).then((check) => {
-      if (!check.ok) { next(new HandshakeError('UNAUTHORIZED', 'Сессия отсутствует или истекла.')); return; }
-      if (!deps.game.canAdmit(check.identity.accountId)) { next(new HandshakeError('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.')); return; }
+      if (!check.ok) { reject('UNAUTHORIZED', 'Сессия отсутствует или истекла.', 'session'); return; }
+      if (!deps.game.canAdmit(check.identity.accountId)) { reject('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.', 'full'); return; }
+      metrics.handshakes.inc({ result: 'ok' });
       socket.data.sessionKey = hashToken(auth.token as string);
       socket.data.identity = check.identity;
       socket.data.expiresAt = check.expiresAt;
+      socket.data.sessionId = check.sessionId;
       next();
-    }, () => next(new HandshakeError('UNAVAILABLE', 'Сервер временно недоступен.')));
+    }, (error: unknown) => { log.error('realtime.handshake.failed', 'Проверка сессии упала', { error }); reject('UNAVAILABLE', 'Сервер временно недоступен.', 'verify failed'); });
   });
 
-  const unsubscribe = deps.sessions.onRevoked?.((sessionKey) => {
-    for (const socket of nsp.sockets.values()) if (socket.data.sessionKey === sessionKey) {
-      socket.emit('game', { v: 3, type: 'error', requestId: SERVER_REQUEST_ID, code: 'UNAUTHORIZED', message: 'Сессия отозвана.' });
-      socket.disconnect(true);
-    }
-  });
-  nsp.on('connection', (socket) => { void new Connection(socket, deps, log).start(); });
+  nsp.on('connection', (socket) => new Connection(socket, deps, log, metrics).start());
 
-  return { close: () => new Promise<void>((resolve) => { unsubscribe?.(); void io.close(() => resolve()); }) };
+  return { close: () => new Promise<void>((resolve) => { void io.close(() => resolve()); }) };
 }
 
 class Connection implements Channel {
@@ -91,38 +110,63 @@ class Connection implements Channel {
   private invalidTimes: number[] = [];
   private expiry: TimerHandle | null = null;
   private closed = false;
+  private readonly metrics: GatewayMetrics;
+  /** Heartbeat RTT samples of the last minute (OBS-010). */
+  private rtt: { at: number; ms: number }[] = [];
+  private pingAt = 0;
+  private droppedInputs = 0;
+  private invalidPackets = 0;
 
-  constructor(socket: Socket, deps: GatewayDeps, log: Logger) {
-    this.socket = socket; this.deps = deps; this.log = log;
+  constructor(socket: Socket, deps: GatewayDeps, log: Logger, metrics: GatewayMetrics) {
+    this.socket = socket; this.deps = deps; this.metrics = metrics;
     this.id = socket.id; this.sessionKey = socket.data.sessionKey as string;
     this.identity = socket.data.identity as PlayerIdentity;
     this.expiresAt = socket.data.expiresAt as number;
     this.ip = socket.handshake.address;
+    this.log = log.child('realtime', { playerId: this.identity.playerId, connectionId: this.id });
     this.inputBucket = new TokenBucket(deps.clock, 30, 30);
     this.chatBucket = new TokenBucket(deps.clock, 1, 3);
   }
 
-  async start(): Promise<void> {
-    this.socket.on('disconnect', reason => this.onDisconnect(reason));
-    // Logout can race with the asynchronous handshake. Verify again before attaching a seat.
-    try {
-      const token = (this.socket.handshake.auth as { token: string }).token;
-      const check = await this.deps.sessions.verify(token);
-      if (this.closed) return;
-      if (!check.ok) { this.close('Сессия отозвана или истекла.'); return; }
-      if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
-      this.scheduleExpiry();
-      this.socket.on('game', (raw: unknown) => this.receive(raw));
-    } catch { this.fail('UNAVAILABLE', 'Сервер временно недоступен.'); }
+  start(): void {
+    this.log.info('realtime.connect', 'Соединение открыто', { ip: this.ip, sessionId: this.socket.data.sessionId as string | undefined });
+    // RTT without client code: time from the server's Engine.IO ping to the client's pong.
+    this.socket.conn.on('packetCreate', (packet: { type: string }) => { if (packet.type === 'ping') this.pingAt = performance.now(); });
+    this.socket.conn.on('packet', (packet: { type: string }) => {
+      if (packet.type !== 'pong' || !this.pingAt) return;
+      const now = this.deps.clock.now();
+      this.rtt = [...this.rtt.filter((sample) => now - sample.at < 60_000), { at: now, ms: performance.now() - this.pingAt }];
+      this.pingAt = 0;
+    });
+    if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
+    this.scheduleExpiry();
+    this.socket.on('game', (raw: unknown) => this.receive(raw));
+    this.socket.on('disconnect', (reason) => this.onDisconnect(reason));
   }
 
-  send(message: ServerMessage): void { if (!this.closed) this.socket.emit('game', message); }
+  send(message: ServerMessage): void { if (this.outgoing(message)) this.socket.emit('game', message); }
 
   /** Droppable packets (npc-partial) must not pile up in Socket.IO's offline buffer. */
-  private sendVolatile(message: ServerMessage): void { if (!this.closed) this.socket.volatile.emit('game', message); }
+  private sendVolatile(message: ServerMessage): void { if (this.outgoing(message)) this.socket.volatile.emit('game', message); }
+
+  private outgoing(message: ServerMessage): boolean {
+    if (this.closed) return false;
+    if (this.deps.validateOutgoing) {
+      try { parseServerMessage(message); }
+      catch { this.log.error('invariant.violated', 'Исходящий пакет не проходит общий контракт', { invariant: 'outgoing.valid', type: message.type }); return false; }
+    }
+    this.metrics.packetsOut.inc({ type: message.type });
+    return true;
+  }
+
+  rttMs(): number | null {
+    if (!this.rtt.length) return null;
+    const sorted = this.rtt.map((sample) => sample.ms).sort((a, b) => a - b);
+    return Math.round(sorted[Math.floor(sorted.length / 2)]!);
+  }
 
   close(reason: string): void {
-    if (!this.closed) this.log.info('Соединение закрыто сервером', { playerId: this.identity.playerId, ip: this.ip, reason });
+    if (!this.closed) this.log.info('realtime.closed_by_server', 'Соединение закрыто сервером', { ip: this.ip, reason });
     this.fail('UNAUTHORIZED', reason);
   }
 
@@ -140,7 +184,7 @@ class Connection implements Channel {
   }
 
   private onDisconnect(reason: string): void {
-    this.log.info('Игрок отключился', { playerId: this.identity.playerId, ip: this.ip, reason });
+    this.log.info('realtime.disconnect', 'Игрок отключился', { ip: this.ip, reason, droppedInputs: this.droppedInputs, invalidPackets: this.invalidPackets, rttMs: this.rttMs() });
     this.closed = true;
     if (this.expiry) this.deps.scheduler.clearTimeout(this.expiry);
     for (const stream of this.streams.values()) stream.stop();
@@ -159,12 +203,17 @@ class Connection implements Channel {
     try { message = parseClientMessage(raw); }
     catch (error) {
       const requestId = peekRequestId(raw) ?? SERVER_REQUEST_ID;
+      const type = raw && typeof raw === 'object' && typeof (raw as { type?: unknown }).type === 'string' ? String((raw as { type: string }).type).slice(0, 32) : 'unknown';
+      this.invalidPackets++;
+      this.metrics.invalid.inc({ reason: error instanceof ProtocolError ? error.code : 'crash' });
+      this.log.debug('realtime.packet.invalid', 'Пакет клиента отклонён', { type, requestId, code: error instanceof ProtocolError ? error.code : 'crash' });
       if (error instanceof ProtocolError && error.code === 'VERSION') { this.error(requestId, 'VERSION', error.message); this.closed = true; this.socket.disconnect(true); return; }
       this.error(requestId, 'INVALID', 'Некорректное сообщение игрового протокола.');
       this.countInvalid();
       return;
     }
-    if (this.usedRequestIds.has(message.requestId)) { this.error(message.requestId, 'INVALID', 'Повтор requestId.'); return; }
+    this.metrics.packetsIn.inc({ type: message.type });
+    if (this.usedRequestIds.has(message.requestId)) { this.log.debug('realtime.packet.invalid', 'Повтор requestId', { type: message.type, requestId: message.requestId, code: 'DUPLICATE' }); this.error(message.requestId, 'INVALID', 'Повтор requestId.'); return; }
     this.usedRequestIds.add(message.requestId);
     this.dispatch(message);
   }
@@ -173,7 +222,7 @@ class Connection implements Channel {
     const now = this.deps.clock.now();
     this.invalidTimes = this.invalidTimes.filter((time) => now - time < INVALID_WINDOW_MS);
     this.invalidTimes.push(now);
-    if (this.invalidTimes.length > INVALID_LIMIT) { this.log.warn('Слишком много неверных пакетов', { playerId: this.identity.playerId }); this.closed = true; this.socket.disconnect(true); }
+    if (this.invalidTimes.length > INVALID_LIMIT) { this.log.warn('realtime.packet.flood', 'Слишком много неверных пакетов, соединение закрыто', { ip: this.ip, invalid: this.invalidTimes.length }); this.closed = true; this.socket.disconnect(true); }
   }
 
   private dispatch(message: ClientMessage): void {
@@ -183,7 +232,7 @@ class Connection implements Channel {
         if (this.deps.sessions.state?.(this.identity).requiresAvatar) { this.error(message.requestId, 'FORBIDDEN', 'Сначала подтвердите облик персонажа.'); return; }
       } catch { this.error(message.requestId, 'UNAVAILABLE', 'Не удалось проверить облик. Повторите позже.'); return; }
       const result = game.join(this, message.mapId);
-      if (result.ok) { this.log.info('Вход в мир', { playerId: this.identity.playerId, mapId: message.mapId, ip: this.ip }); this.send(result.message(message.requestId)); }
+      if (result.ok) { this.log.info('realtime.join', 'Вход в мир', { mapId: message.mapId, ip: this.ip, requestId: message.requestId }); this.send(result.message(message.requestId)); }
       else if (result.reason === 'unknown-map') this.error(message.requestId, 'INVALID', 'Неизвестная карта.');
       else if (result.reason === 'already-joined') this.error(message.requestId, 'INVALID', 'Вход в мир уже выполнен.');
       return;
@@ -193,6 +242,7 @@ class Connection implements Channel {
     switch (message.type) {
       case 'input':
         if (this.inputBucket.take()) game.input(this, message.sequence, message.direction, message.preparedChunks, message.sprint, message.jumpId);
+        else { this.droppedInputs++; this.metrics.limited.inc({ type: 'input' }); }
         return;
       case 'resync': {
         const snapshot = game.resync(this);
@@ -208,7 +258,7 @@ class Connection implements Channel {
       case 'chat-send': {
         const text = message.text.trim();
         if (CONTROL.test(text)) { this.error(message.requestId, 'INVALID', 'Сообщение содержит недопустимые символы.'); return; }
-        if (!this.chatBucket.take()) { this.error(message.requestId, 'RATE_LIMIT', 'Слишком часто. Подождите немного.'); return; }
+        if (!this.chatBucket.take()) { this.metrics.limited.inc({ type: 'chat' }); this.log.debug('realtime.rate_limited', 'Чат слишком часто', { requestId: message.requestId }); this.error(message.requestId, 'RATE_LIMIT', 'Слишком часто. Подождите немного.'); return; }
         game.chat(this, message.requestId, text);
         return;
       }

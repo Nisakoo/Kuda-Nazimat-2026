@@ -3,7 +3,7 @@ import type { NetworkInterfaceInfo } from 'node:os';
 import { addressKind, connectionBlock, connectionInfo, firewallHint, isLoopback, lanAddresses } from '../src/common/network.ts';
 import { startApplication } from '../src/app/application.ts';
 import { createGame } from '../src/game/index.ts';
-import { silentLogger, type Logger } from '../src/common/logger.ts';
+import { memoryLogger, silentLogger } from '../src/common/logger.ts';
 import { defer, setup } from './harness.ts';
 import { createServer } from 'node:net';
 import { writeFile, rm } from 'node:fs/promises';
@@ -71,8 +71,7 @@ it.skipIf(!lan)('operator screen and status are 404 from a non-loopback address'
 });
 
 it('operator screen shows seats, presence and NPC state without secrets; logs carry IP but no tokens or texts (OFFLINE-010, 016)', async () => {
-  const lines: { message: string; fields?: Record<string, unknown> }[] = [];
-  const logger: Logger = { info: (message, fields) => lines.push({ message, ...(fields ? { fields } : {}) }), warn() {}, error() {}, child: () => logger };
+  const logger = memoryLogger(); const lines = logger.records;
   const { origin, guest, connect } = await setup({ disconnectGraceMs: 300 }, undefined, 'test', logger);
   const session = await guest('Аня'); const client = await connect(session.token);
   client.command('join', { mapId: 'test' }); const joined = await client.wait((p) => p.type === 'joined'); if (joined.type !== 'joined') throw new Error();
@@ -86,10 +85,10 @@ it('operator screen shows seats, presence and NPC state without secrets; logs ca
   await client.wait((p) => p.type === 'error' && p.code === 'UNAUTHORIZED');
   takeover.socket.disconnect();
   await expect.poll(async () => ((await (await fetch(`${origin}/api/operator/status`)).json()) as { players: { connected: boolean; releaseInMs: number | null }[] }).players[0]).toMatchObject({ connected: false });
-  await expect.poll(() => lines.some((l) => l.message === 'Место освобождено')).toBe(true);
+  await expect.poll(() => lines.some((l) => l.event === 'game.seat.release')).toBe(true);
   const text = JSON.stringify(lines);
-  expect(lines.find((l) => l.message === 'Вход в мир')?.fields).toMatchObject({ playerId: joined.playerId, mapId: 'test', ip: expect.stringMatching(/127\.0\.0\.1/) });
-  for (const message of ['Соединение закрыто сервером', 'Игрок отключился']) expect(lines.some((l) => l.message === message && typeof l.fields?.ip === 'string')).toBe(true);
+  expect(lines.find((l) => l.event === 'realtime.join')).toMatchObject({ playerId: joined.playerId, mapId: 'test', ip: expect.stringMatching(/127\.0\.0\.1/) });
+  for (const event of ['realtime.closed_by_server', 'realtime.disconnect']) expect(lines.some((l) => l.event === event && typeof l.ip === 'string' && l.playerId === joined.playerId)).toBe(true);
   expect(text).not.toContain(session.token); expect(text).not.toContain('секретный текст');
   const body = JSON.stringify(status); expect(body).not.toContain(session.token); expect(body).not.toContain('секретный текст');
 });

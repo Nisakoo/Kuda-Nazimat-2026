@@ -1,27 +1,37 @@
 import type { PlayerIdentity } from '../contracts.ts';
 
-/** Fixed scrypt-v1 parameters belong to the service, not to caller-controlled data. */
-export interface PasswordCredential {
-  readonly salt: string;
-  readonly passwordHash: string;
-}
-export interface AuthAccount {
+export interface AccountRecord {
   readonly identity: PlayerIdentity;
-  /** null identifies a legacy/demo guest, never a password account. */
-  readonly credential: PasswordCredential | null;
+  /** `scrypt$…` (AUTH-008) or null for a passwordless development/test account. */
+  readonly passwordHash: string | null;
+  readonly mustChangePassword: boolean;
+  readonly tempPasswordExpiresAt: number | null;
+  readonly lastLoginAt: number | null;
 }
 export interface AccountStore {
+  /** Passwordless login (AUTH-001 guest/dev): one name key — one account and player. */
   findOrCreate(name: string, nameKey: string, now: number): PlayerIdentity;
-  findByName(nameKey: string): AuthAccount | null;
-  /** Atomically inserts account, player with NULL avatar, and credential; null on occupied name. */
-  createPassword(name: string, nameKey: string, now: number, credential: PasswordCredential): PlayerIdentity | null;
-  /** True only for a password account whose persisted player avatar is NULL. */
-  requiresAvatar(accountId: string): boolean;
+  find(nameKey: string): AccountRecord | null;
+  /** Throws NameTakenError when the key exists. */
+  create(name: string, nameKey: string, passwordHash: string, now: number): PlayerIdentity;
+  setPassword(accountId: string, passwordHash: string, options: { mustChange: boolean; tempExpiresAt: number | null }, now: number): void;
+  list(now: number): readonly { name: string; hasPassword: boolean; mustChangePassword: boolean; activeSessions: number; lastLoginAt: number | null }[];
 }
-export interface StoredSession { readonly tokenHash: string; readonly accountId: string; readonly createdAt: number; readonly expiresAt: number }
+export class NameTakenError extends Error {}
+
+export interface StoredSession {
+  readonly tokenHash: string; readonly accountId: string; readonly createdAt: number; readonly expiresAt: number;
+  /** Public id for logs and the operator (AUTH-002); generated when omitted. */
+  readonly id?: string; readonly ip?: string;
+}
+export type RevokeReason = 'logout' | 'password-changed' | 'password-reset' | 'operator' | 'limit';
 export interface SessionStore {
   create(session: StoredSession): void;
-  find(tokenHash: string): { readonly identity: PlayerIdentity; readonly expiresAt: number } | null;
-  revoke(tokenHash: string): void;
+  find(tokenHash: string): { readonly identity: PlayerIdentity; readonly expiresAt: number; readonly sessionId: string; readonly revokedAt: number | null } | null;
+  /** Revokes the given session or every active session of an account; returns token hashes that were active. */
+  revoke(target: { tokenHash: string } | { accountId: string }, reason: RevokeReason, now: number): string[];
+  /** Keeps at most `max` active sessions of the account, revoking the oldest with reason `limit`. */
+  enforceLimit(accountId: string, max: number, now: number): string[];
+  /** Deletes sessions that expired or were revoked before `before`. */
   prune(before: number): void;
 }

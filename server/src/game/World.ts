@@ -35,6 +35,12 @@ interface Player {
   tool: ToolId | null;
 }
 export interface PlacedPlayer { readonly id: string; readonly name: string; readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
+/** OBS-003/005 hooks; the domain reports, the composition root logs. All optional. */
+export interface WorldObserver {
+  invariant?(name: string, fields: Record<string, unknown>): void;
+  recovered?(playerId: string, reason: string): void;
+  aoiTruncated?(playerId: string, candidates: number): void;
+}
 export type InteractionCheck = { readonly ok: true; readonly npc: NpcDefinition } | { readonly ok: false; readonly reason: 'not-found' | 'too-far' };
 
 /** Authoritative headless world: players, NPCs, movement and visibility. Time arrives as arguments. */
@@ -46,9 +52,12 @@ export class World {
   private readonly maps: ReadonlyMap<string, GameMap>;
   private readonly settings: WorldSettings;
 
-  constructor(maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[], settings: WorldSettings = DEFAULT_WORLD_SETTINGS) {
+  private readonly observer: WorldObserver;
+
+  constructor(maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[], settings: WorldSettings = DEFAULT_WORLD_SETTINGS, observer: WorldObserver = {}) {
     this.maps = maps;
     this.settings = settings;
+    this.observer = observer;
     this.npcs = new Map(npcs.map((npc) => [npc.id, npc]));
   }
 
@@ -128,7 +137,16 @@ export class World {
   private move(p: Player, dt: number, now: number): void {
     const stale = now - p.intentAt > this.settings.intentTimeoutMs;
     const previous = p.position;
+    const previousRecovery = p.motion.recoveryReason;
     p.motion = stepMotion(p.motion, { direction: stale ? ZERO : p.intent, sprint: !stale && p.sprint, jumpId: stale ? p.motion.jumpAck : p.jumpId }, dt, this.environment(p), this.settings.speed);
+    if (!finite(p.motion.position) || !Number.isFinite(p.motion.verticalVelocity)) {
+      // OBS-005: a non-finite body never reaches the AOI or SQLite; it returns to its last safe support.
+      this.observer.invariant?.('player.position.finite', { playerId: p.id, mapId: p.mapId });
+      const map = this.maps.get(p.mapId)!;
+      const safe = finite(p.motion.safePosition) ? p.motion.safePosition : map.spawn;
+      p.motion = { ...initialMotion(safe), stamina: Number.isFinite(p.motion.stamina) ? p.motion.stamina : MOVEMENT.staminaMax, jumpAck: p.motion.jumpAck };
+    }
+    if (p.motion.recoveryReason && p.motion.recoveryReason !== previousRecovery) this.observer.recovered?.(p.id, p.motion.recoveryReason);
     p.position = p.motion.position;
     const dx = p.position.x - previous.x; const dz = p.position.z - previous.z;
     const speed = p.motion.locomotion === 'sprint' ? MOVEMENT.sprintSpeed : this.settings.speed;
@@ -180,6 +198,7 @@ export class World {
     for (const p of this.players.values()) if (p.mapId === self.mapId && p !== self) consider(p.position, () => this.playerEntity(p));
     for (const npc of this.npcs.values()) if (npc.mapId === self.mapId) consider(npc.position, () => npcEntity(npc));
     near.sort((a, b) => a.distance - b.distance);
+    if (near.length > MAX_AOI - 1) this.observer.aoiTruncated?.(playerId, near.length + 1);
     return [this.playerEntity(self), ...near.slice(0, MAX_AOI - 1).map((item) => item.entity)];
   }
 
@@ -208,3 +227,5 @@ function npcEntity(npc: NpcDefinition): Entity {
     animationState: { name: 'idle' },
   };
 }
+
+const finite = (v: Vector3): boolean => Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z);
