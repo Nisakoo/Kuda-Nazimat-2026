@@ -76,6 +76,8 @@ export type WorldFileAccess = { readonly ok: true; readonly file: WorldFile } | 
 
 /** OFFLINE-010: who holds a seat, for the operator screen; no tokens, texts or positions. */
 export interface PlayerPresence {
+  /** Joins client reports (OBS-011) and history rows to the seat; not shown to players. */
+  readonly playerId: string;
   readonly name: string; readonly mapId: string | null; readonly connected: boolean; readonly releaseInMs: number | null;
   /** OBS-010: median Engine.IO heartbeat RTT of the last minute, reconnects in 10 min, seconds since the seat was taken. */
   readonly rttMs: number | null; readonly reconnects: number; readonly seatedSeconds: number;

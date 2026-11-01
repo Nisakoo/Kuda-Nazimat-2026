@@ -1,4 +1,3 @@
-import { timingSafeEqual } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { AUTH_STATUS, AuthError, type AuthService } from '../auth/AuthService.ts';
 import type { Logger, LogRecord } from '../common/logger.ts';
@@ -6,6 +5,8 @@ import type { MetricsRegistry } from '../common/metrics.ts';
 import { connectionInfo, isLoopback, lanAddresses } from '../common/network.ts';
 import type { GameRuntime } from '../contracts.ts';
 import type { Health } from '../obs/health.ts';
+import type { Overview } from '../obs/overview.ts';
+import { handleOperatorMetrics } from './operatorMetricsRoutes.ts';
 import { OPERATOR_PAGE } from './operatorPage.ts';
 import type { ContentAdmin } from '../content/ContentAdmin.ts';
 import { handleAdminContent } from './adminContentRoutes.ts';
@@ -18,10 +19,10 @@ export interface OperatorDeps {
   readonly health: () => Health;
   readonly warnings: () => readonly LogRecord[];
   readonly dump: (reason: string) => string | null;
-  /** OBS-008: bearer for `/metrics` from the network; null keeps it loopback-only. */
-  readonly monitoringToken: string | null;
   /** ADMIN-SRV: NPC, world, journal and account routes; absent in tests that do not need them. */
   readonly content?: ContentAdmin;
+  /** OBS-013/014 status groups and history series; absent in tests that do not need them. */
+  readonly overview?: Pick<Overview, 'status' | 'series'>;
 }
 
 const startedAt = Date.now();
@@ -32,18 +33,9 @@ export function trustedAction(req: IncomingMessage): boolean {
   const origins = ['localhost', '127.0.0.1', '[::1]'].map((host) => `http://${host}:${port}`);
   return req.headers['x-operator'] === '1' && origins.includes(req.headers.origin ?? '');
 }
-const sameToken = (given: string, expected: string): boolean => given.length === expected.length && timingSafeEqual(Buffer.from(given), Buffer.from(expected));
 
-/** OBS-008/010, OFFLINE-010, AUTH-010; `/metrics` and `/operator`, `/api/operator/*`. False when not ours. */
+/** OBS-008/010/014, OFFLINE-010, AUTH-010; `/operator` and `/api/operator/*`, loopback only. False when not ours. */
 export async function handleOperator(req: IncomingMessage, res: ServerResponse, path: string, deps: OperatorDeps, context: RequestContext): Promise<boolean> {
-  if (path === '/metrics') {
-    context.route = '/metrics';
-    const token = /^Bearer (\S+)$/.exec(req.headers.authorization ?? '')?.[1];
-    const allowed = isLoopback(req.socket.remoteAddress) || (deps.monitoringToken !== null && token !== undefined && sameToken(token, deps.monitoringToken));
-    if (!allowed || req.method !== 'GET') { res.writeHead(404); res.end(); return true; }
-    res.writeHead(200, { 'Content-Type': 'text/plain; version=0.0.4; charset=utf-8' }); res.end(deps.metrics.prometheus());
-    return true;
-  }
   if (path !== '/operator' && !path.startsWith('/api/operator/')) return false;
   context.route = path.startsWith('/api/operator/actions/') ? '/api/operator/actions' : path;
   if (!isLoopback(req.socket.remoteAddress)) { req.resume(); res.writeHead(404); res.end(); return true; }
@@ -61,10 +53,11 @@ export async function handleOperator(req: IncomingMessage, res: ServerResponse, 
       npc: deps.npcReady() ? 'ready' : 'unavailable', language: deps.languageReady() ? 'ready' : 'unavailable',
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
       warnings: deps.warnings().map((record) => ({ ts: record.ts, level: record.level, event: record.event, msg: record.msg })).reverse(),
+      ...deps.overview?.status(),
     });
     return true;
   }
-  if (req.method === 'GET' && path === '/api/operator/metrics') { json(res, 200, deps.metrics.snapshot()); return true; }
+  if (handleOperatorMetrics(req, res, path, deps)) return true;
   if (req.method === 'GET' && path === '/api/operator/accounts') { json(res, 200, { accounts: deps.auth.operator.list() }); return true; }
   if (req.method === 'POST' && path.startsWith('/api/operator/actions/')) {
     if (!trustedAction(req)) { req.resume(); deps.logger.warn('auth.operator.rejected', 'Действие ведущего без правильного Origin или X-Operator', { origin: req.headers.origin ?? null }); error(res, 403, 'FORBIDDEN', 'Действие доступно только со страницы ведущего.'); return true; }

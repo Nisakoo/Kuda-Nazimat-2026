@@ -1,0 +1,23 @@
+Запуск: load-profile · окружение: test
+Период (UTC): 2026-11-01 13:38:13 — 2026-11-01 13:39:14 · пик игроков: 4
+
+| Показатель | Значение | Порог | Итог |
+|---|---|---|---|
+| p95 шага сервера | 2 мс | ≤ 5 мс | ✅ в норме |
+| p95 интервала рассылки | 110 мс | ≤ 120 мс | ✅ в норме |
+| Ошибки сервера (error, fatal) | 0 | 0 | ✅ в норме |
+| p95 ping (RTT) | 5 мс | ≤ 150 мс | ✅ в норме |
+| Минимальный FPS клиента (видимые вкладки) | нет данных | ≥ 30 | — нет данных |
+| Доля таймаутов NPC | 0% | ≤ 25% | ✅ в норме |
+| Потерянные строки журнала | 0 | 0 | ✅ в норме |
+
+server/test/load-profile.ts:53
+  if (!steps.length || answers < 1 || timeouts < 1 || sorted.length < 100 || logs.length) throw new Error(`Profile incomplete: ${JSON.stringify(result)}`);
+                                                                                                ^
+
+Error: Profile incomplete: {"node":"v22.22.2","players":4,"durationMs":61000,"npcDelayMs":5000,"steps":[{"p50":0.226,"p95":1.28,"max":3.793,"broadcastP95":101.163,"broadcastMax":103.391,"players":4}],"broadcast":{"samples":609,"p95Ms":101.22262500000215,"maxMs":103.8248329999999},"deltas":2439,"answers":12,"unavailable":0,"errors":[],"warnings":{"auth.passwordless.enabled":1}}
+    at server/test/load-profile.ts:53:97
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at process.processTimers (node:internal/timers:518:9)
+
+Node.js v22.22.2

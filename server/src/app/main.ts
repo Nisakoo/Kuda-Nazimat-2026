@@ -51,7 +51,9 @@ try {
   const address = app.server.address();
   const port = address && typeof address !== 'string' ? address.port : config.port;
   process.stdout.write(`${connectionBlock(connectionInfo(config.host, port, lanAddresses()))}\n`);
-  shutdownOnSignals({ stop: async () => { try { await app.stop(); } finally { obs.close(); } } }, obs.logger);
+  shutdownOnSignals({ stop: async () => {
+    try { await app.stop(); process.stdout.write(`\nИтог запуска (OBS-017):\n${app.report()}`); } finally { obs.close(); }
+  } }, obs.logger);
 } catch (error) {
   obs.logger.fatal('app.start.failed', error instanceof Error ? error.message : 'Ошибка запуска', { error });
   obs.close();

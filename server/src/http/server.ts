@@ -16,12 +16,13 @@ import { BabylonError, type BabylonService } from '../babylon/BabylonService.ts'
 import { handleAuth } from './authRoutes.ts';
 import { handleOperator, type OperatorDeps } from './operatorRoutes.ts';
 import { telemetryHandler } from './telemetry.ts';
+import type { PerfReport } from '../obs/clientPerf.ts';
 import { bearer, body, clientIp, error, json, type RequestContext } from './util.ts';
 
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 const BABEL_STATUS = { INVALID: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, CONFLICT: 409, NOT_READY: 409, RATE_LIMIT: 429, UNAVAILABLE: 503 } as const;
 /** Routes logged at debug: high-volume polling and static files (OBS-012). */
-const QUIET = new Set(['/world/*', 'static', '/api/operator/status', '/metrics', '/api/babylon:state']);
+const QUIET = new Set(['/world/*', 'static', '/api/operator/status', '/api/operator/history', '/api/babylon:state']);
 
 export interface HttpDeps {
   avatars?: AvatarStore; equipment?: EquipmentStore;
@@ -30,7 +31,9 @@ export interface HttpDeps {
   npcReady(): boolean;
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
-  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump'> & Partial<Pick<OperatorDeps, 'content'>>;
+  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump' | 'overview'> & Partial<Pick<OperatorDeps, 'content'>>;
+  /** OBS-011 perf reports for the admin screen. */
+  readonly clientPerf?: (playerId: string, report: PerfReport) => void;
 }
 
 /** AUTH-014: per-session token buckets; the map is cleared when it grows past any realistic session count. */
@@ -53,10 +56,10 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   const limited = metrics.counter('http_rate_limited_total', 'HTTP-запросы, отклонённые лимитом сессии');
   const babylonLimit = sessionLimiter(deps.clock, 10, 20);
   const worldLimit = sessionLimiter(deps.clock, 50, 300);
-  const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger });
+  const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger, metrics, ...(deps.clientPerf ? { perf: deps.clientPerf } : {}) });
   const operator: OperatorDeps = {
     auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
-    npcReady: deps.npcReady, monitoringToken: config.monitoring.token,
+    npcReady: deps.npcReady,
     languageReady: () => true, health: () => ({ level: 'green', reasons: [] }), warnings: () => [], dump: () => null,
     ...deps.operator,
   };
