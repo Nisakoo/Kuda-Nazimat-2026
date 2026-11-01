@@ -32,7 +32,7 @@
     mapId: 'demo', mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
     performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
-    carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: .3, audioStats: 'Источники: 0 · Буферы: 0 · Загрузки: 0 · Память: 0 байт',
+    carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: .3, graphicsQuality: 'balanced', audioStats: 'Источники: 0 · Буферы: 0 · Загрузки: 0 · Память: 0 байт',
   });
   let avatarMounted = $state(false);
   let entryMounted = $state(false);
@@ -182,7 +182,7 @@
     <BabylonPanel {game} view={snapshot.babylon} panel={snapshot.babylonPanel === 'setup' || snapshot.avatarOpen ? null : snapshot.babylonPanel} target={snapshot.babylonTarget} wordSeed={snapshot.babylonWord} equipment={snapshot.equipment} avatarId={snapshot.avatar?.state?.avatarId ?? null}/>
   {/if}
 
-  {#if game && snapshot.settingsOpen}<div class="modal-backdrop"><Settings mode={snapshot.mode} config={game.config} error={snapshot.settingsError} volume={snapshot.volume} setVolume={(percent) => game.setVolume(percent)} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} {...(snapshot.mode === 'online' && !snapshot.authRequired && !snapshot.avatarOpen ? { appearance: () => game.openAvatar() } : {})} /></div>{/if}
+  {#if game && snapshot.settingsOpen}<div class="modal-backdrop"><Settings quality={snapshot.graphicsQuality} mode={snapshot.mode} config={game.config} error={snapshot.settingsError} volume={snapshot.volume} setVolume={(percent) => game.setVolume(percent)} apply={(...args) => game.applySettings(...args)} close={() => game.closeSettings()} {...(snapshot.mode === 'online' && !snapshot.authRequired && !snapshot.avatarOpen ? { appearance: () => game.openAvatar() } : {})} /></div>{/if}
 
 
 

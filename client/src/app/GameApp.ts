@@ -1,3 +1,5 @@
+import { isGraphicsQuality, type GraphicsQuality } from '../render/GraphicsQuality';
+import { readGraphicsQuality, rememberGraphicsQuality } from './graphicsPreference';
 import type { CameraView, RenderAdapter } from '../render/RenderAdapter';
 import { ThreeRenderer } from '../render/three/ThreeRenderer';
 import type { Entity, GameCommand, WorldEvent, WorldSnapshot } from '../core/types';
@@ -144,6 +146,7 @@ export interface AppSnapshot {
   readonly carryError: string | null;
   readonly heldItemId: string | null;
   readonly volume: number;
+  readonly graphicsQuality: GraphicsQuality;
   readonly audioStats: string;
 }
 
@@ -193,9 +196,11 @@ export class GameApp {
   private snapshot: AppSnapshot;
   private readonly listeners = new Set<(snapshot: AppSnapshot) => void>();
 
+  private graphicsQuality = readGraphicsQuality();
+
   constructor(
     public config: ClientConfig,
-    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false, this.config.mapId === 'market'),
+    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false, this.config.mapId === 'market', this.graphicsQuality),
     private readonly createSession: () => GameSession = () => this.config.mapId === 'market' ? new MarketSession() : new LocalSession('local-player', localEntities),
     private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
     private readonly createNetwork: (mock: boolean, url: string, clock: Clock) => NetworkAdapter = (mock, url, clock) => mock ? createMockDemo(clock) : new SocketIOAdapter(url, clock),
@@ -217,7 +222,7 @@ export class GameApp {
       mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
       performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
-      carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: this.audio.volume, audioStats: this.audioDiagnostics(),
+      carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: this.audio.volume, graphicsQuality: this.graphicsQuality, audioStats: this.audioDiagnostics(),
     });
   }
 
@@ -374,13 +379,14 @@ export class GameApp {
           },
           render: (alpha, elapsed) => {
             const began = this.snapshot.debug ? performance.now() : 0;
+            let submitted: boolean | void;
             if (this.session instanceof OnlineSession) {
               const presentation = this.session.getRenderState();
               this.renderer?.syncWorld(presentation.previous, presentation.current, this.session.playerId);
-              this.renderer?.render(elapsed, presentation.alpha);
-            } else this.renderer?.render(elapsed, alpha);
+              submitted = this.renderer?.render(elapsed, presentation.alpha);
+            } else submitted = this.renderer?.render(elapsed, alpha);
             this.updateVisualStatus();
-            if (this.snapshot.debug) this.updateMetrics(began);
+            if (this.snapshot.debug) this.updateMetrics(began, submitted !== false);
             if (this.snapshot.phase === 'stopped' && !(this.session instanceof OnlineSession) && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
           },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
@@ -554,8 +560,9 @@ export class GameApp {
     this.patch({ mapOpen: false, chatOpen: false, marketPanel: null, babylonPanel: this.snapshot.babylonPanel === 'setup' ? 'setup' : null, settingsOpen: true, settingsError: null });
   }
   closeSettings(): void { this.patch({ settingsOpen: false }); if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host); else this.returnFromOverlay(); }
-  applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean): boolean {
+  applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean, quality: GraphicsQuality = this.graphicsQuality): boolean {
     try {
+      if (!isGraphicsQuality(quality)) throw new Error('Неизвестное качество графики.');
       const config = parseConfig({ session: mode === 'local' ? 'local' : 'online', serverUrl, mapId, chunkRadius, debug }, window.location.origin);
       if ((mode === 'local' || mode === 'mock') && !['demo', 'science', 'market'].includes(mapId)) throw new Error('Для локальной прогулки доступны market, demo и science.');
       if (mode === 'mock' && mapId === 'market') throw new Error('Рынок пока доступен в локальной прогулке. Тестовая сеть использует demo или science.');
@@ -565,6 +572,8 @@ export class GameApp {
       this.entryPending = mode === 'online' && config.mapId === 'market';
       this.patch({ entryStage: this.serverSession && this.entryPending ? 'profile' : null, entryReveal: false });
       this.mock = mode === 'mock'; this.config = config;
+      this.graphicsQuality = quality; rememberGraphicsQuality(quality);
+      this.patch({ graphicsQuality: quality });
       try { rememberConnection(config.serverUrl, window.localStorage); } catch { /* Storage is optional; never persist authentication. */ }
       this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mapId: config.mapId, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
       if (this.host) this.restart(this.host);
@@ -768,13 +777,13 @@ export class GameApp {
     }
   }
 
-  private updateMetrics(began: number): void {
+  private updateMetrics(began: number, submitted: boolean): void {
     const now = performance.now();
-    this.frameMetrics.record(began, now - began);
+    this.frameMetrics.record(began, now - began, submitted);
     if (now - this.lastMetrics < 1000) return;
     this.lastMetrics = now;
     const stats = this.frameMetrics.stats; const render = this.renderer?.getDiagnostics(); const budget = this.worldBudget.stats;
-    this.patch({ performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms`,
+    this.patch({ performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms · Цикл ${stats.loopFps.toFixed(1)} FPS · GPU-пропуски ${stats.skipped}`,
       audioStats: this.audioDiagnostics(),
       renderStats: `Draw ${render?.drawCalls ?? 0} · Геометрии ${render?.geometries ?? 0} · Текстуры ${render?.textures ?? 0} · Ресурсы ${budget.resources} · Память ${budget.memory} / ${budget.memoryLimit} · Пик ${budget.peakBytes}` });
   }

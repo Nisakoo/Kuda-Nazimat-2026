@@ -1,0 +1,195 @@
+[WebServer] (node:94330) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:94349) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/graphics.spec.ts:13:1 › quality profiles persist, recreate antialiasing and cap only the 3D drawing buffer (16.5s)
+  ✘  2 e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session (19.0s)
+(node:94619) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 e2e/main-building.spec.ts:54:1 › default streaming loads the landmark while the player is still on the market (7.0s)
+  ✘  4 e2e/market.spec.ts:21:1 › default five-by-five streaming covers pasture and courtyard without idle request churn (31.2s)
+(node:94809) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 e2e/market.spec.ts:58:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats (9.2s)
+(node:94852) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  6 e2e/market.spec.ts:93:1 › client stone draft survives closing and vocabulary can be edited without moving the player (30.4s)
+(node:94909) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  7 e2e/world.spec.ts:6:1 › streams a nearby region, blocks a slow boundary and stays within its reserved budget (11.7s)
+(node:94958) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  8 e2e/world.spec.ts:39:1 › manifest failure leaves the loop responsive and an explicit retry prepares the world (3.2s)
+
+
+  1) e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('group', { name: 'Текущая область', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('group', { name: 'Текущая область', exact: true }) with timeout 5000ms
+      - waiting for getByRole('group', { name: 'Текущая область', exact: true })
+
+
+      28 |   await page.clock.runFor(300);
+      29 |   await walk(page, 'z', 9); await walk(page, 'x', -32); await walk(page, 'z', 10);
+    > 30 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+         |                                                                                   ^
+      31 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Двор Вавилонской башни');
+      32 |   await page.addStyleTag({ content: '.debug { visibility: hidden; }' });
+      33 |   await page.screenshot({ path: 'test-results/building-courtyard.png' });
+        at /private/tmp/competition-2026-render-perf/client/e2e/main-building.spec.ts:30:83
+
+    Error Context: test-results/main-building-building-cou-81bcc-eturn-preserves-the-session/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/main-building-building-cou-81bcc-eturn-preserves-the-session/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/main-building-building-cou-81bcc-eturn-preserves-the-session/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/market.spec.ts:21:1 › default five-by-five streaming covers pasture and courtyard without idle request churn
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('group', { name: 'Текущая область', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('group', { name: 'Текущая область', exact: true }) with timeout 5000ms
+      - waiting for getByRole('group', { name: 'Текущая область', exact: true })
+
+
+      41 |   await expect(page.getByLabel('Кеш мира')).toContainText('Отложено: 0');
+      42 |   await walk(page, 'z', -26);
+    > 43 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+         |                                                                                   ^
+      44 |   await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Пастбище у рынка');
+      45 |   await settle();
+      46 |   await walk(page, 'z', 9); await walk(page, 'x', -32);
+        at /private/tmp/competition-2026-render-perf/client/e2e/market.spec.ts:43:83
+
+    Error Context: test-results/market-default-five-by-fiv-64e4d--without-idle-request-churn/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/market-default-five-by-fiv-64e4d--without-idle-request-churn/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/market-default-five-by-fiv-64e4d--without-idle-request-churn/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) e2e/market.spec.ts:58:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('dialog', { name: 'Торговец фруктами', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('dialog', { name: 'Торговец фруктами', exact: true }) with timeout 5000ms
+      - waiting for getByRole('dialog', { name: 'Торговец фруктами', exact: true })
+
+
+      17 | }
+      18 | async function closeAndResume(page:Page) {await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Продолжить',exact:true}).click();await expectCapture(page,true);}
+    > 19 | async function interact(page:Page,name:string){await page.keyboard.press('e');await page.clock.runFor(100);await expect(page.getByRole('dialog',{name,exact:true})).toBeVisible();await expectCapture(page,false);}
+         |                                                                                                                                                                     ^
+      20 |
+      21 | test('default five-by-five streaming covers pasture and courtyard without idle request churn', async ({ page }) => {
+      22 |   test.setTimeout(120000);
+        at interact (/private/tmp/competition-2026-render-perf/client/e2e/market.spec.ts:19:165)
+        at /private/tmp/competition-2026-render-perf/client/e2e/market.spec.ts:71:3
+
+    Error Context: test-results/market-market-route-buys-g-23c6f-ure-and-finishes-four-goats/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/market-market-route-buys-g-23c6f-ure-and-finishes-four-goats/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/market-market-route-buys-g-23c6f-ure-and-finishes-four-goats/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) e2e/market.spec.ts:93:1 › client stone draft survives closing and vocabulary can be edited without moving the player
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Камень', exact: true })
+
+
+      94 |   await page.setViewportSize({width:640,height:480});
+      95 |   await page.goto('/');await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Начать прогулку'}).click();await page.keyboard.press('Escape');
+    > 96 |   await page.getByRole('button',{name:'Камень',exact:true}).click();const canvas=page.getByLabel('Камень для рисунка');await canvas.scrollIntoViewIfNeeded();const box=(await canvas.boundingBox())!;
+         |                                                             ^
+      97 |   await page.mouse.move(box.x+40,box.y+40);await page.mouse.down();await page.mouse.move(box.x+100,box.y+100,{steps:5});await page.mouse.up();
+      98 |   await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Камень',exact:true}).click();await expect(canvas.locator('polyline')).toHaveCount(1);
+      99 |   await page.getByRole('button',{name:'Высечь · 0/8',exact:true}).click();await expect(page.getByLabel('Высеченный камень 1')).toBeVisible();await expect(canvas.locator('polyline')).toHaveCount(0);
+        at /private/tmp/competition-2026-render-perf/client/e2e/market.spec.ts:96:61
+
+    Error Context: test-results/market-client-stone-draft--843e9-d-without-moving-the-player/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/market-client-stone-draft--843e9-d-without-moving-the-player/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/market-client-stone-draft--843e9-d-without-moving-the-player/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) e2e/world.spec.ts:6:1 › streams a nearby region, blocks a slow boundary and stays within its reserved budget
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Сады науки', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Сады науки', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Сады науки', exact: true })
+
+
+      28 |   await page.clock.runFor(1200);
+      29 |   await page.keyboard.up('s');
+    > 30 |   await expect(page.getByRole('button', { name: 'Сады науки', exact: true })).toBeVisible();
+         |                                                                               ^
+      31 |   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
+      32 |   const cache = await page.getByLabel('Кеш мира').textContent();
+      33 |   const [used, limit] = cache!.match(/^([\d]+) \/ ([\d]+)/)!.slice(1).map(Number);
+        at /private/tmp/competition-2026-render-perf/client/e2e/world.spec.ts:30:79
+
+    Error Context: test-results/world-streams-a-nearby-reg-1d727--within-its-reserved-budget/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/world-streams-a-nearby-reg-1d727--within-its-reserved-budget/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/world-streams-a-nearby-reg-1d727--within-its-reserved-budget/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5 failed
+    e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session
+    e2e/market.spec.ts:21:1 › default five-by-five streaming covers pasture and courtyard without idle request churn
+    e2e/market.spec.ts:58:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats
+    e2e/market.spec.ts:93:1 › client stone draft survives closing and vocabulary can be edited without moving the player
+    e2e/world.spec.ts:6:1 › streams a nearby region, blocks a slow boundary and stays within its reserved budget
+  3 passed (2.6m)

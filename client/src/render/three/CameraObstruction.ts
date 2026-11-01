@@ -20,6 +20,7 @@ export class CameraObstruction {
     this.right.set(direction.z,0,-direction.x).normalize();
     this.up.crossVectors(direction,this.right).normalize();
     let allowed = desired;
+    for (const obstacle of obstacles) this.geometry.prepare(obstacle, this.ray.params.Line.threshold);
     for (const [x,y] of PROBES) {
       this.origin.copy(target).addScaledVector(this.right,x*halfWidth).addScaledVector(this.up,y*halfHeight);
       this.ray.set(this.origin,direction); this.ray.near=.05; this.ray.far=desired+.15;

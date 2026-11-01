@@ -6,6 +6,8 @@ import type { AssetManager } from '../../map/AssetManager';
 import { abortError, AsyncLeaseCache } from '../../shared/AsyncLeaseCache';
 import type { Lease } from '../../shared/AsyncLeaseCache';
 import { AVATAR_WALK_MAX_PACE, avatarWalkPacing } from './AvatarWalkPace';
+import type { GraphicsQuality } from '../GraphicsQuality';
+import { configureShadows, freezeStaticTransforms } from './modelPresentation';
 
 interface Template { readonly scene: Object3D; readonly animations: AnimationClip[]; readonly sources: readonly Lease<ArrayBuffer>[] }
 export interface ModelInstance {
@@ -53,7 +55,7 @@ export class GltfLibrary {
   private readonly jobs = new Set<Job>();
   private readonly instances = new Set<ModelInstance>();
   private disposed = false;
-  constructor(private readonly assets: AssetManager) { this.cache = new AsyncLeaseCache((id, signal) => this.load(id, signal), disposeTemplate); }
+  constructor(private readonly assets: AssetManager, private readonly quality: GraphicsQuality = 'high', private readonly now: () => number = () => performance.now()) { this.cache = new AsyncLeaseCache((id, signal) => this.load(id, signal), disposeTemplate); }
   register(models: Readonly<Record<string, string>>): void {
     for (const [id, path] of Object.entries(models)) {
       const resolved = this.assets.resolve(path);
@@ -64,7 +66,7 @@ export class GltfLibrary {
   has(id: string): boolean { return this.paths.has(id); }
   get stats() { return { ...this.cache.stats, instances: this.instances.size, queued: this.jobs.size }; }
 
-  async instantiate(id: string, signal: AbortSignal): Promise<ModelInstance> {
+  async instantiate(id: string, signal: AbortSignal, staticTransforms = false): Promise<ModelInstance> {
     const lease = await this.cache.acquire(id, signal);
     if (this.disposed || signal.aborted) { lease.release(); throw abortError(); }
     return new Promise((resolve, reject) => {
@@ -74,7 +76,7 @@ export class GltfLibrary {
         run: () => {
           cleanup();
           if (this.disposed || signal.aborted) { lease.release(); reject(abortError()); return; }
-          try { resolve(this.makeInstance(lease)); } catch (error) { lease.release(); reject(error); }
+          try { resolve(this.makeInstance(lease, id, staticTransforms)); } catch (error) { lease.release(); reject(error); }
         },
       };
       this.jobs.add(job);
@@ -82,12 +84,21 @@ export class GltfLibrary {
     });
   }
 
-  flush(limit = 8): void { for (const job of [...this.jobs].slice(0, limit)) job.run(); }
+  flush(limit = 8, budgetMs = 2): void {
+    const started = this.now();
+    let count = 0;
+    // One indivisible clone may exceed the budget. Always make progress, then yield.
+    for (const job of this.jobs) {
+      if (count >= limit || (count > 0 && this.now() - started >= budgetMs)) break;
+      job.run(); count++;
+    }
+  }
 
-  private makeInstance(lease: Lease<Template>): ModelInstance {
+  private makeInstance(lease: Lease<Template>, id: string, staticTransforms: boolean): ModelInstance {
     const root = clone(lease.value.scene);
-    root.traverse(object => { if ('isMesh' in object) { object.castShadow = true; object.receiveShadow = true; } });
-    const mixer = new AnimationMixer(root);
+    configureShadows(root, this.quality, id);
+    if (staticTransforms) freezeStaticTransforms(root, lease.value.animations);
+    const mixer = lease.value.animations.some(clip => clip.tracks.length) ? new AnimationMixer(root) : null;
     const avatarWalk = avatarWalkPacing(root, lease.value.animations.find(clip => clip.name === 'walk')?.duration);
     let animation = '';
     const actions = new Map<string, { action: AnimationAction; weight: number; from: number }>();
@@ -97,7 +108,7 @@ export class GltfLibrary {
       root,
       ...(avatarWalk ? { walkPace: (speed: number) => avatarWalk.pace(speed) } : {}),
       animate: (name, delta, pace = 1) => {
-        if (disposed) return;
+        if (disposed || !mixer) return;
         const dt = Math.min(Math.max(delta, 0), 0.1);
         const clip = lease.value.animations.find(item => item.name === name)
           ?? lease.value.animations.find(item => item.name === 'idle');
@@ -131,8 +142,8 @@ export class GltfLibrary {
       dispose: () => {
         if (disposed) return;
         disposed = true;
-        mixer.stopAllAction();
-        mixer.uncacheRoot(root);
+        mixer?.stopAllAction();
+        mixer?.uncacheRoot(root);
         const skeletons = new Set<SkinnedMesh['skeleton']>();
         root.traverse((object) => { const mesh = object as SkinnedMesh; if (mesh.isSkinnedMesh) skeletons.add(mesh.skeleton); });
         for (const skeleton of skeletons) skeleton.dispose();

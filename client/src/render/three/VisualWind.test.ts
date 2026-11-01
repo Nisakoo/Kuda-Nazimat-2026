@@ -5,6 +5,14 @@ import { VisualWind } from './VisualWind';
 function fixture(){const root=new Group();const flexible=new Group();flexible.name='wind-leaf-0';flexible.position.set(2,4,3);flexible.rotation.x=.2;root.add(flexible);
  const masonry=new Group();masonry.name='wall';root.add(masonry);return {root,flexible,masonry};}
 describe('bounded visual wind',()=>{
+  it('throttles distant wind, catches up by shared time, and updates immediately when nearby',()=>{
+    const a=fixture(), b=fixture(), wind=new VisualWind(a.root), reference=new VisualWind(b.root);
+    wind.animate(1000,undefined,100); const angle=a.flexible.rotation.x;
+    wind.animate(1050,undefined,100); expect(a.flexible.rotation.x).toBe(angle);
+    wind.animate(1100,undefined,100); reference.animate(1100); expect(a.flexible.rotation.x).toBe(b.flexible.rotation.x);
+    wind.animate(1110); reference.animate(1110); expect(a.flexible.rotation.x).toBe(b.flexible.rotation.x);
+    wind.dispose(); reference.dispose();
+  });
   it('moves only named flexible pivots, remains moderate, and gives a late join the same phase',()=>{
     const a=fixture(),b=fixture();const first=new VisualWind(a.root),late=new VisualWind(b.root);
     first.animate(12345);late.animate(12345);expect(a.flexible.rotation.x).toBe(b.flexible.rotation.x);

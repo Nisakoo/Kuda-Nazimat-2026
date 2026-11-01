@@ -6,6 +6,7 @@ import { WindInstances } from './WindInstances';
 interface FlexiblePart { readonly node: Object3D; readonly x: number; readonly z: number; readonly phase: number; readonly kind: string }
 /** Named flexible pivots only. Masonry, collision geometry, characters and dynamic props never move. */
 export class VisualWind {
+  private lastTime: number | null = null;
   private readonly parts: FlexiblePart[]=[];
   private readonly traces: Line[]=[];
   private readonly geometry: BufferGeometry;
@@ -22,7 +23,9 @@ export class VisualWind {
     this.material=new LineBasicMaterial({color:'#eee0c3',transparent:true,opacity:0,depthWrite:false});
     for(let i=0;i<2;i++){const trace=new Line(this.geometry,this.material);trace.name=`wind-trace-${i}`;trace.visible=false;root.add(trace);this.traces.push(trace);}
   }
-  animate(timeMs: number, wind?: WorldLifeDefinition['wind']): void {
+  animate(timeMs: number, wind?: WorldLifeDefinition['wind'], intervalMs = 0): void {
+    if (this.lastTime !== null && timeMs >= this.lastTime && timeMs - this.lastTime < intervalMs) return;
+    this.lastTime = timeMs;
     const gust=schedulePhase(timeMs,wind?.schedule??{periodMs:67000,durationMs:3000,offsetMs:19000});
     const envelope=gust.active?Math.sin(Math.PI*gust.phase):0;
     const strength=Math.min(.8,Math.max(0,wind?.strength??.24))+Math.min(1,Math.max(0,wind?.gustStrength??.42))*envelope;
