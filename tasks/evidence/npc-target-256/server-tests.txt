@@ -1,0 +1,13 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-uv-local-ai
+
+
+ Test Files  48 passed (48)
+      Tests  724 passed (724)
+   Start at  17:47:35
+   Duration  39.70s (transform 758ms, setup 0ms, import 2.63s, tests 73.10s, environment 4ms)
