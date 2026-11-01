@@ -14,7 +14,7 @@ async function start() {
   await new Promise<void>((done, reject) => {
     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 15000);
     child.once('exit', code => { clearTimeout(timeout); reject(new Error(`Server exited ${code}: ${output}`)); });
-    const ready = (data: Buffer) => { output += data; if (output.includes('(app.ready)')) { clearTimeout(timeout); done(); } };
+    const ready = (data: Buffer) => { output += data; if ((output.includes('(app.ready)') || output.includes('ВАВИЛОН ЗАПУЩЕН'))) { clearTimeout(timeout); done(); } };
     child.stderr!.on('data', ready);
     child.stdout!.on('data', ready);
   });

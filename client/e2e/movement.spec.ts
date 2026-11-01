@@ -47,8 +47,12 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1024, height: 600
     const bounds = await ring.boundingBox(); expect(bounds!.width).toBe(56); expect(bounds!.height).toBe(56);
     expect(viewport.height / zoom - bounds!.y - bounds!.height).toBeGreaterThanOrEqual(22);
     const card = await page.locator('.stamina').boundingBox();
-    expect(card!.x + card!.width).toBeLessThanOrEqual(viewport.width / zoom - 10);
-    expect(card!.x + card!.width).toBeGreaterThanOrEqual(viewport.width / zoom - 20);
+    expect(card!.x + card!.width / 2).toBeCloseTo(viewport.width / zoom / 2, 0);
+    expect(await page.locator('.stamina').innerText()).toBe('');
+    for (const selector of ['.stamina', '.stamina-ring']) {
+      expect(await page.locator(selector).evaluate(e => getComputedStyle(e).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+      expect(await page.locator(selector).evaluate(e => getComputedStyle(e).backgroundImage)).toBe('none');
+    }
     expect(card!.y + card!.height).toBeLessThanOrEqual(viewport.height / zoom - 10);
     const overlap = await ring.evaluate(element => {
       const a = element.getBoundingClientRect();

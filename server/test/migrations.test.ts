@@ -96,7 +96,9 @@ it('repairs historical branch version collisions without dropping players, hands
     const path = join(directory, 'game.sqlite'); const old = new DatabaseSync(path);
     transaction(old, () => applyMigrations(old, loadMigrations().slice(0, 2), 1));
     old.exec("INSERT INTO accounts VALUES ('a', 'Old', 'old', 1); INSERT INTO players(id,account_id,updated_at) VALUES ('p','a',1)");
-    old.exec("ALTER TABLE players ADD COLUMN equipped_tool TEXT; UPDATE players SET equipped_tool='jug'; CREATE TABLE world_apples(id TEXT PRIMARY KEY); INSERT INTO world_apples VALUES ('apple-kept')");
+    old.exec("ALTER TABLE players ADD COLUMN equipped_tool TEXT; UPDATE players SET equipped_tool='jug'; ");
+    old.exec(loadMigrations()[7]!.sql);
+    old.exec("INSERT INTO world_apples(id,map_id,state,x,y,z) VALUES ('apple-kept','market','world',1,0,2)");
     for (let version = 3; version <= recordedVersion; version++) old.prepare('INSERT INTO schema_migrations VALUES (?,1)').run(version);
     old.close();
     const upgraded = openDatabase(path); const stores = sqliteStores(upgraded);

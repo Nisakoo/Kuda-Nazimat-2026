@@ -9,7 +9,7 @@ import { EntityVisuals } from './EntityVisuals';
 import { SceneAssets } from './SceneAssets';
 
 for (const id of ['lukas', 'nic', 'dan', 'ksu', 'fallback']) {
-  it.each([30, 60])(`${id} raises both arms in air and lowers them after landing at %i FPS`, async fps => {
+  it.each([30, 60])(`${id} carries at the wrist, raises both arms in air and lowers them after landing at %i FPS`, async fps => {
     const bytes = id === 'fallback' ? new ArrayBuffer(0) : await readFile(new URL(`../../../public/assets/models/avatars/${id}.glb`, import.meta.url)).then(file => file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength));
     const resources = new AssetManager({ resolve: path => path, load: async () => bytes });
     const library = new GltfLibrary(resources);
@@ -40,6 +40,14 @@ for (const id of ['lukas', 'nic', 'dan', 'ksu', 'fallback']) {
       };
       for (let i = 0; i < fps / 5; i++) advance('grounded');
       for (const arm of arms) expect(Math.abs(arm.rotation.x)).toBeLessThan(.2);
+      visuals.setHands(new Map([['player', 'apple-1']]), false);
+      for (let i = 0; i < fps / 5; i++) advance('grounded');
+      expect(held.visible).toBe(false);
+      const anchor = visuals.handAnchor('player'); expect(anchor).toBeDefined();
+      if (id !== 'fallback') {
+        expect(anchor?.name).toBe('wrist-right');
+        expect(scene.getObjectByName('elbow-right')!.rotation.x).toBeLessThan(-.8);
+      }
       for (const phase of ['rising', 'falling'] as const) {
         for (let i = 0; i < fps / 5; i++) advance(phase, true);
         for (const arm of arms) {
@@ -52,10 +60,12 @@ for (const id of ['lukas', 'nic', 'dan', 'ksu', 'fallback']) {
         expect(visuals.position('player')!.y).toBe(.4);
         expect(held.parent).toBe(joint); expect(held.position.toArray()).toEqual(heldOffset);
       }
+      visuals.setHands(new Map(), false);
       for (let i = 0; i < fps / 3; i++) advance('grounded', true);
       for (const arm of arms) expect(Math.abs(arm.rotation.x)).toBeLessThan(.6);
       for (let i = 0; i < fps / 2; i++) advance('grounded');
       for (const arm of arms) expect(Math.abs(arm.rotation.x)).toBeLessThan(.2);
+      expect(held.visible).toBe(true);
       expect(visuals.position('player')!.y).toBe(0);
     } finally { visuals.dispose(); assets.dispose(); library.dispose(); resources.dispose(); }
   });

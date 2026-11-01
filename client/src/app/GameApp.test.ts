@@ -190,7 +190,7 @@ describe('application lifecycle', () => {
       ? new Promise<Response>(resolve => { finish = resolve; })
       : Promise.resolve(new Response(JSON.stringify({ avatarId: null }))));
     vi.stubGlobal('fetch', fetcher);
-    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribeWorldLife: vi.fn(() => () => {}), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
     const factory = vi.fn(() => transport);
     app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory);
     const listener = vi.fn(); app.subscribe(listener); app.start(host);
@@ -209,7 +209,7 @@ describe('application lifecycle', () => {
       if (options.method === 'POST') { saveSignal = options.signal!; return new Promise<Response>(resolve => { finish = resolve; }); }
       return Promise.resolve(new Response(JSON.stringify({ avatarId: 'nic' })));
     }));
-    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribeWorldLife: vi.fn(() => () => {}), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
     app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, () => transport);
     const listener = vi.fn(); app.subscribe(listener); app.start(host);
     app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 }); app.openAvatar();
@@ -423,10 +423,11 @@ describe('application lifecycle', () => {
     const messages = vi.spyOn(WorldAudio.prototype, 'message').mockImplementation(() => {});
     let state: BabylonState = {
       v: 2, playerId: 'p1', backend: 'test', languages: ['ru', 'en'], profile: { native: 'ru', learning: 'en' }, introSeen: true,
-      party: null, availableParty: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
+      party: null, availableParty: null, partyPositions: [], taskTitle: '', taskTarget: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
       fed: [], stones: [], words: [], messages: [], replies: [{ id: 'old', npcId: 'fruit-seller', question: 'Old question', text: 'Old answer', language: 'en' }],
     };
     vi.stubGlobal('fetch', vi.fn(async (_url: unknown, options: RequestInit) => {
+      if (String(_url).endsWith('/api/avatar')) return new Response(JSON.stringify({ avatarId: 'dan' }));
       const request = JSON.parse(String(options.body)) as BabylonRequest;
       if (request.action.type === 'npc') state = { ...state, replies: [...state.replies, { id: 'new', npcId: request.action.targetId, question: request.action.text, text: 'New answer', language: 'en' }] };
       return new Response(JSON.stringify({ v: 2, requestId: request.requestId, state }));
@@ -440,6 +441,8 @@ describe('application lifecycle', () => {
       const ready = new Promise<void>(resolve => { loaded = resolve; });
       app.subscribe(snapshot => { if (snapshot.babylon?.state) loaded(); });
       app.start(host); await ready;
+      state = { ...state, party: { id: 'audio-party', size: 1, count: 1, role: 1, members: [{ id: 'p1', name: 'Audio', role: 1 }], started: true, completed: false, seconds: 0 } };
+      expect(await app.connectEntryGame(app.config.serverUrl)).toBe(true);
       const views = vi.fn(); app.subscribe(views);
       expect(messages.mock.calls.map(([event]) => event)).toEqual([
         expect.objectContaining({ id: 'babel-npc:old:question', origin: 'history' }),

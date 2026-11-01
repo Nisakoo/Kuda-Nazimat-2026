@@ -18,6 +18,7 @@
 
     {#if error}<p role="alert" class="capture-error">{error}</p>{/if}
     {#if appearance}<button class="secondary" type="button" onclick={appearance}>Изменить облик персонажа</button>{/if}
+    <label>Громкость <input aria-label="Громкость" type="range" min="0" max="100" step="1" value={Math.round(volume * 100)} oninput={(event) => setVolume(Number(event.currentTarget.value))} /> <output>{Math.round(volume * 100)}%</output></label>
     <details class="advanced-settings"><summary>Дополнительно</summary>
     <label>Режим <select aria-label="Режим сессии" bind:value={selected}><option value="local">Локальная прогулка</option><option value="mock">Тестовый сетевой режим</option><option value="online">Локальный сервер</option></select></label>
     {#if selected === 'mock'}<p class="small subtle">Проверка клиента без сервера: участник и ответы имитируются. Сохранений и адаптивного ИИ здесь нет.</p>{/if}
@@ -25,7 +26,6 @@
     <label>Адрес сервера <input aria-label="Адрес сервера" bind:value={server} type="url" required /></label>
     <label>Карта <input aria-label="Карта" bind:value={map} list="available-maps" maxlength="80" required /></label>
     <datalist id="available-maps"><option value="market">Рынок Вавилона</option><option value="demo">Площадь открытий</option><option value="science">Сады науки</option></datalist>
-    <label>Громкость <input aria-label="Громкость" type="range" min="0" max="100" step="1" value={Math.round(volume * 100)} oninput={(event) => setVolume(Number(event.currentTarget.value))} /> <output>{Math.round(volume * 100)}%</output></label>
     <label class="debug-toggle"><input type="checkbox" bind:checked={debug} /> Диагностика</label>
     </details>
     <div class="window-actions"><button class="secondary" type="button" onclick={close}>Отмена</button><button type="submit">Применить и открыть карту</button></div>

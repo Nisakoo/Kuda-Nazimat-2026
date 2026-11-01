@@ -71,7 +71,7 @@ function fixture(initial: BabylonState) {
     return Promise.resolve(packet.action.type === 'state' ? success(packet) : commandReply(packet));
   }));
   const transport: NetworkAdapter = {
-    state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false),
+    state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribeWorldLife: vi.fn(() => () => {}),
     subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn(),
   };
   const network = vi.fn(() => transport);

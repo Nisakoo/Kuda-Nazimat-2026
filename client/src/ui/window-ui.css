@@ -47,18 +47,14 @@ dialog.map-dialog .map-controls button { display: inline-flex; align-items: cent
 .capture-recovery p { max-width: 420px; margin: 0 0 12px; font-size: 14px; line-height: 1.5; }
 .capture-recovery > button { margin: 4px; }
 .game-screen .stamina {
-  left: auto; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); transform: none;
-  display: grid; grid-template-columns: 56px auto; grid-template-rows: auto auto; column-gap: 12px; row-gap: 3px;
-  align-items: center; justify-items: start; padding: 12px 16px; color: var(--ui-ink); max-width: calc(100vw - 32px);
+  position: fixed; left: 50%; right: auto; bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); display: block; padding: 0; border: 0; background: none; box-shadow: none;
+  pointer-events: none;
 }
-.game-screen .stamina-ring { grid-column: 1; grid-row: 1 / 3; background: transparent; }
-.game-screen .stamina-label { display: block; grid-column: 2; grid-row: 1 / 3; padding: 0; background: none; font-size: 13px; font-weight: 700; }
-.game-screen .stamina.blocked .stamina-label { grid-row: 1; align-self: end; }
-.game-screen .stamina-number { display: grid; font-size: 12px; }
-.game-screen .stamina-track { stroke: #d8ccb5; }
-.game-screen .stamina-arc { stroke: #087573; stroke-linecap: round; }
-.game-screen .stamina.low .stamina-arc { stroke: #9a5b16; }
-.game-screen .stamina-recovery { grid-column: 2; grid-row: 2; padding: 0; background: none; color: #875018; font-size: 11px; align-self: start; }
+.game-screen .stamina-ring { background: none; }
+.game-screen .stamina-track { stroke: #315e59; stroke-opacity: .35; }
+.game-screen .stamina-arc { stroke: #286c63; stroke-linecap: round; }
+.game-screen .stamina.low .stamina-arc { stroke: #9c6b35; }
 @media (max-width: 600px) {
   dialog.panel, dialog.dialog-panel, .game-screen dialog.panel, .game-screen dialog.dialog-panel { max-width: calc(100vw - 20px); max-height: calc(100svh - 20px); }
   dialog.babel-panel .babel-content { padding: 16px; }
@@ -68,6 +64,9 @@ dialog.map-dialog .map-controls button { display: inline-flex; align-items: cent
   dialog.babel-panel .babel-compose { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   dialog.babel-panel .babel-compose label { grid-column: 1 / -1; grid-row: 1; }
   dialog.babel-panel .resident-compose { grid-template-columns: minmax(0, 1fr); }
-  .game-screen .stamina { right: 12px; bottom: 12px; padding: 10px 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .game-screen .stamina-arc { transition: none; } }
+
+.hand-status { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left)); max-width: min(240px, calc(50vw - 58px)); padding: 8px 14px; text-align: center; pointer-events: none; font-size: 13px; }
+
+.debug > output { display: block; }

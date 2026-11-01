@@ -28,3 +28,4 @@ it('disposes late models after cancellation without resurrecting a chunk', async
   const rejected = expect(loading).rejects.toThrow(); chunks.dispose();
   finish({ root: new Group(), animate: vi.fn(), dispose }); await rejected;
   expect(dispose).toHaveBeenCalledOnce(); expect(scene.children).toHaveLength(0);
+});

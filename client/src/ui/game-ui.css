@@ -27,7 +27,6 @@ header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
 .hud-dock button:last-child { border: 0; }
 .hud-dock button:hover, .hud-dock .chosen { background: var(--ui-mint); }
 .hud-dock .chosen::after { content: ''; position: absolute; bottom: 0; left: 12%; right: 12%; height: 3px; background: var(--ui-teal); }
-.game-screen .stamina { bottom: 105px; }
 .game-screen .world-actions { margin-bottom: 180px; }
 .game-screen .modal-backdrop { background: none; backdrop-filter: none; }
 .game-screen dialog::backdrop { background: #513f2820; }
@@ -104,7 +103,6 @@ header { justify-content: flex-end; }
 .game-screen .hud-dock button { border-right: 0; border-radius: 6px; }
 .game-screen .hud-dock .chosen::after { display: none; }
 .game-screen .panel-top h2 { font-size: 25px; }
-.game-screen .stamina-label, .game-screen .stamina-number { display: none; }
 .advanced-settings { margin: 16px 0; }
 .advanced-settings summary { cursor: pointer; padding: 12px 0; color: var(--ui-teal); }
 .advanced-settings label { margin-top: 12px; }

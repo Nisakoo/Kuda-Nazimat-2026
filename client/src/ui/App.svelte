@@ -98,11 +98,14 @@
 
   {#if !error && snapshot.screen === 'playing'}
     <div class="hud-top"><aside class="location"><div class="task-chip parchment" aria-label="Текущее задание"><span>{profile ? snapshot.babylon?.state?.taskTitle : snapshot.market ? 'Козы пастуха' : snapshot.region}{#if profile || snapshot.market}<span class="task-count"> · {snapshot.babylon?.state?.fed.length ?? snapshot.market?.fed.length ?? 0} / 4</span>{/if}</span></div></aside>
-    {#if snapshot.debug}<div class="debug glass"><output aria-label="Положение игрока">{snapshot.coordinates}</output><p aria-label="Ресурсы оформления">{snapshot.modelStats}</p><p aria-label="Кеш мира">{snapshot.cacheStats}</p><p aria-label="Производительность">{snapshot.performance}</p><p aria-label="Ресурсы сцены">{snapshot.renderStats}</p></div>{/if}
+    {#if snapshot.debug}<div class="debug glass"><output aria-label="Область мира">{snapshot.region}</output><output aria-label="Состояние связи">{snapshot.networkStatus === 'connected' ? 'Подключён' : snapshot.networkStatus}</output><output aria-label="Положение игрока">{snapshot.coordinates}</output><p aria-label="Ресурсы оформления">{snapshot.modelStats}</p><p aria-label="Кеш мира">{snapshot.cacheStats}</p><p aria-label="Производительность">{snapshot.performance}</p><p aria-label="Ресурсы сцены">{snapshot.renderStats}</p><p aria-label="Звук">{snapshot.audioStats}</p></div>{/if}
     </div>
     {#if snapshot.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
     {#if snapshot.phase === 'running' && !snapshot.dialog && !snapshot.chatOpen && !snapshot.settingsOpen && !snapshot.marketPanel && !snapshot.babylonPanel && !snapshot.mapOpen && !snapshot.avatarOpen}
       {#if !snapshot.controlsHint && (snapshot.stamina < 100 || snapshot.sprintBlocked)}<Stamina value={snapshot.stamina} blocked={snapshot.sprintBlocked} />{/if}
+    {/if}
+    {#if !overlayOpen && snapshot.phase === 'running' && (snapshot.carryHint || snapshot.carryPending || snapshot.carryError || snapshot.heldItemId)}
+      <aside class="hand-status parchment" role="status" aria-label="Предмет в руке">{snapshot.carryError ?? (snapshot.carryPending ? 'Подождите…' : snapshot.heldItemId ? 'В руке яблоко' : snapshot.carryHint)}</aside>
     {/if}
     <div class="world-actions">
     {#if snapshot.nearby && !snapshot.dialog && snapshot.phase === 'running'}
@@ -111,7 +114,7 @@
     {#if snapshot.controlsHint && !overlayOpen && snapshot.phase === 'running'}
       <aside class="controls-hint parchment" aria-label="Управление">
         <h2>Управление</h2>
-        <dl><dt>W A S D / ↑ ← ↓ →</dt><dd>Движение</dd><dt>Мышь / колесо</dt><dd>Камера / приближение</dd><dt>Shift / Пробел</dt><dd>Бег / прыжок</dd><dt>E</dt><dd>Взаимодействие</dd><dt>Tab</dt><dd>Задачи</dd><dt>1</dt><dd>Чат</dd><dt>2</dt><dd>Словарь</dd><dt>3</dt><dd>Карта</dd><dt>4</dt><dd>Язык</dd><dt>Esc</dt><dd>Меню</dd></dl>
+        <dl><dt>W A S D / ↑ ← ↓ →</dt><dd>Движение</dd><dt>Мышь / колесо</dt><dd>Камера / приближение</dd><dt>Shift / Пробел</dt><dd>Бег / прыжок</dd><dt>E</dt><dd>Взаимодействие</dd><dt>F</dt><dd>Взять / положить предмет</dd><dt>Tab</dt><dd>Задачи</dd><dt>1</dt><dd>Чат</dd><dt>2</dt><dd>Словарь</dd><dt>3</dt><dd>Карта</dd><dt>4</dt><dd>Язык</dd><dt>Esc</dt><dd>Меню</dd></dl>
       </aside>
     {/if}
     {#if snapshot.visualError && snapshot.phase === 'running' && !snapshot.dialog}<p class="asset-warning glass" role="alert">{snapshot.visualError}</p>{/if}

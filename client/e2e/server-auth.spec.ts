@@ -18,7 +18,7 @@ async function startServer() {
     processHandle.once('exit', failed);
     const ready = (chunk: Buffer) => {
       output += String(chunk);
-      if (output.includes('(app.ready)')) { clearTimeout(timeout); processHandle.off('exit', failed); resolve(); }
+      if ((output.includes('(app.ready)') || output.includes('ВАВИЛОН ЗАПУЩЕН'))) { clearTimeout(timeout); processHandle.off('exit', failed); resolve(); }
     };
     processHandle.stderr!.on('data', ready);
     processHandle.stdout!.on('data', ready);

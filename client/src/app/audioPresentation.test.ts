@@ -5,7 +5,7 @@ import { babylonAudioChanges, babylonAudioHistory } from './audioPresentation';
 const chat = (authorId: string, id: string, status: ChatEntry['status'] = 'delivered'): ChatEntry => ({ id, authorId, authorName: authorId, text: 'Test', language: 'en', translated: true, status, createdAt: 0 });
 const state = (messages: readonly ChatEntry[] = [], replies: readonly NpcReply[] = []): BabylonState => ({
   v: 2, playerId: 'p1', backend: 'test', languages: ['ru', 'en'], profile: { native: 'ru', learning: 'en' }, introSeen: true,
-  party: null, availableParty: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
+  party: null, availableParty: null, partyPositions: [], taskTitle: '', taskTarget: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
   fed: [], stones: [], words: [], messages, replies,
 });
 

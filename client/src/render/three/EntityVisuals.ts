@@ -1,5 +1,5 @@
 import { Group } from 'three';
-import type { Scene } from 'three';
+import type { Scene, Object3D } from 'three';
 import type { Entity, EntityId, Transform, WorldSnapshot } from '../../core/types';
 import { DEMO_NPCS } from '../../shared/demo';
 import type { SceneAssets } from './SceneAssets';
@@ -51,7 +51,10 @@ export class EntityVisuals {
     }
     this.held = new Map(held);
   }
-  handAnchor(id: string): Group | undefined { return this.visuals.get(id)?.rig?.hand; }
+  handAnchor(id: string): Object3D | undefined {
+    const visual = this.visuals.get(id);
+    return visual?.model?.root.getObjectByName('wrist-right') ?? visual?.rig?.hand;
+  }
   constructor(private readonly scene: Scene, private readonly assets: SceneAssets, private readonly library?: GltfLibrary, private readonly report: (id: string, error: string | null) => void = () => {}, private readonly marketStyle = false) {}
   get ids(): readonly string[] { return [...this.visuals.keys()]; }
 
@@ -132,6 +135,20 @@ export class EntityVisuals {
         ? visual.model?.walkPace?.(speed) ?? Math.max(.2, visual.speed / 3)
         : 1;
       visual.model?.animate(name,dt,pace);
+      if (visual.held) visual.held.visible = !this.held.has(id);
+      // Apply the confirmed hand pose after the GLB mixer; airborne arms retain the jump clip.
+      if (visual.model && visual.airWeight < .5 && (this.held.has(id) || visual.handAction)) {
+        const shoulder = visual.model.root.getObjectByName('shoulder-right');
+        const elbow = visual.model.root.getObjectByName('elbow-right');
+        const progress = visual.handTime / .65;
+        const reach = visual.handAction ? Math.sin(Math.PI * progress) : 0;
+        const weight = visual.handAction === 'pickup' ? progress : visual.handAction === 'place' ? 1-progress : 1;
+        if (shoulder && elbow) {
+          shoulder.rotation.x += (-.28 - shoulder.rotation.x) * weight - reach * .5;
+          shoulder.rotation.z += (-.12 - shoulder.rotation.z) * weight;
+          elbow.rotation.x += (-.98 - elbow.rotation.x) * weight + reach * .7;
+        }
+      }
       visual.snap = false;
     }
   }

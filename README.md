@@ -220,3 +220,7 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 Новый маршрут через личный кабинет, IP/порт и анимированную загрузку описан в [HUB](specs/client-game-hub.md) и [LOAD](specs/client-world-entry.md). Реализация и результаты проверок: [TASK-050](tasks/050-profile-entry-flow.md).
 
 При обновлении старой dev-БД сервер сверяет не только номера миграций, но и поля профиля/персонажа. Отсутствующие поля добавляются без сброса данных. Перед ручными операциями с БД сохраните согласованную резервную копию (команда `npm --prefix server run backup -- /absolute/path/backup.sqlite`); удаление game.sqlite для исправления входа не требуется.
+
+Исправления паузы и компоновки окон: [TASK-061](tasks/061-window-polish.md); минимальный индикатор выносливости по центру: [TASK-063](tasks/063-stamina-center.md). Совместимость новых моделей/UI с переносом предметов, звуком и миграциями main проверяется в [TASK-062](tasks/062-ui-main-integration.md).
+
+Покрытие клиентских unit-тестов: `npm --prefix client run test:coverage` (V8; весь client/src, без тестов/генерированных данных). HTML: `client/coverage/index.html`. Измерение и границы: [TASK-064](tasks/064-client-test-coverage.md); Playwright в этот процент не включается.
