@@ -21,6 +21,7 @@ import { testLanguagePort } from '../src/babylon/TestLanguagePort.ts';
 import { createGenerationQueue } from '../src/npc/GenerationQueue.ts';
 import { systemClock, systemScheduler } from '../src/common/time.ts';
 import { silentLogger } from '../src/common/logger.ts';
+import { marketNpc } from './memory.ts';
 
 const fixtures = JSON.parse(readFileSync(new URL('../../shared/world-life/fixtures.json',import.meta.url),'utf8')) as {direction:string;valid:boolean;packet:unknown}[];
 export const sceneFixture = parseWorldLifeServerMessage(fixtures.find(f => f.direction === 'server' && f.valid && (f.packet as {type:string}).type === 'scene-state')!.packet) as SceneStateMessage;
@@ -82,7 +83,7 @@ it('atomic race has one winner; changed intent conflicts; lost reply and 5 resta
 
 it('all 4 actual BABEL roles can pick up and place without changing BABEL inventory',async()=>{
   const f=durable();const queue=createGenerationQueue({clock:systemClock,scheduler:systemScheduler,logger:silentLogger},{maxConcurrent:1,maxUnfinished:4,timeoutMs:1000});
-  let n=0;const babel=new BabylonService({store:sqliteBabylon(f.db),language:testLanguagePort,generate:queue.generate,now:Date.now,id:()=>`b${++n}`,location:()=>null});
+  let n=0;const babel=new BabylonService({store:sqliteBabylon(f.db),language:testLanguagePort,generate:queue.generate,now:Date.now,id:()=>`b${++n}`,location:()=>null,npc:marketNpc});
   for(const p of f.people)await babel.handle(p,{v:2,requestId:`enroll-${p.playerId}`,action:{type:'enroll',size:4,native:'ru',learning:'en'}},p.playerId);
   for(const [index,p] of f.people.entries()){
     expect(babel.state(p).party?.role).toBe(index+1);const before=copy(babel.state(p).inventory);
@@ -191,7 +192,7 @@ it('upgrades the pre-merge world-life v3 database, preserving held apples, recei
   for (let restart = 0; restart < 2; restart++) {
     const db = openDatabase(path, 20 + restart); dbs.push(db);
     expect(db.prepare('SELECT version, applied_at FROM schema_migrations ORDER BY version').all()).toEqual([
-      { version: 1, applied_at: 10 }, { version: 2, applied_at: 10 }, { version: 3, applied_at: 20 }, { version: 4, applied_at: 10 },
+      { version: 1, applied_at: 10 }, { version: 2, applied_at: 10 }, { version: 3, applied_at: 20 }, { version: 4, applied_at: 10 }, { version: 5, applied_at: 20 },
     ]);
     expect(db.prepare('SELECT password_hash FROM accounts').get()!.password_hash).toBeNull();
     expect(sqliteWorldLife(db).execute('p', 'test', pickup(), () => { throw new Error('Receipt must be replayed'); })).toEqual({ ...result, changed: false });
@@ -200,18 +201,18 @@ it('upgrades the pre-merge world-life v3 database, preserving held apples, recei
   }
 });
 
-it.each([2, 3])('migrates an actual v%i DB to v4 without losing account, position or NPC history; future/failed migration rolls back',(version)=>{
+it.each([2, 3])('migrates an actual v%i DB to the latest version without losing account, position or NPC history; future/failed migration rolls back',(version)=>{
   const dir=mkdtempSync(join(tmpdir(),'life-v2-'));dirs.push(dir);const path=join(dir,'old.sqlite');const old=new DatabaseSync(path);dbs.push(old);
   old.exec('PRAGMA foreign_keys=ON');transaction(old,()=>applyMigrations(old,loadMigrations().slice(0,version),1));
   const p={accountId:'old-account',playerId:'old-player',displayName:'Old'};
   old.exec("INSERT INTO accounts(id,name,name_key,created_at) VALUES('old-account','Old','old',1); INSERT INTO players(id,account_id,map_id,x,y,z,rotation_y,updated_at) VALUES('old-player','old-account','test',2,0,3,1,1); INSERT INTO npc_dialogue(player_id,npc_id,question,answer,created_at) VALUES('old-player','npc','Q','A',2)");
   if (version === 3) old.prepare('UPDATE accounts SET password_hash = ? WHERE id = ?').run('preserved-password-hash',p.accountId);
   old.close();
-  const upgraded=openDatabase(path);dbs.push(upgraded);expect(upgraded.prepare('SELECT max(version) AS v FROM schema_migrations').get()!.v).toBe(4);
+  const upgraded=openDatabase(path);dbs.push(upgraded);expect(upgraded.prepare('SELECT max(version) AS v FROM schema_migrations').get()!.v).toBe(loadMigrations().length);
   if (version === 3) expect(upgraded.prepare('SELECT password_hash FROM accounts WHERE id = ?').get(p.accountId)!.password_hash).toBe('preserved-password-hash');
   expect(upgraded.prepare('SELECT count(*) AS n FROM world_apples').get()!.n).toBe(0);
   const restored=sqliteStores(upgraded);expect(restored.accounts.findOrCreate('Old','old',3)).toEqual(p);expect(restored.players.load(p.playerId)?.position).toEqual(pos(2,3));expect(restored.dialogue.history(p.playerId,'npc')).toEqual([{question:'Q',answer:'A'}]);
   expect(()=>transaction(upgraded,()=>applyMigrations(upgraded,[...loadMigrations(),{version:5,sql:'CREATE TABLE transient(id INTEGER); INSERT INTO missing VALUES(1)'}],4))).toThrow();
   expect(upgraded.prepare("SELECT name FROM sqlite_master WHERE name='transient'").get()).toBeUndefined();
-  upgraded.prepare('INSERT INTO schema_migrations VALUES(5,4)').run();upgraded.close();expect(()=>openDatabase(path)).toThrow('Не удалось открыть БД');
+  upgraded.prepare('INSERT INTO schema_migrations VALUES(?,4)').run(loadMigrations().length + 1);upgraded.close();expect(()=>openDatabase(path)).toThrow('Не удалось открыть БД');
 });

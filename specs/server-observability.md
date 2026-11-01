@@ -12,6 +12,8 @@ related:
   - server-realtime.md
   - server-npc-dialogue.md
   - server-persistence.md
+  - server-admin.md
+  - server-npc-content.md
 ---
 
 # OBS — Наблюдаемость сервера
@@ -85,6 +87,56 @@ related:
   Ни один из эндпоинтов не содержит данных OBS-006 и имён игроков.
 - **OBS-009 (необязательный стек разработчика):** в репозитории `ops/monitoring/` — конфигурация Prometheus (scrape `/metrics` раз в 5 с, хранение 7 дней) и Grafana с готовым дашбордом: шаг и рассылка, игроки и соединения, RTT, NPC (очередь, исходы, время до первого текста), HTTP, вход, БД, процесс; плюс инструкция установки, пока есть интернет. Стек запускается вручную на сервере или на ноутбуке разработчика в той же сети и не входит в `make start`: игра и экран ведущего работают без него. Ожидаемая цена на сервере — около 300 МБ RAM, это учитывается рядом с бюджетом LLM. Логи стек не собирает: разбор — по файлам JSONL (`jq`, любой просмотрщик).
 
+- **OBS-013 (каталог метрик):** полный перечень метрик сервера с типом и метками. Метки — только небольшие фиксированные наборы (маршрут, тип пакета, исход, причина); идентификаторы игроков, NPC, сессий и тексты в метки не попадают — значения по игрокам есть только в JSON панелей (ADMIN-006, OBS-010). «Есть» — уже собирается, «новая» — добавляется вместе с [ADMIN](server-admin.md)/[CONTENT](server-npc-content.md).
+
+  | Группа | Метрика | Тип и метки | Статус |
+  |---|---|---|---|
+  | Процесс | `process_uptime_seconds`, `process_resident_memory_bytes`, `process_heap_used_bytes` | gauge | есть |
+  | | `process_event_loop_delay_ms` | histogram (p99 за минуту) | есть |
+  | | `log_dropped_total` | counter | есть |
+  | | `log_events_total` | counter `{level, module}` — все события `warn`, `error`, `fatal` | новая |
+  | | `invariant_violations_total` | counter `{invariant}` | новая |
+  | | `obs_incident_dumps_total` | counter `{reason}` (`error`, `operator`, `admin`, `fatal`) | новая |
+  | Игра | `game_tick_duration_ms`, `game_broadcast_interval_ms` | histogram | есть |
+  | | `game_players` | gauge `{state: connected\|grace}` | есть |
+  | | `game_seat_events_total` | counter `{event: attach\|detach\|release\|takeover}` | есть |
+  | | `game_spawn_fallback_total`, `game_motion_recovered_total{reason}` | counter | есть |
+  | | `game_delta_bytes` | histogram | есть |
+  | | `game_packets_out_total` | counter `{type}` | есть |
+  | | `game_aoi_entities` | histogram — сущностей в AOI при рассылке | новая |
+  | | `game_npcs` | gauge `{state: active\|disabled\|deleted}` | новая |
+  | Realtime | `realtime_connections` | gauge | есть |
+  | | `realtime_handshakes_total` | counter `{result}` | есть |
+  | | `realtime_packets_in_total`, `realtime_packets_out_total` | counter `{type}` | есть |
+  | | `realtime_invalid_packets_total` | counter `{reason}` | есть |
+  | | `realtime_rate_limited_total` | counter `{type}` | есть |
+  | | `realtime_rtt_ms` | histogram — RTT heartbeat всех соединений | новая |
+  | Клиенты | `client_fps`, `client_frame_ms`, `client_draw_calls` | histogram — из отчётов `perf` (OBS-014) | новая |
+  | | `client_reports_total` | counter `{kind, result: accepted\|rejected\|limited}` | новая |
+  | NPC и язык | `npc_queue` | gauge `{state: queued\|running}` | есть |
+  | | `npc_requests_total` | counter `{kind, outcome}` | есть |
+  | | `npc_queue_wait_ms`, `npc_generation_ms` | histogram `{kind}` | есть |
+  | | `npc_first_partial_ms` | histogram | есть |
+  | | `npc_stuck_slots_total` | counter | есть |
+  | | `babylon_language_ms` | histogram `{kind, success}` | есть |
+  | | `npc_responder_ready`, `language_ready` | gauge 0/1 | новая |
+  | HTTP | `http_requests_total` | counter `{route, status}` | есть |
+  | | `http_request_ms` | histogram `{route}` | есть |
+  | | `http_world_bytes_total`, `http_rate_limited_total{route}` | counter | есть |
+  | Вход | `auth_attempts_total` | counter `{method, outcome}` | есть |
+  | | `auth_sessions_revoked_total` | counter `{reason}` | есть |
+  | | `auth_locks_total` | counter | есть |
+  | | `auth_sessions_active` | gauge `{scope: game\|admin}` | новая |
+  | БД | `db_operation_ms` | histogram `{operation}` | есть |
+  | | `db_errors_total` | counter `{operation}` | есть |
+  | | `db_size_bytes` | gauge | есть |
+  | | `disk_free_bytes` | gauge — каталог БД | новая |
+  | Админка | `admin_actions_total` | counter `{action, result}` | новая |
+  | | `content_npc_changes_total` | counter `{action}` | новая |
+
+  Дашборд OBS-009 и панель ADMIN-005 строятся из этого перечня; новая метрика добавляется в таблицу вместе с кодом.
+- **OBS-014 (FPS и производительность клиентов):** сервер хранит в памяти последний принятый отчёт `perf` (OBS-011) каждого игрока: FPS, время кадра, draw calls, карту и время приёма — и отдаёт его в данных экрана ведущего и панели администратора. Отчёт старше 30 с считается отсутствующим. Значения также попадают в гистограммы `client_*` (OBS-013). Отчёт привязан к игроку его сессии; данные другого игрока он изменить не может. Клиенту рекомендуется отправлять `perf` раз в 10 с (лимит — 10 отчётов в минуту, OBS-011).
+
 ### Экран ведущего и клиент
 
 - **OBS-010 (экран ведущего, расширение OFFLINE-010):** `/operator` дополнительно показывает:
@@ -107,6 +159,7 @@ related:
 - **S6 · OBS-007–008:** Given сервер с игроками; When запрошен `/metrics` с loopback, из сети без токена и из сети с `monitoring.token`; Then 200, 404, 200; метрики шага, игроков и NPC присутствуют в формате Prometheus.
 - **S7 · OBS-010:** Given NPC-ответчик не стартовал и у игрока три переподключения; When ведущий открывает `/operator`; Then состояние жёлтое с причинами «NPC недоступны» и «нестабильная связь у игрока …», у игроков видны RTT. When ведущий нажимает «Сохранить отчёт»; Then появляется файл дампа.
 - **S8 · OBS-011:** Given клиент отправляет 12 отчётов об ошибке за минуту; Then первые 10 — 204 и записаны как `client.error`, остальные — 429; отчёт с лишним полем — 400.
+- **S10 · OBS-013–014:** Given клиент отправил `perf` с FPS 55, а второй игрок — ничего; When запрошены `/metrics` и данные панели; Then `client_fps` содержит наблюдение, у первого игрока в панели FPS 55 и возраст отчёта, у второго — нет данных; через 30 с без отчётов у первого тоже «нет данных». Метки метрик не содержат playerId.
 - **S9 · OBS-012:** Given профиль REALTIME S7 с наблюдаемостью и без; Then разница p95 шага ≤ 0,5 мс, `log.dropped` нет.
 
 ## Ограничения и вне scope

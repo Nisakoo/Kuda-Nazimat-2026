@@ -29,7 +29,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   if (life.catalogue().length && !deps.worldLife) throw new Error('World-life requires a durable store');
   life.setApples(deps.worldLife?.initialize(life.catalogue()) ?? []);
   life.validateSnapshots(deps.clock.now());
-  const world = new World(loaded.maps, loaded.npcs, { ...DEFAULT_WORLD_SETTINGS, aoiRadius: config.aoiRadius }, {
+  const world = new World(loaded.maps, deps.npcSource?.(loaded.maps, loaded.npcs) ?? loaded.npcs, { ...DEFAULT_WORLD_SETTINGS, aoiRadius: config.aoiRadius }, {
     invariant: (name, fields) => log.error('invariant.violated', 'Нарушен инвариант мира', { invariant: name, ...fields }),
     recovered: (playerId, reason) => { recoveries.inc({ reason }); log.warn('game.motion.recovered', 'Движение восстановлено после застревания', { playerId, reason }); },
     aoiTruncated: (playerId, candidates) => log.warn('game.aoi.truncated', 'AOI усечена до 256 сущностей', { playerId, candidates }),

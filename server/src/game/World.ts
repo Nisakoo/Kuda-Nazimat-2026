@@ -1,7 +1,7 @@
 import type { Direction, Entity, Vector3 } from '../../../shared/world/types.ts';
 import type { GameMap } from '../world/GameMap.ts';
 import type { WorldLife } from './WorldLife.ts';
-import type { NpcDefinition } from '../world/npcContent.ts';
+import type { NpcDefinition, NpcSource } from '../world/npcContent.ts';
 import { MOVEMENT, initialMotion, motionStatus, recoverMotion, stepMotion } from '../../../shared/movement/simulation.ts';
 import type { MotionState, MovementEnvironment } from '../../../shared/movement/simulation.ts';
 
@@ -44,7 +44,7 @@ export type InteractionCheck = { readonly ok: true; readonly npc: NpcDefinition 
 export class World {
   private readonly players = new Map<string, Player>();
   private readonly resting = new Map<string, Pick<MotionState, 'stamina' | 'recoveryWait' | 'sprintBlocked' | 'releasedAfterExhaustion'>>();
-  private readonly npcs: ReadonlyMap<string, NpcDefinition>;
+  private readonly npcs: NpcSource;
   private ticks = 0;
   private readonly maps: ReadonlyMap<string, GameMap>;
   private readonly settings: WorldSettings;
@@ -52,12 +52,13 @@ export class World {
 
   private readonly observer: WorldObserver;
 
-  constructor(maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[], settings: WorldSettings = DEFAULT_WORLD_SETTINGS, observer: WorldObserver = {}, life?: WorldLife) {
+  constructor(maps: ReadonlyMap<string, GameMap>, npcs: readonly NpcDefinition[] | NpcSource, settings: WorldSettings = DEFAULT_WORLD_SETTINGS, observer: WorldObserver = {}, life?: WorldLife) {
     this.life = life;
     this.maps = maps;
     this.settings = settings;
     this.observer = observer;
-    this.npcs = new Map(npcs.map((npc) => [npc.id, npc]));
+    if (Array.isArray(npcs)) { const byId = new Map(npcs.map((npc) => [npc.id, npc])); this.npcs = { active: () => npcs, get: (id) => byId.get(id) }; }
+    else this.npcs = npcs as NpcSource;
   }
 
   get tick(): number { return this.ticks; }
@@ -200,7 +201,7 @@ export class World {
       if (distance <= this.settings.aoiRadius) near.push({ distance, entity: entity() });
     };
     for (const p of this.players.values()) if (p.mapId === self.mapId && p !== self) consider(p.position, () => this.playerEntity(p));
-    for (const npc of this.npcs.values()) if (npc.mapId === self.mapId) consider(npc.position, () => npcEntity(npc));
+    for (const npc of this.npcs.active()) if (npc.mapId === self.mapId) consider(npc.position, () => npcEntity(npc));
     near.sort((a, b) => a.distance - b.distance);
     if (near.length > MAX_AOI - 1) this.observer.aoiTruncated?.(playerId, near.length + 1);
     return [this.playerEntity(self), ...near.slice(0, MAX_AOI - 1).map((item) => item.entity)];

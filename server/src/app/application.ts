@@ -6,7 +6,10 @@ import type { Logger, LogRecord } from '../common/logger.ts';
 import { MS_BUCKETS, MetricsRegistry } from '../common/metrics.ts';
 import { systemClock, systemScheduler } from '../common/time.ts';
 import { openDatabase, sqliteStores, type DatabaseObserver } from '../persistence/database.ts';
-import { BabylonService } from '../babylon/BabylonService.ts';
+import { BabylonService, babylonNpc } from '../babylon/BabylonService.ts';
+import { BABEL_NPC_IDS } from '../babylon/content.ts';
+import { NpcCatalog } from '../content/NpcCatalog.ts';
+import { sqliteNpcStore } from '../persistence/npcContent.ts';
 import { createLanguagePort, unavailableLanguagePort } from '../babylon/adapters.ts';
 import type { LanguagePort } from '../babylon/ports.ts';
 import { sqliteBabylon } from '../persistence/babylon.ts';
@@ -87,16 +90,23 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     language = languagePort ?? createLanguagePort(config.language.adapter, config.language.options);
     try { await language.start(); languageReady = true; logger.child('language').info('language.ready', 'Переводчик готов', { mode: language.mode, languages: language.languages }); }
     catch (error) { logger.child('language').error('language.unavailable', 'LanguagePort недоступен', { error }); language = unavailableLanguagePort(language); }
+    // CONTENT: one live catalogue for the world, NPC dialogue and BABEL; seeded from npcs.json once the maps are loaded.
+    let catalog: NpcCatalog | undefined;
     const babylonLog = logger.child('babylon');
     const babylon = new BabylonService({
-      store: sqliteBabylon(db), language, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null,
+      store: sqliteBabylon(db), language, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, npc: id => babylonNpc(catalog?.get(id)),
       measure: (kind, durationMs, success) => {
         languageTime.observe(durationMs, { kind, success: String(success) });
         if (success) babylonLog.debug('babylon.language', 'Языковая операция BABEL', { kind, durationMs });
         else babylonLog.warn('babylon.translation.failed', 'Языковая операция BABEL не выполнена', { kind, durationMs });
       },
     });
-    game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing });
+    game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing,
+      npcSource: (maps, seed) => {
+        catalog = new NpcCatalog({ store: sqliteNpcStore(db), maps: (mapId) => maps.get(mapId), clock: systemClock, babelRequired: BABEL_NPC_IDS, mapFiguresFromServer: config.content.mapFiguresFromServer, logger: logger.child('content'), metrics });
+        catalog.seed(seed);
+        return catalog;
+      } });
     const runtime = game;
     auth.onRevoked((hashes, reason) => runtime.closeSessions(hashes, REVOKE_MESSAGES[reason]));
     const npcService = npc;

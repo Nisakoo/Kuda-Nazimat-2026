@@ -1,5 +1,4 @@
 import type { ItemId, Language } from '../../../shared/babylon/types.ts';
-import type { NpcProfile } from '../contracts.ts';
 export const ITEMS: Readonly<Record<ItemId, string>> = { dates: 'fruit-seller', 'red-fruit': 'fruit-seller', 'yellow-fruit': 'fruit-seller', water: 'potter', fabric: 'fabric-seller' };
 export const GOATS = [
   { id: 'white-goat', food: 'dates', x: -5, z: -31 },
@@ -7,12 +6,8 @@ export const GOATS = [
   { id: 'spotted-goat', food: 'yellow-fruit', x: -4, z: -37 },
   { id: 'kid-goat', food: 'water', x: 4, z: -37 },
 ] as const;
-export const NPCS: Readonly<Record<string, NpcProfile & { x: number; z: number }>> = {
-  'fruit-seller': { id: 'fruit-seller', name: 'Торговец фруктами', topic: 'Финики и фрукты', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Добро пожаловать!', x: -4.5, z: .5 },
-  'fabric-seller': { id: 'fabric-seller', name: 'Торговка тканями', topic: 'Ткани и узоры', persona: 'Жительница древнего Вавилона, учебная реконструкция', greeting: 'Рассмотри ткани.', x: -3, z: -5.2 },
-  potter: { id: 'potter', name: 'Гончар', topic: 'Глиняная посуда и вода', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Здесь есть вода в кувшине.', x: 4.6, z: -.5 },
-  shepherd: { id: 'shepherd', name: 'Пастух', topic: 'Козы', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Помоги накормить коз.', x: -3, z: -26 },
-};
+/** CONTENT-009: NPCs the task cannot work without — merchants of the items and the shepherd's list. */
+export const BABEL_NPC_IDS: ReadonlySet<string> = new Set([...Object.values(ITEMS), 'shepherd']);
 export const GUIDE: Record<Language, string> = {
   ru: 'Белая коза с колокольчиком — финики. Чёрная с длинными рогами — красные плоды. Рыжая пятнистая — жёлтые фрукты. Маленький серый козлёнок — вода в кувшине.',
   en: 'The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.',

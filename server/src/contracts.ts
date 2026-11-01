@@ -5,6 +5,7 @@ import type { Server as HttpServer } from 'node:http';
 import type { Vector3 } from '../../shared/world/types.ts';
 import type { Logger } from './common/logger.ts';
 import type { Metrics } from './common/metrics.ts';
+import type { NpcDefinition, NpcSource } from './world/npcContent.ts';
 import type { Clock, Scheduler } from './common/time.ts';
 import type { WorldLifeStore } from './game/worldLifePorts.ts';
 
@@ -85,6 +86,8 @@ export interface GameDeps {
   readonly scheduler: Scheduler;
   readonly logger: Logger;
   readonly metrics?: Metrics;
+  /** CONTENT-002/004: builds the live NPC source from the loaded maps and the npcs.json seed; static list when absent. */
+  readonly npcSource?: (maps: ReadonlyMap<string, { isSafeSupport(x: number, z: number): boolean; heightAt(x: number, z: number): number }>, seed: readonly NpcDefinition[]) => NpcSource;
   /** Engine.IO heartbeat interval, also the RTT sampling period (OBS-010). */
   readonly pingIntervalMs?: number;
   /** OBS-005: validate every outgoing packet (development). */

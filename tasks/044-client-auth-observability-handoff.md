@@ -29,7 +29,7 @@ scheduling_note: передача от серверной команды 2026-11
 - `POST /api/auth/logout` с Bearer → 204 при выходе.
 - Отзыв (выход в другой вкладке, смена пароля, ведущий) приходит в игровой канал как `error {requestId: "server", code: "UNAUTHORIZED", message}` — показать `message`.
 - Development: `POST /api/auth/dev` с JSON `{}` или `{name}` → сессия без ввода данных, если `mode.dev === true`.
-- Необязательно: `POST /api/telemetry/client` с Bearer `{v: 1, kind: "error" | "unhandled_rejection" | "perf", message?, stack?, source?, build?, fps?, frameMs?, drawCalls?, map?}` → 204; ≤10 в минуту; без текстов игроков.
+- Необязательно, но нужно для FPS в панели администратора ([ADMIN-006](../specs/server-admin.md), OBS-014): отчёт `perf` раз в 10 с. `POST /api/telemetry/client` с Bearer `{v: 1, kind: "error" | "unhandled_rejection" | "perf", message?, stack?, source?, build?, fps?, frameMs?, drawCalls?, map?}` → 204; ≤10 в минуту; без текстов игроков.
 - `/config.json` в development отдаёт `debug: true`.
 
 ## Реализация

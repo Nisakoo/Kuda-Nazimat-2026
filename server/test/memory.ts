@@ -1,6 +1,13 @@
 import type { PlayerStore, SavedPosition } from '../src/contracts.ts';
 import type { DialogueStore, DialogueEntry } from '../src/npc/ports.ts';
+import { readFileSync } from 'node:fs';
 import { openDatabase, sqliteStores } from '../src/persistence/database.ts';
+import { parseNpcContent } from '../src/world/npcContent.ts';
+import { babylonNpc } from '../src/babylon/BabylonService.ts';
+
+/** The shipped npcs.json seed and its BABEL view, for services built without the catalogue. */
+export const seedNpcs = parseNpcContent(JSON.parse(readFileSync(new URL('../content/npcs.json', import.meta.url), 'utf8')));
+export const marketNpc = (id: string) => babylonNpc(seedNpcs.find((npc) => npc.id === id));
 
 /** In-memory players/dialogue; accounts and sessions use SQLite `:memory:` so there is one implementation of the auth ports. */
 export function memoryStores() {

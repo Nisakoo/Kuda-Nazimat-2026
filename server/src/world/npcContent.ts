@@ -12,10 +12,15 @@ export interface NpcDefinition {
   readonly interactionRadius: number;
   /** Optional: market NPCs are drawn by the chunk GLB. */
   readonly assetId?: string;
+  /** CONTENT-002: `map` when the figure is part of the map model; defaults by assetId. */
+  readonly figure?: 'entity' | 'map';
 }
 
+/** CONTENT-004: current active NPCs; the editable catalogue implements it, a plain list is static. */
+export interface NpcSource { active(): readonly NpcDefinition[]; get(id: string): NpcDefinition | undefined }
+
 const ID = /^[A-Za-z0-9_-]{1,80}$/;
-const FIELDS = ['id', 'mapId', 'name', 'topic', 'persona', 'greeting', 'position', 'rotationY', 'interactionRadius', 'assetId'];
+const FIELDS = ['id', 'mapId', 'name', 'topic', 'persona', 'greeting', 'position', 'rotationY', 'interactionRadius', 'assetId', 'figure'];
 
 function fail(index: number, field: string): never { throw new Error(`npcs.json[${index}].${field}: некорректное значение`); }
 function text(value: unknown, index: number, field: string, max: number): string {
@@ -38,10 +43,11 @@ export function parseNpcContent(raw: unknown): NpcDefinition[] {
     const id = text(value.id, index, 'id', 80); if (!ID.test(id) || seen.has(id)) fail(index, 'id'); seen.add(id);
     const assetId = value.assetId === undefined ? undefined : text(value.assetId, index, 'assetId', 80);
     if (assetId !== undefined && !ID.test(assetId)) fail(index, 'assetId');
+    if (value.figure !== undefined && value.figure !== 'entity' && value.figure !== 'map') fail(index, 'figure');
     const position = value.position as Record<string, unknown> | undefined;
     if (!position || typeof position !== 'object') fail(index, 'position');
     return {
-      id, ...(assetId ? { assetId } : {}),
+      id, ...(assetId ? { assetId } : {}), figure: (value.figure as 'entity' | 'map' | undefined) ?? (assetId ? 'entity' : 'map'),
       mapId: text(value.mapId, index, 'mapId', 80),
       name: text(value.name, index, 'name', 80),
       topic: text(value.topic, index, 'topic', 80),

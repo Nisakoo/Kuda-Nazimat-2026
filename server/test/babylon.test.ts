@@ -14,6 +14,7 @@ import { silentLogger } from '../src/common/logger.ts';
 import type { BabylonAction } from '../../shared/babylon/types.ts';
 import { parseBabylonRequest, parseBabylonResult } from '../../shared/babylon/validate.ts';
 import type { PlayerIdentity } from '../src/contracts.ts';
+import { marketNpc } from './memory.ts';
 
 const dirs: string[] = [], dbs: DatabaseSync[] = [];
 afterEach(() => { for (const db of dbs.splice(0)) { try { db.close(); } catch {} } for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -24,7 +25,7 @@ function fixture(language: LanguagePort = testLanguagePort) {
   const positions = new Map<string, BabylonLocation>();
   const queue = createGenerationQueue({ clock: systemClock, scheduler: systemScheduler, logger: silentLogger }, { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000 });
   let ids = 0, requests = 0;
-  const make = () => new BabylonService({ store: sqliteBabylon(db), language, generate: queue.generate, now: Date.now, id: () => `id${++ids}`, location: id => positions.get(id) ?? null });
+  const make = () => new BabylonService({ store: sqliteBabylon(db), language, generate: queue.generate, now: Date.now, id: () => `id${++ids}`, npc: marketNpc, location: id => positions.get(id) ?? null });
   let service = make();
   return { people, positions, queue, get service() { return service; }, get db() { return db; },
     call: (player: PlayerIdentity, action: BabylonAction, requestId = `request${++requests}`) => service.handle(player, parseBabylonRequest({ v: 2, requestId, action }), player.playerId),

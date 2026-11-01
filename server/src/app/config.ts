@@ -17,6 +17,8 @@ export interface Config extends GameConfig {
   auth: { maxSessions: number; passwordless: boolean };
   logs: LogsConfig;
   monitoring: { token: string | null; pingIntervalMs: number; validateOutgoing: boolean };
+  /** CONTENT-009: true once the client draws map-model NPC figures from server entities (TASK-058). */
+  content: { mapFiguresFromServer: boolean };
   language: { adapter: string; options: Record<string, unknown> };
   npc: { adapter: string; maxConcurrent: number; maxUnfinished: number; timeoutMs: number; streamTimeoutMs: number; options: Record<string, unknown> };
 }
@@ -31,10 +33,11 @@ const defaults: Input = {
   auth: { maxSessions: 5, passwordless: false },
   logs: { consoleLevel: 'info', fileLevel: 'debug', dir: 'data/logs', maxFileMb: 20, maxTotalMb: 200, retentionDays: 14 },
   monitoring: { token: null, pingIntervalMs: 5000, validateOutgoing: false },
+  content: { mapFiguresFromServer: false },
   language: { adapter: 'test', options: {} },
   npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000, streamTimeoutMs: 30000, options: {} },
 };
-const NESTED = ['auth', 'logs', 'monitoring', 'language', 'npc'] as const;
+const NESTED = ['auth', 'logs', 'monitoring', 'content', 'language', 'npc'] as const;
 type Preset = { [K in keyof Input]?: K extends (typeof NESTED)[number] ? Partial<Input[K]> : Input[K] };
 const PRESETS: Record<Environment, Preset> = {
   development: { dbPath: 'data/dev.sqlite', corsOrigins: ['http://localhost:5173'], clientDebug: true, auth: { passwordless: true }, logs: { consoleLevel: 'debug' }, monitoring: { validateOutgoing: true } },
@@ -85,6 +88,7 @@ export function parseConfig(raw: unknown, path: string, env: Environment = 'deve
   if (monitoring.token !== null && (typeof monitoring.token !== 'string' || monitoring.token.length < 32 || /\s/.test(monitoring.token))) throw new Error('monitoring.token: null или строка от 32 символов без пробелов');
   integer(monitoring.pingIntervalMs, 'monitoring.pingIntervalMs', 1000, 60000);
   if (typeof monitoring.validateOutgoing !== 'boolean') throw new Error('Неверный monitoring.validateOutgoing');
+  if (typeof config.content.mapFiguresFromServer !== 'boolean') throw new Error('Неверный content.mapFiguresFromServer');
   if (typeof language.adapter !== 'string' || !language.adapter) throw new Error('Неверный language.adapter');
   record(language.options, 'language.options');
   if (typeof npc.adapter !== 'string' || !npc.adapter) throw new Error('Неверный npc.adapter');

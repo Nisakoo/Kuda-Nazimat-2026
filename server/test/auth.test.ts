@@ -187,8 +187,11 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     const headers = { Authorization: `Bearer ${token}` };
     // A flood must arrive concurrently: sequential requests on a busy machine can be
     // slower than the refill rate and never exercise the limiter.
-    const statuses = await Promise.all(Array.from({ length: 400 }, async () =>
-      (await fetch(`${origin}/world/maps/test/manifest.json`, { method: 'HEAD', headers })).status));
+    // Waves of 50 concurrent requests: still faster than the refill rate, but within the accept
+    // backlog of Windows, which refuses part of 400 simultaneous connections (ECONNREFUSED).
+    const statuses: number[] = [];
+    for (let wave = 0; wave < 8; wave++) statuses.push(...await Promise.all(Array.from({ length: 50 }, async () =>
+      (await fetch(`${origin}/world/maps/test/manifest.json`, { method: 'HEAD', headers })).status)));
     expect(statuses.filter((s) => s === 200).length).toBeGreaterThanOrEqual(300); expect(statuses).toContain(429);
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect((await fetch(`${origin}/world/maps/test/manifest.json`, { headers })).status).toBe(200);

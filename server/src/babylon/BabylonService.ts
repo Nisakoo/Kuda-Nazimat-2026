@@ -1,9 +1,19 @@
 import { createHash } from 'node:crypto';
 import { EMPTY_INVENTORY } from '../../../shared/babylon/types.ts';
 import type { BabylonRequest, BabylonResult, BabylonState, BabylonErrorCode, ChatEntry, Language } from '../../../shared/babylon/types.ts';
-import type { PlayerIdentity } from '../contracts.ts';
+import type { NpcProfile, PlayerIdentity } from '../contracts.ts';
+import type { NpcDefinition } from '../world/npcContent.ts';
+
+/** What BABEL needs of an NPC (CONTENT-003). */
+export interface BabylonNpc extends NpcProfile { readonly position: { readonly x: number; readonly z: number }; readonly interactionRadius: number }
+/** Profile snapshot of a catalogue NPC on the market; null for other maps or a missing NPC. */
+export function babylonNpc(npc: NpcDefinition | undefined): BabylonNpc | null {
+  if (!npc || npc.mapId !== 'market') return null;
+  const { id, name, topic, persona, greeting, position, interactionRadius } = npc;
+  return { id, name, topic, persona, greeting, position: { x: position.x, z: position.z }, interactionRadius };
+}
 import type { BabylonStore, Generate, LanguagePort, Profile, Party, BabylonLocation, Message } from './ports.ts';
-import { GOATS, GUIDE, ITEMS, NPCS, task } from './content.ts';
+import { GOATS, GUIDE, ITEMS, task } from './content.ts';
 
 export class BabylonError extends Error {
   readonly code: BabylonErrorCode;
@@ -17,6 +27,8 @@ const clean = (text: string, limit = 4000): string => {
 export interface BabylonDeps {
   store: BabylonStore; language: LanguagePort; generate: Generate; now(): number; id(): string;
   location(accountId: string): BabylonLocation | null;
+  /** CONTENT-003: current active NPC from the catalogue; null when unknown, disabled or deleted. */
+  npc(id: string): BabylonNpc | null;
   measure?(kind: 'chat' | 'npc' | 'suggest', durationMs: number, success: boolean): void;
 }
 export class BabylonService {
@@ -82,9 +94,9 @@ export class BabylonService {
     if (!role) return fail('FORBIDDEN', 'Вы не участник задания');
     return { profile, party, role };
   }
-  private near(identity: PlayerIdentity, target: { x: number; z: number }): void {
+  private near(identity: PlayerIdentity, target: { x: number; z: number }, radius = 2.7): void {
     const location = this.deps.location(identity.accountId);
-    if (!location || location.mapId !== 'market' || Math.hypot(location.position.x - target.x, location.position.y, location.position.z - target.z) > 2.7) fail('FORBIDDEN', 'Подойдите ближе к объекту на рынке');
+    if (!location || location.mapId !== 'market' || Math.hypot(location.position.x - target.x, location.position.y, location.position.z - target.z) > radius) fail('FORBIDDEN', 'Подойдите ближе к объекту на рынке');
   }
   private async execute(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, fingerprint: string, authorize: () => Promise<boolean>): Promise<BabylonResult> {
     const { store, id, now } = this.deps, a = packet.action, pid = identity.playerId;
@@ -132,8 +144,9 @@ export class BabylonService {
             if (g.size > 1 && role === 1) fail('FORBIDDEN', 'Ваша роль — объяснять корм напарникам');
             const inventory = g.inventory[pid]!;
             if (a.type === 'buy') {
-              if (ITEMS[a.item] !== a.targetId || !NPCS[a.targetId]) fail('INVALID', 'У торговца нет такого предмета');
-              this.near(identity, NPCS[a.targetId]!);
+              const merchant = this.deps.npc(a.targetId);
+              if (ITEMS[a.item] !== a.targetId || !merchant) fail('INVALID', 'У торговца нет такого предмета');
+              this.near(identity, merchant!.position, merchant!.interactionRadius);
               if (inventory[a.item] >= 8) fail('INVALID', 'Можно носить до 8 одинаковых предметов');
               inventory[a.item]++; notice = 'Предмет добавлен в сумку.';
             } else {
@@ -158,6 +171,7 @@ export class BabylonService {
     const { store, now, language, generate } = this.deps, a = packet.action, pid = identity.playerId;
     const { profile, party, role } = this.player(identity);
     let message: Message | undefined;
+    let speaker: BabylonNpc | null = null;
     if (a.type === 'chat') {
       message = party.messages.find(m => m.id === packet.requestId && m.authorId === pid);
       if (!message) {
@@ -174,7 +188,8 @@ export class BabylonService {
       }
     } else if (a.type === 'npc') {
       if (party.size > 1 && role !== 1 && a.targetId === 'shepherd') fail('FORBIDDEN', 'Список пастуха доступен игроку 1. Свяжитесь с ним.');
-      const npc = NPCS[a.targetId]; if (!npc) fail('INVALID', 'Неизвестный собеседник'); this.near(identity, npc!);
+      // CONTENT-004: the profile is taken when the question is accepted.
+      speaker = this.deps.npc(a.targetId); if (!speaker) fail('INVALID', 'Неизвестный собеседник'); this.near(identity, speaker!.position, speaker!.interactionRadius);
     }
     const captured = message;
     const work = async (signal: AbortSignal, deadline: number): Promise<string> => {
@@ -195,7 +210,7 @@ export class BabylonService {
           translations.set(d.language, clean(await language.translate(captured.source, captured.sourceLanguage, d.language, signal)));
         }
       } else if (a.type === 'suggest') output = clean(await language.translate(a.word, profile.learning, profile.native, signal), 200);
-      else if (a.type === 'npc') output = clean(await language.answer(NPCS[a.targetId]!, a.text, profile.learning, profile.replies.filter(r => r.npcId === a.targetId).slice(-6), signal));
+      else if (a.type === 'npc') output = clean(await language.answer(speaker!, a.text, profile.learning, profile.replies.filter(r => r.npcId === a.targetId).slice(-6), signal));
       if (signal.aborted || now() >= deadline || !await authorize()) fail('UNAUTHORIZED', 'Запрос отменён или сессия истекла');
       if (signal.aborted || now() >= deadline) fail('UNAVAILABLE', 'Время запроса истекло');
       store.transaction(() => {
