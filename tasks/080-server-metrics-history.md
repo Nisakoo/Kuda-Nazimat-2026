@@ -12,7 +12,7 @@ related:
   - spec: ../specs/server-foundation.md
     requirements: [SERVER-004]
 depends_on: [TASK-043]
-scheduling_note: серверная часть реализована 2026-11-01; остаются ручная проверка графиков в браузере (делает задача страницы ADMIN) и прогон на Node 24; клиентская часть FPS — TASK-081
+scheduling_note: серверная часть реализована 2026-11-01; графики в браузере проверены в TASK-090; остаётся прогон на Node 24; клиентская часть FPS — TASK-081
 ---
 
 # Сервер: история метрик, графики в админке и отчёт приёмки
@@ -40,7 +40,7 @@ scheduling_note: серверная часть реализована 2026-11-01
 - [x] OBS S6: `test/observability.test.ts` — `/api/operator/status`, `/metrics`, `/history` с loopback 200, `/metrics` 404; с LAN-адреса все четыре — 404 даже с `Authorization`; `test/config.test.ts` — `monitoring.token` отклоняется.
 - [x] OBS S8, S10: раздельные лимиты 10/12, обязательные `fps`+`visible`; у игроков FPS, «нет данных» без отчёта, `visible: false` снимает FPS и причину «тормозит картинка».
 - [x] OBS S11: `test/metrics-history.test.ts` — окно 5 мин после часа медленных шагов показывает быстрые (1 мс против 50 мс накопленного p95), 1440 кадров с 4 игроками, оценка памяти ≤ 1 МБ (633 600 байт; замер `node --expose-gc` с 4 игроками — тот же порядок), `null` без данных.
-- [ ] OBS S13: группы и ряды в API проверены тестами (ответ полного буфера с 4 игроками ≤ 256 КиБ, 480 точек по 30 с); ручная проверка графиков в браузере — не выполнена, её делает задача страницы ADMIN.
+- [x] OBS S13: группы и ряды в API проверены тестами (ответ полного буфера с 4 игроками ≤ 256 КиБ, 480 точек по 30 с); графики в браузере проверены в [TASK-090](090-admin-panel-sections.md): Chrome, `server/test/operator.browser.mjs` — линии, пороги, разрыв на `null`, «выше шкалы», подсказка, без внешних запросов (ряды — контролируемый ответ API; живой ответ — пустая история короткого прогона показывает «нет данных»).
 - [x] OBS S14, S16: `metrics.minute` раз в 6 кадров, ≤ 2 КиБ, без имён; отчёт по запуску, по периоду и через CLI (`--file`, ошибка аргумента → код 1), «нет данных» вместо «в норме»; профиль печатает ту же таблицу.
 - [x] OBS S2, S5: история в дампе (`state.history`); секреты и тексты не найдены в журнале, дампе, статусе, истории и снимке метрик.
 - [x] OBS S9: профиль 60 с с 4 игроками на одной машине — p95 шага 1,28 мс против 1,25 мс базы (6938f9d) в тех же условиях (+0,03 мс, бюджет 0,5), `log.dropped` нет; [новая версия](evidence/metrics-history/load-profile-new.txt), [база](evidence/metrics-history/load-profile-base.txt). Node 22.22.2, а не 24 — на машине нет Node 24.
@@ -49,6 +49,6 @@ scheduling_note: серверная часть реализована 2026-11-01
 ## Результат
 - Файлы: `server/src/obs/{history,overview,thresholds,clientPerf,health,recorder,index}.ts`, `server/src/http/{telemetry,operatorRoutes,operatorMetricsRoutes,server}.ts`, `server/src/cli/report.ts`, `server/src/common/metrics.ts`, `server/src/app/{application,main,config}.ts`, `server/src/realtime/gateway.ts`, `server/src/game/{index,GameService}.ts`, `server/src/contracts.ts`; тесты `server/test/{metrics-history,observability,config,platform}.test.ts`, `server/test/load-profile.ts`; удалён `ops/monitoring/`.
 - Проверки (2026-11-01, macOS, Node 22.22.2): `npm --prefix server run check` — без ошибок; `npm --prefix server test` — 46 файлов, 681 пройдено, 4 пропущено, 3 упало: `building-height.test.ts` (в worktree нет сгенерированного мира `client/public/maps/market`) и два теста `llm-diagnostic.test.ts` про занятый порт (на исходном `config.ts` падают так же). Профиль `node server/test/load-profile.ts` завершается «Profile incomplete» из-за проверки `timeouts < 1`: при текущем таймауте NPC вопрос с задержкой 5 с не истекает — проверка профиля устарела до этой задачи; таблица печатается до неё.
-- Не проверено: графики в браузере (страница ADMIN); прогон на Node 24.15; замеры на целевых ноутбуках (OFFLINE-017).
+- Не проверено: прогон на Node 24.15; замеры на целевых ноутбуках (OFFLINE-017).
 - Отклонения: перцентили окна — верхние границы корзин (как в OBS-007), поэтому p95 рассылки в таблице 110 мс при точных 101 мс; «последнее значение» шага в статусе — точный p95 последней минуты `game.tick.stats`; бесконечный максимум (только корзина переполнения) отдаётся в JSON строкой `"inf"`. Ряды истории длиннее 480 точек объединяются (шаг 30 с для 4 часов), чтобы ответ уложился в 256 КиБ. Подпись «внимание/ошибка» у info-событий на текущей странице `/operator` неточна — страницу переделывает задача ADMIN.
 

@@ -65,7 +65,7 @@ export async function handleOperator(req: IncomingMessage, res: ServerResponse, 
   if (handleOperatorMetrics(req, res, path, deps)) return true;
   if (req.method === 'GET' && path === '/api/operator/accounts') { json(res, 200, { accounts: deps.auth.operator.list() }); return true; }
   if (req.method === 'POST' && path.startsWith('/api/operator/actions/')) {
-    if (!trustedAction(req)) { req.resume(); deps.logger.warn('auth.operator.rejected', 'Действие ведущего без правильного Origin или X-Operator', { origin: req.headers.origin ?? null }); error(res, 403, 'FORBIDDEN', 'Действие доступно только со страницы ведущего.'); return true; }
+    if (!trustedAction(req)) { req.resume(); deps.logger.warn('auth.operator.rejected', 'Действие администратора без правильного Origin или X-Operator', { origin: req.headers.origin ?? null }); error(res, 403, 'FORBIDDEN', 'Действие доступно только со страницы администратора.'); return true; }
     const action = path.slice('/api/operator/actions/'.length);
     let input: Record<string, unknown> | null;
     try { input = fields(await body(req), action === 'dump' ? [] : ['name']); }
@@ -77,7 +77,7 @@ export async function handleOperator(req: IncomingMessage, res: ServerResponse, 
       else if (action === 'unlock') json(res, 200, { unlocked: deps.auth.operator.unlock(input.name) });
       else if (action === 'dump') {
         const file = deps.dump('operator');
-        deps.logger.info('obs.incident.dumped', 'Ведущий сохранил отчёт', { file });
+        deps.logger.info('obs.incident.dumped', 'Администратор сохранил отчёт', { file });
         if (file) json(res, 200, { file }); else error(res, 503, 'UNAVAILABLE', 'Отчёт не сохранён: запись журнала выключена или диск недоступен.');
       } else error(res, 404, 'INVALID', 'Неизвестное действие.');
     } catch (cause) {
