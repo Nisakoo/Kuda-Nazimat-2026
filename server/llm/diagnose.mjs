@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { setImmediate as nextTurn } from 'node:timers/promises';
 import { defaultConfigPath, parseConfig } from '../src/app/config.ts';
+import { selectLlmProfile } from '../src/app/llmProfiles.ts';
 import { systemClock, systemScheduler } from '../src/common/time.ts';
 import { isNpcFailureCode } from '../src/npc/failureCodes.ts';
 import { parseNpcContent } from '../src/world/npcContent.ts';
@@ -50,6 +51,7 @@ function defaultWriteLine(line) { process.stdout.write(`${line}\n`); }
  */
 export async function runDiagnostic({
   configPath = defaultConfigPath,
+  profilesPath,
   factory = productionFactory,
   writeLine = defaultWriteLine,
   signal,
@@ -159,8 +161,12 @@ export async function runDiagnostic({
   }
   try {
     let config;
-    try { config = parseConfig(JSON.parse(await readFile(configPath, 'utf8')), configPath); }
-    catch { failure = 'config_invalid'; throw new Error('refused'); }
+    try {
+      config = parseConfig(JSON.parse(await readFile(configPath, 'utf8')), configPath);
+      const selected = await selectLlmProfile(config, profilesPath === undefined ? {} : { profilesPath });
+      config = selected.config;
+      if (selected.profile) emit('selection', { backend: selected.profile.backend, model: selected.profile.model, timeoutMs: config.npc.timeoutMs });
+    } catch { failure = 'config_invalid'; throw new Error('refused'); }
     if (config.npc.adapter !== 'ollama') { failure = 'adapter_required'; throw new Error('refused'); }
     const nativePort = config.npc.options.port ?? 11501;
     if (!Number.isSafeInteger(nativePort) || nativePort < 1024 || nativePort > 65535) { failure = 'config_invalid'; throw new Error('refused'); }

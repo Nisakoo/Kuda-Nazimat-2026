@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createServer, type Server } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -12,6 +12,7 @@ import { runDiagnostic as runUntyped } from '../llm/diagnose.mjs';
 
 type Options = {
   configPath: string;
+  profilesPath?: string;
   factory: (options: Record<string, unknown>, deps: { clock: Clock; scheduler: Scheduler }) => NpcResponder | Promise<NpcResponder>;
   writeLine: (line: string) => void;
   signal?: AbortSignal;
@@ -74,6 +75,42 @@ describe('operator diagnostic (fake responders only; no models or worker process
     const output = execFileSync(process.execPath, ['--input-type=module', '-e',
       `const n=['SIGINT','SIGTERM','SIGHUP'].map(s=>process.listenerCount(s)); await import(${JSON.stringify(script)}); console.log(['SIGINT','SIGTERM','SIGHUP'].map((s,i)=>process.listenerCount(s)-n[i]).join(','));`], { encoding: 'utf8' });
     expect(output).toBe('0,0,0\n');
+  });
+
+  it('uses the same saved prepared profile as the game, not stale legacy model options', async () => {
+    const f = await fixture(); const h = harness();
+    const python = join(f.dir, 'python'); const executable = join(f.dir, 'ollama');
+    await writeFile(python, 'fixture only, never executed', { mode: 0o700 });
+    await writeFile(executable, 'fixture only, never executed', { mode: 0o700 });
+    const modelsDir = join(f.dir, 'models');
+    const manifests = join(modelsDir, 'manifests-v2/ollama.com/library/qwen3.5');
+    await mkdir(manifests, { recursive: true });
+    const metadata = await readFile(new URL('../llm/fixtures/qwen35-2b-active-manifest.json', import.meta.url));
+    const profiles = [];
+    for (const [model, tag] of [['2b', '2b-q4_K_M'], ['0.8b', '0.8b-q8_0']]) {
+      const tokenizerDir = join(f.dir, `tokenizer-${model}`); await mkdir(tokenizerDir);
+      await writeFile(join(tokenizerDir, 'tokenizer.json'), '{}');
+      const tokenizerManifest = join(f.dir, `inventory-${model}.json`);
+      await writeFile(tokenizerManifest, JSON.stringify({ 'tokenizer.json': 'a'.repeat(64) }));
+      await writeFile(join(manifests, tag!), metadata);
+      profiles.push({ backend: 'ollama', model, options: { python, executable, modelsDir, tokenizerDir, tokenizerManifest,
+        model: `qwen3.5:${tag}`, modelDigest: 'a'.repeat(64), runnerVersion: '0.40.13', port: f.nativePort } });
+    }
+    const profilesPath = join(f.dir, 'profiles.json');
+    const catalog = JSON.stringify({ version: 1, selected: { backend: 'ollama', model: '2b' }, profiles });
+    await writeFile(profilesPath, catalog);
+    expect(await runDiagnostic({ ...h, configPath: f.configPath, profilesPath })).toBe(0);
+    expect(h.factory.mock.calls[0]![0]).toMatchObject({ model: 'qwen3.5:2b-q4_K_M', tokenizerDir: join(f.dir, 'tokenizer-2b') });
+    expect(h.events()[0]).toEqual({ event: 'selection', backend: 'ollama', model: '2b', timeoutMs: 8000 });
+    expect(await readFile(profilesPath, 'utf8')).toBe(catalog);
+    expect(await readFile(f.configPath, 'utf8')).toBe(f.original);
+  });
+
+  it('refuses an explicit missing profile catalog before creating a responder', async () => {
+    const f = await fixture(); const h = harness();
+    expect(await runDiagnostic({ ...h, configPath: f.configPath, profilesPath: join(f.dir, 'missing.json') })).toBe(1);
+    expect(h.events()).toEqual([{ event: 'failure', code: 'config_invalid' }]);
+    expect(h.factory).not.toHaveBeenCalled();
   });
 
   it('refuses an occupied game port before constructing or starting a responder', async () => {

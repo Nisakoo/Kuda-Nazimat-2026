@@ -3,11 +3,16 @@
 # Commands run from the repo root; overrides remain available.
 CLIENT_RUN_CMD ?= npm --prefix client run dev
 CLIENT_TEST_CMD ?= npm --prefix client test
+NODE ?= node
+# Export values as data, not interpolated shell arguments. Empty values keep the saved choice.
+export KUDA_LLM_BACKEND = $(BACKEND)
+export KUDA_LLM_MODEL = $(MODEL)
+export KUDA_LLM_PROFILES = $(LLM_PROFILES)
 
 .PHONY: help client client-test
 
 help:
-	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the server in development (ENV=production to override)' 'make server-test  Run server/shared tests' 'make prepare      Once, with internet: install, build client/world, self-check' 'make start        Offline delivery: build and start in production (alias: make demo)' 'See README.md for installation, type checks, build and browser checks.'
+	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the LAN server' 'make server-test  Run server/shared tests' 'make demo         Prepare client/world and start server' 'make server BACKEND=ollama MODEL=2b   Use a prepared profile for one run' 'make llm-import   Import existing local profiles and select Ollama 2B (no downloads)' 'NODE=/path/to/node and LLM_PROFILES=/path/to/profiles.json are optional overrides'  'See README.md for installation, type checks, build and browser checks.'
 
 client:
 ifeq ($(strip $(CLIENT_RUN_CMD)),)
@@ -25,28 +30,18 @@ else
 	$(CLIENT_TEST_CMD)
 endif
 
-.PHONY: server server-test prepare start demo
-# PORT=9000 overrides the configured port (OFFLINE-003); ENV picks the environment (SERVER-009), development by default.
-ENV ?= development
+.PHONY: server server-test demo llm-import
 server:
-	npm --prefix server start -- --env $(ENV)$(if $(PORT), --port $(PORT))
+	$(NODE) server/src/app/main.ts
+
+llm-import:
+	$(NODE) server/src/cli/importLlmProfiles.ts
 
 server-test:
 	npm --prefix server test
 
-# OFFLINE-001: idempotent; never touches the players' database.
-prepare:
-	@node -e "const [a,b]=process.versions.node.split('.').map(Number); if (a!==24||b<15) { console.error('Нужен Node 24.15+ в ветке 24, сейчас '+process.versions.node); process.exit(1); }"
-	npm --prefix client ci
-	npm --prefix server ci
-	npm --prefix client run build
-	npm --prefix server run lan:check -- --env production$(if $(PORT), --port $(PORT))
-
-# OFFLINE-002: works offline once prepared; dependencies are installed only when missing.
-start:
+demo:
 	@test -d client/node_modules || npm --prefix client ci
 	@test -d server/node_modules || npm --prefix server ci
 	npm --prefix client run build
-	$(MAKE) server ENV=production
-
-demo: start
+	$(MAKE) server

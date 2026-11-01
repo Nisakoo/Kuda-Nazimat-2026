@@ -18,7 +18,8 @@ const ANSWER_CEILING_MS = 30000;
 const SOFT_RSS = 3_500_000_000;
 const failures = new Set<Failure>(['model_unavailable', 'runner_mismatch', 'tokenizer_unavailable', 'resource_limit', 'input_too_long', 'output_limit']);
 
-function validate(backend: Backend, input: Record<string, unknown>): Record<string, unknown> {
+/** Validate local runtime options without starting a process or reading artifacts. */
+export function validateLocalLlmOptions(backend: Backend, input: Record<string, unknown>): Record<string, unknown> {
   if (backend !== 'ollama' && backend !== 'mlx') throw new Error('Invalid NPC backend');
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Invalid npc.options');
   const common = ['python', 'startupTimeoutMs', 'threads', 'runnerVersion'];
@@ -164,7 +165,7 @@ interface Session {
 }
 
 export function localLlm(backend: Backend, options: Record<string, unknown>, deps: Deps): LocalLlmResponder {
-  return build(backend, validate(backend, options), deps, {
+  return build(backend, validateLocalLlmOptions(backend, options), deps, {
     workerPath: fileURLToPath(new URL(`../../../llm/${backend}_worker.py`, import.meta.url)),
     platform: process.platform, arch: process.arch, monotonicNow: () => performance.now(), memoryBytes, groupAlive,
   });
@@ -175,13 +176,13 @@ export const mlx = (options: Record<string, unknown>, deps: Deps): LocalLlmRespo
  * or selected by config. All ownership, memory, cancellation and IPC guards stay.
  */
 export function ollamaDiagnostic(options: Record<string, unknown>, deps: Deps): LocalLlmResponder {
-  return build('ollama', validate('ollama', options), deps, {
+  return build('ollama', validateLocalLlmOptions('ollama', options), deps, {
     workerPath: fileURLToPath(new URL('../../../llm/ollama_worker.py', import.meta.url)),
     platform: process.platform, arch: process.arch, monotonicNow: () => performance.now(), memoryBytes, groupAlive,
   });
 }
 export function localLlmForTest(backend: Backend, options: Record<string, unknown>, deps: Deps, runtime: Partial<Runtime> & Pick<Runtime, 'workerPath'>): LocalLlmResponder {
-  return build(backend, validate(backend, options), deps, {
+  return build(backend, validateLocalLlmOptions(backend, options), deps, {
     platform: process.platform, arch: process.arch, monotonicNow: () => performance.now(), memoryBytes, groupAlive, ...runtime,
   });
 }
