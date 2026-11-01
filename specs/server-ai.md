@@ -34,7 +34,7 @@ related:
 
 ## Связь с v1
 
-Сервер MVP реализует [NPC v1](server-npc-dialogue.md): NpcDialogueService, планировщик и порт `NpcResponder` с заглушкой `scripted`, без потоковой передачи (PROTO v1). Адаптер локальной модели реализует `NpcResponder` и проходит контрактный тест NPC-007. Внутри адаптера могут работать PromptBuilder/KnowledgeSource/LlmPort, описанные ниже. Требования AI-005, AI-007, AI-010–011 в полном объёме (streaming, preferences, ledger, память) требуют PROTO v2 и изменения клиента. Лимит ответа v1 — 8–9 с на сервере при таймауте клиента 10 с.
+Сервер MVP реализует [NPC v1](server-npc-dialogue.md): NpcDialogueService, планировщик и порт `NpcResponder` с заглушкой `scripted`, без потоковой передачи (PROTO v1). Адаптер локальной модели реализует `NpcResponder` и проходит контрактный тест NPC-007. Внутри адаптера могут работать PromptBuilder/KnowledgeSource/LlmPort, описанные ниже. Требования AI-005, AI-007, AI-010–011 в полном объёме (streaming, preferences, ledger, память) требуют PROTO v2 и изменения клиента. Текущий согласованный общий лимит ответа v1 —30с на сервере (очередь включена), NPC pending32с на клиенте, остальные запросы10с. Это увеличение аварийного срока, не подтверждение целевой скорости≤8с и не реализация streaming.
 
 ## Границы модулей сервера
 

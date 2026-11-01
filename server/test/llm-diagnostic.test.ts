@@ -101,7 +101,7 @@ describe('operator diagnostic (fake responders only; no models or worker process
     [{ npc: { adapter: 'mlx', options: {} } }, 'adapter_required'],
     [{ npc: { adapter: 'scripted', options: {} } }, 'adapter_required'],
     [{ npc: { adapter: 'ollama', options: { port: 'secret-path' } } }, 'config_invalid'],
-    [{ npc: { adapter: 'ollama', timeoutMs: 30000, options: {} } }, 'config_invalid'],
+    [{ npc: { adapter: 'ollama', timeoutMs: 30001, options: {} } }, 'config_invalid'],
     [{ port: 0 }, 'config_invalid'],
   ])('refuses invalid adapter/config with a fixed error (%j)', async (overrides, code) => {
     const f = await fixture(overrides); const h = harness();

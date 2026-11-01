@@ -6,7 +6,7 @@
     "adapter": "ollama",
     "maxConcurrent": 1,
     "maxUnfinished": 4,
-    "timeoutMs": 8000,
+    "timeoutMs": 30000,
     "options": {
       "python": "/absolute/ollama-venv/bin/python3",
       "executable": "/absolute/path/to/ollama",

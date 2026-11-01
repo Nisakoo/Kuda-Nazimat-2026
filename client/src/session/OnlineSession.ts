@@ -223,12 +223,13 @@ export class OnlineSession implements GameSession {
     if (this.disposed || this.network.state.status !== 'connected' || (type !== 'join' && this.value.status !== 'connected')) { this.publish({ type: 'request-error', requestId: 'offline', message: 'Нет связи с миром. Действие не отправлено.' }); return null; }
     if (this.pending.size >= LIMITS.pending) { this.publish({ type: 'request-error', requestId: 'limit', message: 'Слишком много ожидающих действий.' }); return null; }
     const requestId = this.nextId();
+    const timeoutMs = type === 'npc-question' ? LIMITS.npcRequestMs : LIMITS.requestMs;
     const timer = this.clock.set(() => {
       const pending = this.pending.get(requestId); this.pending.delete(requestId);
       if (!pending) return;
-      this.publish({ type: 'request-error', requestId, message: 'Сервер не подтвердил действие за 10 секунд.' });
+      this.publish({ type: 'request-error', requestId, message: `Сервер не подтвердил действие за ${timeoutMs / 1000} секунд.` });
       if (pending.type === 'join' || pending.type === 'resync') this.status({ status: 'error', error: 'Не удалось синхронизировать мир. Повторите подключение.' });
-    }, LIMITS.requestMs);
+    }, timeoutMs);
     this.pending.set(requestId, { type, timer, ...(targetId ? { targetId } : {}) });
     try { if (this.network.send(create(requestId))) return requestId; } catch { /* invalid intent is surfaced below */ }
     this.finish(requestId);

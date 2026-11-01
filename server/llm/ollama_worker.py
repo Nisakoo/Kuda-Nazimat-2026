@@ -521,7 +521,7 @@ class OllamaWorker:
         tokens = count_prompt_tokens(prompt, self.tokenizer)
         # Operational prefill means waiting for first text, including HTTP setup.
         emit({'type': 'progress', 'stage': 'prefill', 'promptTokens': tokens})
-        # The supervisor owns the absolute deadline (9 s game / 30 s operator
+        # The supervisor owns the absolute deadline (up to 30 s game / operator
         # probe). Do not let the old 10 s socket default cut the probe short.
         # Missing deadline keeps the existing internal fixture default only.
         remaining = (request.get('deadlineAt', (time.time() + 10) * 1000) / 1000) - time.time()

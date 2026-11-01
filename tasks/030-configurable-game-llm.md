@@ -7,6 +7,12 @@ requirements: [LLM-001–009, LLM-011–015]
 related:
   - spec: ../specs/server-npc-dialogue.md
     requirements: [NPC-002–005, NPC-007]
+  - spec: ../specs/protocol.md
+    requirements: [PROTO-006, PROTO-008]
+  - spec: ../specs/server-foundation.md
+    requirements: [SERVER-004]
+  - spec: ../specs/client-input-ui.md
+    requirements: [UI-005]
 depends_on: [TASK-025]
 scheduling_note: интегрированный v1-срез с явным выбором backend; не завершает PROTO v2, TASK-017 или квалификацию TASK-018
 ---
@@ -15,7 +21,7 @@ scheduling_note: интегрированный v1-срез с явным выб
 
 ## Цель и изменения требований
 
-По запросу владельца подключить локальную LLM непосредственно к игре: оператор выбирает Ollama или MLX, а не получает жёстко выбранный backend/отдельный чат. Добавлен LLM-015: явная конфигурация, диагностика и интеграция v1. MLX технически требует Apple Silicon; несовместимость не приводит к скрытой смене backend. PROTO v1 сохраняется: один ответ в общем дедлайне 8–9 с. Полная потоковая система по-прежнему требует v2.
+По запросу владельца подключить локальную LLM непосредственно к игре: оператор выбирает Ollama или MLX, а не получает жёстко выбранный backend/отдельный чат. Добавлен LLM-015: явная конфигурация, диагностика и интеграция v1. MLX технически требует Apple Silicon; несовместимость не приводит к скрытой смене backend. Wire shapes PROTOv1 сохраняются: один полный ответ. После отдельного согласования пользователя общий deadline увеличен с8–9с до30с, клиентский NPC pending с10с до32с; остальные pending10с. Полная потоковая система по-прежнему требует v2.
 
 ## Реализация
 
@@ -33,6 +39,10 @@ scheduling_note: интегрированный v1-срез с явным выб
 - [x] Серверные unit/integration, strict types/imports и Python syntax/fixture tests проходят; fake workers не называются модельными тестами.
 - [ ] Настоящий запуск через игру, hardware RAM/скорость, network isolation и physical cancel каждого backend проверены на соответствующем пользовательском оборудовании. Без них задача не done.
 - [x] При отсутствии пакетов/модели мир доступен, health unavailable, NPC не подменяется scripted.
+
+## Как читать исторические свидетельства
+
+Разделы ниже — хронология отдельных patches/прогонов. Указанные в старых разделах8–9с/клиент10с и «client/shared не менялись» относятся **только к тому этапу**, не к текущему состоянию. Последнее согласованное решение — раздел «Согласованное увеличение игрового deadline до30с»: server30с/clientNPC32с и минимальные правки client/shared. Новое решение не превращает старые timeout в успешные прогоны.
 
 ## Диагностика первого запуска Intel Mac
 
@@ -127,6 +137,23 @@ scheduling_note: интегрированный v1-срез с явным выб
 - Финальный полный **serial** прогон: `node --check server/llm/diagnose.mjs`, `npm --prefix server run check` (strict TS + import48modules/130deps), `make server-test` **230passed/1skipped**, Python discovery **76passed**, docs checker24specs/29tasks/238requirements и `git diff --check` PASS. Skip прежний: отсутствующий built real map fixture. Client/shared/frozencontracts не изменены. Независимый review кода и Mac-команд не нашёл blockers; добавлена явная остановка процедуры, если подготовительный daemon не занял свой порт. Реальные inference/model downloads/CLI на dev не выполнялись.
 - Оператор на Mac подтвердил `pull qwen3.5:0.8b-q8_0`: model811MB/projector207MB и SHA256 verification, `writing manifest`, `success`. Это только успешная подготовка пакета, не запуск и не доказательство скорости/RAM/качества.
 - Инструкция MAC-INTEL-08B использует существующие внешние tools/store/venv, отдельный pinned tokenizer и create-only0600backup2B перед atomic config replacement.7shell-блоков проверены `bash -n`, Python heredocs только compiled, **не выполнены**. Настоящий CLI/daemon/download на dev не выполнялся. Скорость, RAM и качество0.8B не квалифицированы. CLI30с остаётся отдельным диагностическим инструментом; gameplay8с/max9с и client10с не меняются.
+
+## Первый реальный диагностический ответ0.8B на Mac
+
+- Оператор подтвердил обновление55ba9ab, tokenizer inventory6files и явное переключение config с сохранением2Bbackup. Проверенный activeSHA нового пакета: `7c00f78aed0fd757e9ba2f2720896768fd22da24b7fb6fe17096bb1e85bb2d25`. Реальный одиночный `diagnose.mjs` вернул ready18289мс, prompt162tokens, firstToken2403мс, complete6634мс,72output chunks (не tokens), cleanup_confirmed25242мс total и shell prompt. Ответ принят целиком, truncated0. Это изолированный тест без игры/browser, не квалификация игровых8с/RAM/p95.
+- По сравнению с предыдущим единственным2B isolated run: startup34251→18289мс, firstText3797→2403мс; полное время ответа6296→6634мс, то есть ускорение полного ответа не показано. Различная длина/текст и единичные наблюдения не дают корректного hardware benchmark. До8с в новом прогоне оставалось1366мс, что не доказывает стабильный запас в игре.
+- **Качество прогона неудовлетворительно:** на фиксированное «Привет!» fabric-seller выдала длинное сообщение с опечаткой «Здраствуйте», необоснованным символическим толкованием бирюзовых линий и бессвязным правилом о треугольнике/стреле/балансе. Мягкая цель короткого приветствия/вопроса не соблюдена. Этот текст нельзя выдавать за учебно корректный ответ или квалификацию0.8B. Prompt/model/limits без согласования не изменяются. Следующий допустимый технический шаг — один сравнительный игровой вопрос с теми же8с; даже технический успех не снимет quality gate.
+
+## Согласованное увеличение игрового deadline до30с
+
+- Оператор проверил0.8B в игре: `2026-11-01T06:19:49.249Z` timeout, stage decoding, elapsed7999мс, prompt167tokens, firstToken3449мс, milestone16chunks; в UI «Собеседник не успел ответить». После уточнения единицы оператор явно подтвердил **30 секунд**, а не30мс. Прежнее решение сохранить8с заменено этим согласованием.
+- Изменяемые требования: NPC-002 и LLM-015 — default/max общего v1 deadline30000мс, включая очередь, supervisor ceiling30000мс с более ранним request.deadlineAt и monotonic guard; PROTO-006/008 — только NPC pending32с, остальные10с. Wire shapes/PROTOv1 не меняются. Минимальная правка клиента/shared для согласованного ожидания теперь разрешена запросом пользователя; frozencontracts/realtime/game не затрагиваются.
+- Реализация/приёмка: обновить server config defaults/validation/examples и supervisor production+fixture default; проверить shorterdeadline/monotonic rollback/late rejection/cleanup; клиент принимает NPCответ после10с, но отклоняет после32с, обычные pending по-прежнему10с, disconnect/dispose очищают без replay. Сохранить queue≤4/1perplayer, concurrency1, memory/ownership/physicalstop. Отдельный diagnostic30с остаётся доступен, но уже не имеет большего ceiling, чем game.
+- Независимый review обнаружил прежний дефект общего budget при wall-clock rollback **в очереди**, до запуска supervisor. Исправлено без frozencontracts: optional `Clock.monotonicNow`, systemClock=`performance.now()`, job хранит elapsed deadline; admission/dispatch/precommit проверяют wall+monotonic, ранее потраченный budget не восстанавливается. После чтения history бюджет проверяется снова; в responder передаётся только оставшаяся часть, а не свежие30с. Deterministic тесты удерживают timer callbacks, проверяют20сqueue→10сremaining, expired queued без inference, поздний ответ без commit и history IO, съевший срок. Legacy fake clocks без monotonic сохраняют now fallback; production использует оба источника. Повторный read-only review не нашёл blockers.
+- Клиентская приёмка с установленными **lockfile** dependencies: `make client-test` **158passed**, `npm --prefix client run check` (Svelte0errors/0warnings + TS/core) PASS, `check:imports`86modules/239deps PASS, `build` PASS (обычное предупреждение о872.90KB JS chunk). Предварительный targeted11test run использовал fetched Vitest5 из-за отсутствия client deps и **не** считался acceptance; затем выполнен `npm --prefix client ci`, full suite использовал pinnedVitest4.1.12. Npm сообщил2lowseverity dependency findings; зависимости не обновлялись вслепую.
+- Browser: production `network.spec.ts` в установленном Chromium с временным config executablePath `/usr/bin/chromium` — **3failed**, timeout на настройках checkbox/select до проверки NPC (trace/error-context в ignored `client/test-results/`). Причина зависания в этой среде не установлена; это не PASS и не доказанная regression deadline. Отдельный scoped smoke в **реальном Chromium** через Vite source modules OnlineSession/MockNetworkAdapter/TestClock PASS: chat timeout10000мс, NPC не истёк тогда, ответ29900мс принят,32000мс поздний ответ проигнорирован, dispose0pendingTimers. Это module-level browser check с controlled clock/transport, не UI/e2e или реальная модель. Console Vite не показала JS exceptions (остались Three/shadow/softwareWebGL warnings); ошибки4173 после завершения Playwright preview не выдаются за Vite regressions. Оба временных dev/preview server остановлены после проверки.
+- Финальная serial server/Python приёмка после queue fix: `node --check server/llm/diagnose.mjs`, `npm --prefix server run check` (strict TS/shared +48modules/130deps) PASS; `make server-test` **250passed/0skipped** (real-world fixture теперь подготовлен client commands), Python discovery **80passed**, включая4новых fixture-теста **только config migration heredoc** во временном HOME/checkout: меняется толькоtimeout, backup исходных bytes0600, existingbackup/повторныйзапуск/symlink отказывают без потери файлов. Shell блоки3Mac guides проверены `bash -n`, Python heredocs только compiled (без runtime/download). Docs checker24specs/29tasks/238requirements и diff check PASS. Настоящая модель/Ollama/MLX/diagnoseCLI на сервере с Pi не запускались, веса не скачивались. Frozencontracts/realtime/game не изменены; минимальная клиентская/shared правка ограничена NPCwait.
+- Mac-инструкция MAC-30S обновляет только npc.timeoutMs в существующем config с backup, не скачивает и не переустанавливает модель/tokenizer; пересобрать client dist и обновить страницу, чтобы старый10с JS не обрывал ожидание. Запрещены реальные модели/downloadweights на сервере с Pi. Acceptance: make client-test/server-test, types/import/build, релевантная браузерная проверка без модели, docs/diff; реальный30с игровой результат остаётся непроверенным до Mac-прогона.
 
 ## Результат
 

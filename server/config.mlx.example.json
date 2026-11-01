@@ -6,7 +6,7 @@
     "adapter": "mlx",
     "maxConcurrent": 1,
     "maxUnfinished": 4,
-    "timeoutMs": 8000,
+    "timeoutMs": 30000,
     "options": {
       "python": "/absolute/mlx-venv/bin/python3",
       "modelDir": "/absolute/qwen35-2b-text-4bit",

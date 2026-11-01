@@ -103,6 +103,58 @@ it('correlates NPC replies, deduplicates chat, times out failures and discards a
   expect(s.sent.filter((message) => message.type === 'chat-send' && message.text === 'pending')).toHaveLength(0);
   expect(s.session.state.status).toBe('connected'); s.session.dispose(); expect(s.clock.pending).toBe(0);
 });
+it('accepts an NPC answer at 29.9 seconds but ignores one at the 32-second deadline', () => {
+  const s = setup();
+  const accepted = s.session.askNpc('guide', 'first');
+  expect(accepted).not.toBeNull();
+  s.clock.advance(29900);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: accepted }));
+  s.adapter.receive({ v: 1, type: 'npc-answer', requestId: accepted, targetId: 'guide', text: 'answer' }); s.clock.advance(0);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: accepted, text: 'answer' }));
+
+  const expired = s.session.askNpc('guide', 'second');
+  s.clock.advance(31999);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: expired }));
+  s.clock.advance(1);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: expired, message: expect.stringContaining('32 секунд') }));
+  s.adapter.receive({ v: 1, type: 'npc-answer', requestId: expired, targetId: 'guide', text: 'late' }); s.clock.advance(0);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: expired }));
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
+it('keeps ordinary request deadlines at 10 seconds while NPC requests remain pending', () => {
+  const s = setup();
+  const npc = s.session.askNpc('guide', 'question');
+  const chat = s.session.chat('message');
+  s.clock.advance(9999);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: chat }));
+  s.clock.advance(1);
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: chat, message: expect.stringContaining('10 секунд') }));
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: npc }));
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
+it('clears NPC requests on disconnect and dispose without replay', () => {
+  const s = setup();
+  const dropped = s.session.askNpc('guide', 'drop'); s.clock.advance(50);
+  s.adapter.drop();
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: dropped }));
+  s.session.reconnect(); s.clock.advance(100);
+  s.adapter.receive({ v: 1, type: 'npc-answer', requestId: dropped, targetId: 'guide', text: 'stale' }); s.clock.advance(0);
+  expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: dropped }));
+  expect(s.sent.filter((message) => message.type === 'npc-question' && message.text === 'drop')).toHaveLength(1);
+  const disposed = s.session.askNpc('guide', 'dispose'); s.clock.advance(50);
+  s.session.dispose();
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: disposed }));
+  expect(s.clock.pending).toBe(0);
+  s.clock.advance(32000);
+  expect(s.sent.filter((message) => message.type === 'npc-question' && message.text === 'dispose')).toHaveLength(1);
+});
+it('bounds pending NPC requests to 32', () => {
+  const s = setup();
+  for (let i = 0; i < 32; i++) expect(s.session.askNpc('guide', `question ${i}`)).not.toBeNull();
+  expect(s.session.askNpc('guide', 'overflow')).toBeNull();
+  expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: 'limit' }));
+  s.session.dispose(); expect(s.clock.pending).toBe(0);
+});
 it('delivers one text message to two independent sessions over a controlled test network', () => {
   const clock = new TestClock(); const peers: MockNetworkAdapter[] = []; let messageCount = 0;
   const sessions = ['p1', 'p2'].map((id) => {

@@ -15,7 +15,7 @@ const defaults: Config = {
   defaultMap: 'market', contentDir: 'content', dbPath: 'data/game.sqlite', maxPlayers: 4,
   sessionTtlMs: 43200000, tickHz: 20, broadcastHz: 10, aoiRadius: 64, staticChunkRadius: 3,
   disconnectGraceMs: 10000, saveIntervalMs: 10000, corsOrigins: [], logWorldAccess: false,
-  npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000, options: {} },
+  npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000, options: {} },
 };
 export function record(value: unknown, key: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Неверный объект: ${key}`);
@@ -45,7 +45,7 @@ export function parseConfig(raw: unknown, path: string): Config {
   })) throw new Error('Неверный corsOrigins');
   if (typeof npc.adapter !== 'string' || !npc.adapter) throw new Error('Неверный npc.adapter');
   record(npc.options, 'npc.options');
-  for (const [key, max] of [['maxConcurrent', 2], ['maxUnfinished', 4], ['timeoutMs', 9000]] as const) {
+  for (const [key, max] of [['maxConcurrent', 2], ['maxUnfinished', 4], ['timeoutMs', 30000]] as const) {
     if (!Number.isSafeInteger(npc[key]) || npc[key] < 1 || npc[key] > max) throw new Error(`Неверный npc.${key}`);
   }
   if (npc.maxConcurrent > npc.maxUnfinished) throw new Error('npc.maxConcurrent > maxUnfinished');

@@ -4,7 +4,7 @@
 
 Точный tag — **`qwen3.5:0.8b-q8_0`**, Q8_0. Не использовать общий `0.8b`: его опубликованный пакет включает отдельный MTP/draft. Тега `0.8b-q4_K_M` нет. Metadata explicit Q8-пакета: model811843520байт + projector207346304байта, около1.02GB суммарно; это не измерение RAM. Адаптер отвергает отдельные draft layers и задаёт `draft_num_predict: 0`. Возможные embedded tensors/загрузка projector и реальная память остаются непроверенными.
 
-Игровой deadline остаётся8с (max9), клиент10с; модель сама не переключается. Скорость и качество0.8B пока не квалифицированы. Пример полного профиля — [config.ollama-08b.example.json](../config.ollama-08b.example.json), но им **не надо затирать** уже рабочие настройки.
+После последующего явного согласования игровой default/max deadline —30с, клиент ждёт NPC32с (остальные запросы10с); модель сама не переключается. Существующий config8с не обновляется автоматически: [MAC-30S.md](MAC-30S.md) описывает отдельную смену timeout с backup и пересборку клиента. Скорость и качество0.8B пока не квалифицированы. Пример полного профиля — [config.ollama-08b.example.json](../config.ollama-08b.example.json), но им **не надо затирать** уже рабочие настройки.
 
 ## 1. Скачать только новый пакет (2 терминала)
 
@@ -84,9 +84,9 @@ if target.is_symlink() or not target.is_file():
 raw = target.read_bytes()
 config = json.loads(raw)
 npc = config['npc']
-if (npc['adapter'] != 'ollama' or npc.get('timeoutMs', 8000) != 8000
+if (npc['adapter'] != 'ollama' or npc.get('timeoutMs', 30000) not in (8000, 30000)
         or npc['options']['model'] != 'qwen3.5:2b-q4_K_M'):
-    raise SystemExit('Expected the unchanged Ollama 2B profile with 8s deadline; stop and review')
+    raise SystemExit('Expected an Ollama 2B profile with an approved 8s or 30s deadline; stop and review')
 o = npc['options']
 model, tag = 'qwen3.5:0.8b-q8_0', '0.8b-q8_0'
 tokenizer = base / 'tokenizer-qwen35-08b'
@@ -130,7 +130,7 @@ finally:
     if temporary is not None and temporary.exists():
         temporary.unlink()
 print('Selected', model, 'digest', digest)
-print('Original 2B config preserved; game deadline remains 8000 ms')
+print('Original 2B config preserved; game deadline:', npc.get('timeoutMs', 30000), 'ms')
 PY
 ```
 
@@ -144,7 +144,7 @@ PY
 "$HOME/kuda-llm/tools/node-v24.22.2-darwin-x64/bin/node" server/llm/diagnose.mjs
 ```
 
-Он имеет собственный30с предел только для измерения и сохраняет RAM/cancel guards. Ответ за30с сам по себе не выполняет игровые8с. Дождаться `cleanup_confirmed`; при quarantine не запускать второй runtime. Сохранить `response`/`failure` и `final` — это проверка скорости и первого фактического текста, не учебного качества.
+Он имеет собственный30с предел только для измерения и сохраняет RAM/cancel guards. Ответ за30с сам по себе не квалифицирует текущий игровой лимит30с/целевую скорость8с: в игре иная нагрузка, а очередь входит в общий deadline. Дождаться `cleanup_confirmed`; при quarantine не запускать второй runtime. Сохранить `response`/`failure` и `final` — это проверка скорости и первого фактического текста, не учебного качества.
 
 Затем обычный игровой запуск:
 

@@ -12,7 +12,7 @@ import { memoryStores } from './memory.ts';
 import { answerRequest, auditResponderNetwork } from './responderContract.ts';
 
 const deps = { clock: systemClock, scheduler: systemScheduler };
-const config = { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000 };
+const config = { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000 };
 const q = (player = 'p', id = 'r') => ({ connectionId: 'c' + player, requestId: id,
   player: { accountId: 'a' + player, playerId: player, displayName: 'Игрок' }, npc: answerRequest().npc, question: 'Вопрос' });
 afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers(); });
@@ -21,7 +21,7 @@ describe('configured game LLM integration without real models', () => {
   it('selects registered backends explicitly and does not permit an unqualified second slot', async () => {
     for (const adapter of ['ollama', 'mlx']) {
       const c = parseConfig({ npc: { adapter, options: {} } }, '/tmp/config.json');
-      expect(c.npc.adapter).toBe(adapter); expect(c.npc.timeoutMs).toBe(8000);
+      expect(c.npc.adapter).toBe(adapter); expect(c.npc.timeoutMs).toBe(30000);
       expect(() => parseConfig({ npc: { adapter, maxConcurrent: 2 } }, '/tmp/config.json')).toThrow('maxConcurrent');
       expect(() => createResponder(adapter, {}, deps)).toThrow(); // strict options, not a scripted fallback
     }
@@ -29,15 +29,19 @@ describe('configured game LLM integration without real models', () => {
     expect(() => createResponder('ollamaDiagnostic', {}, deps)).toThrow('Неизвестный');
     expect(parseConfig({ npc: { adapter: 'scripted', maxConcurrent: 2 } }, '/tmp/config.json').npc.maxConcurrent).toBe(2);
   });
-  it('keeps the 0.8B example explicit, separately pinned and at the game 8s deadline', () => {
+  it('keeps the 0.8B example explicit, separately pinned and at the game 30s deadline', () => {
     const path = fileURLToPath(new URL('../config.ollama-08b.example.json', import.meta.url));
     const parsed = parseConfig(JSON.parse(readFileSync(path, 'utf8')), path);
-    expect(parsed.npc.adapter).toBe('ollama'); expect(parsed.npc.timeoutMs).toBe(8000);
+    expect(parsed.npc.adapter).toBe('ollama'); expect(parsed.npc.timeoutMs).toBe(30000);
     expect(parsed.npc.maxConcurrent).toBe(1);
     expect(parsed.npc.options.model).toBe('qwen3.5:0.8b-q8_0');
     expect(parsed.npc.options.tokenizerDir).toContain('08b');
     expect(parsed.npc.options.tokenizerManifest).toContain('08b');
     expect(() => createResponder('ollama', { ...parsed.npc.options, modelDigest: 'a'.repeat(64), runnerVersion: '0.40.13' }, deps)).not.toThrow();
+  });
+  it.each(['config.example.json', 'config.mlx.example.json', 'config.ollama.example.json', 'config.ollama-08b.example.json'])('sets the 30 s overall deadline in %s', (name) => {
+    const path = fileURLToPath(new URL(`../${name}`, import.meta.url));
+    expect(parseConfig(JSON.parse(readFileSync(path, 'utf8')), path).npc.timeoutMs).toBe(30000);
   });
   it.each([
     ['ollama_memory_insufficient', 'ollama_memory_insufficient'],

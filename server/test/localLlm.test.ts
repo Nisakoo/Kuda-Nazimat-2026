@@ -98,6 +98,12 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
     if (q === 'progress-too-many') return batch(prefill, ...Array.from({length:12},(_,i)=>({...decoding,outputChunks:i+1})));
     if (q === 'progress-early-answer') return batch(prefill, decoding, answer);
     if (q === 'progress-after-complete') return batch(prefill, decoding, complete, decoding);
+    if (q === 'deadline-gate') {
+      const timer = setInterval(() => {
+        if (fs.existsSync(${JSON.stringify(dir)}+'/answer')) { clearInterval(timer); send({type:'answer',text:'Ответ'}); }
+      }, 5);
+      return;
+    }
     if (q === 'stall') return;
     if (q === 'exit') return process.exit(7);
     if (q === 'malformed') return process.stdout.write('{bad}\\n');
@@ -136,7 +142,8 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
     if (ownedGroup === undefined) throw new Error('Fixture worker has not spawned');
     return ownedGroup;
   };
-  return { responder, events, pid, releaseProgress: (name: 'decode' | 'complete') => writeFileSync(join(dir, name), '') };
+  return { responder, events, pid, releaseAnswer: () => writeFileSync(join(dir, 'answer'), ''),
+    releaseProgress: (name: 'decode' | 'complete') => writeFileSync(join(dir, name), '') };
 }
 afterEach(async () => {
   for (const release of releaseCleanup.splice(0)) release();
@@ -343,30 +350,34 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
       await responder.stop();
     }
   });
-  it('enforces wall deadline even without timer delivery and the 9 s monotonic ceiling after a clock rollback', async () => {
+  it.each(['ollama', 'mlx'] as const)('%s respects an earlier request deadline without timer delivery, including clock rollback', async (backend) => {
     for (const mode of ['wall', 'monotonic']) {
       let wall = Date.now(); let mono = 0;
-      const { responder, events, pid } = fixture('ollama', 'normal', { monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
+      const { responder, events, pid, releaseAnswer } = fixture(backend, 'normal', { monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
       await responder.start();
-      const request = { ...answerRequest(), deadlineAt: wall + (mode === 'wall' ? 5000 : 60000) };
-      const pending = responder.answer(request, new AbortController().signal);
+      const pending = responder.answer({ ...answerRequest(), question: 'deadline-gate', deadlineAt: wall + 5000 }, new AbortController().signal);
       const rejected = expect(pending).rejects.toThrow('timeout');
       await until(() => events().some((event) => event.type === 'answer'));
-      if (mode === 'wall') wall += 6000; else { wall -= 60000; mono = 9001; }
-      // Cleanup needs a moving monotonic clock only for escalation; this worker honors stop.
+      if (mode === 'wall') wall += 5000; else { wall -= 60000; mono = 5000; }
+      releaseAnswer();
+      // The worker honors stop, so cleanup does not need monotonic escalation.
       await rejected; expect(alive(pid())).toBe(false); expect(responder.status()).toBe('unavailable');
       await responder.stop();
     }
   });
-  it('limits the explicit operator probe to 30 s without changing the default game ceiling', async () => {
-    for (const after of [20000, 30001]) {
-      let mono = 0; const wall = Date.now();
-      const { responder, events } = fixture('ollama', 'normal', { answerCeilingMs: 30000, monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
+  it.each(['ollama', 'mlx'] as const)('%s uses the fixed 30 s game ceiling after rollback and accepts answers beyond 9 s', async (backend) => {
+    for (const after of [20000, 29999, 30000, 30001]) {
+      let mono = 0; let wall = Date.now();
+      const { responder, events, pid, releaseAnswer } = fixture(backend, 'normal', { monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
       await responder.start();
-      const pending = responder.answer({ ...answerRequest(), deadlineAt: wall + 120000 }, new AbortController().signal);
-      const assertion = after > 30000 ? expect(pending).rejects.toThrow(/^timeout$/) : expect(pending).resolves.toEqual({ text: 'Ответ: Вопрос' });
-      await until(() => events().some(event => event.type === 'answer')); mono = after;
-      await assertion; await responder.stop();
+      const pending = responder.answer({ ...answerRequest(), question: 'deadline-gate', deadlineAt: wall + 120000 }, new AbortController().signal);
+      const assertion = after >= 30000 ? expect(pending).rejects.toThrow(/^timeout$/) : expect(pending).resolves.toEqual({ text: 'Ответ' });
+      await until(() => events().some(event => event.type === 'answer'));
+      wall -= 60000; mono = after; releaseAnswer();
+      await assertion;
+      if (after >= 30000) { expect(alive(pid())).toBe(false); expect(responder.status()).toBe('unavailable'); }
+      else expect(responder.status()).toBe('ready');
+      await responder.stop();
     }
   });
   it('times out partial/no output without accepting a truncated answer', async () => {
