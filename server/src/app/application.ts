@@ -20,6 +20,7 @@ import { createResponder } from '../npc/adapters/index.ts';
 import { createNpcDialogueService } from '../npc/NpcDialogueService.ts';
 import { createHttpServer } from '../http/server.ts';
 import { CounterWindow, evaluateHealth } from '../obs/health.ts';
+import { ClientPerfStore } from '../obs/clientPerf.ts';
 import type { Config } from './config.ts';
 
 /** Optional observability pieces from `createObservability`; tests run without them. */
@@ -76,6 +77,9 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   dbLog.info('db.opened', 'База данных открыта', { path: config.dbPath, schema });
   metrics.gauge('db_size_bytes', 'Размер файла БД и WAL', () => databaseBytes(config.dbPath));
   const stores = sqliteStores(db, Date.now, observe);
+  const clientPerf = new ClientPerfStore(systemClock);
+  metrics.gauge('auth_sessions_active', 'Действующие сессии по области', () => (['game', 'admin'] as const).map((scope) => ({ labels: { scope }, value: Number((db.prepare('SELECT count(*) AS n FROM sessions WHERE revoked_at IS NULL AND expires_at > ? AND scope = ?').get(Date.now(), scope) as { n: number }).n) })));
+  metrics.gauge('disk_free_bytes', 'Свободно на диске в каталоге БД', () => { try { const fs = statfsSync(dirname(config.dbPath)); return fs.bavail * fs.bsize; } catch { return 0; } });
   const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: systemClock, ttlMs: config.sessionTtlMs, canAdmit: accountId => game?.canAdmit ? game.canAdmit(accountId ?? '') : !game || game.activePlayers() < config.maxPlayers, maxSessions: config.auth.maxSessions, adminTtlMs: config.admin.sessionTtlMs, passwordless: config.auth.passwordless, logger: logger.child('auth'), metrics });
   if (config.auth.passwordless) log.warn('auth.passwordless.enabled', `Вход без пароля включён (${config.env}); в production он запрещён`);
   let npc: ReturnType<typeof createNpcDialogueService> | undefined;
@@ -101,7 +105,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
         else babylonLog.warn('babylon.translation.failed', 'Языковая операция BABEL не выполнена', { kind, durationMs });
       },
     });
-    game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), avatars: stores.avatars, equipment: stores.equipment, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing,
+    game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), avatars: stores.avatars, equipment: stores.equipment, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing, clientPerf: (playerId) => clientPerf.latest(playerId),
       npcSource: (maps, seed) => {
         catalog = new NpcCatalog({ store: sqliteNpcStore(db), maps: (mapId) => maps.get(mapId), clock: systemClock, babelRequired: BABEL_NPC_IDS, mapFiguresFromServer: config.content.mapFiguresFromServer, logger: logger.child('content'), metrics });
         catalog.seed(seed);
@@ -110,6 +114,8 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     const runtime = game;
     auth.onRevoked((hashes, reason) => runtime.closeSessions(hashes, REVOKE_MESSAGES[reason]));
     const npcService = npc;
+    metrics.gauge('npc_responder_ready', 'Ответчик NPC готов (1/0)', () => npcService.ready() ? 1 : 0);
+    metrics.gauge('language_ready', 'Переводчик готов (1/0)', () => languageReady ? 1 : 0);
     const counters = new CounterWindow();
     const sample = () => counters.sample(Date.now(), {
       timeouts: metrics.value('npc_requests_total', { outcome: 'timeout' }),
@@ -131,7 +137,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
       });
     };
     http = createHttpServer(config, {
-      auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
+      auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, clientPerf, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
       operator: { languageReady: () => languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
     });
     obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state() }));

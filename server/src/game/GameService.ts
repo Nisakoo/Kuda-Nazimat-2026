@@ -16,7 +16,8 @@ import { chooseSpawn, isFree } from './spawn.ts';
 import type { Channel } from './ports.ts';
 import type { PlacedPlayer, World } from './World.ts';
 
-export interface GameSettings { readonly maxPlayers: number; readonly disconnectGraceMs: number; readonly broadcastEvery: number; readonly initialSpawn?: (playerId: string) => { mapId: string; position: { x: number; y: number; z: number }; force?: boolean } | null; readonly didSpawn?: (playerId: string) => void }
+export interface GameSettings {
+  readonly clientPerf?: (playerId: string) => PlayerPresence['perf']; readonly maxPlayers: number; readonly disconnectGraceMs: number; readonly broadcastEvery: number; readonly initialSpawn?: (playerId: string) => { mapId: string; position: { x: number; y: number; z: number }; force?: boolean } | null; readonly didSpawn?: (playerId: string) => void }
 
 interface Seat {
   readonly identity: PlayerIdentity;
@@ -56,6 +57,7 @@ export class GameService {
   private readonly spawnFallbacks: Counter;
   private readonly deltaBytes: Histogram;
   private readonly packets: Counter;
+  private readonly aoiSize: Histogram;
 
   constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger, avatars?: AvatarStore, equipment?: EquipmentStore, metrics: Metrics = new MetricsRegistry(), lifeStore?: WorldLifeStore) {
     this.avatars = avatars; this.equipment = equipment;
@@ -66,6 +68,7 @@ export class GameService {
     this.spawnFallbacks = metrics.counter('game_spawn_fallback_total', 'Появления в базовой точке без свободного места');
     this.deltaBytes = metrics.histogram('game_delta_bytes', 'Оценка размера delta на соединение', [512, 2048, 8192, 32768, 65536, 131072, 196608, 262144]);
     this.packets = metrics.counter('game_packets_out_total', 'Игровые пакеты сервера по типу');
+    this.aoiSize = metrics.histogram('game_aoi_entities', 'Сущностей в AOI при рассылке', [1, 2, 4, 8, 16, 32, 64, 128, 256]);
     metrics.gauge('game_players', 'Игроки по состоянию места', () => {
       const connected = [...this.seats.values()].filter((seat) => seat.channel).length;
       return [{ labels: { state: 'connected' }, value: connected }, { labels: { state: 'grace' }, value: this.seats.size - connected }];
@@ -253,6 +256,7 @@ export class GameService {
       this.syncLife(channel, true, scenes, now);
       if (seat.channel !== channel || !seat.stream) continue;
       const entities = this.world.aoi(seat.identity.playerId);
+      this.aoiSize.observe(entities.length);
       if (new Set(entities.map((entity) => entity.id)).size !== entities.length) this.log.error('invariant.violated', 'Повтор ID сущности в AOI', { invariant: 'aoi.unique-ids', playerId: seat.identity.playerId });
       const delta = seat.stream.diff(entities);
       if (!delta) continue;
@@ -293,7 +297,7 @@ export class GameService {
       name: seat.identity.displayName, mapId: this.world.locate(seat.identity.playerId)?.mapId ?? null,
       connected: seat.channel !== null, releaseInMs: seat.releaseAt === null ? null : Math.max(0, seat.releaseAt - now),
       rttMs: seat.channel?.rttMs?.() ?? null, reconnects: Math.max(0, seat.attaches.filter((time) => now - time < 600_000).length - 1),
-      seatedSeconds: Math.floor((now - seat.seatedAt) / 1000),
+      seatedSeconds: Math.floor((now - seat.seatedAt) / 1000), perf: this.settings.clientPerf?.(seat.identity.playerId) ?? null,
     }));
   }
 

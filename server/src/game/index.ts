@@ -36,7 +36,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   }, life);
   const broadcastEvery = config.tickHz / config.broadcastHz;
   const game = new GameService(world, deps.players, deps.clock, deps.scheduler, {
-    maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery, initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
+    maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery, ...(deps.clientPerf ? { clientPerf: deps.clientPerf } : {}), initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
   }, log, deps.avatars, deps.equipment, metrics, deps.worldLife);
   const tickHistogram = metrics.histogram('game_tick_duration_ms', 'Длительность шага симуляции', FAST_MS_BUCKETS);
   const broadcastHistogram = metrics.histogram('game_broadcast_interval_ms', 'Интервал между рассылками AOI', MS_BUCKETS);

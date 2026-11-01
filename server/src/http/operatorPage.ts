@@ -28,7 +28,7 @@ export const OPERATOR_PAGE = `<!doctype html>
 <p><span id="health"></span> <strong id="seats"></strong> · NPC: <span id="npc"></span> · переводчик: <span id="language"></span> · <span class="muted" id="uptime"></span></p>
 <ul id="reasons"></ul>
 <h2>Игроки</h2>
-<table><thead><tr><th>Игрок</th><th>Карта</th><th>Состояние</th><th>Связь</th><th>В игре</th><th></th></tr></thead><tbody id="players"></tbody></table>
+<table><thead><tr><th>Игрок</th><th>Карта</th><th>Состояние</th><th>Связь</th><th>FPS</th><th>В игре</th><th></th></tr></thead><tbody id="players"></tbody></table>
 <h2>Аккаунт</h2>
 <p><input id="name" placeholder="Имя игрока" maxlength="32">
 <button data-action="reset-password">Выдать временный пароль</button><button data-action="revoke">Завершить сессии</button><button data-action="unlock">Снять блокировку входа</button>
@@ -68,7 +68,7 @@ async function refresh() {
       const kick = document.createElement('button'); kick.textContent = 'Завершить'; kick.addEventListener('click', () => act('revoke', p.name));
       const link = (p.rttMs === null ? '—' : p.rttMs + ' мс') + (p.reconnects >= 3 ? ', нестабильно (' + p.reconnects + ')' : p.reconnects ? ', переподключений: ' + p.reconnects : '');
       const td = document.createElement('td'); td.append(kick);
-      return row([p.name, p.mapId || '—', p.connected ? 'подключён' : 'вышел, место удержано ' + Math.ceil(p.releaseInMs / 1000) + ' с', link, Math.floor(p.seatedSeconds / 60) + ' мин', td]);
+      return row([p.name, p.mapId || '—', p.connected ? 'подключён' : 'вышел, место удержано ' + Math.ceil(p.releaseInMs / 1000) + ' с', link, p.perf && p.perf.fps !== null ? Math.round(p.perf.fps) + ' (' + Math.round(p.perf.ageMs / 1000) + ' с назад)' : 'нет данных', Math.floor(p.seatedSeconds / 60) + ' мин', td]);
     }));
     $('warnings').replaceChildren(...status.warnings.map((w) => row([w.ts.slice(11, 19), w.level === 'warn' ? 'внимание' : 'ошибка', w.msg, w.event])));
     $('error').textContent = '';

@@ -7,6 +7,8 @@ export interface RecorderOptions {
   readonly now?: () => number;
   /** Extra snapshot for the dump: metrics, seats, queue (OBS-004). Must contain no secrets or texts. */
   readonly snapshot?: () => unknown;
+  /** OBS-013 `obs_incident_dumps_total{reason}`. */
+  readonly onDump?: (reason: string) => void;
 }
 
 /**
@@ -20,7 +22,7 @@ export class FlightRecorder {
   private lastDump = -Infinity;
   private suppressed = 0;
   private dumping = false;
-  private readonly options: Required<Omit<RecorderOptions, 'snapshot'>> & Pick<RecorderOptions, 'snapshot'>;
+  private readonly options: Required<Omit<RecorderOptions, 'snapshot' | 'onDump'>> & Pick<RecorderOptions, 'snapshot' | 'onDump'>;
   private readonly recent: LogRecord[] = [];
 
   constructor(options: RecorderOptions) {
@@ -53,6 +55,7 @@ export class FlightRecorder {
       mkdirSync(this.options.dir, { recursive: true });
       writeFileSync(file, [header, { type: 'snapshot', snapshot }, ...ordered].map((line) => JSON.stringify(line)).join('\n') + '\n');
       this.lastDump = now; this.suppressed = 0;
+      this.options.onDump?.(reason);
       return file;
     } catch { return null; }
     finally { this.dumping = false; }

@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { monitorEventLoopDelay } from 'node:perf_hooks';
-import { createLogger, type Logger, type LogsConfig } from '../common/logger.ts';
+import { createLogger, type Logger, type LogSink, type LogsConfig } from '../common/logger.ts';
 import { MetricsRegistry } from '../common/metrics.ts';
 import { consoleSink, FileSink, fanOut } from './sinks.ts';
 import { FlightRecorder } from './recorder.ts';
@@ -24,7 +24,15 @@ export function createObservability(logs: LogsConfig, options: { runId?: string;
   let snapshot: () => unknown = () => null;
   const metrics = new MetricsRegistry();
   const console = consoleSink(logs.consoleLevel, options.consoleWrite);
-  const recorder = new FlightRecorder({ dir: logs.fileLevel === 'off' ? null : logs.dir, runId, now, snapshot: () => ({ metrics: metrics.snapshot(), state: snapshot() }) });
+  const dumps = metrics.counter('obs_incident_dumps_total', 'Дампы бортового самописца по причине');
+  const recorder = new FlightRecorder({ dir: logs.fileLevel === 'off' ? null : logs.dir, runId, now, snapshot: () => ({ metrics: metrics.snapshot(), state: snapshot() }), onDump: (reason) => dumps.inc({ reason: ['operator', 'admin'].includes(reason) ? reason : reason.startsWith('process.') ? 'fatal' : 'error' }) });
+  const events = metrics.counter('log_events_total', 'События warn, error и fatal по модулю');
+  const invariants = metrics.counter('invariant_violations_total', 'Нарушения инвариантов по имени');
+  // OBS-013: counts come from the records themselves, so every module is covered without extra calls.
+  const counting: LogSink = (record) => {
+    if (record.level === 'warn' || record.level === 'error' || record.level === 'fatal') events.inc({ level: record.level, module: record.module });
+    if (record.event === 'invariant.violated') invariants.inc({ invariant: String(record.invariant ?? 'unknown') });
+  };
   let file: FileSink | null = null;
   // Sink trouble goes to the console only, so a broken disk cannot recurse into the file sink.
   const report = (event: 'log.sink.failed' | 'log.dropped', fields: Record<string, unknown>) => {
@@ -32,7 +40,7 @@ export function createObservability(logs: LogsConfig, options: { runId?: string;
     console({ ts: new Date(now()).toISOString(), seq: 0, runId, level: 'warn', module: 'obs', event, msg: event === 'log.dropped' ? 'Строки лога отброшены' : 'Не удалось записать лог в файл', ...fields });
   };
   if (logs.fileLevel !== 'off') file = new FileSink({ dir: logs.dir, runId, minLevel: logs.fileLevel, maxFileBytes: logs.maxFileMb << 20, maxTotalBytes: logs.maxTotalMb << 20, retentionMs: logs.retentionDays * 86_400_000, now, report });
-  const logger = createLogger(fanOut(console, recorder.sink, ...(file ? [file.sink] : [])), runId, now);
+  const logger = createLogger(fanOut(counting, console, recorder.sink, ...(file ? [file.sink] : [])), runId, now);
 
   const delay = monitorEventLoopDelay({ resolution: 20 }); delay.enable();
   let last = { eventLoopP99Ms: 0, rssBytes: process.memoryUsage().rss };

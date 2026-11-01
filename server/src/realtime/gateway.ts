@@ -5,7 +5,7 @@ import { SERVER_REQUEST_ID } from '../../../shared/protocol/types.ts';
 import type { ClientMessage, ErrorCode, ServerMessage } from '../../../shared/protocol/types.ts';
 import { ProtocolError, parseClientMessage, parseServerMessage, peekRequestId } from '../../../shared/protocol/validate.ts';
 import type { Logger } from '../common/logger.ts';
-import { MetricsRegistry, type Counter, type Metrics } from '../common/metrics.ts';
+import { MetricsRegistry, type Counter, type Histogram, type Metrics } from '../common/metrics.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { NpcAnswer, NpcQuestions, PlayerIdentity, SessionVerifier } from '../contracts.ts';
 import type { GameService } from '../game/GameService.ts';
@@ -32,7 +32,7 @@ export interface GatewayDeps {
   readonly validateOutgoing?: boolean;
 }
 
-interface GatewayMetrics { readonly packetsIn: Counter; readonly packetsOut: Counter; readonly invalid: Counter; readonly limited: Counter; readonly handshakes: Counter }
+interface GatewayMetrics { readonly rtt: Histogram; readonly packetsIn: Counter; readonly packetsOut: Counter; readonly invalid: Counter; readonly limited: Counter; readonly handshakes: Counter }
 
 const PACKET_LIMIT = 262144 + 4096;
 const CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
@@ -62,6 +62,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
   const log = deps.logger.child('realtime');
   const registry = deps.metrics ?? new MetricsRegistry();
   const metrics: GatewayMetrics = {
+    rtt: registry.histogram('realtime_rtt_ms', 'RTT heartbeat Engine.IO', [5, 10, 20, 50, 100, 150, 250, 500, 1000, 2000]),
     packetsIn: registry.counter('realtime_packets_in_total', 'Игровые пакеты клиента по типу'),
     packetsOut: registry.counter('realtime_packets_out_total', 'Игровые пакеты сервера по типу'),
     invalid: registry.counter('realtime_invalid_packets_total', 'Отклонённые пакеты клиента'),
@@ -146,7 +147,9 @@ class Connection implements Channel {
     this.socket.conn.on('packet', (packet: { type: string }) => {
       if (packet.type !== 'pong' || !this.pingAt) return;
       const now = this.deps.clock.now();
-      this.rtt = [...this.rtt.filter((sample) => now - sample.at < 60_000), { at: now, ms: performance.now() - this.pingAt }];
+      const ms = performance.now() - this.pingAt;
+      this.metrics.rtt.observe(ms);
+      this.rtt = [...this.rtt.filter((sample) => now - sample.at < 60_000), { at: now, ms }];
       this.pingAt = 0;
     });
     this.socket.on('disconnect', reason => this.onDisconnect(reason));

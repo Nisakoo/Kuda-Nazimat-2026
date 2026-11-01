@@ -17,6 +17,7 @@ import { handleAuth } from './authRoutes.ts';
 import { handleAdmin } from './adminRoutes.ts';
 import { handleOperator, type OperatorDeps } from './operatorRoutes.ts';
 import { telemetryHandler } from './telemetry.ts';
+import type { ClientPerfStore } from '../obs/clientPerf.ts';
 import { bearer, body, clientIp, error, json, type RequestContext } from './util.ts';
 
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
@@ -28,6 +29,8 @@ export interface HttpDeps {
   avatars?: AvatarStore; equipment?: EquipmentStore;
   readonly auth: AuthService; readonly game: GameRuntime; readonly logger: Logger; readonly clock: Clock;
   readonly metrics?: MetricsRegistry;
+  /** OBS-014 store for accepted perf reports. */
+  readonly clientPerf?: ClientPerfStore;
   npcReady(): boolean;
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
@@ -54,7 +57,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   const limited = metrics.counter('http_rate_limited_total', 'HTTP-запросы, отклонённые лимитом сессии');
   const babylonLimit = sessionLimiter(deps.clock, 10, 20);
   const worldLimit = sessionLimiter(deps.clock, 50, 300);
-  const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger });
+  const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger, metrics, ...(deps.clientPerf ? { perf: deps.clientPerf } : {}) });
   const operator: OperatorDeps = {
     auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
     npcReady: deps.npcReady, monitoringToken: config.monitoring.token,

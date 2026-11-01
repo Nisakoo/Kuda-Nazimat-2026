@@ -3,10 +3,12 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, utimesSync,
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createLogger, memoryLogger, type LogRecord } from '../src/common/logger.ts';
+import { createLogger, memoryLogger, silentLogger, type LogRecord } from '../src/common/logger.ts';
 import { MetricsRegistry } from '../src/common/metrics.ts';
 import { consoleSink, fanOut, FileSink } from '../src/obs/sinks.ts';
 import { FlightRecorder } from '../src/obs/recorder.ts';
+import { ClientPerfStore } from '../src/obs/clientPerf.ts';
+import { createObservability } from '../src/obs/index.ts';
 import { evaluateHealth, CounterWindow, type HealthInputs } from '../src/obs/health.ts';
 import * as responders from '../src/npc/adapters/index.ts';
 import { hashToken } from '../src/auth/AuthService.ts';
@@ -92,7 +94,7 @@ describe('metrics and health (OBS-007, 010)', () => {
     expect(evaluateHealth({ ...base, tickP95Ms: 25 }).level).toBe('red');
     expect(evaluateHealth({ ...base, dbErrors5m: 1 }).level).toBe('red');
     expect(evaluateHealth({ ...base, diskFreeBytes: 100 * 1024 ** 2 }).level).toBe('red');
-    const unstable = evaluateHealth({ ...base, players: [{ name: 'Аня', mapId: 'test', connected: true, releaseInMs: null, rttMs: 20, reconnects: 3, seatedSeconds: 60 }] });
+    const unstable = evaluateHealth({ ...base, players: [{ name: 'Аня', mapId: 'test', connected: true, releaseInMs: null, rttMs: 20, reconnects: 3, seatedSeconds: 60, perf: null }] });
     expect(unstable.reasons.map((r) => r.text)).toEqual([expect.stringContaining('Нестабильная связь у игрока Аня')]);
     const window = new CounterWindow(300_000);
     window.sample(0, { t: 0 }); window.sample(200_000, { t: 5 }); window.sample(400_000, { t: 9 });
@@ -169,5 +171,40 @@ describe('end to end (OBS-006, 008, 010, 011)', () => {
     statuses.push((await post('/api/telemetry/client', { v: 1, kind: 'error' }, auth)).status);
     expect(statuses).toEqual([...Array(8).fill(204), 429, 429, 429]);
     expect(logger.records.find((r) => r.event === 'client.error')).toMatchObject({ level: 'warn', message: 'TypeError: x', stack: 'at y', fps: 58 });
+  });
+});
+
+describe('OBS-013/014: catalogue metrics and client performance', () => {
+  it('keeps the last perf report per player for 30 s and exposes client and server metrics without player labels', async () => {
+    let now = 0; const store = new ClientPerfStore({ now: () => now });
+    store.record('p1', { fps: 55, frameMs: 18, drawCalls: 120, map: 'market' });
+    expect(store.latest('p1')).toEqual({ fps: 55, frameMs: 18, drawCalls: 120, map: 'market', ageMs: 0 });
+    now = 30_001; expect(store.latest('p1')).toBeNull(); expect(store.latest('p2')).toBeNull();
+
+    const metrics = new MetricsRegistry();
+    const { post, connect, origin } = await setup({}, undefined, 'test', silentLogger, { metrics });
+    const anya = (await post('/api/auth/dev', { name: 'Аня' })).body!.token as string;
+    const boris = (await post('/api/auth/dev', { name: 'Борис' })).body!.token as string;
+    const ids: string[] = [];
+    for (const token of [anya, boris]) { const c = await connect(token); c.command('join', { mapId: 'test' }); const joined = await c.wait((p) => p.type === 'joined'); if (joined.type === 'joined') ids.push(joined.playerId); }
+    expect((await post('/api/telemetry/client', { v: 1, kind: 'perf', fps: 55, frameMs: 18, drawCalls: 120 }, { Authorization: `Bearer ${anya}` })).status).toBe(204);
+    const players = ((await (await fetch(`${origin}/api/operator/status`)).json()) as { players: { name: string; perf: { fps: number } | null }[] }).players;
+    expect(players.find((p) => p.name === 'Аня')?.perf).toMatchObject({ fps: 55, frameMs: 18, drawCalls: 120 });
+    expect(players.find((p) => p.name === 'Борис')?.perf).toBeNull();
+    const text = await (await fetch(`${origin}/metrics`)).text();
+    for (const name of ['client_fps_bucket', 'client_reports_total{kind="perf",result="accepted"} 1', 'game_aoi_entities_bucket', 'npc_responder_ready 1', 'language_ready 1', 'auth_sessions_active{scope="game"} 2', 'disk_free_bytes', 'game_npcs{state="active"}']) expect(text, name).toContain(name);
+    for (const id of ids) expect(text).not.toContain(id);
+  });
+
+  it('counts warn/error events, invariant violations and incident dumps from the log records', () => {
+    const dir = temp();
+    const obs = createObservability({ consoleLevel: 'fatal', fileLevel: 'debug', dir, maxFileMb: 1, maxTotalMb: 10, retentionDays: 1 }, { runId: 'm' });
+    try {
+      obs.logger.child('game').warn('game.tick.slow', 'Медленно');
+      obs.logger.child('game').error('invariant.violated', 'Нарушение', { invariant: 'aoi.unique-ids' });
+      expect(obs.metrics.value('log_events_total', { level: 'warn', module: 'game' })).toBe(1);
+      expect(obs.metrics.value('invariant_violations_total', { invariant: 'aoi.unique-ids' })).toBe(1);
+      expect(obs.metrics.value('obs_incident_dumps_total', { reason: 'error' })).toBe(1);
+    } finally { obs.close(); }
   });
 });

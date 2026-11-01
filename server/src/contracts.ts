@@ -68,6 +68,8 @@ export interface PlayerPresence {
   readonly name: string; readonly mapId: string | null; readonly connected: boolean; readonly releaseInMs: number | null;
   /** OBS-010: median Engine.IO heartbeat RTT of the last minute, reconnects in 10 min, seconds since the seat was taken. */
   readonly rttMs: number | null; readonly reconnects: number; readonly seatedSeconds: number;
+  /** OBS-014: last client performance report younger than 30 s, null otherwise. */
+  readonly perf: { readonly fps: number | null; readonly frameMs: number | null; readonly drawCalls: number | null; readonly ageMs: number } | null;
 }
 
 export interface MapSummary { readonly mapId: string; readonly worldBytes: number; readonly chunks: number }
@@ -104,6 +106,8 @@ export interface GameDeps {
   readonly pingIntervalMs?: number;
   /** OBS-005: validate every outgoing packet (development). */
   readonly validateOutgoing?: boolean;
+  /** OBS-014: latest client performance report of a player. */
+  readonly clientPerf?: (playerId: string) => PlayerPresence['perf'];
 }
 export interface GameRuntime {
   canAdmit?(accountId: string): boolean;
