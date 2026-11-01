@@ -2,9 +2,12 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readFile, realpath, stat } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import type { Config } from '../app/config.ts';
-import type { GameRuntime, SessionVerifier } from '../contracts.ts';
+import type { AvatarStore, EquipmentStore, GameRuntime } from '../contracts.ts';
+import { parseAvatarSelection } from '../../../shared/avatar/validate.ts';
+import { AVATAR_IDS } from '../../../shared/avatar/types.ts';
 import type { Logger } from '../common/logger.ts';
-import { validName, hashToken } from '../auth/AuthService.ts';
+import { AuthError, type AuthService, validName, hashToken, parseCredentials } from '../auth/AuthService.ts';
+import { parseEquipmentState } from '../../../shared/equipment/validate.ts';
 import { parseBabylonRequest } from '../../../shared/babylon/validate.ts';
 import { BabylonError, type BabylonService } from '../babylon/BabylonService.ts';
 
@@ -30,7 +33,7 @@ async function body(req: IncomingMessage, limit = 1024): Promise<unknown> {
   });
   return JSON.parse(encoded.toString('utf8'));
 }
-export function createHttpServer(config: Config, deps: { auth: SessionVerifier & { guest(name: string): { token: string; expiresAt: number } }; game: GameRuntime; npcReady(): boolean; logger: Logger; babylon?: BabylonService; cancelBabylon?(connectionId: string): void }) {
+export function createHttpServer(config: Config, deps: { auth: AuthService; game: GameRuntime; avatars?: AvatarStore; equipment?: EquipmentStore; npcReady(): boolean; logger: Logger; babylon?: BabylonService; cancelBabylon?(connectionId: string): void }) {
   let stopping = false;
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -45,12 +48,85 @@ export function createHttpServer(config: Config, deps: { auth: SessionVerifier &
     try { path = decodeURIComponent((req.url ?? '/').split('?')[0]!); }
     catch { res.writeHead(404); res.end(); return; }
     if (!path.startsWith('/') || path.includes('//') || path.includes('\\') || path.includes('\0') || path.split('/').some((part) => part === '..' || part === '.')) { res.writeHead(404); res.end(); return; }
-    if (req.method === 'POST' && path === '/api/auth/guest') {
-      let name: string | null;
-      try { const value = await body(req) as Record<string, unknown>; name = value && Object.keys(value).length === 1 && Object.hasOwn(value, 'name') ? validName(value.name) : null; }
-      catch { name = null; }
-      if (!name) { error(res, 400, 'INVALID', 'Введите имя длиной 1–32 символа без управляющих символов'); return; }
-      json(res, 200, deps.auth.guest(name)); return;
+    if (req.method === 'POST' && ['/api/auth/guest', '/api/auth/register', '/api/auth/login'].includes(path)) {
+      let value: unknown;
+      try { value = await body(req); } catch { error(res, 400, 'INVALID', 'Некорректные данные входа'); return; }
+      const source = req.socket.remoteAddress ?? 'unknown';
+      try {
+        if (path === '/api/auth/guest') {
+          const record = value as Record<string, unknown> | null;
+          const name = record && !Array.isArray(record) && Object.keys(record).length === 1 && Object.hasOwn(record, 'name') ? validName(record.name) : null;
+          if (!name) throw new AuthError('INVALID');
+          json(res, 200, deps.auth.guest(name, source));
+        } else {
+          const { name, password } = parseCredentials(value);
+          const registered = path === '/api/auth/register';
+          const session = await (registered ? deps.auth.register(name, password, source) : deps.auth.login(name, password, source));
+          json(res, registered ? 201 : 200, session);
+        }
+      } catch (cause) {
+        if (!(cause instanceof AuthError)) throw cause;
+        error(res, cause.status, cause.code, cause.message);
+      }
+      return;
+    }
+    if ((path === '/api/auth/state' && req.method === 'GET') || (path === '/api/auth/logout' && req.method === 'POST')) {
+      const bearer = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.headers.authorization ?? '');
+      const session = bearer ? await deps.auth.verify(bearer[1]!) : { ok: false as const };
+      if (!session.ok) { req.resume(); error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      if (path === '/api/auth/state') { json(res, 200, deps.auth.state(session.identity)); return; }
+      if (req.headers['content-length'] !== undefined && req.headers['content-length'] !== '0' || req.headers['transfer-encoding']) {
+        try {
+          const value = await body(req);
+          if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length) throw new Error();
+        } catch { error(res, 400, 'INVALID', 'Выход не принимает параметры'); return; }
+      }
+      if (!(await deps.auth.verify(bearer![1]!)).ok) { error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      deps.auth.logout(bearer![1]!);
+      deps.cancelBabylon?.('babel:' + hashToken(bearer![1]!));
+      res.writeHead(204); res.end(); return;
+    }
+    if (path === '/api/equipment' && (req.method === 'GET' || req.method === 'POST') && deps.equipment) {
+      const bearer = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.headers.authorization ?? '');
+      const session = bearer ? await deps.auth.verify(bearer[1]!) : { ok: false as const };
+      if (!session.ok) { req.resume(); error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      if (req.method === 'GET') { json(res, 200, { tool: deps.equipment.load(session.identity.playerId) }); return; }
+      let selection;
+      try { selection = parseEquipmentState(await body(req)); }
+      catch { error(res, 400, 'INVALID', 'Некорректный предмет экипировки'); return; }
+      if (!(await deps.auth.verify(bearer![1]!)).ok) { error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      deps.equipment.save(session.identity.playerId, selection.tool);
+      deps.game.setEquipment?.(session.identity.playerId, selection.tool);
+      json(res, 200, selection); return;
+    }
+    if (path.startsWith('/api/avatar/models/') && (req.method === 'GET' || req.method === 'HEAD')) {
+      const bearer = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.headers.authorization ?? '');
+      const session = bearer ? await deps.auth.verify(bearer[1]!) : { ok: false as const };
+      if (!session.ok) { error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      const id = path.slice('/api/avatar/models/'.length).replace(/\.glb$/, '');
+      if (!AVATAR_IDS.some(value => value === id) || !path.endsWith('.glb')) { res.writeHead(404); res.end(); return; }
+      try {
+        const root = await realpath(resolve(config.worldDir, 'assets/models/avatars'));
+        const file = await realpath(resolve(root, `${id}.glb`));
+        const info = await stat(file);
+        if (!file.startsWith(root + sep) || !info.isFile() || info.size > 2 * 1024 * 1024) throw new Error('Invalid model asset');
+        const data = await readFile(file);
+        res.writeHead(200, { 'Content-Type': 'model/gltf-binary', 'Content-Length': data.byteLength }); res.end(req.method === 'HEAD' ? undefined : data);
+      } catch { res.writeHead(404); res.end(); }
+      return;
+    }
+    if (path === '/api/avatar' && (req.method === 'GET' || req.method === 'POST') && deps.avatars) {
+      const bearer = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.headers.authorization ?? '');
+      const session = bearer ? await deps.auth.verify(bearer[1]!) : { ok: false as const };
+      if (!session.ok) { req.resume(); error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      if (req.method === 'GET') { json(res, 200, { avatarId: deps.avatars.load(session.identity.playerId) }); return; }
+      let selection;
+      try { selection = parseAvatarSelection(await body(req)); }
+      catch { error(res, 400, 'INVALID', 'Некорректный облик'); return; }
+      if (!(await deps.auth.verify(bearer![1]!)).ok) { error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+      deps.avatars.save(session.identity.playerId, selection.avatarId);
+      deps.game.setAvatar?.(session.identity.playerId, selection.avatarId);
+      json(res, 200, selection); return;
     }
     if (req.method === 'POST' && path === '/api/babylon' && deps.babylon) {
       const bearer = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.headers.authorization ?? '');

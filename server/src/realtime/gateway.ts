@@ -59,9 +59,15 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
     }, () => next(new HandshakeError('UNAVAILABLE', 'Сервер временно недоступен.')));
   });
 
-  nsp.on('connection', (socket) => new Connection(socket, deps, log).start());
+  const unsubscribe = deps.sessions.onRevoked?.((sessionKey) => {
+    for (const socket of nsp.sockets.values()) if (socket.data.sessionKey === sessionKey) {
+      socket.emit('game', { v: 3, type: 'error', requestId: SERVER_REQUEST_ID, code: 'UNAUTHORIZED', message: 'Сессия отозвана.' });
+      socket.disconnect(true);
+    }
+  });
+  nsp.on('connection', (socket) => { void new Connection(socket, deps, log).start(); });
 
-  return { close: () => new Promise<void>((resolve) => { void io.close(() => resolve()); }) };
+  return { close: () => new Promise<void>((resolve) => { unsubscribe?.(); void io.close(() => resolve()); }) };
 }
 
 class Connection implements Channel {
@@ -88,11 +94,18 @@ class Connection implements Channel {
     this.chatBucket = new TokenBucket(deps.clock, 1, 3);
   }
 
-  start(): void {
-    if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
-    this.scheduleExpiry();
-    this.socket.on('game', (raw: unknown) => this.receive(raw));
+  async start(): Promise<void> {
     this.socket.on('disconnect', () => this.onDisconnect());
+    // Logout can race with the asynchronous handshake. Verify again before attaching a seat.
+    try {
+      const token = (this.socket.handshake.auth as { token: string }).token;
+      const check = await this.deps.sessions.verify(token);
+      if (this.closed) return;
+      if (!check.ok) { this.close('Сессия отозвана или истекла.'); return; }
+      if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
+      this.scheduleExpiry();
+      this.socket.on('game', (raw: unknown) => this.receive(raw));
+    } catch { this.fail('UNAVAILABLE', 'Сервер временно недоступен.'); }
   }
 
   send(message: ServerMessage): void { if (!this.closed) this.socket.emit('game', message); }
@@ -149,6 +162,9 @@ class Connection implements Channel {
   private dispatch(message: ClientMessage): void {
     const game = this.deps.game;
     if (message.type === 'join') {
+      try {
+        if (this.deps.sessions.state?.(this.identity).requiresAvatar) { this.error(message.requestId, 'FORBIDDEN', 'Сначала подтвердите облик персонажа.'); return; }
+      } catch { this.error(message.requestId, 'UNAVAILABLE', 'Не удалось проверить облик. Повторите позже.'); return; }
       const result = game.join(this, message.mapId);
       if (result.ok) this.send(result.message(message.requestId));
       else if (result.reason === 'unknown-map') this.error(message.requestId, 'INVALID', 'Неизвестная карта.');

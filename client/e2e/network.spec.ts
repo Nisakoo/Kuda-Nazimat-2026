@@ -52,7 +52,7 @@ test('changes the map and restores local play after an unauthorized real session
   await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click();
   await expectCapture(page, true);
-  await expect(page.getByRole('heading', { name: 'Сады науки' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Сады науки', exact: true })).toBeVisible();
   await expect(page.getByLabel('Положение игрока')).toContainText('Z 38.0');
   expect(await old!.evaluate((element) => element.isConnected)).toBe(false);
   await page.keyboard.press('Escape');

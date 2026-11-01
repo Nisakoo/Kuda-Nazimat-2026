@@ -5,6 +5,6 @@ import base from './playwright.config';
 export default defineConfig({
   ...base,
   testMatch: 'ui-hud.spec.ts',
-  webServer: undefined,
+  webServer: [],
   outputDir: 'test-results/ui-hud',
 });

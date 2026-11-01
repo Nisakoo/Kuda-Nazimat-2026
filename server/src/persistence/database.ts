@@ -1,10 +1,12 @@
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { randomId } from '../common/ids.ts';
+import { sqliteAuthStores } from './authentication.ts';
 import type { AccountStore, SessionStore } from '../auth/ports.ts';
 import type { DialogueStore } from '../npc/ports.ts';
-import type { PlayerIdentity, PlayerStore } from '../contracts.ts';
+import type { AvatarStore, EquipmentStore, PlayerStore } from '../contracts.ts';
+import { isToolId } from '../../../shared/equipment/validate.ts';
+import { isAvatarId } from '../../../shared/avatar/validate.ts';
 import { applyMigrations, loadMigrations } from './migrate.ts';
 
 export function transaction<T>(db: DatabaseSync, action: () => T): T {
@@ -23,29 +25,9 @@ export function openDatabase(path: string, now = Date.now()): DatabaseSync {
   } catch (error) { db.close(); throw new Error(`Не удалось открыть БД ${path}`, { cause: error }); }
 }
 export function sqliteStores(db: DatabaseSync, now: () => number = Date.now): {
-  accounts: AccountStore; sessions: SessionStore; players: PlayerStore; dialogue: DialogueStore;
+  accounts: AccountStore; sessions: SessionStore; players: PlayerStore; avatars: AvatarStore; equipment: EquipmentStore; dialogue: DialogueStore;
 } {
-  const findAccount = db.prepare('SELECT a.id AS accountId, p.id AS playerId, a.name AS displayName FROM accounts a JOIN players p ON p.account_id = a.id WHERE name_key = ?');
-  const accounts: AccountStore = {
-    findOrCreate(name, nameKey, time) {
-      return transaction(db, () => {
-        const found = findAccount.get(nameKey);
-        if (found) return found as unknown as PlayerIdentity;
-        const accountId = randomId('a'); const playerId = randomId('p');
-        db.prepare('INSERT INTO accounts VALUES (?, ?, ?, ?)').run(accountId, name, nameKey, time);
-        db.prepare('INSERT INTO players (id, account_id, updated_at) VALUES (?, ?, ?)').run(playerId, accountId, time);
-        return { accountId, playerId, displayName: name };
-      });
-    },
-  };
-  const sessions: SessionStore = {
-    create(s) { db.prepare('INSERT INTO sessions VALUES (?, ?, ?, ?)').run(s.tokenHash, s.accountId, s.createdAt, s.expiresAt); },
-    find(hash) {
-      const row = db.prepare('SELECT a.id AS accountId, p.id AS playerId, a.name AS displayName, s.expires_at AS expiresAt FROM sessions s JOIN accounts a ON a.id = s.account_id JOIN players p ON p.account_id = a.id WHERE token_hash = ?').get(hash);
-      return row ? { identity: { accountId: String(row.accountId), playerId: String(row.playerId), displayName: String(row.displayName) }, expiresAt: Number(row.expiresAt) } : null;
-    },
-    prune(before) { db.prepare('DELETE FROM sessions WHERE expires_at < ?').run(before); },
-  };
+  const { accounts, sessions } = sqliteAuthStores(db);
   const players: PlayerStore = {
     load(id) {
       const row = db.prepare('SELECT map_id, x, y, z, rotation_y FROM players WHERE id = ?').get(id);
@@ -61,6 +43,26 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now): {
       });
     },
   };
+  const avatars: AvatarStore = {
+    load(id) {
+      const row = db.prepare('SELECT avatar_id FROM players WHERE id = ?').get(id);
+      if (!row || (row.avatar_id !== null && !isAvatarId(row.avatar_id))) throw new Error('Игрок или облик не найден');
+      return row.avatar_id as import('../../../shared/avatar/types.ts').AvatarId | null;
+    },
+    save(id, avatarId) {
+      if (!isAvatarId(avatarId) || db.prepare('UPDATE players SET avatar_id = ? WHERE id = ?').run(avatarId, id).changes !== 1) throw new Error('Игрок или облик не найден');
+    },
+  };
+  const equipment: EquipmentStore = {
+    load(id) {
+      const row = db.prepare('SELECT equipped_tool FROM players WHERE id = ?').get(id);
+      if (!row || (row.equipped_tool !== null && !isToolId(row.equipped_tool))) throw new Error('Игрок или инструмент не найден');
+      return row.equipped_tool as import('../../../shared/equipment/types.ts').ToolId | null;
+    },
+    save(id, tool) {
+      if ((tool !== null && !isToolId(tool)) || db.prepare('UPDATE players SET equipped_tool = ? WHERE id = ?').run(tool, id).changes !== 1) throw new Error('Игрок или инструмент не найден');
+    },
+  };
   const dialogue: DialogueStore = {
     history(playerId, npcId) {
       return db.prepare('SELECT question, answer FROM npc_dialogue WHERE player_id = ? AND npc_id = ? ORDER BY created_at DESC, id DESC LIMIT 6').all(playerId, npcId).reverse() as unknown as { question: string; answer: string }[];
@@ -72,5 +74,5 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now): {
       });
     },
   };
-  return { accounts, sessions, players, dialogue };
+  return { accounts, sessions, players, avatars, equipment, dialogue };
 }

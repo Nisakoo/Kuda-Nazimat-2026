@@ -18,7 +18,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   const log = deps.logger.child('game');
   const game = new GameService(world, deps.players, deps.clock, deps.scheduler, {
     maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery: config.tickHz / config.broadcastHz, initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
-  }, log);
+  }, log, deps.avatars, deps.equipment);
 
   const timers: TimerHandle[] = [];
   let gateway: { close(): Promise<void> } | null = null;
@@ -55,8 +55,12 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   };
 
   return {
+    canAdmit: accountId => game.canAdmit(accountId),
+    setAvatar: (playerId, avatarId) => game.setAvatar(playerId, avatarId),
+    setEquipment: (playerId, tool) => game.setEquipment(playerId, tool),
     canAct: (accountId, sessionKey) => game.canAct(accountId, sessionKey),
     location: accountId => game.locate(accountId),
+    playerLocation: playerId => game.playerLocation(playerId),
     maps: [...loaded.maps.values()].map((map) => ({ mapId: map.id, worldBytes: map.manifest.worldBytes, chunks: map.manifest.chunks.length })),
     worldFile(path: string, accountId: string): WorldFileAccess {
       const file = loaded.files.get(path);

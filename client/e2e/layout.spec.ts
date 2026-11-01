@@ -61,7 +61,7 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1024, height: 600
     await page.clock.runFor(200);
     // HUD actions must not overlap, including the interaction prompt near an NPC.
     const interaction = await page.locator('.interaction').boundingBox();
-    const chatButton = await page.locator('.chat-button').boundingBox();
+    const chatButton = await page.getByRole('navigation', { name: 'Игровые окна', exact: true }).getByRole('button', { name: 'Чат', exact: true }).boundingBox();
     expect(interaction).not.toBeNull();
     const a = interaction!, b = chatButton!;
     expect(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y).toBe(true);

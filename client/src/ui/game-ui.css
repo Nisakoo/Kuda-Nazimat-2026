@@ -3,7 +3,7 @@ button, input, select, textarea { font: inherit; }
 button { min-height: 44px; border-radius: 3px; background: var(--ui-teal); }
 button:hover { background: #055558; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #138e93; outline-offset: 3px; }
-.parchment { background: linear-gradient(125deg, #fff8ec, var(--ui-paper) 55%, #f1e4cc); color: var(--ui-ink); border: 2px solid #fff9e9; box-shadow: 0 8px 28px #63412730, inset 0 0 0 1px var(--ui-line); border-radius: 4px; }
+.parchment { background: var(--ui-paper) linear-gradient(125deg, #fff8ec, var(--ui-paper) 55%, #f1e4cc); color: var(--ui-ink); border: 2px solid #fff9e9; box-shadow: 0 8px 28px #63412730, inset 0 0 0 1px var(--ui-line); border-radius: 4px; }
 header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
 .brand { color: var(--ui-ink); font-size: 27px; font-weight: 500; letter-spacing: 0; gap: 14px; }
 .header-actions .mode { font-size: 11px; background: #fbf1dfdc; }
@@ -12,12 +12,12 @@ header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
 .language-button:hover { background: #fff9ed; }
 .game-screen .header-actions .mode { display: none; }
 .game-screen .header-actions > .small { padding: 8px; background: #fff6e5d9; border-radius: 3px; }
-.game-screen .hud-top { position: absolute; top: 88px; left: 32px; right: 32px; margin: 0; }
+.game-screen .hud-top { grid-area: auto; position: absolute; top: 88px; left: 32px; right: 32px; margin: 0; }
 .location { padding: 0; pointer-events: auto; }
 .task-chip { display: flex; gap: 13px; align-items: center; max-width: min(540px, 70vw); padding: 12px 18px; font-size: 16px; text-align: left; }
 .task-chip:hover { background: #fff6e5; }
 .task-count { color: #617b7c; white-space: nowrap; }
-.task-gem { background: #078c88; color: white; width: 23px; height: 23px; display: grid; place-items: center; border-radius: 4px; flex: 0 0 auto; }
+.task-gem { background: #078c88; color: white; width: 25px; height: 25px; display: grid; place-items: center; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); flex: 0 0 auto; }
 .game-screen footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px 16px; background: none; pointer-events: none; }
 .game-screen footer .hints { display: none; }
 .game-screen footer .status { margin: 3px; padding: 4px 8px; background: #fff8e9d9; border-radius: 2px; }
@@ -33,6 +33,7 @@ header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
 .game-screen .modal-backdrop { background: none; backdrop-filter: none; }
 .game-screen dialog::backdrop { background: #513f2820; }
 .game-screen .panel, .game-screen .dialog-panel { background: var(--ui-paper); border: 2px solid #fff9e9; border-radius: 4px; color: var(--ui-ink); box-shadow: 0 10px 35px #5c3b2138; }
+dialog.babel-panel, .map-dialog { background-image: linear-gradient(135deg, #198b87 0 8px, transparent 8px), linear-gradient(225deg, #198b87 0 8px, transparent 8px), linear-gradient(45deg, #198b87 0 8px, transparent 8px), linear-gradient(315deg, #198b87 0 8px, transparent 8px); background-size: 14px 14px; background-position: left 5px top 5px, right 5px top 5px, left 5px bottom 5px, right 5px bottom 5px; background-repeat: no-repeat; }
 dialog.babel-panel { max-height: calc(100svh - 190px); margin: auto auto 108px; overflow: visible; position: fixed; }
 .babel-content { border-radius: 4px; }
 .babel-navigation { border: 0; }

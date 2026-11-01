@@ -3,7 +3,7 @@ export type PartySize = 1 | 2 | 3 | 4;
 export type ItemId = 'dates' | 'red-fruit' | 'yellow-fruit' | 'water' | 'fabric';
 export type Stone = readonly (readonly (readonly [number, number])[])[];
 export interface Languages { native: Language; learning: Language }
-export interface Word extends Languages { id: string; word: string; translation: string; note: string }
+export interface Word extends Languages { id: string; word: string; translation: string; note: string; learned: boolean; example: string; exampleTranslation: string }
 export interface Tablet { id: string; authorId: string; authorName: string; drawing: Stone; createdAt: number }
 export interface ChatEntry { id: string; authorId: string; authorName: string; text: string; language: Language; translated: boolean; status: 'sent' | 'translating' | 'delivered' | 'error'; createdAt: number; error?: string }
 export interface NpcReply { id: string; npcId: string; question: string; text: string; language: Language }
@@ -16,7 +16,10 @@ export interface BabylonState {
   introSeen: boolean;
   party: { id: string; size: PartySize; count: number; role: number; members: readonly { id: string; name: string; role: number }[]; started: boolean; completed: boolean; seconds: number } | null;
   availableParty: { size: PartySize; count: number } | null;
+  partyPositions: readonly { readonly id: string; readonly name: string; readonly x: number; readonly z: number }[];
   task: string;
+  taskTitle: string;
+  taskTarget: { readonly x: number; readonly z: number } | null;
   goatGuide: string | null;
   inventory: Readonly<Record<ItemId, number>>;
   fed: readonly string[];
@@ -33,7 +36,8 @@ export type BabylonAction =
   | { type: 'buy'; item: ItemId; targetId: string }
   | { type: 'feed'; item: ItemId; targetId: string }
   | { type: 'carve'; drawing: Stone }
-  | { type: 'word-save'; id?: string; word: string; translation: string; note: string }
+  | { type: 'word-save'; id?: string; word: string; translation: string; note: string; example?: string; exampleTranslation?: string }
+  | { type: 'word-learn'; id: string; learned: boolean }
   | { type: 'word-delete'; id: string }
   | { type: 'suggest'; word: string }
   | { type: 'chat'; text: string }

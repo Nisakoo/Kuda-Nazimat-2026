@@ -28,24 +28,40 @@ test.beforeAll(async () => {
   await start();
 });
 test.afterAll(async () => { await stop(); if (directory) await rm(directory, { recursive: true, force: true }); });
-async function login(page: Page, name: string, size?: string, learning = 'en', chunkRadius: number | null = 0) {
+async function login(page: Page, name: string, size?: string, learning?: string, chunkRadius: number | null = 0) {
   await page.route('**/config.json', route => route.fulfill({ json: { session: 'online', serverUrl: origin, mapId: 'market', debug: true, chunkRadius } }));
-  await page.goto(origin); await page.getByLabel('Имя игрока').fill(name); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
-  if (size) {
-    const mode = page.getByRole('dialog', { name: 'Куда отправимся?' });
-    await expect(mode).toBeVisible();
-    if (size !== '1') {
-      const friends = mode.getByRole('radio', { name: 'С друзьями' });
-      if (await friends.count() && await friends.isEnabled()) {
-        await friends.check();
-        const count = mode.getByLabel('Число игроков');
-        if (await count.count() && await count.isEnabled()) await count.selectOption(size);
-      }
+  await page.goto(origin); await page.getByLabel('Имя игрока').fill(name); await page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }).click();
+  const mode = page.getByRole('dialog', { name: 'Куда отправимся?' });
+  await expect(mode).toBeVisible();
+  const restored = size === undefined;
+  if (restored) {
+    await expect(mode).toContainText('Продолжение сохранённого задания. Режим и прогресс сохраняются.');
+    await expect(mode.getByRole('radio', { name: /^Одному/ })).toBeDisabled();
+    await expect(mode.getByRole('radio', { name: /^С друзьями/ })).toBeDisabled();
+  } else if (size !== '1') {
+    const friends = mode.getByRole('radio', { name: /^С друзьями/ });
+    if (await friends.isEnabled()) {
+      await mode.locator('.entry-choice').filter({ has: friends }).click();
+      await expect(friends).toBeChecked();
+      const count = mode.getByLabel('Число игроков');
+      if (await count.isEnabled()) await count.selectOption(size);
     }
-    await mode.getByRole('button', { name: 'Далее: языки →' }).click();
-    await expect(page.getByRole('dialog', { name: 'Ваши языки' })).toBeVisible();
-    await page.getByLabel('Изучаемый язык').selectOption(learning);
-    await page.getByRole('button', { name: 'Войти в Вавилон →' }).click();
+  }
+  await mode.getByRole('button', { name: 'Далее: языки →', exact: true }).click();
+  const languages = page.getByRole('dialog', { name: 'Ваши языки', exact: true });
+  await expect(languages).toBeVisible();
+  // Keep a restored profile's saved language unless this caller requests a change.
+  if (learning !== undefined || !restored) await languages.getByLabel('Изучаемый язык').selectOption(learning ?? 'en');
+  const action = restored ? 'languages' : 'enroll';
+  const [completed] = await Promise.all([
+    page.waitForResponse(response => response.url() === `${origin}/api/babylon` && response.request().method() === 'POST'
+      && (response.request().postDataJSON() as { action?: { type?: string } }).action?.type === action),
+    languages.getByRole('button', { name: 'Войти в Вавилон →', exact: true }).click(),
+  ]);
+  expect(completed.ok()).toBe(true);
+  if (restored) {
+    await expect(languages).toBeHidden();
+  } else {
     await expect(page.getByRole('dialog', { name: 'Добро пожаловать в Вавилон' })).toBeVisible();
     await expectCapture(page, false); await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   }
@@ -73,7 +89,7 @@ test('two real players enroll, translate, share stones and restore a private dic
   await menu(other, 'Общение'); await expect(other.getByLabel('История общения')).toContainText('Compra dátiles'); await expect(other.getByLabel('История общения')).toContainText('Машинный перевод');
   await other.getByRole('button', { name: 'Запомнить dátiles', exact: true }).click();
   await expect(other.getByLabel('Перевод', { exact: true })).toHaveValue('финики');
-  await other.getByLabel('Заметка').fill('Личная запись'); await other.getByRole('button', { name: 'Добавить слово', exact: true }).click(); await expect(other.locator('.word-list')).toContainText('Личная запись'); await close(other);
+  await other.getByLabel('Заметка', { exact: true }).fill('Личная запись'); await other.getByRole('button', { name: 'Добавить слово', exact: true }).click(); await expect(other.locator('.word-list')).toContainText('Личная запись'); await close(other);
   await close(page); await menu(page, 'Камень');
   const canvas = page.getByLabel('Камень для рисунка'); const box = (await canvas.boundingBox())!;
   await page.mouse.move(box.x + 40, box.y + 40); await page.mouse.down(); await page.mouse.move(box.x + 100, box.y + 100, { steps: 5 }); await page.mouse.up();
@@ -83,8 +99,11 @@ test('two real players enroll, translate, share stones and restore a private dic
   await other.screenshot({ path: 'test-results/babylon-shared-stone.png' });
   await close(page); await menu(page, 'Словарь'); await expect(page.locator('.word-list li')).toHaveCount(0);
   await stop(); await start();
-  await login(other, 'Покупатель-тест'); await menu(other, 'Словарь'); await expect(other.locator('.word-list')).toContainText('Личная запись');
-  await other.getByRole('button', { name: 'Изменить', exact: true }).click(); await other.getByLabel('Заметка').fill('Исправлено'); await other.getByRole('button', { name: 'Сохранить слово', exact: true }).click(); await expect(other.locator('.word-list')).toContainText('Исправлено');
+  await login(other, 'Покупатель-тест'); await menu(other, 'Словарь');
+  await other.getByRole('button', { name: 'Учу · 1', exact: true }).click();
+  await expect(other.getByRole('button', { name: 'Учу · 1', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(other.locator('.word-list')).toContainText('Личная запись');
+  await other.getByRole('button', { name: 'Изменить', exact: true }).click(); await other.getByLabel('Заметка', { exact: true }).fill('Исправлено'); await other.getByRole('button', { name: 'Сохранить слово', exact: true }).click(); await expect(other.locator('.word-list')).toContainText('Исправлено');
   await other.screenshot({ path: 'test-results/babylon-dictionary.png' });
   await other.close(); expect(errors).toEqual([]);
 });
@@ -137,7 +156,8 @@ test('real server authorizes the default 25-chunk window at the market and tower
   const cache = page.getByLabel('Кеш мира');
   await expect(cache).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
   await walk(page, 'z', 9); await walk(page, 'x', -32);
-  await expect(page.getByRole('heading', { name: 'Двор Вавилонской башни', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Двор Вавилонской башни');
   await expect(cache).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
   await page.mouse.move(850, 250, { steps: 20 });
   await page.waitForTimeout(500);

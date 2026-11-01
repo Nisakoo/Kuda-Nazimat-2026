@@ -31,17 +31,19 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   catch { throw new Error(`Нет мира ${config.worldDir}. Выполните npm --prefix client run world:generate`); }
   const db = openDatabase(config.dbPath);
   const stores = sqliteStores(db);
-  const auth = createAuthService(stores.accounts, stores.sessions, systemClock, config.sessionTtlMs);
-  let npc: ReturnType<typeof createNpcDialogueService> | undefined;
   let game: Awaited<ReturnType<CreateGame>> | undefined;
+  const auth = createAuthService(stores.accounts, stores.sessions, systemClock, config.sessionTtlMs, {
+    canAdmit: accountId => game?.canAdmit ? game.canAdmit(accountId ?? '') : !game || game.activePlayers() < config.maxPlayers,
+  });
+  let npc: ReturnType<typeof createNpcDialogueService> | undefined;
   let http: ReturnType<typeof createHttpServer> | undefined;
   try {
     npc = createNpcDialogueService({ responder: createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler }), dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger: logger.child('npc') }, config.npc);
     await npc.start();
-    const babylon = new BabylonService({ store: sqliteBabylon(db), language: languagePort, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, measure: (kind, durationMs, success) => logger.info('BABEL language operation', { kind, durationMs, success }) });
-    game = await createGame(config, { sessions: auth, players: stores.players, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger: logger.child('game') });
+    const babylon = new BabylonService({ store: sqliteBabylon(db), language: languagePort, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, peerLocation: playerId => game?.playerLocation?.(playerId) ?? null, measure: (kind, durationMs, success) => logger.info('BABEL language operation', { kind, durationMs, success }) });
+    game = await createGame(config, { sessions: auth, players: stores.players, avatars: stores.avatars, equipment: stores.equipment, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger: logger.child('game') });
     const npcService = npc;
-    http = createHttpServer(config, { auth, game, npcReady: () => npcService.ready(), logger: logger.child('http'), babylon, cancelBabylon: npc.cancelConnection });
+    http = createHttpServer(config, { auth, game, avatars: stores.avatars, equipment: stores.equipment, npcReady: () => npcService.ready(), logger: logger.child('http'), babylon, cancelBabylon: npc.cancelConnection });
     game.attach(http.server);
     stores.sessions.prune(Date.now() - 86400000);
     await new Promise<void>((resolve, reject) => {

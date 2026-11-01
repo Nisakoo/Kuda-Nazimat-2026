@@ -33,6 +33,7 @@ export class BabylonClient {
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await fetch(`${this.url.replace(/\/$/, '')}/api/babylon`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.session.token}` }, body: JSON.stringify(packet), signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error' });
+      controller.signal.throwIfAborted();
       if (response.status === 401) { this.unauthorized(); throw new Error('Сессия истекла. Войдите снова.'); }
       // All collections have server-side caps; still bound received bytes before parsing.
       const reader = response.body?.getReader(); if (!reader) throw new Error('Пустой ответ сервера');

@@ -1,4 +1,6 @@
 import type { Direction, Entity, Vector3 } from '../../../shared/world/types.ts';
+import { avatarAssetId, type AvatarId } from '../../../shared/avatar/index.ts';
+import type { ToolId } from '../../../shared/equipment/types.ts';
 import type { GameMap } from '../world/GameMap.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
 import { MOVEMENT, initialMotion, motionStatus, recoverMotion, stepMotion } from '../../../shared/movement/simulation.ts';
@@ -29,6 +31,8 @@ interface Player {
   motion: MotionState;
   sprint: boolean;
   jumpId: number;
+  avatarId: AvatarId | null;
+  tool: ToolId | null;
 }
 export interface PlacedPlayer { readonly id: string; readonly name: string; readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
 export type InteractionCheck = { readonly ok: true; readonly npc: NpcDefinition } | { readonly ok: false; readonly reason: 'not-found' | 'too-far' };
@@ -53,12 +57,22 @@ export class World {
   map(mapId: string): GameMap | undefined { return this.maps.get(mapId); }
   has(playerId: string): boolean { return this.players.has(playerId); }
 
+  setAvatar(playerId: string, avatarId: AvatarId | null): void {
+    const player = this.players.get(playerId);
+    if (player) player.avatarId = avatarId;
+  }
+
+  setEquipment(playerId: string, tool: ToolId | null): void {
+    const player = this.players.get(playerId);
+    if (player) player.tool = tool;
+  }
+
   add(player: PlacedPlayer): void {
     const map = this.maps.get(player.mapId)!;
     const position = { ...player.position, y: map.heightAt(player.position.x, player.position.z) };
     const motion = { ...initialMotion(position), ...this.resting.get(player.id) };
     this.resting.delete(player.id);
-    const p = { ...player, position, motion: { ...motion, safePosition: map.isSafeSupport(position.x, position.z) ? position : map.spawn }, sprint: false, jumpId: 0, intent: ZERO, intentAt: 0, applied: ZERO, prepared: new Set<string>(), lastSequence: 0, dirty: false };
+    const p = { ...player, avatarId: null, tool: null, position, motion: { ...motion, safePosition: map.isSafeSupport(position.x, position.z) ? position : map.spawn }, sprint: false, jumpId: 0, intent: ZERO, intentAt: 0, applied: ZERO, prepared: new Set<string>(), lastSequence: 0, dirty: false };
     p.motion = recoverMotion(p.motion, this.environment(p));
     p.position = p.motion.position;
     this.players.set(player.id, p);
@@ -171,7 +185,8 @@ export class World {
       transform: { position: p.position, rotationY: p.rotationY },
       movement: { direction: p.applied, speed: p.motion.locomotion === 'sprint' ? MOVEMENT.sprintSpeed : this.settings.speed },
       motion: motionStatus(p.motion),
-      renderable: { assetId: 'demo-player' },
+      renderable: { assetId: p.avatarId ? avatarAssetId(p.avatarId) : 'demo-player' },
+      ...(p.tool === null ? {} : { equipment: { tool: p.tool } }),
       animationState: { name: p.motion.grounded ? p.motion.locomotion : p.motion.phase },
     };
   }

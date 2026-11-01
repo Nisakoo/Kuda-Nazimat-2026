@@ -3,7 +3,7 @@ import { EMPTY_INVENTORY } from '../../../shared/babylon/types.ts';
 import type { BabylonRequest, BabylonResult, BabylonState, BabylonErrorCode, ChatEntry, Language } from '../../../shared/babylon/types.ts';
 import type { PlayerIdentity } from '../contracts.ts';
 import type { BabylonStore, Generate, LanguagePort, Profile, Party, BabylonLocation, Message } from './ports.ts';
-import { GOATS, GUIDE, ITEMS, NPCS, task } from './content.ts';
+import { GOATS, GUIDE, ITEMS, NPCS, TASK_TITLE, task } from './content.ts';
 
 export class BabylonError extends Error {
   readonly code: BabylonErrorCode;
@@ -17,6 +17,7 @@ const clean = (text: string, limit = 4000): string => {
 export interface BabylonDeps {
   store: BabylonStore; language: LanguagePort; generate: Generate; now(): number; id(): string;
   location(accountId: string): BabylonLocation | null;
+  peerLocation?(playerId: string): BabylonLocation | null;
   measure?(kind: 'chat' | 'npc' | 'suggest', durationMs: number, success: boolean): void;
 }
 export class BabylonService {
@@ -39,6 +40,20 @@ export class BabylonService {
     const { store, language, now } = this.deps;
     const p = store.profile(identity.playerId), g = p && store.party(p.groupId), open = store.openParty();
     const role = g?.members.find(m => m.id === identity.playerId)?.role ?? 0;
+    const partyPositions: BabylonState['partyPositions'][number][] = [];
+    // Never enumerate the world. Resolve only this task's bounded member IDs.
+    if (g?.members.some(member => member.id === identity.playerId)) {
+      const seen = new Set<string>([identity.playerId]);
+      for (const member of g.members.slice(0, 4)) {
+        if (seen.has(member.id)) continue;
+        seen.add(member.id);
+        const location = this.deps.peerLocation?.(member.id);
+        if (!location || location.mapId !== 'market') continue;
+        const { x, z } = location.position;
+        if (![x, z].every(value => Number.isFinite(value) && Math.abs(value) <= 1_000_000)) continue;
+        partyPositions.push({ id: member.id, name: member.name, x, z });
+      }
+    }
     const messages: ChatEntry[] = [];
     for (const m of g?.messages ?? []) {
       if (m.authorId === identity.playerId) {
@@ -55,7 +70,10 @@ export class BabylonService {
       profile: p ? { native: p.native, learning: p.learning } : null, introSeen: p?.introSeen ?? false,
       party: g ? { id: g.id, size: g.size, count: g.members.length, role, members: g.members, started: g.startedAt !== null, completed: g.completedAt !== null, seconds: g.startedAt === null ? 0 : Math.max(0, Math.floor(((g.completedAt ?? now()) - g.startedAt) / 1000)) } : null,
       availableParty: open ? { size: open.size, count: open.members.length } : null,
+      partyPositions,
       task: p && g ? task(p.learning, g.size, role, g.startedAt !== null, g.completedAt !== null) : '',
+      taskTitle: p && g ? TASK_TITLE[p.learning] : '',
+      taskTarget: g && g.startedAt !== null && g.completedAt === null ? { x: 0, z: -34 } : null,
       goatGuide: p && g && (g.size === 1 || role === 1) ? GUIDE[p.learning] : null,
       inventory: g?.inventory[identity.playerId] ?? { ...EMPTY_INVENTORY }, fed: g?.fed ?? [], stones: g?.stones ?? [], words: p?.words ?? [], messages, replies: p?.replies ?? [],
     };
@@ -112,12 +130,16 @@ export class BabylonService {
           case 'word-save': {
             if (a.id) {
               const word = p.words.find(w => w.id === a.id); if (!word) fail('FORBIDDEN', 'Запись не найдена в вашем словаре');
-              Object.assign(word!, { word: a.word, translation: a.translation, note: a.note });
+              Object.assign(word!, { word: a.word, translation: a.translation, note: a.note, ...(a.example === undefined ? {} : { example: a.example }), ...(a.exampleTranslation === undefined ? {} : { exampleTranslation: a.exampleTranslation }) });
             } else {
               if (p.words.length >= 64) fail('INVALID', 'В словаре уже 64 записи');
-              p.words.push({ id: id(), native: p.native, learning: p.learning, word: a.word, translation: a.translation, note: a.note });
+              p.words.push({ id: id(), native: p.native, learning: p.learning, word: a.word, translation: a.translation, note: a.note, learned: false, example: a.example ?? '', exampleTranslation: a.exampleTranslation ?? '' });
             }
             break;
+          }
+          case 'word-learn': {
+            const word = p.words.find(w => w.id === a.id); if (!word) fail('FORBIDDEN', 'Запись не найдена в вашем словаре');
+            word!.learned = a.learned; break;
           }
           case 'word-delete': {
             const index = p.words.findIndex(w => w.id === a.id); if (index < 0) fail('FORBIDDEN', 'Запись не найдена в вашем словаре');

@@ -2,7 +2,7 @@
 id: client-game-hud
 type: module-design
 status: draft
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Игровой интерфейс поверх мира — задание, выбор языка, нижняя панель и окна инвентаря, карты, словаря и чата.
 related:

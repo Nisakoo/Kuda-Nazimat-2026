@@ -28,6 +28,25 @@ it('migrates empty and old databases in order, preserving data and original time
   expect(fresh.prepare('SELECT * FROM example').all()).toEqual(db.prepare('SELECT * FROM example').all());
 });
 
+it('upgrades existing players to null avatar and restores a saved selection on reopen', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'avatar-migration-')); directories.push(directory);
+  const path = join(directory, 'game.sqlite'); const old = new DatabaseSync(path);
+  old.exec('PRAGMA foreign_keys = ON');
+  transaction(old, () => applyMigrations(old, loadMigrations().slice(0, 2), 1));
+  // Seed the historical schema directly; today's adapter requires the latest migrations.
+  const player = { accountId: 'a_old', playerId: 'p_old', displayName: 'Old player' };
+  old.prepare('INSERT INTO accounts (id,name,name_key,created_at) VALUES (?,?,?,?)').run(player.accountId, player.displayName, 'old player', 1);
+  old.prepare('INSERT INTO players (id,account_id,updated_at) VALUES (?,?,?)').run(player.playerId, player.accountId, 1);
+  old.close();
+  const upgraded = openDatabase(path); const store = sqliteStores(upgraded);
+  expect(store.avatars.load(player.playerId)).toBeNull();
+  store.avatars.save(player.playerId, 'ksu');
+  expect(() => upgraded.prepare('UPDATE players SET avatar_id = ? WHERE id = ?').run('arbitrary', player.playerId)).toThrow();
+  upgraded.close();
+  const reopened = openDatabase(path); databases.push(reopened);
+  expect(sqliteStores(reopened).avatars.load(player.playerId)).toBe('ksu');
+});
+
 it('rolls back all pending schema, data and version changes when a later migration fails', () => {
   const db = memory();
   transaction(db, () => applyMigrations(db, [first], 1));

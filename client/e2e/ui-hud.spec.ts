@@ -6,6 +6,8 @@ import { resolve, join } from 'node:path';
 import { createServer } from 'node:net';
 import { once } from 'node:events';
 import { expectCapture } from './helpers';
+import { authAvatarScenario } from './auth-avatar-scenario';
+import { avatarWorldScenario } from './avatar-world-scenario';
 
 let child: ChildProcess, directory: string, origin: string;
 const evidence = resolve('../tasks/evidence/ui-redesign-2026-07-02');
@@ -35,7 +37,7 @@ async function screenshot(page: Page, name: string) { await page.screenshot({ pa
 async function enroll(page: Page, name: string, size = '1') {
   await page.goto(origin);
   await page.getByLabel('Имя игрока').fill(name);
-  await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
+  await page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'Куда отправимся?' })).toBeVisible();
   if (size !== '1') { const friends = page.getByRole('radio', { name: /С друзьями/ }); if (await friends.isEnabled()) await friends.check(); const count = page.getByLabel('Число игроков'); if (await count.isEnabled()) await count.selectOption(size); }
   await screenshot(page, 'mode-1280.png');
@@ -53,8 +55,14 @@ async function withinViewport(page: Page) {
   expect(problems).toEqual([]);
 }
 
+test('confirmed appearance enters the real world, changes live and keeps the held jug', async ({ page }) => {
+  test.setTimeout(240000);
+  await avatarWorldScenario(page, origin, evidence);
+});
+
 test('real guest entry preserves only the connection address and returns from mode with Escape', async ({ page }) => {
   await page.goto(origin);
+  expect(await page.locator('.entry-login-screen').evaluate(element => element.scrollHeight - element.clientHeight)).toBeLessThanOrEqual(1);
   await screenshot(page, 'entry-1280.png');
   await page.setViewportSize({ width: 390, height: 844 }); await screenshot(page, 'entry-390.png');
   await expect(page.getByLabel('Имя игрока')).toBeVisible();
@@ -63,15 +71,28 @@ test('real guest entry preserves only the connection address and returns from mo
   await page.getByRole('button', { name: 'Применить и открыть карту', exact: true }).click();
   await page.reload();
   expect(await page.evaluate(() => localStorage.getItem('babylon.serverUrl'))).toBe(origin);
-  await page.getByLabel('Имя игрока').fill('UI-назад'); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
+  await page.getByLabel('Имя игрока').fill('UI-назад'); await page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'Куда отправимся?' })).toBeVisible();
+  await page.getByRole('radio', { name: /^Одному/ }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByRole('radio', { name: /^С друзьями/ })).toBeChecked();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog', { name: 'Ваши языки', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Куда отправимся?', exact: true })).toBeVisible();
+  await expect(page.getByRole('radio', { name: /^С друзьями/ })).toBeChecked();
   await page.keyboard.press('Escape');
   await expect(page.getByLabel('Имя игрока')).toHaveValue('');
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual(['babylon.serverUrl']);
 });
 
+test('real registration resumes mandatory appearance and uses password authentication', async ({ page }) => {
+  test.setTimeout(180000);
+  await authAvatarScenario(page, origin, evidence);
+});
+
 test('real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(240000);
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await enroll(page, 'UI-соло');
   await screenshot(page, 'hud-1280.png');
@@ -79,6 +100,9 @@ test('real server HUD switches one modal, blocks gameplay, preserves words and r
   await expect(page.getByRole('dialog', { name: 'Инвентарь', exact: true })).toBeVisible();
   await expectCapture(page, false);
   await expect(page.getByRole('dialog')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Кувшин', exact: true }).click();
+  await page.getByRole('button', { name: 'Взять в руки', exact: true }).click();
+  await expect(page.getByText('В руках: Кувшин', { exact: true })).toBeVisible();
   await screenshot(page, 'inventory-1280.png');
   await page.keyboard.press('i');
   await expect(page.getByRole('dialog', { name: 'Пауза' })).toBeVisible();
@@ -86,6 +110,7 @@ test('real server HUD switches one modal, blocks gameplay, preserves words and r
   await dock(page, 'Инвентарь');
   await dock(page, 'Карта');
   await expect(page.getByRole('dialog', { name: 'Карта Вавилона', exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Карта Вавилона', exact: true })).toHaveCSS('background-color', 'rgb(251, 241, 223)');
   await expect(page.getByRole('dialog')).toHaveCount(1);
   const map = page.getByRole('img', { name: 'Схема рынка и положение игрока' });
   const before = await map.getAttribute('viewBox');
@@ -102,6 +127,16 @@ test('real server HUD switches one modal, blocks gameplay, preserves words and r
   await page.getByRole('button', { name: 'Добавить слово', exact: true }).click();
   await expect(page.locator('.word-list')).toContainText('<img src=x onerror=alert(1)>');
   await expect(page.locator('.word-list img')).toHaveCount(0);
+  await page.getByLabel('Моя заметка', { exact: true }).fill('Уточнённая заметка перед изучением');
+  await page.getByLabel('Пример', { exact: true }).fill('The little goat is hungry.');
+  await page.getByLabel('Перевод примера', { exact: true }).fill('Козлёнок голоден.');
+  for (let poll = 0; poll < 2; poll++) await page.waitForResponse(response => new URL(response.url()).pathname === '/api/babylon' && response.request().method() === 'POST' && response.request().postDataJSON()?.action?.type === 'state' && response.ok());
+  await expect(page.getByLabel('Моя заметка', { exact: true })).toHaveValue('Уточнённая заметка перед изучением');
+  await expect(page.getByLabel('Пример', { exact: true })).toHaveValue('The little goat is hungry.');
+  await expect(page.getByLabel('Перевод примера', { exact: true })).toHaveValue('Козлёнок голоден.');
+  await page.getByRole('button', { name: 'Запомнил', exact: true }).click();
+  await page.getByRole('button', { name: 'Выучено · 1', exact: true }).click();
+  await expect(page.locator('.word-list')).toContainText('Уточнённая заметка перед изучением');
   await screenshot(page, 'dictionary-1280.png');
   await page.getByLabel('Поиск', { exact: true }).fill('не существует'); await expect(page.locator('.word-list li')).toHaveCount(0);
   await page.getByLabel('Поиск', { exact: true }).fill('');
@@ -120,11 +155,21 @@ test('real server HUD switches one modal, blocks gameplay, preserves words and r
   await page.getByRole('button', { name: 'Продолжить', exact: true }).click(); await expectCapture(page, true);
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Выйти из сессии', exact: true }).click();
-  await page.getByLabel('Имя игрока').fill('UI-соло'); await page.getByRole('button', { name: 'Начать путешествие →', exact: true }).click();
+  await page.getByLabel('Имя игрока').fill('UI-соло'); await page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Куда отправимся?' })).toBeVisible();
+  await expect(page.getByText('Продолжение сохранённого задания. Режим и прогресс сохраняются.')).toBeVisible();
+  await page.getByRole('button', { name: 'Далее: языки →', exact: true }).click();
+  await page.getByRole('button', { name: 'Войти в Вавилон →', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
-  await page.keyboard.press('i'); await dock(page, 'Словарь');
-  await expect(page.locator('.word-list')).toContainText('Проверка сохранения');
+  await page.keyboard.press('i');
+  await expect(page.getByText('В руках: Кувшин', { exact: true })).toBeVisible();
+  await dock(page, 'Словарь');
+  await page.getByRole('button', { name: 'Выучено · 1', exact: true }).click();
+  await expect(page.locator('.word-list')).toContainText('Уточнённая заметка перед изучением');
+  await expect(page.getByLabel('Моя заметка', { exact: true })).toHaveValue('Уточнённая заметка перед изучением');
+  await expect(page.getByLabel('Пример', { exact: true })).toHaveValue('The little goat is hungry.');
+  await expect(page.getByLabel('Перевод примера', { exact: true })).toHaveValue('Козлёнок голоден.');
   await page.getByRole('button', { name: 'Изменить', exact: true }).click();
   await page.getByLabel('Заметка', { exact: true }).fill('Изменено'); await page.getByRole('button', { name: 'Сохранить слово', exact: true }).click();
   await expect(page.locator('.word-list')).toContainText('Изменено');

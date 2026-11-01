@@ -17,24 +17,77 @@ import type { PlayerIdentity } from '../src/contracts.ts';
 
 const dirs: string[] = [], dbs: DatabaseSync[] = [];
 afterEach(() => { for (const db of dbs.splice(0)) { try { db.close(); } catch {} } for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
-function fixture(language: LanguagePort = testLanguagePort) {
+function fixture(language: LanguagePort = testLanguagePort, withPeerLocation = true) {
   const dir = mkdtempSync(join(tmpdir(), 'babel-')); dirs.push(dir);
   const path = join(dir, 'game.sqlite'); let db = openDatabase(path); dbs.push(db);
   const stores = sqliteStores(db), people = ['A', 'B', 'C', 'D'].map(name => stores.accounts.findOrCreate(name, name, 1));
   const positions = new Map<string, BabylonLocation>();
+  const peerPositions = new Map<string, BabylonLocation>(), peerQueries: string[] = [];
   const queue = createGenerationQueue({ clock: systemClock, scheduler: systemScheduler, logger: silentLogger }, { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000 });
   let ids = 0, requests = 0;
-  const make = () => new BabylonService({ store: sqliteBabylon(db), language, generate: queue.generate, now: Date.now, id: () => `id${++ids}`, location: id => positions.get(id) ?? null });
+  const make = () => new BabylonService({ store: sqliteBabylon(db), language, generate: queue.generate, now: Date.now, id: () => `id${++ids}`, location: id => positions.get(id) ?? null, ...(withPeerLocation ? { peerLocation: (playerId: string) => { peerQueries.push(playerId); return peerPositions.get(playerId) ?? null; } } : {}) });
   let service = make();
-  return { people, positions, queue, get service() { return service; }, get db() { return db; },
+  return { people, positions, peerPositions, peerQueries, queue, get service() { return service; }, get db() { return db; },
     call: (player: PlayerIdentity, action: BabylonAction, requestId = `request${++requests}`) => service.handle(player, parseBabylonRequest({ v: 2, requestId, action }), player.playerId),
     restart() { db.close(); db = openDatabase(path); dbs.push(db); service = make(); },
   };
 }
+it('exposes only current task peers and queries no nonmember or self coordinates', async () => {
+  const f = fixture(), [a, b, c, d] = f.people as [PlayerIdentity, PlayerIdentity, PlayerIdentity, PlayerIdentity];
+  for (const person of f.people) f.peerPositions.set(person.playerId, { mapId: 'market', position: { x: 1000, y: 50, z: -500 } });
+  expect(f.service.state(a).partyPositions).toEqual([]); expect(f.peerQueries).toEqual([]);
+  for (const person of f.people) await f.call(person, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
+  f.peerQueries.length = 0;
+  const state = f.service.state(a);
+  expect(state.partyPositions).toEqual([{ id: b.playerId, name: b.displayName, x: 1000, z: -500 }]);
+  expect(f.peerQueries).toEqual([b.playerId]);
+  expect(f.service.state(c).partyPositions).toEqual([{ id: d.playerId, name: d.displayName, x: 1000, z: -500 }]);
+  expect(f.service.state(b).goatGuide).toBeNull();
+  f.peerPositions.set(b.playerId, { mapId: 'market', position: { x: 800, y: 0, z: -600 } });
+  expect((await f.call(a, { type: 'state' })).state.partyPositions[0]).toMatchObject({ x: 800, z: -600 });
+  f.peerPositions.delete(b.playerId);
+  expect(f.service.state(a).partyPositions).toEqual([]);
+});
+
+it('bounds party positions and omits absent, non-market or invalid locations without fallback', async () => {
+  const f = fixture(), [a, b, c, d] = f.people as [PlayerIdentity, PlayerIdentity, PlayerIdentity, PlayerIdentity];
+  for (const person of f.people) await f.call(person, { type: 'enroll', size: 4, native: 'ru', learning: 'en' });
+  for (const person of f.people) f.peerPositions.set(person.playerId, { mapId: 'market', position: { x: 10, y: 0, z: 20 } });
+  expect(f.service.state(a).partyPositions).toHaveLength(3);
+  f.peerPositions.set(b.playerId, { mapId: 'demo', position: { x: 1, y: 0, z: 2 } });
+  f.peerPositions.set(c.playerId, { mapId: 'market', position: { x: Infinity, y: 0, z: 2 } });
+  f.peerPositions.set(d.playerId, { mapId: 'market', position: { x: 1, y: 0, z: 1_000_001 } });
+  // The own/account location cannot be used as a substitute for a missing peer.
+  f.positions.set(a.accountId, { mapId: 'market', position: { x: 99, y: 0, z: 99 } });
+  expect(f.service.state(a).partyPositions).toEqual([]);
+  const optional = fixture(testLanguagePort, false);
+  for (const person of optional.people) await optional.call(person, { type: 'enroll', size: 4, native: 'ru', learning: 'en' });
+  expect(optional.service.state(optional.people[0]!).partyPositions).toEqual([]);
+});
+
+it('strictly validates bounded party positions, membership, uniqueness and finite coordinates', async () => {
+  const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
+  const before = f.service.state(a);
+  const peer = { id: b.playerId, name: b.displayName, x: 0, z: -30 };
+  const parse = (state: unknown) => parseBabylonResult({ v: 2, requestId: 'r', state });
+  expect(() => parse({ ...before, partyPositions: [peer] })).toThrow();
+  for (const person of [a, b]) await f.call(person, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
+  const state = f.service.state(a);
+  expect(parse({ ...state, partyPositions: [peer] }).state.partyPositions).toEqual([peer]);
+  for (const partyPositions of [
+    undefined, null, {}, [peer, peer], Array(5).fill(peer),
+    [{ ...peer, id: a.playerId, name: a.displayName }], [{ ...peer, id: 'outsider' }],
+    [{ ...peer, name: 'forged' }], [{ ...peer, x: NaN }], [{ ...peer, x: Infinity }],
+    [{ ...peer, x: 1_000_001 }], [{ ...peer, z: '0' }], [{ ...peer, y: 0 }],
+    [{ ...peer, mapId: 'market' }], [{ ...peer, accountId: 'secret' }],
+  ]) expect(() => parse({ ...state, partyPositions })).toThrow();
+  expect(() => parse({ ...state, party: null, partyPositions: [peer] })).toThrow();
+});
+
 it('enrolls a fixed group, starts only when full, restores roles/languages and hides private dictionary data', async () => {
   const f = fixture(), [a, b, c] = f.people as [PlayerIdentity, PlayerIdentity, PlayerIdentity, PlayerIdentity];
   await f.call(a, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
-  expect(f.service.state(a).party?.started).toBe(false);
+  expect(f.service.state(a).party?.started).toBe(false); expect(f.service.state(a).taskTarget).toBeNull();
   await expect(f.call(b, { type: 'enroll', size: 3, native: 'ru', learning: 'es' })).rejects.toMatchObject({ code: 'CONFLICT' });
   await f.call(b, { type: 'enroll', size: 2, native: 'ru', learning: 'es' });
   expect(f.service.state(a).party?.started).toBe(true); expect(f.service.state(b).goatGuide).toBeNull();
@@ -50,6 +103,62 @@ it('enrolls a fixed group, starts only when full, restores roles/languages and h
   expect(f.service.state(a).profile).toEqual({ native: 'es', learning: 'ru' });
   await f.call(a, { type: 'word-delete', id: word.id }); expect(f.service.state(a).words).toEqual([]);
 });
+it('upgrades legacy dictionary entries without data loss and persists private examples and learned receipts', async () => {
+  const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
+  for (const p of [a, b]) await f.call(p, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
+  const saved = await f.call(a, { type: 'word-save', word: 'goat', translation: 'коза', note: 'note' });
+  const id = saved.state.words[0]!.id;
+  const row = f.db.prepare('SELECT state FROM babel_profiles WHERE player_id = ?').get(a.playerId)!;
+  const legacy = JSON.parse(String(row.state));
+  delete legacy.words[0].learned; delete legacy.words[0].example; delete legacy.words[0].exampleTranslation;
+  f.db.prepare('UPDATE babel_profiles SET state = ? WHERE player_id = ?').run(JSON.stringify(legacy), a.playerId);
+  f.restart();
+  expect(f.service.state(a).words[0]).toMatchObject({ id, word: 'goat', translation: 'коза', note: 'note', learned: false, example: '', exampleTranslation: '' });
+  await f.call(a, { type: 'word-save', id, word: 'goat', translation: 'коза', note: 'note', example: 'A goat', exampleTranslation: 'Коза' });
+  await f.call(a, { type: 'word-learn', id, learned: true }, 'learn-once');
+  await f.call(a, { type: 'word-save', id, word: 'kid', translation: 'козлёнок', note: 'edited' });
+  f.restart();
+  expect(f.service.state(a).words[0]).toMatchObject({ word: 'kid', note: 'edited', learned: true, example: 'A goat', exampleTranslation: 'Коза' });
+  await f.call(a, { type: 'word-learn', id, learned: true }, 'learn-once');
+  await expect(f.call(a, { type: 'word-learn', id, learned: false }, 'learn-once')).rejects.toMatchObject({ code: 'CONFLICT' });
+  await expect(f.call(b, { type: 'word-learn', id, learned: true })).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  expect(f.service.state(b).words).toEqual([]);
+  f.db.exec("CREATE TRIGGER reject_learn_receipt BEFORE INSERT ON babel_operations BEGIN SELECT RAISE(ABORT, 'fixture'); END");
+  await expect(f.call(a, { type: 'word-learn', id, learned: false }, 'rollback-learn')).rejects.toThrow('fixture');
+  expect(f.service.state(a).words[0]!.learned).toBe(true);
+  f.db.exec('DROP TRIGGER reject_learn_receipt');
+  await f.call(a, { type: 'word-learn', id, learned: false }, 'rollback-learn');
+  expect(f.service.state(a).words[0]!.learned).toBe(false);
+  await f.call(a, { type: 'word-save', id, word: 'kid', translation: 'козлёнок', note: '', example: '', exampleTranslation: '' });
+  expect(f.service.state(a).words[0]).toMatchObject({ example: '', exampleTranslation: '' });
+});
+
+it('rejects item coercion rather than returning a non-string ItemId', () => {
+  for (const type of ['buy', 'feed']) {
+    for (const item of [['dates'], ['water'], {}, null, 42, true]) expect(() => parseBabylonRequest({ v: 2, requestId: 'strict-item', action: { type, item, targetId: 'target' } })).toThrow();
+    expect(parseBabylonRequest({ v: 2, requestId: 'strict-item', action: { type, item: 'dates', targetId: 'target' } }).action).toEqual({ type, item: 'dates', targetId: 'target' });
+  }
+});
+
+it('validates dictionary additions and serves prepared titles in the learning language', async () => {
+  for (const action of [
+    { type: 'word-learn', id: 'x', learned: 1 }, { type: 'word-learn', id: 'x', learned: true, playerId: 'x' },
+    { type: 'word-save', word: 'x', translation: 'y', note: '', example: 'x'.repeat(501) },
+    { type: 'word-save', word: 'x', translation: 'y', note: '', exampleTranslation: 1 },
+  ]) expect(() => parseBabylonRequest({ v: 2, requestId: 'r', action })).toThrow();
+  const f = fixture(), a = f.people[0]!;
+  expect(f.service.state(a).taskTitle).toBe(''); expect(f.service.state(a).taskTarget).toBeNull();
+  await f.call(a, { type: 'enroll', size: 1, native: 'ru', learning: 'en' });
+  expect(f.service.state(a).taskTitle).toBe('The Shepherd’s Goats'); expect(f.service.state(a).taskTarget).toEqual({ x: 0, z: -34 });
+  await f.call(a, { type: 'languages', native: 'ru', learning: 'es' });
+  expect(f.service.state(a).taskTitle).toBe('Las cabras del pastor');
+  await f.call(a, { type: 'languages', native: 'en', learning: 'ru' });
+  const state = f.service.state(a); expect(state.taskTitle).toBe('Козы пастуха'); expect(state.fed).toHaveLength(0);
+  expect(parseBabylonResult({ v: 2, requestId: 'r', state }).state.taskTitle).toBe('Козы пастуха');
+  expect(() => parseBabylonResult({ v: 2, requestId: 'r', state: { ...state, taskTitle: null } })).toThrow();
+  for (const taskTarget of [{ x: 1e7, z: 0 }, { x: 0, z: NaN }, { x: 0, z: 0, mapId: 'market' }]) expect(() => parseBabylonResult({ v: 2, requestId: 'r', state: { ...state, taskTarget } })).toThrow();
+});
+
 it('persists immutable group stones, deduplicates retries and rejects a changed request body', async () => {
   const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
   for (const p of [a, b]) await f.call(p, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
@@ -75,7 +184,7 @@ it('validates authoritative location and role, keeps wrong food, completes solo 
   await f.call(a, { type: 'feed', item: 'dates', targetId: 'black-goat' }); expect(f.service.state(a).inventory.dates).toBe(1);
   const feed = [['white-goat', 'dates', -5, -31], ['black-goat', 'red-fruit', 4, -32], ['spotted-goat', 'yellow-fruit', -4, -37], ['kid-goat', 'water', 4, -37]] as const;
   for (const [targetId, item, x, z] of feed) { f.positions.set(a.accountId, { mapId: 'market', position: { x, y: 0, z } }); await f.call(a, { type: 'feed', item, targetId }); }
-  f.restart(); expect(f.service.state(a).party?.completed).toBe(true); expect(f.service.state(a).fed).toHaveLength(4); expect(f.service.state(a).inventory.dates).toBe(0);
+  f.restart(); expect(f.service.state(a).party?.completed).toBe(true); expect(f.service.state(a).taskTarget).toBeNull(); expect(f.service.state(a).fed).toHaveLength(4); expect(f.service.state(a).inventory.dates).toBe(0);
 });
 it('translates per recipient, skips matching languages and fixes languages for an accepted request', async () => {
   let release!: () => void, started!: () => void;

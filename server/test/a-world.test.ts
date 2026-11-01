@@ -39,6 +39,18 @@ it('replaces an existing demo position with a role spawn once and preserves move
   expect(world.locate('p')?.position).toEqual(moved); expect(moved.x).toBeLessThan(position.x);
 });
 
+it('resolves live positions by stable playerId without account or persisted-position lookup', () => {
+  const world = fresh();
+  const game = new GameService(world, { load() { throw new Error('Must not read persistence'); }, save() {} }, systemClock, systemScheduler, { maxPlayers: 4, disconnectGraceMs: 0, broadcastEvery: 2 }, silentLogger);
+  expect(game.playerLocation('p')).toEqual({ mapId: 'test', position: SPAWN });
+  expect(game.playerLocation('account-id')).toBeNull();
+  const snapshot = game.playerLocation('p')!; Object.assign(snapshot.position, { x: 100 });
+  expect(world.locate('p')!.position).toEqual(SPAWN);
+  walk(world, { x: -1, z: 0 }, .5);
+  expect(game.playerLocation('p')!.position.x).toBeLessThan(SPAWN.x);
+  world.remove('p'); expect(game.playerLocation('p')).toBeNull();
+});
+
 describe('world loading (SERVER-WORLD-002)', () => {
   it('validates sizes and indexes chunk, collision, model and manifest files', () => {
     expect(loaded.maps.get('test')!.bootstrap.manifestUrl).toBe('maps/test/manifest.json');

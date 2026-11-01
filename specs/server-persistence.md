@@ -29,12 +29,13 @@ related:
   | Таблица | Поля | Ограничения |
   |---|---|---|
   | accounts | id, name, name_key, created_at | `name_key` = имя в нижнем регистре, UNIQUE (mock-вход AUTH-001) |
-  | sessions | token_hash, account_id, created_at, expires_at | PK token_hash; FK accounts |
+  | sessions | token_hash, account_id, created_at, expires_at | PK token_hash; FK accounts; logout удаляет только текущий hash |
+  | account_credentials | account_id, algorithm, salt, password_hash | PK/FK account_id; scrypt-v1; соль 16 байт и hash 64 байта в hex, CHECK длины/алфавита |
   | players | id, account_id, map_id, x, y, z, rotation_y, updated_at | PK id (формат ID PROTO, `p_` + 16 base36); account_id UNIQUE |
   | npc_dialogue | id, player_id, npc_id, question, answer, created_at | индекс (player_id, npc_id, created_at); FK players |
   | schema_migrations | version, applied_at | — |
 
-  Аккаунт и его игрок создаются одной транзакцией при первом входе под новым именем. Позиция `NULL` означает «ещё не входил», при join используется spawn.
+  Аккаунт и его игрок создаются одной транзакцией при первом guest-входе под новым именем. Password-регистрация создаёт account/player/credential одной транзакцией, только для свободного имени; guest не превращается в password account. Миграция 004 добавляет account_credentials без изменения старых guest. Отсутствие credential означает guest; наличие credential вместе с `players.avatar_id IS NULL` — устойчивый pending-avatar marker (AUTH-003). Позиция `NULL` означает «ещё не входил», при join используется spawn.
 - **STORE-002:** Схема создаётся и меняется нумерованными SQL-миграциями из `server/src/persistence/migrations/`, применяемыми при старте в транзакции. Неизвестная (более новая) версия БД — ошибка запуска. Включены `foreign_keys = ON` и `journal_mode = WAL`. Связанные изменения фиксируются одной транзакцией; некорректные данные не создают частичную запись.
 - **STORE-003:** Позиция и карта игрока сохраняются:
   - каждые `saveIntervalMs` (10 с), если изменились;
@@ -57,7 +58,12 @@ related:
 
 ### Состояние BABEL
 
+- В `babel_profiles` поля записи словаря `learned`, `example`, `exampleTranslation` хранятся отдельно от `note`. При чтении старого JSON отсутствующие поля получают false и пустые строки без удаления остальных данных; явное сохранение обновляет профиль и receipt одной транзакцией. Словарь и изменения доступны только владельцу.
 - **STORE-012:** Миграция 002 добавляет `babel_parties` (группа и общее задание), `babel_profiles` (FK игрока и группы, языки, словарь, личные ответы) и `babel_operations` (ключ игрок/requestId, SHA-256 fingerprint без исходного действия, статус, подтверждение). Ограниченные JSON-агрегаты изменяются сервисом в короткой транзакции вместе с receipt операции. Ошибка записи откатывает инвентарь, прогресс и receipt целиком. Отправленные камни неизменяемы; профиль читается только для серверного владельца. На старте pending-операции и незавершённые переводы помечаются failed/error, повтор не создаёт дубликатов. Политика расширенной памяти NPC из STORE-006–010 остаётся отдельной работой.
+
+## Профиль облика
+
+Миграция 003 добавляет `players.avatar_id`: nullable TEXT с ограничением четырёх ID `lukas`, `nic`, `dan`, `ksu`. Старые записи получают null и остаются играбельными. POST настройки сохраняет только собственный ID в SQLite до успешного HTTP-ответа; периодическое сохранение позиции не перезаписывает облик. Null не означает регистрацию или обязательный выбор.
 
 ## Сценарии
 

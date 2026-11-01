@@ -39,13 +39,16 @@ test('default five-by-five streaming covers pasture and courtyard without idle r
   await settle();
   await expect(page.getByLabel('Кеш мира')).toContainText('Отложено: 0');
   await walk(page, 'z', -26);
-  await expect(page.getByRole('heading', { name: 'Пастбище у рынка', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Пастбище у рынка');
   await settle();
   await walk(page, 'z', 9); await walk(page, 'x', -32);
-  await expect(page.getByRole('heading', { name: 'Двор Вавилонской башни', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Двор Вавилонской башни');
   await settle();
   await walk(page, 'x', 0);
-  await expect(page.getByRole('heading', { name: 'Рынок Вавилона', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Рынок Вавилона');
   await settle();
   expect(await canvas!.evaluate(element => element.isConnected)).toBe(true);
   expect(errors).toEqual([]);
@@ -69,7 +72,8 @@ test('market route buys goods, rejects wrong feed, streams pasture and finishes 
   await closeAndResume(page);await walk(page,'x',2.2);await walk(page,'z',-.5);
   await interact(page,'Гончар');await page.getByRole('button',{name:'Взять: Вода в кувшине',exact:true}).click();await closeAndResume(page);
   await walk(page,'x',0);await walk(page,'z',-26);await walk(page,'x',-1);
-  await expect(page.getByRole('heading',{name:'Пастбище у рынка',exact:true})).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Пастбище у рынка');
   await interact(page,'Пастух');await expect(page.getByRole('dialog')).toContainText('Колокольчик'.toLowerCase());await closeAndResume(page);
   await walk(page,'x',0);await walk(page,'z',-31);await walk(page,'x',2);
   await interact(page,'Чёрная коза');await page.getByRole('button',{name:'Финики · 1',exact:true}).click();await page.getByRole('button',{name:'Дать выбранный корм'}).click();
@@ -92,7 +96,7 @@ test('client stone draft survives closing and vocabulary can be edited without m
   await page.mouse.move(box.x+40,box.y+40);await page.mouse.down();await page.mouse.move(box.x+100,box.y+100,{steps:5});await page.mouse.up();
   await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Камень',exact:true}).click();await expect(canvas.locator('polyline')).toHaveCount(1);
   await page.getByRole('button',{name:'Высечь · 0/8',exact:true}).click();await expect(page.getByLabel('Высеченный камень 1')).toBeVisible();await expect(canvas.locator('polyline')).toHaveCount(0);
-  await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('button',{name:'Словарь',exact:true}).click();
+  await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.getByRole('dialog',{name:'Пауза',exact:true}).getByRole('button',{name:'Словарь',exact:true}).click();
   await page.getByLabel('Слово',{exact:true}).fill('goat');await page.getByLabel('Перевод',{exact:true}).fill('коза');await page.getByRole('button',{name:'Добавить слово',exact:true}).click();
   await page.getByRole('button',{name:'Изменить',exact:true}).click();await page.getByLabel('Слово',{exact:true}).fill('kid');await page.getByRole('button',{name:'Сохранить слово',exact:true}).click();await expect(page.locator('.word-list')).toContainText('kid');
   await page.screenshot({path:'test-results/market-words-small.png'});

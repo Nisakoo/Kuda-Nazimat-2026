@@ -9,6 +9,7 @@ import { GltfLibrary } from './GltfLibrary';
 import { VisualChunks } from './VisualChunks';
 import { CameraObstruction } from './CameraObstruction';
 import { damp } from './CharacterMotion';
+import { FrameFence } from './FrameFence';
 
 export class ThreeRenderer implements RenderAdapter {
   private renderer: WebGLRenderer | null = null;
@@ -27,12 +28,20 @@ export class ThreeRenderer implements RenderAdapter {
   private focusHeight = .8;
   private sun: DirectionalLight | null = null;
   private readonly errors = new Map<string, string>();
+  private frameFence: FrameFence | null = null;
+  private readonly contextLost = (): void => { this.frameFence?.contextLost(); this.errors.set('gpu', 'Графический контекст потерян.'); };
+  private readonly contextRestored = (): void => { this.frameFence?.contextRestored(); this.errors.delete('gpu'); };
 
   constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true, private readonly marketStyle = false) {}
 
   mount(container: HTMLElement): void {
     if (this.renderer) throw new Error('Сцена уже создана.');
     this.renderer = new WebGLRenderer({ antialias: true });
+    const gl = this.renderer.getContext();
+    if (!('fenceSync' in gl)) throw new Error('Требуется WebGL2 для управления очередью кадров.');
+    this.frameFence = new FrameFence(gl);
+    this.renderer.domElement.addEventListener('webglcontextlost', this.contextLost);
+    this.renderer.domElement.addEventListener('webglcontextrestored', this.contextRestored);
     this.renderer.domElement.setAttribute('aria-label', 'Трёхмерная сцена');
     this.renderer.domElement.setAttribute('role', 'img');
     this.scene = new Scene();
@@ -121,9 +130,14 @@ export class ThreeRenderer implements RenderAdapter {
       halfHeight*this.camera.aspect,halfHeight,this.scene.children.filter(child=>child.name.startsWith('chunk:')),delta);
     this.camera.position.copy(this.target).addScaledVector(this.cameraDirection,allowed);
     this.camera.lookAt(this.target);
+    if (!this.frameFence?.canSubmit()) {
+      if (this.frameFence?.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
+      return;
+    }
     this.scene.matrixWorldAutoUpdate = false;
-    try { this.renderer.render(this.scene, this.camera); }
+    try { this.renderer.render(this.scene, this.camera); this.frameFence.submitted(); }
     finally { this.scene.matrixWorldAutoUpdate = true; }
+    if (this.frameFence.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
   }
 
   dispose(): void {
@@ -134,6 +148,9 @@ export class ThreeRenderer implements RenderAdapter {
     this.sun?.shadow.dispose(); this.sun = null;
     this.scene?.clear();
     if (this.renderer) {
+      this.renderer.domElement.removeEventListener('webglcontextlost', this.contextLost);
+      this.renderer.domElement.removeEventListener('webglcontextrestored', this.contextRestored);
+      this.frameFence?.dispose(); this.frameFence = null;
       this.renderer.dispose();
       this.renderer.forceContextLoss();
       this.renderer.domElement.remove();

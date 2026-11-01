@@ -9,7 +9,11 @@ export function sqliteBabylon(db: DatabaseSync): BabylonStore {
   const parse = <T>(row: Record<string, unknown> | undefined): T | null => row ? JSON.parse(String(row.state)) as T : null;
   return {
     transaction: action => transaction(db, action),
-    profile: id => parse<Profile>(profile.get(id)),
+    profile(id) {
+      const value = parse<Profile>(profile.get(id));
+      if (value) value.words = value.words.map(word => ({ ...word, learned: word.learned ?? false, example: word.example ?? '', exampleTranslation: word.exampleTranslation ?? '' }));
+      return value;
+    },
     party: id => parse<Party>(party.get(id)),
     openParty: () => parse<Party>(db.prepare("SELECT state FROM babel_parties WHERE json_extract(state, '$.startedAt') IS NULL ORDER BY rowid LIMIT 1").get()),
     saveProfile(id, value) { db.prepare('INSERT INTO babel_profiles VALUES (?, ?, ?) ON CONFLICT(player_id) DO UPDATE SET party_id=excluded.party_id,state=excluded.state').run(id, value.groupId, JSON.stringify(value)); },

@@ -9,6 +9,7 @@ import { parseConfig } from '../src/app/config.ts';
 import { createGame } from '../src/game/index.ts';
 import { silentLogger } from '../src/common/logger.ts';
 import { parseServerMessage } from '../../shared/protocol/validate.ts';
+import { parseBabylonResult } from '../../shared/babylon/validate.ts';
 import type { ServerMessage } from '../../shared/protocol/types.ts';
 import { makeWorld, npc } from './a-helpers.ts';
 import { testLanguagePort } from '../src/babylon/TestLanguagePort.ts';
@@ -27,8 +28,8 @@ async function setup(overrides: Record<string, unknown> = {}, language?: Languag
     const response = await fetch(`${origin}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
     return await response.json() as { token: string; expiresAt: number };
   };
-  async function connect(token: string) {
-    const socket = io(`${origin}/game`, { auth: { version: 3, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
+  async function connect(token: string, endpoint = origin) {
+    const socket = io(`${endpoint}/game`, { auth: { version: 3, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
     cleanups.push(async () => { socket.disconnect(); });
     const packets: ServerMessage[] = []; socket.on('game', (raw) => packets.push(parseServerMessage(raw)));
     const connected = new Promise<void>((resolve, reject) => { socket.once('connect', resolve); socket.once('connect_error', reject); }); socket.connect(); await connected;
@@ -39,6 +40,173 @@ async function setup(overrides: Record<string, unknown> = {}, language?: Languag
   }
   return { app, config, origin, guest, connect };
 }
+
+async function authPost(origin: string, route: string, value?: unknown, token?: string) {
+  return fetch(`${origin}/api/auth/${route}`, {
+    method: 'POST', headers: { ...(value === undefined ? {} : { 'Content-Type': 'application/json' }), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    ...(value === undefined ? {} : { body: JSON.stringify(value) }),
+  });
+}
+const authPassword = 'a sufficiently long password';
+
+it('password registration restores pending state after restart, gates join, saves avatar and revokes the live session', async () => {
+  const { app, config, origin, connect } = await setup();
+  expect((await authPost(origin, 'register', { name: 'Protected', password: authPassword, extra: true })).status).toBe(400);
+  const response = await authPost(origin, 'register', { name: 'Protected', password: authPassword });
+  expect(response.status).toBe(201);
+  const session = await response.json() as { token: string; expiresAt: number };
+  expect(Object.keys(session).sort()).toEqual(['expiresAt', 'token']);
+  expect((await authPost(origin, 'login', { name: 'protected', password: 'wrong password' })).status).toBe(401);
+  expect((await authPost(origin, 'register', { name: 'PROTECTED', password: authPassword })).status).toBe(409);
+  expect((await authPost(origin, 'guest', { name: 'Protected' })).status).toBe(401);
+  const loginResponse = await authPost(origin, 'login', { name: 'protected', password: authPassword }); expect(loginResponse.status).toBe(200);
+  const login = await loginResponse.json() as typeof session;
+  const headers = { Authorization: `Bearer ${login.token}` };
+  expect((await fetch(`${origin}/api/auth/state`)).status).toBe(401);
+  expect(await (await fetch(`${origin}/api/auth/state`, { headers })).json()).toEqual({ requiresAvatar: true });
+  const pending = await connect(login.token); const denied = pending.command('join', { mapId: 'test' });
+  await pending.wait(p => p.type === 'error' && p.requestId === denied && p.code === 'FORBIDDEN');
+  expect(pending.packets.some(p => p.type === 'joined')).toBe(false);
+  await app.stop();
+  const restarted = await startApplication(config, createGame, silentLogger); cleanups.push(() => restarted.stop());
+  const address = restarted.server.address(); if (!address || typeof address === 'string') throw new Error('No restarted server');
+  const nextOrigin = `http://127.0.0.1:${address.port}`;
+  expect(await (await fetch(`${nextOrigin}/api/auth/state`, { headers })).json()).toEqual({ requiresAvatar: true });
+  const save = await fetch(`${nextOrigin}/api/avatar`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ avatarId: 'dan' }) });
+  expect(save.status).toBe(200);
+  expect(await (await fetch(`${nextOrigin}/api/auth/state`, { headers })).json()).toEqual({ requiresAvatar: false });
+  const live = await connect(login.token, nextOrigin); live.command('join', { mapId: 'test' });
+  const joined = await live.wait(p => p.type === 'joined');
+  expect(joined.type === 'joined' && joined.snapshot.entities.find(e => e.id === joined.playerId)?.renderable?.assetId).toBe('avatar-dan');
+  expect((await authPost(nextOrigin, 'logout', undefined, login.token)).status).toBe(204);
+  await live.wait(p => p.type === 'error' && p.code === 'UNAUTHORIZED');
+  await expect.poll(() => live.socket.connected).toBe(false);
+  expect((await fetch(`${nextOrigin}/api/auth/state`, { headers })).status).toBe(401);
+  await expect(connect(login.token, nextOrigin)).rejects.toMatchObject({ data: { code: 'UNAUTHORIZED' } });
+  const resumed = await authPost(nextOrigin, 'login', { name: 'Protected', password: authPassword });
+  expect(resumed.status).toBe(200);
+  const resumedSession = await resumed.json() as typeof session;
+  expect(await (await fetch(`${nextOrigin}/api/auth/state`, { headers: { Authorization: `Bearer ${resumedSession.token}` } })).json()).toEqual({ requiresAvatar: false });
+}, 20_000);
+
+it('logout targets the matching session, preserves newer takeover and cancels its pending NPC without commit', async () => {
+  const { origin, config, guest, connect } = await setup({ npc: { options: { delayMs: 600 } } });
+  const old = await guest('Logout'); const first = await connect(old.token); first.command('join', { mapId: 'test' }); await first.wait(p => p.type === 'joined');
+  const current = await guest('Logout'); const live = await connect(current.token); live.command('join', { mapId: 'test' }); await live.wait(p => p.type === 'joined');
+  expect((await authPost(origin, 'logout', {}, old.token)).status).toBe(204);
+  expect(live.socket.connected).toBe(true);
+  const chat = live.command('chat-send', { text: 'Still controlling' }); await live.wait(p => p.type === 'chat' && p.requestId === chat);
+  live.command('npc-question', { targetId: 'guide', text: 'Do not commit after logout' });
+  await new Promise(resolve => setTimeout(resolve, 50));
+  expect((await authPost(origin, 'logout', undefined, current.token)).status).toBe(204);
+  await live.wait(p => p.type === 'error' && p.code === 'UNAUTHORIZED');
+  await new Promise(resolve => setTimeout(resolve, 650));
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try { expect(db.prepare('SELECT COUNT(*) AS n FROM npc_dialogue').get()!.n).toBe(0); } finally { db.close(); }
+  expect(live.packets.some(p => p.type === 'npc-answer')).toBe(false);
+});
+
+it('logout prevents an in-flight BABEL language action from committing', async () => {
+  let started!: () => void, release!: () => void;
+  const began = new Promise<void>(resolve => { started = resolve; });
+  const language: LanguagePort = { ...testLanguagePort, async translate(...args) { started(); await new Promise<void>(resolve => { release = resolve; }); return testLanguagePort.translate(...args); } };
+  const { origin, guest, connect } = await setup({}, language, 'market');
+  const session = await guest('BABEL logout'), peer = await guest('BABEL peer');
+  const post = (action: unknown, requestId: string, token = session.token) => fetch(`${origin}/api/babylon`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ v: 2, requestId, action }) });
+  for (const token of [session.token, peer.token]) expect((await post({ type: 'enroll', size: 2, native: 'ru', learning: 'en' }, 'enroll', token)).status).toBe(200);
+  const client = await connect(session.token); client.command('join', { mapId: 'market' }); await client.wait(p => p.type === 'joined');
+  const pending = post({ type: 'chat', text: 'Must not commit' }, 'chat'); await began;
+  expect((await authPost(origin, 'logout', undefined, session.token)).status).toBe(204);
+  release(); expect((await pending).status).toBe(503);
+  expect((await post({ type: 'state' }, 'state')).status).toBe(401);
+  const state = await (await post({ type: 'state' }, 'state', peer.token)).json() as { state: { messages: unknown[] } };
+  expect(state.state.messages).toEqual([]);
+});
+
+it('full capacity rejects new authentication before creation but preserves existing seat takeover', async () => {
+  const { origin, config, guest, connect } = await setup();
+  expect((await authPost(origin, 'register', { name: 'Outside', password: authPassword })).status).toBe(201);
+  for (let i = 0; i < 4; i++) { const session = await guest(`Seat ${i}`); const client = await connect(session.token); client.command('join', { mapId: 'test' }); await client.wait(p => p.type === 'joined'); }
+  for (const [route, value] of [
+    ['register', { name: 'Not created', password: authPassword }],
+    ['guest', { name: 'No guest created' }],
+    ['login', { name: 'Outside', password: authPassword }],
+  ] as const) {
+    const response = await authPost(origin, route, value); expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ error: { code: 'FULL', message: expect.stringContaining('заполнен') } });
+  }
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try { expect(db.prepare('SELECT COUNT(*) AS n FROM accounts').get()!.n).toBe(5); expect(db.prepare('SELECT COUNT(*) AS n FROM sessions').get()!.n).toBe(5); } finally { db.close(); }
+  const replacement = await guest('Seat 0'); expect(replacement.token).toBeDefined();
+  const again = await connect(replacement.token); again.command('join', { mapId: 'test' }); await again.wait(p => p.type === 'joined');
+}, 15_000);
+
+it('equipment HTTP is authenticated, bounded, owner-only, persistent and visible to nearby players', async () => {
+  const { origin, config, guest, connect } = await setup();
+  const a = await guest('Equipment A'), b = await guest('Equipment B');
+  const headers = { Authorization: `Bearer ${a.token}`, 'Content-Type': 'application/json' };
+  const post = (value: unknown) => fetch(`${origin}/api/equipment`, { method: 'POST', headers, body: JSON.stringify(value) });
+  expect((await fetch(`${origin}/api/equipment`)).status).toBe(401);
+  expect(await (await fetch(`${origin}/api/equipment`, { headers })).json()).toEqual({ tool: null });
+  for (const value of [{ tool: 'apple' }, { tool: 'bag', playerId: 'other' }, { tool: 'x'.repeat(2048) }, {}, []]) expect((await post(value)).status).toBe(400);
+  const first = await connect(a.token); first.command('join', { mapId: 'test' }); const joined = await first.wait(p => p.type === 'joined'); if (joined.type !== 'joined') throw new Error();
+  const peer = await connect(b.token); peer.command('join', { mapId: 'test' }); await peer.wait(p => p.type === 'joined');
+  for (const tool of ['bag', 'jug'] as const) {
+    expect(await (await post({ tool })).json()).toEqual({ tool });
+    const changed = (p: ServerMessage) => p.type === 'delta' && p.upsert.some(e => e.id === joined.playerId && e.equipment?.tool === tool);
+    await first.wait(changed); await peer.wait(changed);
+  }
+  expect(await (await fetch(`${origin}/api/equipment`, { headers: { Authorization: `Bearer ${b.token}` } })).json()).toEqual({ tool: null });
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try { expect(db.prepare('SELECT equipped_tool FROM players WHERE id = ?').get(joined.playerId)!.equipped_tool).toBe('jug'); } finally { db.close(); }
+  expect(await (await post({ tool: null })).json()).toEqual({ tool: null });
+  await peer.wait(p => p.type === 'delta' && p.upsert.some(e => e.id === joined.playerId && !e.equipment));
+});
+
+it('BABEL polling returns only task peer positions outside AOI and omits released actors', async () => {
+  const { origin, guest, connect } = await setup({ aoiRadius: 8 }, undefined, 'market');
+  const a = await guest('Task A'), b = await guest('Task B'), outsider = await guest('Unrelated');
+  let sequence = 0;
+  const post = (token: string, action: unknown) => fetch(`${origin}/api/babylon`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ v: 2, requestId: `peer${++sequence}`, action }) });
+  for (const session of [a, b]) expect((await post(session.token, { type: 'enroll', size: 2, native: 'ru', learning: 'en' })).status).toBe(200);
+  const first = await connect(a.token); first.command('join', { mapId: 'market' }); const one = await first.wait(p => p.type === 'joined'); if (one.type !== 'joined') throw new Error();
+  const peer = await connect(b.token); peer.command('join', { mapId: 'market' }); const two = await peer.wait(p => p.type === 'joined'); if (two.type !== 'joined') throw new Error();
+  expect(two.snapshot.entities.some(e => e.id === one.playerId)).toBe(false);
+  const third = await connect(outsider.token); third.command('join', { mapId: 'market' }); const other = await third.wait(p => p.type === 'joined'); if (other.type !== 'joined') throw new Error();
+  const state = parseBabylonResult(await (await post(b.token, { type: 'state' })).json()).state;
+  expect(state.partyPositions).toEqual([{ id: one.playerId, name: 'Task A', x: 0, z: -26 }]);
+  expect(state.partyPositions.some(p => p.id === other.playerId)).toBe(false);
+  expect(parseBabylonResult(await (await post(outsider.token, { type: 'state' })).json()).state.partyPositions).toEqual([]);
+  expect((await post(b.token, { type: 'state', playerId: other.playerId })).status).toBe(400);
+  first.socket.disconnect(); await new Promise(resolve => setTimeout(resolve, 180));
+  expect(parseBabylonResult(await (await post(b.token, { type: 'state' })).json()).state.partyPositions).toEqual([]);
+});
+
+it('avatar settings persist and update nearby sockets without arbitrary models', async () => {
+  const { origin, guest, connect, config } = await setup();
+  const a = await guest('Avatar A'), b = await guest('Avatar B');
+  const headers = { Authorization: `Bearer ${a.token}`, 'Content-Type': 'application/json' };
+  const get = (token = a.token) => fetch(`${origin}/api/avatar`, { headers: { Authorization: `Bearer ${token}` } });
+  const post = (value: unknown) => fetch(`${origin}/api/avatar`, { method: 'POST', headers, body: JSON.stringify(value) });
+  expect((await get('')).status).toBe(401);
+  expect(await (await get()).json()).toEqual({ avatarId: null });
+  for (const value of [{ avatarId: 'evil.glb' }, { avatarId: null }, { avatarId: 'nic', playerId: 'other' }]) expect((await post(value)).status).toBe(400);
+  const first = await connect(a.token); first.command('join', { mapId: 'test' });
+  const joined = await first.wait(p => p.type === 'joined'); if (joined.type !== 'joined') throw new Error();
+  expect(joined.snapshot.entities.find(e => e.id === joined.playerId)?.renderable?.assetId).toBe('demo-player');
+  const peer = await connect(b.token); peer.command('join', { mapId: 'test' }); await peer.wait(p => p.type === 'joined');
+  const response = await post({ avatarId: 'dan' }); expect(response.status).toBe(200); expect(await response.json()).toEqual({ avatarId: 'dan' });
+  const changed = (p: ServerMessage) => p.type === 'delta' && p.upsert.some(e => e.id === joined.playerId && e.renderable?.assetId === 'avatar-dan');
+  await first.wait(changed); await peer.wait(changed);
+  expect(await (await get(b.token)).json()).toEqual({ avatarId: null });
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try { expect(db.prepare('SELECT avatar_id FROM players WHERE id = ?').get(joined.playerId)?.avatar_id).toBe('dan'); } finally { db.close(); }
+  first.socket.disconnect(); await new Promise(resolve => setTimeout(resolve, 180));
+  const again = await connect(a.token); again.command('join', { mapId: 'test' });
+  const restored = await again.wait(p => p.type === 'joined'); if (restored.type !== 'joined') throw new Error();
+  expect(restored.snapshot.entities.find(e => e.id === joined.playerId)?.renderable?.assetId).toBe('avatar-dan');
+});
+
 it('real HTTP auth, join, private world, periodic/grace save and NPC commit work together', async () => {
   const { config, origin, guest, connect } = await setup(); const session = await guest('Аня');
   const headers = { Authorization: `Bearer ${session.token}` };

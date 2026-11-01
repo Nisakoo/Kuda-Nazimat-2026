@@ -2,7 +2,9 @@ import type { ServerMessage } from '../../../shared/protocol/types.ts';
 import type { Direction } from '../../../shared/world/types.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
-import type { PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
+import type { AvatarStore, EquipmentStore, PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
+import type { ToolId } from '../../../shared/equipment/types.ts';
+import type { AvatarId } from '../../../shared/avatar/types.ts';
 import type { PlayerLocation } from '../world/access.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
 import { AoiStream } from './AoiStream.ts';
@@ -36,8 +38,11 @@ export class GameService {
   private readonly scheduler: Scheduler;
   private readonly settings: GameSettings;
   private readonly log: Logger;
+  private readonly avatars: AvatarStore | undefined;
+  private readonly equipment: EquipmentStore | undefined;
 
-  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger) {
+  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger, avatars?: AvatarStore, equipment?: EquipmentStore) {
+    this.avatars = avatars; this.equipment = equipment;
     this.world = world; this.players = players; this.clock = clock; this.scheduler = scheduler; this.settings = settings; this.log = log;
     this.startedAt = clock.now().toString(36);
   }
@@ -100,6 +105,8 @@ export class GameService {
       const usable = !force && saved !== null && saved.mapId === mapId && map.isSafeSupport(saved.position.x, saved.position.z);
       const spawn = initial?.mapId === mapId && map.isSafeSupport(initial.position.x, initial.position.z) ? initial.position : map.spawn;
       this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : spawn, rotationY: usable ? saved.rotationY : Math.PI });
+      this.world.setAvatar(playerId, this.avatars?.load(playerId) ?? null);
+      this.world.setEquipment(playerId, this.equipment?.load(playerId) ?? null);
     }
     if (force) {
       // Save the role spawn before acknowledging it, so a reconnect never restores an old demo position.
@@ -114,6 +121,9 @@ export class GameService {
     const snapshot = { tick: this.world.tick, entities };
     return { ok: true, message: (requestId) => ({ v: 3, type: 'joined', requestId, playerId, revision: stream.revision, snapshot, world: map.bootstrap }) };
   }
+
+  setAvatar(playerId: string, avatarId: AvatarId): void { this.world.setAvatar(playerId, avatarId); }
+  setEquipment(playerId: string, tool: ToolId | null): void { this.world.setEquipment(playerId, tool); }
 
   input(channel: Channel, sequence: number, direction: Direction, preparedChunks: readonly string[], sprint = false, jumpId = 0): void {
     const seat = this.joinedSeat(channel);
@@ -148,6 +158,11 @@ export class GameService {
 
   /** Who is asking, for services that act on behalf of a joined controlling connection. */
   identityOf(channel: Channel): PlayerIdentity | null { return this.joinedSeat(channel)?.identity ?? null; }
+
+  playerLocation(playerId: string): PlayerLocation | null {
+    const actor = this.world.locate(playerId);
+    return actor ? { mapId: actor.mapId, position: { ...actor.position } } : null;
+  }
 
   locate(accountId: string): PlayerLocation | null {
     const seat = this.seats.get(accountId);

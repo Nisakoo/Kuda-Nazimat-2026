@@ -27,7 +27,7 @@ test('streams a nearby region, blocks a slow boundary and stays within its reser
   await expect.poll(async () => { await page.clock.runFor(200); return coords.textContent(); }).not.toBe(stopped);
   await page.clock.runFor(1200);
   await page.keyboard.up('s');
-  await expect(page.getByRole('heading', { name: 'Сады науки' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Сады науки', exact: true })).toBeVisible();
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
   const cache = await page.getByLabel('Кеш мира').textContent();
   const [used, limit] = cache!.match(/^([\d]+) \/ ([\d]+)/)!.slice(1).map(Number);

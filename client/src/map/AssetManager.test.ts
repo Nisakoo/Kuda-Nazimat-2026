@@ -32,6 +32,19 @@ it('confines URLs to the configured HTTP source', () => {
   expect(source.resolve('./a.glb')).toBe('http://school.local/world/a.glb');
   for (const path of ['../secret', '//remote.test/model', 'https://school.local/world/a', 'http://user:pass@school.local/world/a']) expect(() => source.resolve(path)).toThrow();
 });
+it('does not report a late unauthorized asset response after cancellation', async () => {
+  let finish!: (response: Response) => void;
+  const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise<Response>(resolve => { finish = resolve; }));
+  const access = { token: () => 'server-issued', unauthorized: vi.fn() };
+  const source = new HttpAssetSource('http://school.local/world/', access); const controller = new AbortController();
+  try {
+    const pending = source.load(source.resolve('avatar.glb'), controller.signal);
+    controller.abort(); finish(new Response(null, { status: 401 }));
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+    expect(access.unauthorized).not.toHaveBeenCalled();
+  } finally { fetcher.mockRestore(); }
+});
+
 it('requires server credentials for protected HTTP and reports expiry without a public fallback', async () => {
   const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 401 }));
   const access = { token: vi.fn((): string | null => null), unauthorized: vi.fn() };

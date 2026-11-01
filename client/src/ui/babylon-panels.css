@@ -41,4 +41,24 @@ dialog.babel-panel:not([open]) { display: none; }
 .babel-panel .babel-compose { display: flex; align-items: end; gap: 8px; border-top: 1px solid #e9d5b6; padding-top: 12px; }
 .babel-compose label { flex: 1; min-width: 0; }
 .babel-panel .babel-compose textarea { min-height: 44px; height: 44px; }
+/* Tools and dictionary use the parchment, clipped-card language of the HUD. */
+.babel-section-title { display: flex; align-items: center; gap: 14px; margin: 18px 0 12px; font-size: 1.1rem; }
+.babel-section-title::after { content: ''; height: 1px; background: #e9d5b6; flex: 1; }
+.babel-tools-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(190px, .85fr); gap: 26px; }
+.babel-tool-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.babel-panel .babel-tool-card { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; min-height: 155px; padding: 7px; background: #f1e4d2; color: #073c48; border: 1px solid #e9d5b6; border-radius: 8px; }
+.babel-panel .babel-tool-card.selected { border: 2px solid #07908c; background: #e4e4d6; }
+.tool-illustration { display: block; width: min(100%, 145px); height: 120px; }
+.babel-tool-detail { border-left: 1px solid #e9d5b6; padding: 4px 0 0 26px; }
+.babel-tool-detail h3 { margin: 0; font-size: 1.45rem; }.babel-tool-detail p { color: #657d80; }.babel-tool-detail button { width: 100%; }
+.babel-held { font-size: .85rem; margin: 8px 0; }
+.babel-tool-contents { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; min-height: 80px; }
+.babel-empty-cells { display: flex; gap: 10px; }.babel-empty-cells span, .babel-content-cell { width: 75px; min-height: 72px; background: #f1e4d2; border: 1px solid #e9d5b6; border-radius: 7px; }
+.babel-content-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 6px; text-align: center; overflow-wrap: anywhere; font-size: .85rem; }
+.babel-word-tabs { display: flex; gap: 8px; border-bottom: 1px solid #e9d5b6; margin-top: 4px; }
+.babel-panel .babel-word-tabs button { color: #657d80; background: transparent; border: 0; border-bottom: 4px solid transparent; border-radius: 0; padding: 8px 20px; }
+.babel-panel .babel-word-tabs button.active { color: #073c48; border-bottom-color: #079a96; }
+.babel-word-layout { border-top: 0; padding-top: 12px; }.babel-word-detail h3 { font-size: 1.65rem; }.babel-word-detail form label { display: block; font-size: .9rem; margin: 8px 0; }.babel-word-actions { margin-top: 12px; }
+.babel-participants { margin: 8px 0; }.babel-compose button { white-space: nowrap; }
+@media (max-width: 600px) { .babel-tools-layout { grid-template-columns: 1fr; gap: 12px; }.babel-tool-detail { border-left: 0; border-top: 1px solid #e9d5b6; padding: 12px 0 0; }.babel-panel .babel-tool-card { min-height: 135px; }.tool-illustration { height: 100px; } }
 @media (max-width: 600px) { dialog.babel-panel { width: calc(100% - 16px); max-height: calc(100svh - 16px); } .babel-content { padding: 16px; } .babel-word-layout { grid-template-columns: 1fr; gap: 12px; } .babel-word-list { max-height: 180px; } .babel-word-detail { border-left: 0; border-top: 1px solid #e9d5b6; padding: 12px 0 0; } .babel-panel .babel-compose { flex-wrap: wrap; } .babel-compose label { flex-basis: 100%; order: -1; } }

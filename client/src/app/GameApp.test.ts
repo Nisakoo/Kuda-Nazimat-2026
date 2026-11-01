@@ -35,6 +35,11 @@ describe('application lifecycle', () => {
       return nextFrame;
     });
     vi.stubGlobal('cancelAnimationFrame', (id: number) => { pending.delete(id); });
+    // Unit tests never contact the LAN. Individual tests override this stub for their own routes.
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, options?: RequestInit) => {
+      if (String(input).endsWith('/api/auth/logout') && options?.method === 'POST') return Promise.resolve(new Response(null, { status: 204 }));
+      return Promise.reject(new Error(`Unexpected unit-test fetch: ${String(input)}`));
+    }));
     vi.stubGlobal('ResizeObserver', class {
       observe(): void { observerCount++; }
       disconnect(): void { observerCount--; }
@@ -171,7 +176,44 @@ describe('application lifecycle', () => {
     app.provideServerSession(context);
     expect(transport.connect).toHaveBeenCalledWith({ kind: 'server', session: context });
     app.logout(); expect(transport.dispose).toHaveBeenCalledOnce();
+    expect(vi.mocked(fetch)).toHaveBeenCalledWith('http://school.local/api/auth/logout', expect.objectContaining({ method: 'POST', headers: { Authorization: `Bearer ${context.token}` } }));
     expect(factory).toHaveBeenCalledOnce(); expect(pending.size).toBe(0);
+  });
+
+  it('does not start a world or transport for a first avatar until the server confirms selection', async () => {
+    app.dispose(); let finish!: (response: Response) => void;
+    const fetcher = vi.fn((_url: string, options: RequestInit) => options.method === 'POST'
+      ? new Promise<Response>(resolve => { finish = resolve; })
+      : Promise.resolve(new Response(JSON.stringify({ avatarId: null }))));
+    vi.stubGlobal('fetch', fetcher);
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    const factory = vi.fn(() => transport);
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 }, true);
+    await vi.waitFor(() => expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: true, avatarPurpose: 'first', avatar: expect.objectContaining({ state: { avatarId: null }, busy: false }) })));
+    app.start(host); expect(factory).not.toHaveBeenCalled(); expect(createRenderer).not.toHaveBeenCalled();
+    const saving = app.saveAvatar('dan'); expect(factory).not.toHaveBeenCalled(); expect(createRenderer).not.toHaveBeenCalled();
+    finish(new Response(JSON.stringify({ avatarId: 'dan' })));
+    expect(await saving).toBe(true); expect(factory).toHaveBeenCalledOnce(); expect(transport.connect).toHaveBeenCalledOnce();
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: false, authRequired: false }));
+  });
+
+  it('ignores a late avatar save after settings selector closes', async () => {
+    app.dispose(); let finish!: (response: Response) => void; let saveSignal!: AbortSignal;
+    vi.stubGlobal('fetch', vi.fn((_url: string, options: RequestInit) => {
+      if (options.method === 'POST') { saveSignal = options.signal!; return new Promise<Response>(resolve => { finish = resolve; }); }
+      return Promise.resolve(new Response(JSON.stringify({ avatarId: 'nic' })));
+    }));
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, () => transport);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 }); app.openAvatar();
+    await vi.waitFor(() => expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatar: expect.objectContaining({ state: { avatarId: 'nic' }, busy: false }) })));
+    const saving = app.saveAvatar('dan'); app.closeAvatar(); expect(saveSignal.aborted).toBe(true);
+    app.closeSettings(); expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: false, settingsOpen: false }));
+    finish(new Response(JSON.stringify({ avatarId: 'dan' })));
+    expect(await saving).toBe(false); expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: false, settingsOpen: false, avatar: null }));
   });
 
   it('prepares the authoritative saved position instead of the manifest spawn in an online session', async () => {
@@ -262,6 +304,31 @@ describe('application lifecycle', () => {
       resolve({ token: 'x'.repeat(43), expiresAt: Date.now() + 10000 }); await pendingLogin; expect(network).not.toHaveBeenCalled();
       login.mockRejectedValueOnce(new Error('Сервер недоступен')); await app.login('Аня');
       expect(login).toHaveBeenCalledTimes(2); expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authError: 'Сервер недоступен', authPending: false }));
+    } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
+  it('explains registration timeout recovery and revokes a cancelled late issued token', async () => {
+    vi.useFakeTimers();
+    let resolve!: (response: Response) => void;
+    const fetch = vi.fn((url: string, init?: RequestInit): Promise<Response> => {
+      if (url.endsWith('/api/auth/register')) return new Promise(done => { resolve = done; });
+      if (url.endsWith('/api/auth/logout')) { expect(init?.headers).toEqual({ Authorization: `Bearer ${'x'.repeat(43)}` }); return Promise.resolve(new Response(null, { status: 204 })); }
+      throw new Error(`Unexpected request ${url}`);
+    });
+    vi.stubGlobal('fetch', fetch);
+    app.dispose(); const network = vi.fn();
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, network);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    try {
+      const pending = app.register('Аня', 'registration-password');
+      await vi.advanceTimersByTimeAsync(10000);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authPending: false, authError: expect.stringContaining('Аккаунт мог быть создан') }));
+      expect(listener.mock.lastCall?.[0].authError).toContain('Вход');
+      resolve(new Response(JSON.stringify({ token: 'x'.repeat(43), expiresAt: Date.now() + 10000 }), { status: 201 }));
+      await pending;
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual(['http://school.local/api/auth/register', 'http://school.local/api/auth/logout']);
+      expect(network).not.toHaveBeenCalled();
+      expect(listener.mock.lastCall?.[0].authError).toContain('Аккаунт мог быть создан');
     } finally { app.dispose(); vi.useRealTimers(); }
   });
 
@@ -376,6 +443,36 @@ describe('application lifecycle', () => {
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, marketPanel: 'words' }));
       app.toggleHudPanel('words');
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'stopped' }));
+      app.resume(); expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      app.dispose();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
+  it('waits for queued visuals before capture and still requires explicit start or resume', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null, loading = true;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    const request = vi.fn(() => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: request });
+    const diagnostics = renderer.getDiagnostics();
+    vi.mocked(renderer.getDiagnostics).mockImplementation(() => ({ ...diagnostics, pending: loading ? 1 : 0 }));
+    const listener = vi.fn(); app.subscribe(listener);
+    try {
+      app.start(host); advance(100); app.enterWorld();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ visualLoading: true, capture: 'idle' }));
+      expect(request).not.toHaveBeenCalled();
+      loading = false; advance(200);
+      expect(request).not.toHaveBeenCalled();
+      app.enterWorld(); expect(request).toHaveBeenCalledTimes(1);
+      loading = true; app.stop(); app.resume();
+      expect(request).toHaveBeenCalledTimes(1); expect(locked).toBeNull();
+      loading = false; advance(300);
+      expect(request).toHaveBeenCalledTimes(1);
       app.resume(); expect(request).toHaveBeenCalledTimes(2);
     } finally {
       app.dispose();
