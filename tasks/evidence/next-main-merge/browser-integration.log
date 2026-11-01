@@ -1,0 +1,1275 @@
+[WebServer] (node:74304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 10 tests using 1 worker
+
+(node:74305) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/10] e2e/babylon.spec.ts:54:1 › two real players enroll, translate, share stones and restore a private dictionary after restart
+[2/10] e2e/babylon.spec.ts:100:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task
+[3/10] e2e/babylon.spec.ts:121:1 › real server authorizes the default 25-chunk window at the market and tower
+[4/10] e2e/server-auth.spec.ts:54:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token
+[5/10] e2e/server-auth.spec.ts:72:1 › real players exchange chat and NPC memory survives a server restart
+[6/10] e2e/server-auth.spec.ts:92:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits
+[7/10] e2e/server-auth.spec.ts:108:1 › a world 401 and client session expiry return to login without automatically posting again
+[8/10] e2e/server-auth.spec.ts:119:1 › switching to the server market enrolls BABEL and opens the authoritative inventory
+(node:74501) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[9/10] e2e/world-next.spec.ts:205:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+e2e/world-next.spec.ts:205:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+NEXT backend (node:74503) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+NEXT backend 09:13:44.009 INFO  [app] Запуск сервера (app.start) {"env":"development","version":"0.1.0","node":"v24.15.0","platform":"darwin arm64","pid":74503,"config":{"host":"127.0.0.1","port":52329,"clientDir":"/private/tmp/competition-2026-next-merge/client/dist","worldDir":"/private/tmp/competition-2026-next-merge/client/public","maps":{"market":"maps/market/manifest.json","demo":"maps/demo/manifest.json","science":"maps/demo/science.json"},"defaultMap":"market","contentDir":"/private/tmp/competition-2026-next-merge/server/content","dbPath":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-yHDIs7/game.sqlite","maxPlayers":4,"sessionTtlMs":43200000,"tickHz":20,"broadcastHz":10,"aoiRadius":64,"staticChunkRadius":3,"disconnectGraceMs":100,"saveIntervalMs":100,"corsOrigins":["http://localhost:5173"],"logWorldAccess":false,"clientDebug":true,"auth":{"maxSessions":5,"passwordless":true},"logs":{"consoleLevel":"debug","fileLevel":"debug","dir":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-yHDIs7/data/logs","maxFileMb":20,"maxTotalMb":200,"retentionDays":14},"language":{"adapter":"test","options":{}},"npc":{"adapter":"scripted","maxConcurrent":1,"maxUnfinished":4,"timeoutMs":8000,"streamTimeoutMs":30000,"options":{}},"env":"development","monitoring":{"token":null,"pingIntervalMs":5000,"validateOutgoing":true}}}
+
+NEXT backend 09:13:44.013 INFO  [db] База данных открыта (db.opened) {"path":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-yHDIs7/game.sqlite","schema":4}
+
+NEXT backend 09:13:44.013 WARN  [app] Вход без пароля включён (development); в production он запрещён (auth.passwordless.enabled)
+
+NEXT backend 09:13:44.014 INFO  [npc] Ответчик NPC готов (npc.responder.ready)
+
+NEXT backend 09:13:44.014 INFO  [language] Переводчик готов (language.ready) {"mode":"test","languages":["ru","en","es"]}
+
+NEXT backend 09:13:44.140 INFO  [game] Карта готова (world.loaded) {"mapId":"market","chunks":1024,"worldBytes":21088910,"durationMs":126}
+09:13:44.140 INFO  [game] Карта готова (world.loaded) {"mapId":"demo","chunks":1024,"worldBytes":18697328,"durationMs":126}
+
+NEXT backend 09:13:44.140 INFO  [game] Карта готова (world.loaded) {"mapId":"science","chunks":1024,"worldBytes":18697332,"durationMs":126}
+
+NEXT backend 09:13:44.147 INFO  [app] Сервер готов (app.ready) {"host":"127.0.0.1","port":52329,"maps":["market","demo","science"]}
+
+NEXT backend ================================================================
+  ВАВИЛОН ЗАПУЩЕН
+
+  Этот компьютер:     http://localhost:52329/
+  Другие устройства:
+    —
+  Экран ведущего:     http://localhost:52329/operator
+
+  ! host = 127.0.0.1: другие устройства не подключатся, доступен только этот компьютер.
+================================================================
+
+NEXT backend 09:13:44.912 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.6,"bytes":491,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:44.918 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.3,"bytes":11404,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:44.919 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.4,"bytes":962810,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:45.049 INFO  [auth] Вход выполнен (auth.guest) {"accountId":"a_hkdvqpzn5raji5af","playerId":"p_v3u70a2oiixub3jp","name":"NEXT role 1","ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU"}
+09:13:45.050 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/auth/guest","status":200,"durationMs":2.2,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:45.063 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.6,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.120 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_v3u70a2oiixub3jp","sessionId":"0Lc4Lzs56RsU","requestId":"542dbd67-a6ba-4315-8666-578b0b7a059e","type":"enroll","result":"ok","durationMs":1}
+09:13:45.120 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":1.6,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.134 INFO  [realtime] Соединение открыто (realtime.connect) {"playerId":"p_v3u70a2oiixub3jp","connectionId":"cOs9s8xinylLEidhAAAA","ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU"}
+09:13:45.134 INFO  [game] Игрок занял место (game.seat.attach) {"playerId":"p_v3u70a2oiixub3jp","connectionId":"cOs9s8xinylLEidhAAAA","takeover":false,"reconnects":0}
+
+NEXT backend 09:13:45.139 DEBUG [game] Точка появления выбрана (game.spawn) {"playerId":"p_v3u70a2oiixub3jp","mapId":"market","position":{"x":0,"y":0,"z":-26},"saved":false}
+
+NEXT backend 09:13:45.140 INFO  [realtime] Вход в мир (realtime.join) {"playerId":"p_v3u70a2oiixub3jp","connectionId":"cOs9s8xinylLEidhAAAA","mapId":"market","ip":"127.0.0.1","requestId":"c1_1"}
+
+NEXT backend 09:13:45.166 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2.7,"bytes":1424731,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.209 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.4,"bytes":142,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.263 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":16384,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.266 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_v3u70a2oiixub3jp","sessionId":"0Lc4Lzs56RsU","requestId":"8ca17b58-5e57-4eb7-a822-2c35f3af6372","type":"intro-seen","result":"ok","durationMs":1}
+09:13:45.266 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":1,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.273 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":420000,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.316 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":9848,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:45.316 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":31776,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT pointer probe {"kind":"request","at":455.10000002384186,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":603.5,"focus":true,"visibility":"visible","active":true,"durationMs":147.70000004768372}
+
+NEXT pointer probe {"kind":"resolve","at":609.8999999761581,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":613.1000000238419,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":648.7999999523163,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 09:13:45.568 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.4,"bytes":491,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:45.577 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.5,"bytes":11404,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:45.578 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.6,"bytes":962810,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:45.696 INFO  [auth] Вход выполнен (auth.guest) {"accountId":"a_a14l6j5w9kk72zpy","playerId":"p_h8m672hlmonujy05","name":"NEXT role 2","ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ"}
+
+NEXT backend 09:13:45.696 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/auth/guest","status":200,"durationMs":0.8,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:45.700 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.8,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.743 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_h8m672hlmonujy05","sessionId":"vlhPXzxb_5EZ","requestId":"87624dd3-eeb3-4bd0-b3c3-c682f890f2b2","type":"enroll","result":"ok","durationMs":0}
+
+NEXT backend 09:13:45.743 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.753 INFO  [realtime] Соединение открыто (realtime.connect) {"playerId":"p_h8m672hlmonujy05","connectionId":"4W6ygw4OsZnoLGmmAAAB","ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ"}
+09:13:45.753 INFO  [game] Игрок занял место (game.seat.attach) {"playerId":"p_h8m672hlmonujy05","connectionId":"4W6ygw4OsZnoLGmmAAAB","takeover":false,"reconnects":0}
+
+NEXT backend 09:13:45.755 DEBUG [game] Точка появления выбрана (game.spawn) {"playerId":"p_h8m672hlmonujy05","mapId":"market","position":{"x":0,"y":0,"z":8},"saved":false}
+
+NEXT backend 09:13:45.755 INFO  [realtime] Вход в мир (realtime.join) {"playerId":"p_h8m672hlmonujy05","connectionId":"4W6ygw4OsZnoLGmmAAAB","mapId":"market","ip":"127.0.0.1","requestId":"c1_1"}
+
+NEXT backend 09:13:45.776 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.9,"bytes":1424731,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.820 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":137,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.820 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":243,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.871 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.873 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.877 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":52080,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.879 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_h8m672hlmonujy05","sessionId":"vlhPXzxb_5EZ","requestId":"63f10ef8-a9f0-41ae-ae36-6a61d235171e","type":"intro-seen","result":"ok","durationMs":1}
+09:13:45.879 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":1.8,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.880 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":4.8,"bytes":728488,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.880 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":4.1,"bytes":46836,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.902 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":154,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.902 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":243,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.907 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.909 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.910 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":421808,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.925 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":11168,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.925 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":9848,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.926 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.5,"bytes":31776,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.927 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.8,"bytes":52080,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.934 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":253,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.951 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT pointer probe {"kind":"request","at":388.59999990463257,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":390,"focus":true,"visibility":"visible","active":true,"durationMs":1.2000000476837158}
+
+NEXT pointer probe {"kind":"resolve","at":398.5,"focus":true,"visibility":"visible","active":true}
+
+NEXT backend 09:13:45.975 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":6.6,"bytes":248,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.975 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":3.4,"bytes":142,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT pointer probe {"kind":"change","at":420.1999999284744,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 09:13:45.994 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.995 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:45.999 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":420000,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.015 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":258,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+09:13:46.015 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":253,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.020 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.023 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.031 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":242,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.035 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.048 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":252,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT pointer probe {"kind":"change","at":491.89999997615814,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 09:13:46.062 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.3,"bytes":491,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:46.068 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.069 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:46.070 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.6,"bytes":11404,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:46.071 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.3,"bytes":962810,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:46.082 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":247,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.082 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":248,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.087 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.091 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.097 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":242,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.101 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.116 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":252,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.116 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":247,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.135 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+09:13:46.135 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.147 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":257,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.147 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":252,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.150 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.152 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.164 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":247,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.164 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":257,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.169 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.170 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.181 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":252,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.182 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":251,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.187 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.197 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.215 INFO  [auth] Вход выполнен (auth.guest) {"accountId":"a_qszd2x06f2pq1ped","playerId":"p_va5lpienytlaxa3m","name":"NEXT role 3","ip":"127.0.0.1","sessionId":"JQYzZHyusKwG"}
+09:13:46.215 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/auth/guest","status":200,"durationMs":0.6,"ip":"127.0.0.1"}
+09:13:46.215 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":246,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+09:13:46.215 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":256,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.220 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.224 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.227 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.231 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":251,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.234 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.282 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_va5lpienytlaxa3m","sessionId":"JQYzZHyusKwG","requestId":"9c3c6b2c-18c3-42c2-9596-7bd37f8bf161","type":"enroll","result":"ok","durationMs":0}
+09:13:46.282 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.304 INFO  [realtime] Соединение открыто (realtime.connect) {"playerId":"p_va5lpienytlaxa3m","connectionId":"FTghWkjOZ4wjonxGAAAC","ip":"127.0.0.1","sessionId":"JQYzZHyusKwG"}
+09:13:46.305 INFO  [game] Игрок занял место (game.seat.attach) {"playerId":"p_va5lpienytlaxa3m","connectionId":"FTghWkjOZ4wjonxGAAAC","takeover":false,"reconnects":0}
+
+NEXT backend 09:13:46.312 DEBUG [game] Точка появления выбрана (game.spawn) {"playerId":"p_va5lpienytlaxa3m","mapId":"market","position":{"x":1.5,"y":0,"z":8},"saved":false}
+09:13:46.312 INFO  [realtime] Вход в мир (realtime.join) {"playerId":"p_va5lpienytlaxa3m","connectionId":"FTghWkjOZ4wjonxGAAAC","mapId":"market","ip":"127.0.0.1","requestId":"c1_1"}
+
+NEXT backend 09:13:46.334 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.5,"bytes":1424731,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.378 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":137,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.432 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.433 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_va5lpienytlaxa3m","sessionId":"JQYzZHyusKwG","requestId":"620458eb-907e-43c8-a353-291e31383ee3","type":"intro-seen","result":"ok","durationMs":0}
+
+NEXT backend 09:13:46.433 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.440 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":728488,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.481 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":9848,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.481 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":11168,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:46.481 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":31776,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT pointer probe {"kind":"request","at":470.89999997615814,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":472.10000002384186,"focus":true,"visibility":"visible","active":true,"durationMs":1}
+
+NEXT pointer probe {"kind":"resolve","at":472.60000002384186,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":486.89999997615814,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":501.1999999284744,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 09:13:46.565 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.4,"bytes":491,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:46.577 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.6,"bytes":11404,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:46.577 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1,"bytes":962810,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:46.691 INFO  [auth] Вход выполнен (auth.guest) {"accountId":"a_axkrmn759lsta14v","playerId":"p_7irqy88w31sg5r3a","name":"NEXT role 4","ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv"}
+
+NEXT backend 09:13:46.691 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/auth/guest","status":200,"durationMs":0.9,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:46.696 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:46.710 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:46.736 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_7irqy88w31sg5r3a","sessionId":"91hJ8zUSuOXv","requestId":"58f927e8-6c45-47d4-b6b1-fa563613d53d","type":"enroll","result":"ok","durationMs":0}
+
+NEXT backend 09:13:46.736 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:46.751 INFO  [realtime] Соединение открыто (realtime.connect) {"playerId":"p_7irqy88w31sg5r3a","connectionId":"Vwe8PuEsMgfP9gfdAAAD","ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv"}
+
+NEXT backend 09:13:46.751 INFO  [game] Игрок занял место (game.seat.attach) {"playerId":"p_7irqy88w31sg5r3a","connectionId":"Vwe8PuEsMgfP9gfdAAAD","takeover":false,"reconnects":0}
+
+NEXT backend 09:13:46.753 DEBUG [game] Точка появления выбрана (game.spawn) {"playerId":"p_7irqy88w31sg5r3a","mapId":"market","position":{"x":3,"y":0,"z":8},"saved":false}
+
+NEXT backend 09:13:46.753 INFO  [realtime] Вход в мир (realtime.join) {"playerId":"p_7irqy88w31sg5r3a","connectionId":"Vwe8PuEsMgfP9gfdAAAD","mapId":"market","ip":"127.0.0.1","requestId":"c1_1"}
+
+NEXT backend 09:13:46.771 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":1424731,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:46.816 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":137,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:46.870 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:46.873 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":728488,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:46.894 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_7irqy88w31sg5r3a","sessionId":"91hJ8zUSuOXv","requestId":"5c766a43-54a0-4605-ae64-3e676191797a","type":"intro-seen","result":"ok","durationMs":0}
+
+NEXT backend 09:13:46.894 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":0.9,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:46.906 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.6,"bytes":11168,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+09:13:46.907 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":9848,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+09:13:46.907 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":31776,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT pointer probe {"kind":"request","at":368.2999999523163,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":369.39999997615814,"focus":true,"visibility":"visible","active":true,"durationMs":0.8999999761581421}
+
+NEXT pointer probe {"kind":"resolve","at":369.7000000476837,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":378.5,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":412.10000002384186,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":1431.2999999523163,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":1432.3999999761581,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":1440.5999999046326,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 09:13:47.072 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:47.235 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:47.700 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:47.713 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.2,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:48.076 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.5,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:48.239 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:48.311 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.7,"bytes":8424,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:48.610 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.9,"bytes":6660,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:48.703 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:48.715 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:48.910 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.1,"bytes":12392,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:49.080 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT backend 09:13:49.243 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.8,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT backend 09:13:49.706 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"91hJ8zUSuOXv","playerId":"p_7irqy88w31sg5r3a"}
+
+NEXT backend 09:13:49.718 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vlhPXzxb_5EZ","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:50.084 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"0Lc4Lzs56RsU","playerId":"p_v3u70a2oiixub3jp"}
+
+NEXT pointer probe {"kind":"change","at":4671.599999904633,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 09:13:50.246 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"JQYzZHyusKwG","playerId":"p_va5lpienytlaxa3m"}
+
+NEXT pointer probe {"kind":"request","at":4689.799999952316,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":4690.399999976158,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":4707.099999904633,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 09:13:50.519 INFO  [app] Получен сигнал остановки (app.signal)
+
+NEXT backend 09:13:50.519 INFO  [app] Остановка сервера (app.stop) {"reason":"shutdown"}
+
+NEXT backend 09:13:50.520 INFO  [realtime] Соединение закрыто сервером (realtime.closed_by_server) {"playerId":"p_v3u70a2oiixub3jp","connectionId":"cOs9s8xinylLEidhAAAA","ip":"127.0.0.1","reason":"shutdown"}
+
+NEXT backend 09:13:50.521 INFO  [realtime] Игрок отключился (realtime.disconnect) {"playerId":"p_v3u70a2oiixub3jp","connectionId":"cOs9s8xinylLEidhAAAA","ip":"127.0.0.1","reason":"server namespace disconnect","droppedInputs":0,"invalidPackets":0,"rttMs":0}
+
+NEXT backend 09:13:50.521 INFO  [realtime] Соединение закрыто сервером (realtime.closed_by_server) {"playerId":"p_h8m672hlmonujy05","connectionId":"4W6ygw4OsZnoLGmmAAAB","ip":"127.0.0.1","reason":"shutdown"}
+
+NEXT backend 09:13:50.521 INFO  [realtime] Игрок отключился (realtime.disconnect) {"playerId":"p_h8m672hlmonujy05","connectionId":"4W6ygw4OsZnoLGmmAAAB","ip":"127.0.0.1","reason":"server namespace disconnect","droppedInputs":0,"invalidPackets":0,"rttMs":null}
+
+NEXT backend 09:13:50.521 INFO  [realtime] Соединение закрыто сервером (realtime.closed_by_server) {"playerId":"p_va5lpienytlaxa3m","connectionId":"FTghWkjOZ4wjonxGAAAC","ip":"127.0.0.1","reason":"shutdown"}
+09:13:50.521 INFO  [realtime] Игрок отключился (realtime.disconnect) {"playerId":"p_va5lpienytlaxa3m","connectionId":"FTghWkjOZ4wjonxGAAAC","ip":"127.0.0.1","reason":"server namespace disconnect","droppedInputs":0,"invalidPackets":0,"rttMs":null}
+09:13:50.521 INFO  [realtime] Соединение закрыто сервером (realtime.closed_by_server) {"playerId":"p_7irqy88w31sg5r3a","connectionId":"Vwe8PuEsMgfP9gfdAAAD","ip":"127.0.0.1","reason":"shutdown"}
+
+NEXT backend 09:13:50.521 INFO  [realtime] Игрок отключился (realtime.disconnect) {"playerId":"p_7irqy88w31sg5r3a","connectionId":"Vwe8PuEsMgfP9gfdAAAD","ip":"127.0.0.1","reason":"server namespace disconnect","droppedInputs":0,"invalidPackets":0,"rttMs":null}
+
+NEXT backend 09:13:50.528 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"modules","durationMs":8}
+
+NEXT backend 09:13:50.530 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"closed","durationMs":10}
+
+NEXT backend 09:13:50.530 INFO  [app] Сервер остановлен (app.stop.done) {"durationMs":10}
+
+NEXT game error {"v":3,"type":"error","requestId":"server","code":"UNAUTHORIZED","message":"shutdown"}
+
+NEXT game error {"v":3,"type":"error","requestId":"server","code":"UNAUTHORIZED","message":"shutdown"}
+
+NEXT game error {"v":3,"type":"error","requestId":"server","code":"UNAUTHORIZED","message":"shutdown"}
+
+NEXT pointer probe {"kind":"change","at":4965.599999904633,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT game error {"v":3,"type":"error","requestId":"server","code":"UNAUTHORIZED","message":"shutdown"}
+
+NEXT backend (node:74546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+NEXT backend 09:13:50.689 INFO  [app] Запуск сервера (app.start) {"env":"development","version":"0.1.0","node":"v24.15.0","platform":"darwin arm64","pid":74546,"config":{"host":"127.0.0.1","port":52329,"clientDir":"/private/tmp/competition-2026-next-merge/client/dist","worldDir":"/private/tmp/competition-2026-next-merge/client/public","maps":{"market":"maps/market/manifest.json","demo":"maps/demo/manifest.json","science":"maps/demo/science.json"},"defaultMap":"market","contentDir":"/private/tmp/competition-2026-next-merge/server/content","dbPath":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-yHDIs7/game.sqlite","maxPlayers":4,"sessionTtlMs":43200000,"tickHz":20,"broadcastHz":10,"aoiRadius":64,"staticChunkRadius":3,"disconnectGraceMs":100,"saveIntervalMs":100,"corsOrigins":["http://localhost:5173"],"logWorldAccess":false,"clientDebug":true,"auth":{"maxSessions":5,"passwordless":true},"logs":{"consoleLevel":"debug","fileLevel":"debug","dir":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-yHDIs7/data/logs","maxFileMb":20,"maxTotalMb":200,"retentionDays":14},"language":{"adapter":"test","options":{}},"npc":{"adapter":"scripted","maxConcurrent":1,"maxUnfinished":4,"timeoutMs":8000,"streamTimeoutMs":30000,"options":{}},"env":"development","monitoring":{"token":null,"pingIntervalMs":5000,"validateOutgoing":true}}}
+
+NEXT backend 09:13:50.692 INFO  [db] База данных открыта (db.opened) {"path":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-yHDIs7/game.sqlite","schema":4}
+
+NEXT backend 09:13:50.692 WARN  [app] Вход без пароля включён (development); в production он запрещён (auth.passwordless.enabled)
+
+NEXT backend 09:13:50.692 INFO  [npc] Ответчик NPC готов (npc.responder.ready)
+
+NEXT backend 09:13:50.692 INFO  [language] Переводчик готов (language.ready) {"mode":"test","languages":["ru","en","es"]}
+
+NEXT backend 09:13:50.827 INFO  [game] Карта готова (world.loaded) {"mapId":"market","chunks":1024,"worldBytes":21088910,"durationMs":134}
+
+NEXT backend 09:13:50.827 INFO  [game] Карта готова (world.loaded) {"mapId":"demo","chunks":1024,"worldBytes":18697328,"durationMs":134}
+09:13:50.827 INFO  [game] Карта готова (world.loaded) {"mapId":"science","chunks":1024,"worldBytes":18697332,"durationMs":134}
+
+NEXT backend 09:13:50.836 INFO  [app] Сервер готов (app.ready) {"host":"127.0.0.1","port":52329,"maps":["market","demo","science"]}
+
+NEXT backend ================================================================
+  ВАВИЛОН ЗАПУЩЕН
+
+  Этот компьютер:     http://localhost:52329/
+  Другие устройства:
+    —
+  Экран ведущего:     http://localhost:52329/operator
+
+  ! host = 127.0.0.1: другие устройства не подключатся, доступен только этот компьютер.
+================================================================
+
+NEXT backend 09:13:50.851 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.7,"bytes":491,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:50.862 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.3,"bytes":11404,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:50.863 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.6,"bytes":962810,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:50.928 INFO  [auth] Вход выполнен (auth.guest) {"accountId":"a_a14l6j5w9kk72zpy","playerId":"p_h8m672hlmonujy05","name":"NEXT role 2","ip":"127.0.0.1","sessionId":"vbdzV_qhfHul"}
+
+NEXT backend 09:13:50.928 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/auth/guest","status":200,"durationMs":1.8,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:50.942 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.9,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:50.948 INFO  [realtime] Соединение открыто (realtime.connect) {"playerId":"p_h8m672hlmonujy05","connectionId":"WuL5vj1WxvOwcvU1AAAA","ip":"127.0.0.1","sessionId":"vbdzV_qhfHul"}
+
+NEXT backend 09:13:50.948 INFO  [game] Игрок занял место (game.seat.attach) {"playerId":"p_h8m672hlmonujy05","connectionId":"WuL5vj1WxvOwcvU1AAAA","takeover":false,"reconnects":0}
+
+NEXT backend 09:13:50.951 DEBUG [game] Точка появления выбрана (game.spawn) {"playerId":"p_h8m672hlmonujy05","mapId":"market","position":{"x":0,"y":0,"z":12.949999999999964},"saved":true}
+
+NEXT backend 09:13:50.951 INFO  [realtime] Вход в мир (realtime.join) {"playerId":"p_h8m672hlmonujy05","connectionId":"WuL5vj1WxvOwcvU1AAAA","mapId":"market","ip":"127.0.0.1","requestId":"c1_1"}
+
+NEXT backend 09:13:50.968 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":1424731,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.000 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":137,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.000 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":243,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.002 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":9848,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.056 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.056 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.059 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":52080,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.059 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":728488,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.059 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":46836,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.079 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":154,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.079 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":243,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.082 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.084 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.085 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":421808,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.087 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":52080,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.106 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2.3,"bytes":11168,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.106 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.9,"bytes":253,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+09:13:51.107 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2.7,"bytes":31776,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.113 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":248,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.115 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.118 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.145 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":142,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.145 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":258,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.148 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.151 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.151 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":420000,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.169 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":253,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.169 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":242,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.175 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.178 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT pointer probe {"kind":"request","at":337.2999999523163,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":342.89999997615814,"focus":true,"visibility":"visible","active":true,"durationMs":5.600000023841858}
+
+NEXT pointer probe {"kind":"resolve","at":350.5,"focus":true,"visibility":"visible","active":true}
+
+NEXT backend 09:13:51.199 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.199 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":247,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT pointer probe {"kind":"change","at":361.7999999523163,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 09:13:51.212 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.214 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.228 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":248,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.228 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":242,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.232 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.234 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.279 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.279 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":247,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.284 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.288 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.312 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":257,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.312 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.316 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.317 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.365 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":251,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.365 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":246,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT walk start {"axis":"x","target":0,"position":{"x":0,"z":12.949999999999964}}
+
+NEXT walk done {"axis":"x","target":0,"position":{"x":0,"z":12.949999999999964}}
+
+NEXT walk start {"axis":"z","target":-25,"position":{"x":0,"z":12.949999999999964}}
+
+NEXT backend 09:13:51.369 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.374 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.379 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":247,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.395 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.413 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.413 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":257,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.416 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.2,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.418 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.2,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.429 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":256,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.429 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":251,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.433 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.434 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.2,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:51.693 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.8,"bytes":8424,"ip":"127.0.0.1"}
+
+NEXT backend 09:13:51.946 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:52.950 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:53.953 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:54.959 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:55.963 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:56.967 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:57.974 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:58.979 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:13:59.984 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:00.825 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":11240,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:00.986 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:01.990 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:02.997 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:04.001 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.006 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.799 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":248,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.799 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":258,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.802 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.805 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.814 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":253,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.817 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.829 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":257,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.829 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.832 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:05.833 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.2,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:06.011 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:07.015 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:07.978 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.8,"bytes":75014,"ip":"127.0.0.1"}
+
+NEXT backend 09:14:08.019 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:09.023 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:10.031 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT walk done {"axis":"z","target":-25,"position":{"x":0,"z":-24.699999999999818}}
+
+NEXT walk start {"axis":"z","target":9,"position":{"x":0,"z":-24.699999999999818}}
+
+NEXT backend 09:14:11.035 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:12.038 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:13.044 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:14.049 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.002 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":242,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.002 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.006 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.008 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.015 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":247,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.021 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.036 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":246,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.036 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":251,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.040 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.042 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:15.053 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:16.057 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:17.063 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:18.068 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:19.072 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:20.077 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:21.081 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:22.085 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:23.089 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:24.092 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:25.101 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:26.106 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:27.109 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT walk done {"axis":"z","target":9,"position":{"x":0,"z":8.749999999999904}}
+
+NEXT walk start {"axis":"x","target":-32,"position":{"x":0,"z":8.749999999999904}}
+
+NEXT backend 09:14:28.114 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:29.118 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:30.122 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:31.127 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:32.135 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:33.139 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:34.143 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.163 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.901 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":253,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.902 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":249,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.906 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.907 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.916 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.7,"bytes":258,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.920 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.938 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.938 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":257,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.941 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:35.943 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:36.167 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:37.171 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:38.182 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:39.185 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:40.189 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:41.192 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:42.196 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:43.200 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:44.203 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:45.207 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT walk done {"axis":"x","target":-32,"position":{"x":-32.24999999999924,"z":8.749999999999904}}
+
+NEXT walk start {"axis":"x","target":0,"position":{"x":-32.24999999999924,"z":8.749999999999904}}
+
+NEXT backend 09:14:46.212 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:47.216 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:48.221 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:49.224 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:50.230 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:50.696 DEBUG [app] Память процесса (process.memory) {"rss":150716416,"heapUsed":33160032,"external":84735275,"eventLoopP99Ms":21.8}
+
+NEXT backend 09:14:50.839 INFO  [game] Длительность шага и интервал рассылки, мс (game.tick.stats) {"p50":0.102,"p95":0.429,"max":5.485,"broadcastP95":100.894,"broadcastMax":105.264,"players":1}
+
+NEXT backend 09:14:51.000 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":2.1,"bytes":141164,"ip":"127.0.0.1"}
+
+NEXT backend 09:14:51.235 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:52.241 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.248 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.607 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":242,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.607 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":247,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.612 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.614 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.634 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":246,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.634 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.4,"bytes":252,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.639 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.641 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.648 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":251,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:53.652 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:54.255 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:55.259 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:56.264 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:57.270 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.3,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:58.276 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.8,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:14:59.281 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.5,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:15:00.285 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:15:01.289 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vbdzV_qhfHul","playerId":"p_h8m672hlmonujy05"}
+
+NEXT walk done {"axis":"x","target":0,"position":{"x":-3.3653635433950058e-15,"z":8.749999999999904}}
+
+NEXT pointer probe {"kind":"visibility","at":71305.79999995232,"focus":true,"visibility":"hidden","active":true}
+
+NEXT backend 09:15:02.167 INFO  [realtime] Игрок отключился (realtime.disconnect) {"playerId":"p_h8m672hlmonujy05","connectionId":"WuL5vj1WxvOwcvU1AAAA","ip":"127.0.0.1","reason":"transport close","droppedInputs":0,"invalidPackets":0,"rttMs":0}
+09:15:02.168 INFO  [game] Соединение потеряно, место удерживается (game.seat.detach) {"playerId":"p_h8m672hlmonujy05","connectionId":"WuL5vj1WxvOwcvU1AAAA","graceMs":100}
+
+NEXT pointer probe {"kind":"visibility","at":76117.5,"focus":true,"visibility":"hidden","active":false}
+
+NEXT pointer probe {"kind":"visibility","at":75620.60000002384,"focus":true,"visibility":"hidden","active":false}
+
+NEXT pointer probe {"kind":"visibility","at":77302,"focus":true,"visibility":"hidden","active":true}
+
+[10/10] e2e/world-next.spec.ts:283:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+e2e/world-next.spec.ts:283:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+NEXT backend 09:15:02.268 INFO  [game] Место освобождено (game.seat.release) {"playerId":"p_h8m672hlmonujy05"}
+
+NEXT backend 09:15:02.360 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.6,"bytes":491,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:02.369 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.6,"bytes":11404,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:02.371 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":2.6,"bytes":962810,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:02.476 INFO  [auth] Вход выполнен (auth.guest) {"accountId":"a_w4p7ybquh0jqni8r","playerId":"p_jlky7cx35p5ec4kq","name":"NEXT audio","ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd"}
+
+NEXT backend 09:15:02.476 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/auth/guest","status":200,"durationMs":1,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:02.484 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.523 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_jlky7cx35p5ec4kq","sessionId":"KnL3OBf3ilHd","requestId":"1eb63265-93b0-4188-a48c-ad2d77172898","type":"enroll","result":"ok","durationMs":1}
+09:15:02.523 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":1.1,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.539 INFO  [realtime] Соединение открыто (realtime.connect) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"QT6kaizSw0_c5X9vAAAB","ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd"}
+
+NEXT backend 09:15:02.539 INFO  [game] Игрок занял место (game.seat.attach) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"QT6kaizSw0_c5X9vAAAB","takeover":false,"reconnects":0}
+
+NEXT backend 09:15:02.541 DEBUG [game] Точка появления выбрана (game.spawn) {"playerId":"p_jlky7cx35p5ec4kq","mapId":"market","position":{"x":0,"y":0,"z":8},"saved":false}
+
+NEXT backend 09:15:02.542 INFO  [realtime] Вход в мир (realtime.join) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"QT6kaizSw0_c5X9vAAAB","mapId":"market","ip":"127.0.0.1","requestId":"c1_1"}
+
+NEXT backend 09:15:02.563 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2.6,"bytes":1424731,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.604 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2,"bytes":137,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.604 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.4,"bytes":243,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.655 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+09:15:02.656 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.661 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":52080,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+09:15:02.661 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":46836,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+09:15:02.661 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2.4,"bytes":728488,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.669 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_jlky7cx35p5ec4kq","sessionId":"KnL3OBf3ilHd","requestId":"e943ab2b-e56e-48e8-9196-173ad2e65e1a","type":"intro-seen","result":"ok","durationMs":0}
+
+NEXT backend 09:15:02.669 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.707 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":243,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.707 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":154,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.710 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.712 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.712 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":52080,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.714 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":421808,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.731 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":9848,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.731 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":11168,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.732 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":253,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.732 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":2,"bytes":31776,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.744 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":248,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.748 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.751 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT pointer probe {"kind":"request","at":401.10000002384186,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":405.60000002384186,"focus":true,"visibility":"visible","active":true,"durationMs":4.200000047683716}
+
+NEXT pointer probe {"kind":"resolve","at":406.10000002384186,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":418.2000000476837,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 09:15:02.778 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":258,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+09:15:02.778 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.1,"bytes":142,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.782 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.784 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.2,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.789 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.6,"bytes":420000,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.807 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":253,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.807 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":242,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.811 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.813 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.824 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.4,"bytes":252,"ip":"127.0.0.1","sessionId":"KnL3OBf3ilHd","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.851 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.1,"bytes":491,"ip":"127.0.0.1"}
+
+NEXT pointer probe {"kind":"change","at":492.60000002384186,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 09:15:02.859 INFO  [realtime] Игрок отключился (realtime.disconnect) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"QT6kaizSw0_c5X9vAAAB","ip":"127.0.0.1","reason":"transport close","droppedInputs":0,"invalidPackets":0,"rttMs":null}
+
+NEXT backend 09:15:02.859 INFO  [game] Соединение потеряно, место удерживается (game.seat.detach) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"QT6kaizSw0_c5X9vAAAB","graceMs":100}
+
+NEXT backend 09:15:02.867 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.8,"bytes":962810,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:02.868 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":1.1,"bytes":11404,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:02.928 INFO  [auth] Вход выполнен (auth.guest) {"accountId":"a_w4p7ybquh0jqni8r","playerId":"p_jlky7cx35p5ec4kq","name":"NEXT audio","ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ"}
+09:15:02.928 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/auth/guest","status":200,"durationMs":0.5,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:02.934 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.3,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.941 INFO  [realtime] Соединение открыто (realtime.connect) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"vnwpZ06eH_BLQzZxAAAC","ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ"}
+
+NEXT backend 09:15:02.941 INFO  [game] Игрок занял место (game.seat.attach) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"vnwpZ06eH_BLQzZxAAAC","takeover":false,"reconnects":1}
+
+NEXT backend 09:15:02.943 INFO  [realtime] Вход в мир (realtime.join) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"vnwpZ06eH_BLQzZxAAAC","mapId":"market","ip":"127.0.0.1","requestId":"c1_1"}
+
+NEXT backend 09:15:02.959 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.3,"bytes":1424731,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.997 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":137,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:02.997 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":243,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.049 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.049 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.055 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":52080,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.055 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1,"bytes":728488,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.055 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":46836,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.072 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":154,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.072 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":243,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.075 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.077 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.077 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":421808,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.078 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":52080,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.096 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":9848,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.096 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":11168,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.096 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":253,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.096 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":31776,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.100 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.107 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":248,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.110 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.128 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":142,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.128 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":258,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.132 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.133 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.137 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":420000,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.155 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":253,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+09:15:03.155 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":242,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.159 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.161 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT pointer probe {"kind":"request","at":315.10000002384186,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":315.90000009536743,"focus":true,"visibility":"visible","active":true,"durationMs":0.7000000476837158}
+
+NEXT pointer probe {"kind":"resolve","at":316.2000000476837,"focus":true,"visibility":"visible","active":true}
+
+NEXT backend 09:15:03.174 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":252,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.175 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":247,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT pointer probe {"kind":"change","at":336.8000000715256,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT backend 09:15:03.188 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.191 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.206 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.2,"bytes":242,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.206 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":248,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.211 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.212 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.223 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.2,"bytes":247,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.223 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.7,"bytes":252,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.227 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.229 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.241 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":252,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.242 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":1.4,"bytes":257,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.245 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.247 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.255 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":257,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.256 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.8,"bytes":247,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.259 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.261 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.274 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":252,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.274 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.9,"bytes":251,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.278 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.279 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.290 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":246,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.290 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.6,"bytes":256,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.299 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.300 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.4,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.322 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.5,"bytes":251,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.326 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"/world/*","status":200,"durationMs":0.3,"bytes":16384,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:03.939 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT audio: muted jump is silent; opening settings
+
+NEXT pointer probe {"kind":"change","at":1751.2000000476837,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT audio: volume45; close settings and resume
+
+NEXT pointer probe {"kind":"request","at":1807,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":1807.7000000476837,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":1820.3000000715256,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":1833.9000000953674,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 09:15:04.711 DEBUG [babylon] Языковая операция BABEL (babylon.language) {"kind":"chat","durationMs":1}
+
+NEXT backend 09:15:04.711 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_jlky7cx35p5ec4kq","sessionId":"vNpoAvEnAchJ","requestId":"597e17c3-01e8-441d-8a8e-f2b3b80a722e","type":"chat","result":"ok","durationMs":1}
+
+NEXT backend 09:15:04.711 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":200,"durationMs":1.2,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:04.719 DEBUG [http] HTTP-запрос (http.request) {"method":"GET","route":"static","status":200,"durationMs":0.8,"bytes":25180,"ip":"127.0.0.1"}
+
+NEXT backend 09:15:04.944 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:05.164 WARN  [babylon] Языковая операция BABEL не выполнена (babylon.translation.failed) {"kind":"chat","durationMs":0}
+09:15:05.164 INFO  [http] Действие BABEL (babylon.action) {"playerId":"p_jlky7cx35p5ec4kq","sessionId":"vNpoAvEnAchJ","requestId":"b71c51b5-e1c7-4a26-afd9-353661e303e6","type":"chat","result":"RATE_LIMIT","durationMs":0}
+09:15:05.164 INFO  [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon","status":429,"durationMs":1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:05.951 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.9,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:06.960 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.2,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:07.968 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.2,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:08.977 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:09.984 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.8,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:10.990 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:11.998 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:13.005 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:14.013 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.8,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:15.020 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.6,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:16.027 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.3,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:17.033 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.6,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:18.040 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:19.047 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.9,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:20.053 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.3,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:21.061 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:22.067 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:23.073 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.9,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:24.084 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.3,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:25.089 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.4,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:26.095 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.7,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:27.103 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.8,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:28.111 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:29.118 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.4,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:30.126 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.9,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:31.134 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.4,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:32.141 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":0.8,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:33.149 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1.1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT backend 09:15:34.157 DEBUG [http] HTTP-запрос (http.request) {"method":"POST","route":"/api/babylon:state","status":200,"durationMs":1,"ip":"127.0.0.1","sessionId":"vNpoAvEnAchJ","playerId":"p_jlky7cx35p5ec4kq"}
+
+NEXT pointer probe {"kind":"visibility","at":31676,"focus":true,"visibility":"hidden","active":true}
+
+NEXT backend 09:15:34.527 INFO  [realtime] Игрок отключился (realtime.disconnect) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"vnwpZ06eH_BLQzZxAAAC","ip":"127.0.0.1","reason":"transport close","droppedInputs":0,"invalidPackets":0,"rttMs":1}
+09:15:34.527 INFO  [game] Соединение потеряно, место удерживается (game.seat.detach) {"playerId":"p_jlky7cx35p5ec4kq","connectionId":"vnwpZ06eH_BLQzZxAAAC","graceMs":100}
+
+NEXT backend 09:15:34.537 INFO  [app] Получен сигнал остановки (app.signal)
+
+NEXT backend 09:15:34.537 INFO  [app] Остановка сервера (app.stop) {"reason":"shutdown"}
+
+NEXT backend 09:15:34.538 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"modules","durationMs":1}
+
+NEXT backend 09:15:34.542 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"closed","durationMs":5}
+
+NEXT backend 09:15:34.542 INFO  [app] Сервер остановлен (app.stop.done) {"durationMs":5}
+
+  1) e2e/world-next.spec.ts:283:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+
+    Call Log:
+    - Timeout 30000ms exceeded while waiting on the predicate
+
+      332 |   const oldMumbles = await countMumbles();
+      333 |   await page.getByLabel('Сообщение группе').fill('Привет');
+    > 334 |   await activate(page.getByRole('button', { name: 'Отправить', exact: true }));
+          |                                   ^
+      335 |   await expect.poll(countMumbles).toBe(oldMumbles + 1);
+      336 |   await page.waitForTimeout(2200); expect(await countMumbles()).toBe(oldMumbles + 1);
+      337 |   await activate(page.getByRole('button', { name: 'Закрыть', exact: true })); await resume(page);
+        at /private/tmp/competition-2026-next-merge/client/e2e/world-next.spec.ts:334:35
+
+    attachment #1: backend-log (text/plain) ────────────────────────────────────────────────────────
+    test-results-merge-integration/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/backend-log-1d0a6d5d3cc70c99a9b2d7c5c757957e3aba986a.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final-ui-0 (text/plain) ─────────────────────────────────────────────────────────
+    test-results-merge-integration/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/final-ui-0-414b61765a10471deed72c7ce2bf3415fd1aa732.txt
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: native-pointer-0 (application/json) ─────────────────────────────────────────────
+    test-results-merge-integration/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/native-pointer-0-8cbbbba57b829c9a9f2ab06108ecb766caf9694f.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-merge-integration/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+    Error Context: test-results-merge-integration/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results-merge-integration/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results-merge-integration/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    e2e/world-next.spec.ts:283:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+  9 passed (3.5m)

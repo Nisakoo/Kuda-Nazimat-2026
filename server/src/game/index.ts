@@ -7,6 +7,8 @@ import { canAccess } from '../world/access.ts';
 import { loadWorld } from '../world/loader.ts';
 import { GameService } from './GameService.ts';
 import { DEFAULT_WORLD_SETTINGS, World } from './World.ts';
+import { WorldLife } from './WorldLife.ts';
+import { randomId } from '../common/ids.ts';
 
 const MAX_CATCH_UP = 5;
 const STATS_EVERY_MS = 60_000;
@@ -23,15 +25,19 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   const loaded = await loadWorld({ worldDir: config.worldDir, maps: config.maps, contentDir: config.contentDir });
   for (const map of loaded.maps.values()) log.info('world.loaded', 'Карта готова', { mapId: map.id, chunks: map.manifest.chunks.length, worldBytes: map.manifest.worldBytes, durationMs: Math.round(performance.now() - began) });
   const recoveries = metrics.counter('game_motion_recovered_total', 'Восстановления движения по причине (MOVE)');
+  const life = new WorldLife(loaded.maps, deps.clock.now(), randomId('scene'));
+  if (life.catalogue().length && !deps.worldLife) throw new Error('World-life requires a durable store');
+  life.setApples(deps.worldLife?.initialize(life.catalogue()) ?? []);
+  life.validateSnapshots(deps.clock.now());
   const world = new World(loaded.maps, loaded.npcs, { ...DEFAULT_WORLD_SETTINGS, aoiRadius: config.aoiRadius }, {
     invariant: (name, fields) => log.error('invariant.violated', 'Нарушен инвариант мира', { invariant: name, ...fields }),
     recovered: (playerId, reason) => { recoveries.inc({ reason }); log.warn('game.motion.recovered', 'Движение восстановлено после застревания', { playerId, reason }); },
     aoiTruncated: (playerId, candidates) => log.warn('game.aoi.truncated', 'AOI усечена до 256 сущностей', { playerId, candidates }),
-  });
+  }, life);
   const broadcastEvery = config.tickHz / config.broadcastHz;
   const game = new GameService(world, deps.players, deps.clock, deps.scheduler, {
     maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery, initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
-  }, log, deps.avatars, deps.equipment, metrics);
+  }, log, deps.avatars, deps.equipment, metrics, deps.worldLife);
   const tickHistogram = metrics.histogram('game_tick_duration_ms', 'Длительность шага симуляции', FAST_MS_BUCKETS);
   const broadcastHistogram = metrics.histogram('game_broadcast_interval_ms', 'Интервал между рассылками AOI', MS_BUCKETS);
   let stats: { tickP95Ms: number; broadcastP95Ms: number; players: number } | null = null;

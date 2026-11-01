@@ -10,6 +10,10 @@ import type { ServerSession } from '../../../shared/protocol/types.ts';
 import type { NetworkAdapter } from '../multiplayer/NetworkAdapter';
 import type { MapSource, WorldManifest } from '../map/types';
 import { DEMO_WORLD } from '../shared/demoWorld.generated';
+import { WorldAudio, AUDIO_VOLUME_KEY } from '../audio/WorldAudio';
+import { MockWorldLife } from '../multiplayer/MockWorldLife';
+import type { WorldLifeClientMessage } from '../../../shared/world-life/types.ts';
+import type { BabylonRequest, BabylonState } from '../../../shared/babylon/types.ts';
 
 describe('application lifecycle', () => {
   const pending = new Map<number, FrameRequestCallback>();
@@ -47,7 +51,7 @@ describe('application lifecycle', () => {
     vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
     host = document.createElement('div');
     host.getBoundingClientRect = () => new DOMRect(0, 0, 640, 480);
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), setSceneState: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     createRenderer = vi.fn(() => renderer);
     app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, null);
   });
@@ -95,7 +99,7 @@ describe('application lifecycle', () => {
     app.start(host);
     app.dispose();
     const previousRenderer = renderer;
-    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
+    renderer = { mount: vi.fn(), render: vi.fn(), resize: vi.fn(), syncWorld: vi.fn(), setCamera: vi.fn(), setBuildingSymbols: vi.fn(), setSceneState: vi.fn(), registerModels: vi.fn(), loadChunk: vi.fn().mockResolvedValue(undefined), unloadChunk: vi.fn(), retryFailedModels: vi.fn(), getDiagnostics: vi.fn(() => ({ chunks: [], entities: [], models: 0, instances: 0, queued: 0, pending: 0, errors: [], geometries: 0, textures: 0, drawCalls: 0 })), dispose: vi.fn() };
     app = new GameApp(parseConfig({}, 'http://school.local'), () => renderer, undefined, null);
     app.start(host);
     advance(100);
@@ -168,7 +172,7 @@ describe('application lifecycle', () => {
 
   it('passes a supplied server session through the integration boundary and closes it on logout', () => {
     app.dispose();
-    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn((listener) => { listener({ status: 'unauthorized', error: null }); return () => {}; }), dispose: vi.fn() };
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeWorldLife: vi.fn(() => () => {}), subscribeState: vi.fn((listener) => { listener({ status: 'unauthorized', error: null }); return () => {}; }), dispose: vi.fn() };
     const factory = vi.fn(() => transport);
     app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory);
     app.start(host); expect(factory).not.toHaveBeenCalled();
@@ -266,7 +270,7 @@ describe('application lifecycle', () => {
   it('submits one login, passes the validated session to the transport and forgets it on logout', async () => {
     let resolve!: (session: ServerSession) => void;
     const login = vi.fn(() => new Promise<ServerSession>((done) => { resolve = done; }));
-    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeWorldLife: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
     const factory = vi.fn(() => transport); app.dispose();
     app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory, login);
     const listener = vi.fn(); app.subscribe(listener); app.start(host);
@@ -330,6 +334,218 @@ describe('application lifecycle', () => {
       expect(network).not.toHaveBeenCalled();
       expect(listener.mock.lastCall?.[0].authError).toContain('Аккаунт мог быть создан');
     } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
+  it('requests native Pointer Lock before optional audio unlock in the same play handler', () => {
+    const order: string[] = [];
+    const requestLock = vi.fn(() => { order.push('capture'); return Promise.resolve(); });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: requestLock });
+    const unlock = vi.spyOn(WorldAudio.prototype, 'unlock').mockImplementation(async () => { order.push('audio'); });
+    try {
+      app.start(host); app.enterWorld();
+      expect(requestLock).toHaveBeenCalledOnce();
+      expect(unlock).toHaveBeenCalledOnce();
+      expect(order).toEqual(['capture', 'audio']);
+    } finally { app.dispose(); unlock.mockRestore(); }
+  });
+
+  it('publishes only confirmed hands, forwards scene state, and keeps F pending separate from focus/MOVE', async () => {
+    vi.useFakeTimers(); app.dispose();
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    Object.defineProperty(host, 'requestPointerLock', { value: () => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); } });
+    const actor = { id: 'p1', motion: motionStatus(initialMotion({ x: 0, y: 0, z: 0 })), transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 }, character: { kind: 'player' as const, name: 'P1' } };
+    let transport!: MockNetworkAdapter; const hands: WorldLifeClientMessage[] = [];
+    const retain = vi.spyOn(WorldAudio.prototype, 'retainEntities');
+    const factory = (_mock: boolean, _url: string, clock: import('../multiplayer/NetworkAdapter').Clock) => {
+      const life = new MockWorldLife('demo', clock.now(), actor.transform.position);
+      transport = new MockNetworkAdapter(clock, (message, peer) => {
+        if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: actor.id, revision: 0, snapshot: { tick: 0, entities: [actor, { ...actor, id: 'p2' }] }, world: DEMO_WORLD });
+      }, (message, peer) => { if (message.type === 'scene-sync') peer.receiveWorldLife(life.snapshot(clock.now())); else hands.push(message); });
+      return transport;
+    };
+    const listener = vi.fn();
+    try {
+      app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory);
+      app.subscribe(listener); app.applySettings('mock', 'http://school.local', 'demo', 1, false); app.start(host);
+      await vi.advanceTimersByTimeAsync(200); advance(0); app.enterWorld();
+      transport.receive({ v: 3, type: 'delta', baseRevision: 0, revision: 1, tick: 1, upsert: [], remove: ['p2'] });
+      await vi.advanceTimersByTimeAsync(50); advance(20); advance(40);
+      expect(retain).toHaveBeenLastCalledWith(['p1']);
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', key: 'а' }));
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', repeat: true }));
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ carryPending: true, heldItemId: null }));
+      await vi.advanceTimersByTimeAsync(100); expect(hands).toHaveLength(1);
+      expect(renderer.setSceneState).toHaveBeenCalledWith(expect.objectContaining({ type: 'scene-state' }));
+      const hand = hands[0]!;
+      if (hand.type !== 'hand') throw new Error('Missing hand request');
+      transport.receiveWorldLife({ v: 1, type: 'hand-result', requestId: hand.requestId, ok: false, code: 'BLOCKED', message: 'Занято.' });
+      await vi.advanceTimersByTimeAsync(1);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ carryPending: false, heldItemId: null, carryError: 'Занято.' }));
+      app.toggleMenu();
+      window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyF' }));
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF' }));
+      await vi.advanceTimersByTimeAsync(100); expect(hands).toHaveLength(1);
+      app.resume(); await vi.advanceTimersByTimeAsync(100); expect(hands).toHaveLength(1);
+    } finally {
+      app.dispose(); vi.useRealTimers(); retain.mockRestore();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
+  it('integrates silent audio baselines, confirmed movement and one jump, volume storage and scene disposal', () => {
+    const movement = vi.spyOn(WorldAudio.prototype, 'movement');
+    const disposed = vi.spyOn(WorldAudio.prototype, 'dispose');
+    localStorage.removeItem(AUDIO_VOLUME_KEY);
+    try {
+      app.start(host);
+      expect(movement).toHaveBeenCalledWith(expect.objectContaining({ tick: 0, origin: 'snapshot', jumpStarted: false }));
+      app.send({ type: 'move', direction: { x: 1, z: 0 } });
+      advance(0); advance(100);
+      expect(movement).toHaveBeenCalledWith(expect.objectContaining({ origin: 'live', grounded: true, position: expect.objectContaining({ x: expect.any(Number) }) }));
+      app.send({ type: 'jump' }); advance(120); advance(140);
+      expect(movement.mock.calls.filter(([sample]) => sample.jumpStarted)).toHaveLength(1);
+      const listener = vi.fn(); app.subscribe(listener); app.setVolume(42);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ volume: .42 }));
+      app.restart(host);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ volume: .42 }));
+      app.setVolume(0); expect(localStorage.getItem(AUDIO_VOLUME_KEY)).toBe('0');
+      const count = disposed.mock.calls.length; app.dispose(); expect(disposed.mock.calls.length).toBe(count + 1);
+    } finally { localStorage.removeItem(AUDIO_VOLUME_KEY); movement.mockRestore(); disposed.mockRestore(); }
+  });
+
+  it('keeps BABEL interaction open/reopen silent for old history and goats, but emits both new reply utterances', async () => {
+    app.dispose();
+    const messages = vi.spyOn(WorldAudio.prototype, 'message').mockImplementation(() => {});
+    let state: BabylonState = {
+      v: 2, playerId: 'p1', backend: 'test', languages: ['ru', 'en'], profile: { native: 'ru', learning: 'en' }, introSeen: true,
+      party: null, availableParty: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
+      fed: [], stones: [], words: [], messages: [], replies: [{ id: 'old', npcId: 'fruit-seller', question: 'Old question', text: 'Old answer', language: 'en' }],
+    };
+    vi.stubGlobal('fetch', vi.fn(async (_url: unknown, options: RequestInit) => {
+      const request = JSON.parse(String(options.body)) as BabylonRequest;
+      if (request.action.type === 'npc') state = { ...state, replies: [...state.replies, { id: 'new', npcId: request.action.targetId, question: request.action.text, text: 'New answer', language: 'en' }] };
+      return new Response(JSON.stringify({ v: 2, requestId: request.requestId, state }));
+    }));
+    const network: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), dispose: vi.fn(), send: vi.fn(() => true), sendWorldLife: vi.fn(() => true),
+      subscribe: () => () => {}, subscribeWorldLife: () => () => {}, subscribeState: () => () => {} };
+    try {
+      app = new GameApp(parseConfig({ session: 'online', mapId: 'market' }, 'http://school.local'), createRenderer, undefined, null, () => network);
+      app.provideServerSession({ token: 'a'.repeat(64), expiresAt: Date.now() + 60_000 });
+      let loaded!: () => void;
+      const ready = new Promise<void>(resolve => { loaded = resolve; });
+      app.subscribe(snapshot => { if (snapshot.babylon?.state) loaded(); });
+      app.start(host); await ready;
+      const views = vi.fn(); app.subscribe(views);
+      expect(messages.mock.calls.map(([event]) => event)).toEqual([
+        expect.objectContaining({ id: 'babel-npc:old:question', origin: 'history' }),
+        expect.objectContaining({ id: 'babel-npc:old:answer', origin: 'history' }),
+      ]);
+      messages.mockClear();
+      for (const target of ['fruit-seller', 'fruit-seller', 'white-goat', 'white-goat']) {
+        app.openBabylonPanel('interaction', target); await app.closeBabylonPanel();
+      }
+      expect(messages).not.toHaveBeenCalled();
+      app.openBabylonPanel('interaction', 'fruit-seller');
+      expect(views).toHaveBeenLastCalledWith(expect.objectContaining({ babylonPanel: 'interaction', babylonTarget: 'fruit-seller' }));
+      expect(await app.babylonAction({ type: 'npc', targetId: 'fruit-seller', text: 'New question' })).toBe(true);
+      expect(messages.mock.calls.map(([event]) => event)).toEqual([
+        expect.objectContaining({ id: 'babel-npc:new:question', origin: 'live' }),
+        expect.objectContaining({ id: 'babel-npc:new:answer', origin: 'live' }),
+      ]);
+      messages.mockClear();
+      await app.closeBabylonPanel(); app.openBabylonPanel('interaction', 'fruit-seller');
+      await app.babylonAction({ type: 'state' });
+      expect(messages).not.toHaveBeenCalled();
+    } finally { app.dispose(); messages.mockRestore(); vi.unstubAllGlobals(); }
+  });
+
+  it('keeps local market goat controls silent while retaining actual prepared NPC greetings', () => {
+    app.dispose();
+    const messages = vi.spyOn(WorldAudio.prototype, 'message').mockImplementation(() => {});
+    try {
+      app = new GameApp(parseConfig({ mapId: 'market' }, 'http://school.local'), createRenderer, undefined, null); app.start(host);
+      app.openMarketPanel('interaction', 'white-goat'); app.closeMarketPanel();
+      app.openMarketPanel('interaction', 'white-goat');
+      expect(messages).not.toHaveBeenCalled();
+      app.closeMarketPanel(); app.openMarketPanel('interaction', 'shepherd');
+      expect(messages).toHaveBeenCalledOnce();
+      expect(messages).toHaveBeenCalledWith(expect.objectContaining({ stream: 'market-npc', origin: 'live' }));
+    } finally { app.dispose(); messages.mockRestore(); }
+  });
+
+  it('emits separate local demo question and answer mumbles only when those utterances are appended', () => {
+    app.dispose();
+    const messages = vi.spyOn(WorldAudio.prototype, 'message').mockImplementation(() => {});
+    const local = () => new LocalSession('p1', [
+      { id: 'p1', character: { kind: 'player', name: 'P1' }, transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 } },
+      { id: 'history-guide', character: { kind: 'npc', name: 'Лея' }, transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 }, interactable: { radius: 2, label: 'Talk' } },
+    ]);
+    try {
+      app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, local, null); app.start(host);
+      app.send({ type: 'interact', targetId: 'history-guide' }); advance(0); advance(20); messages.mockClear();
+      app.submitDialog('Что такое источник?');
+      const events = messages.mock.calls.map(([event]) => event);
+      expect(events).toHaveLength(2);
+      expect(events[0]).toMatchObject({ id: expect.stringMatching(/^local-npc:.*:question$/), stream: 'npc:history-guide', origin: 'live' });
+      expect(events[1]).toMatchObject({ id: events[0]!.id.replace(/:question$/, ':answer'), stream: 'npc:history-guide', origin: 'live' });
+      app.submitDialog('   '); advance(0); advance(20);
+      expect(messages).toHaveBeenCalledTimes(2);
+      app.closeDialog(); app.restart(host);
+      expect(messages.mock.calls.filter(([event]) => event.origin === 'live')).toHaveLength(2);
+    } finally { app.dispose(); messages.mockRestore(); }
+  });
+
+  it('mumbles a newly appended online question once and its correlated answer once without replay on reconnect', async () => {
+    app.dispose(); vi.useFakeTimers();
+    const messages = vi.spyOn(WorldAudio.prototype, 'message').mockImplementation(() => {});
+    let transport!: MockNetworkAdapter; let question: { requestId: string; targetId: string } | null = null;
+    const actor = { id: 'p1', motion: motionStatus(initialMotion({ x: 0, y: 0, z: 0 })), transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 }, character: { kind: 'player' as const, name: 'P1' } };
+    const guide = { id: 'history-guide', character: { kind: 'npc' as const, name: 'Лея' }, transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 }, interactable: { radius: 2, label: 'Talk' } };
+    const factory = (_mock: boolean, _url: string, clock: import('../multiplayer/NetworkAdapter').Clock) => {
+      transport = new MockNetworkAdapter(clock, (packet, peer) => {
+        if (packet.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: packet.requestId, playerId: actor.id, revision: 0, snapshot: { tick: 0, entities: [actor, guide] }, world: DEMO_WORLD });
+        else if (packet.type === 'interact') peer.receive({ v: 3, type: 'interacted', requestId: packet.requestId, targetId: packet.targetId });
+        else if (packet.type === 'npc-question') question = packet;
+      });
+      return transport;
+    };
+    try {
+      app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, null, factory);
+      app.applySettings('mock', 'http://school.local', 'demo', 1, false); app.start(host);
+      await vi.advanceTimersByTimeAsync(200);
+      app.send({ type: 'interact', targetId: 'history-guide' }); await vi.advanceTimersByTimeAsync(100);
+      messages.mockClear(); app.submitDialog('Question'); app.submitDialog('Pending duplicate');
+      expect(messages).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(100);
+      expect(question).not.toBeNull();
+      const reply = { v: 3, type: 'npc-answer', requestId: question!.requestId, targetId: question!.targetId, text: 'Answer' };
+      transport.receive(reply); transport.receive(reply); await vi.advanceTimersByTimeAsync(1);
+      const events = messages.mock.calls.map(([event]) => event);
+      expect(events).toHaveLength(2);
+      expect(events[0]).toMatchObject({ id: `npc-question:${question!.requestId}`, origin: 'live' });
+      expect(events[1]).toMatchObject({ id: `npc-answer:${question!.requestId}`, origin: 'live' });
+      app.reconnect(); await vi.advanceTimersByTimeAsync(200);
+      expect(messages.mock.calls.filter(([event]) => event.origin === 'live')).toHaveLength(2);
+    } finally { app.dispose(); messages.mockRestore(); vi.useRealTimers(); }
+  });
+
+  it('publishes bounded-cadence debug audio counters and zeroes them on scene disposal', () => {
+    app.dispose();
+    const now = vi.spyOn(performance, 'now').mockReturnValue(0);
+    const stats = vi.spyOn(WorldAudio.prototype, 'stats', 'get').mockReturnValue({ sources: 2, buffers: 3, pending: 1, reservedBytes: 456, failures: 0, unlocked: true, entities: 1, streams: 0, messageIds: 0 });
+    try {
+      app = new GameApp(parseConfig({ debug: true }, 'http://school.local'), createRenderer, undefined, null);
+      const listener = vi.fn(); app.subscribe(listener); app.start(host); advance(0);
+      now.mockReturnValue(1100); advance(100);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ audioStats: 'Источники: 2 · Буферы: 3 · Загрузки: 1 · Память: 456 байт' }));
+      app.dispose();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ audioStats: 'Источники: 0 · Буферы: 0 · Загрузки: 0 · Память: 0 байт' }));
+    } finally { now.mockRestore(); stats.mockRestore(); }
   });
 
   it('supports unsubscribing and clears subscriptions on dispose', () => {

@@ -1,0 +1,19 @@
+[WebServer] (node:75387) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 2 tests using 1 worker
+
+(node:75390) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/2] e2e/quality.spec.ts:8:41 › profiles demo sixty seconds offline and checks retained resources after five complete restarts
+e2e/quality.spec.ts:8:41 › profiles demo sixty seconds offline and checks retained resources after five complete restarts
+{"environment":{"userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36","gpu":"ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)","viewport":"1280x800","dpr":1},"minFps":60,"maxP95":17.5,"maxDrawCalls":234,"baselineHeap":9843628,"heaps":[11185684,11449540,11511924,11617408,11585792],"baselineResources":{"drawCalls":285,"geometries":15,"textures":13},"counts":[{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13}]}
+
+[2/2] e2e/quality.spec.ts:8:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts
+e2e/quality.spec.ts:8:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts
+{"environment":{"userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36","gpu":"ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)","viewport":"1280x800","dpr":1},"minFps":60,"maxP95":17.6,"maxDrawCalls":418,"baselineHeap":10839532,"heaps":[12241096,12339300,12479012,12545228,12496340],"baselineResources":{"drawCalls":407,"geometries":52,"textures":6},"counts":[{"drawCalls":407,"geometries":52,"textures":6},{"drawCalls":407,"geometries":52,"textures":6},{"drawCalls":407,"geometries":52,"textures":6},{"drawCalls":407,"geometries":52,"textures":6},{"drawCalls":407,"geometries":52,"textures":6}]}
+
+  2 passed (2.5m)

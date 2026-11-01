@@ -1,0 +1,8 @@
+
+> educational-world-client@0.1.0 test:render
+> playwright test --config playwright.render.config.ts --reporter=line --timeout=120000
+
+
+Running 14 tests using 1 worker
+
+[1/14] e2e/render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner

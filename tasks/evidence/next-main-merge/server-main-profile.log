@@ -1,0 +1,34 @@
+{"startupMs":8589.137625000001}
+{
+  "baseRevision": "09fd771",
+  "node": "v24.15.0",
+  "players": 4,
+  "durationMs": 61000,
+  "startupMs": 8589.137625000001,
+  "backend": "real generated world and temporary SQLite; explicit test LLM",
+  "steps": [
+    {
+      "p50": 1.003,
+      "p95": 3.796,
+      "max": 73.629,
+      "broadcastP95": 105.138,
+      "players": 4
+    }
+  ],
+  "deltas": 2439,
+  "scenePackets": 0,
+  "errors": [
+    "game.tick.slow: Медленный шаг симуляции",
+    "game.tick.slow: Медленный шаг симуляции",
+    "game.tick.slow: Медленный шаг симуляции"
+  ],
+  "targetHardware": "darwin/arm64; browser GPU measured separately"
+}
+file:///private/tmp/competition-2026-main-baseline/server/test/merge-baseline-profile.ts:61
+  if (errors.length || steps.length < 1 || deltas < 100) throw new Error('Four-player profile failed');
+                                                               ^
+
+Error: Four-player profile failed
+    at file:///private/tmp/competition-2026-main-baseline/server/test/merge-baseline-profile.ts:61:64
+
+Node.js v24.15.0

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { browserTestOrigin } from '../playwright.settings';
 import { expectCapture, resume } from './helpers';
 
 test.beforeEach(async ({ page }) => { await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'demo' } })); });
@@ -9,7 +10,7 @@ test('local build renders with external access blocked and handles resize, pause
   page.on('request', (request) => requests.push(request.url()));
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route('**/*', (route) => {
-    return new URL(route.request().url()).origin === 'http://127.0.0.1:4173'
+    return new URL(route.request().url()).origin === browserTestOrigin
       ? route.fallback() : route.abort();
   });
   await page.goto('/');
@@ -44,7 +45,7 @@ test('local build renders with external access blocked and handles resize, pause
     await previous?.dispose();
     await expect(page.getByRole('status')).toHaveText('Сцена открыта');
   }
-  expect(requests.every((url) => new URL(url).origin === 'http://127.0.0.1:4173')).toBe(true);
+  expect(requests.every((url) => new URL(url).origin === browserTestOrigin)).toBe(true);
   expect(new Set(requests.filter((url) => /\/maps\/.*\.json$/.test(url))).size).toBeLessThanOrEqual(10);
   expect(requests.filter((url) => /\/assets\/models\//.test(url)).every((url) => /\/demo\/(tablet|courtyard|science|history)\.glb$/.test(url))).toBe(true);
   expect(errors).toEqual([]);

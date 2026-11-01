@@ -1,0 +1,299 @@
+[WebServer] (node:72812) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 45 tests using 1 worker
+
+(node:72813) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/45] e2e/babylon.spec.ts:53:1 › two real players enroll, translate, share stones and restore a private dictionary after restart
+  1) e2e/babylon.spec.ts:53:1 › two real players enroll, translate, share stones and restore a private dictionary after restart
+
+    Error: (node:72814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    09:05:07.499 INFO  [app] Запуск сервера (app.start) {"env":"development","version":"0.1.0","node":"v24.15.0","platform":"darwin arm64","pid":72814,"config":{"host":"127.0.0.1","port":62553,"clientDir":"/private/tmp/competition-2026-next-merge/client/dist","worldDir":"/private/tmp/competition-2026-next-merge/client/public","maps":{"market":"maps/market/manifest.json","demo":"maps/demo/manifest.json","science":"maps/demo/science.json"},"defaultMap":"market","contentDir":"/private/tmp/competition-2026-next-merge/server/content","dbPath":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/browser-babel-Qv4qgQ/game.sqlite","maxPlayers":4,"sessionTtlMs":43200000,"tickHz":20,"broadcastHz":10,"aoiRadius":64,"staticChunkRadius":3,"disconnectGraceMs":100,"saveIntervalMs":100,"corsOrigins":["http://localhost:5173"],"logWorldAccess":false,"clientDebug":true,"auth":{"maxSessions":5,"passwordless":true},"logs":{"consoleLevel":"debug","fileLevel":"debug","dir":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/browser-babel-Qv4qgQ/data/logs","maxFileMb":20,"maxTotalMb":200,"retentionDays":14},"language":{"adapter":"test","options":{}},"npc":{"adapter":"scripted","maxConcurrent":1,"maxUnfinished":4,"timeoutMs":8000,"streamTimeoutMs":30000,"options":{}},"env":"development","monitoring":{"token":null,"pingIntervalMs":5000,"validateOutgoing":true}}}
+    09:05:07.505 INFO  [db] База данных открыта (db.opened) {"path":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/browser-babel-Qv4qgQ/game.sqlite","schema":4}
+    09:05:07.506 WARN  [app] Вход без пароля включён (development); в production он запрещён (auth.passwordless.enabled)
+    09:05:07.506 INFO  [npc] Ответчик NPC готов (npc.responder.ready)
+    09:05:07.506 INFO  [language] Переводчик готов (language.ready) {"mode":"test","languages":["ru","en","es"]}
+    09:05:07.810 INFO  [game] Карта готова (world.loaded) {"mapId":"market","chunks":1024,"worldBytes":21088910,"durationMs":303}
+    09:05:07.810 INFO  [game] Карта готова (world.loaded) {"mapId":"demo","chunks":1024,"worldBytes":18697328,"durationMs":303}
+    09:05:07.810 INFO  [game] Карта готова (world.loaded) {"mapId":"science","chunks":1024,"worldBytes":18697332,"durationMs":303}
+    09:05:07.836 INFO  [app] Сервер готов (app.ready) {"host":"127.0.0.1","port":62553,"maps":["market","demo","science"]}
+    ================================================================
+      ВАВИЛОН ЗАПУЩЕН
+
+      Этот компьютер:     http://localhost:62553/
+      Другие устройства:
+        —
+      Экран ведущего:     http://localhost:62553/operator
+
+      ! host = 127.0.0.1: другие устройства не подключатся, доступен только этот компьютер.
+    ================================================================
+
+
+      12 |   let output = '';
+      13 |   await new Promise<void>((done, reject) => {
+    > 14 |     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 15000);
+         |                                             ^
+      15 |     child.once('exit', code => { clearTimeout(timeout); reject(new Error(`Server exited ${code}: ${output}`)); });
+      16 |     child.stderr!.on('data', data => { output += data; });
+      17 |     child.stdout!.on('data', data => { output += data; if (output.includes('Сервер доступен')) { clearTimeout(timeout); done(); } });
+        at Timeout._onTimeout (/private/tmp/competition-2026-next-merge/client/e2e/babylon.spec.ts:14:45)
+
+    Error Context: test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/error-context.md
+
+    Error Context: test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[2/45] e2e/babylon.spec.ts:99:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task
+[3/45] e2e/babylon.spec.ts:120:1 › real server authorizes the default 25-chunk window at the market and tower
+(node:72846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[4/45] e2e/demo.spec.ts:15:1 › walks to both NPCs, opens local dialogue, blocks movement and changes camera
+[5/45] e2e/demo.spec.ts:77:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen
+[6/45] e2e/foundation.spec.ts:7:1 › local build renders with external access blocked and handles resize, pause and restart
+[7/45] e2e/foundation.spec.ts:54:1 › unavailable WebGL shows a useful error and no canvas
+[8/45] e2e/foundation.spec.ts:69:1 › runtime config selects guest login before opening online channels
+[9/45] e2e/foundation.spec.ts:82:1 › missing config remains visible in the interface
+[10/45] e2e/foundation.spec.ts:89:1 › invalid runtime config is rejected before creating the scene
+[11/45] e2e/layout.spec.ts:22:3 › controls remain reachable at 1280x800
+[12/45] e2e/layout.spec.ts:22:3 › controls remain reachable at 1024x600
+[13/45] e2e/layout.spec.ts:22:3 › controls remain reachable at 640x480
+[14/45] e2e/main-building.spec.ts:21:1 › building courtyard streams from market, stairs rise to landing, symbols toggle and return preserves the session
+[15/45] e2e/main-building.spec.ts:52:1 › default streaming loads the landmark while the player is still on the market
+[16/45] e2e/market.spec.ts:21:1 › default five-by-five streaming covers pasture and courtyard without idle request churn
+[17/45] e2e/market.spec.ts:55:1 › market route buys goods, rejects wrong feed, streams pasture and finishes four goats
+[18/45] e2e/market.spec.ts:89:1 › client stone draft survives closing and vocabulary can be edited without moving the player
+[19/45] e2e/models.spec.ts:6:1 › optional decoration failure is visible, retry succeeds, and the game remains playable
+[20/45] e2e/movement.spec.ts:15:52 › MOVE: demo supports jump, sprint, stamina HUD and interruption
+[21/45] e2e/movement.spec.ts:15:52 › MOVE: science supports jump, sprint, stamina HUD and interruption
+[22/45] e2e/movement.spec.ts:15:52 › MOVE: market supports jump, sprint, stamina HUD and interruption
+[23/45] e2e/movement.spec.ts:36:30 › MOVE HUD layout 1280x800 at 100% equivalent CSS viewport
+[24/45] e2e/movement.spec.ts:36:30 › MOVE HUD layout 1280x800 at 200% equivalent CSS viewport
+[25/45] e2e/movement.spec.ts:36:30 › MOVE HUD layout 1024x600 at 100% equivalent CSS viewport
+[26/45] e2e/movement.spec.ts:36:30 › MOVE HUD layout 1024x600 at 200% equivalent CSS viewport
+[27/45] e2e/movement.spec.ts:36:30 › MOVE HUD layout 640x480 at 100% equivalent CSS viewport
+[28/45] e2e/movement.spec.ts:36:30 › MOVE HUD layout 640x480 at 200% equivalent CSS viewport
+[29/45] e2e/network.spec.ts:6:1 › switches to a labelled mock session, exchanges text, handles loss and reconnects cleanly
+[30/45] e2e/network.spec.ts:45:1 › changes the map and restores local play after an unauthorized real session
+[31/45] e2e/network.spec.ts:72:1 › receives correlated NPC replies through the mock session
+[32/45] e2e/pointer-lock.spec.ts:6:1 › real pointer lock survives repeated relative movement, releases on loss and resumes with clean input
+[33/45] e2e/pointer-lock.spec.ts:44:1 › denied capture keeps controls blocked and a new user click can retry
+[34/45] e2e/pointer-lock.spec.ts:64:1 › missing pointer lock offers a clear error, retry and a route back to the main screen
+[35/45] e2e/quality.spec.ts:8:41 › profiles demo sixty seconds offline and checks retained resources after five complete restarts
+e2e/quality.spec.ts:8:41 › profiles demo sixty seconds offline and checks retained resources after five complete restarts
+{"environment":{"userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36","gpu":"ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)","viewport":"1280x800","dpr":1},"minFps":59.9,"maxP95":18.1,"maxDrawCalls":259,"baselineHeap":10522060,"heaps":[12082576,12370832,12205300,12607444,12489508],"baselineResources":{"drawCalls":285,"geometries":15,"textures":13},"counts":[{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13},{"drawCalls":285,"geometries":15,"textures":13}]}
+
+[36/45] e2e/quality.spec.ts:8:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts
+  2) e2e/quality.spec.ts:8:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 25
+    Received: 10
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      20 |   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
+      21 |   // The normal map window fits within the emergency memory guard.
+    > 22 |   await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBe(mapId === 'market' ? 25 : 9);
+         |                                                                                                                       ^
+      23 |   await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
+      24 |   await page.waitForTimeout(5000);
+      25 |   const cdp = await page.context().newCDPSession(page);
+        at /private/tmp/competition-2026-next-merge/client/e2e/quality.spec.ts:22:119
+
+    Error Context: test-results/quality-profiles-market-si-f98ae-fter-five-complete-restarts/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/quality-profiles-market-si-f98ae-fter-five-complete-restarts/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/quality-profiles-market-si-f98ae-fter-five-complete-restarts/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:74181) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[37/45] e2e/server-auth.spec.ts:53:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token
+  3) e2e/server-auth.spec.ts:53:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token
+
+    Error: Server startup timeout: (node:74186) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    09:10:59.272 INFO  [app] Запуск сервера (app.start) {"env":"development","version":"0.1.0","node":"v24.15.0","platform":"darwin arm64","pid":74186,"config":{"host":"127.0.0.1","port":51483,"clientDir":"/private/tmp/competition-2026-next-merge/client/dist","worldDir":"/private/tmp/competition-2026-next-merge/client/public","maps":{"market":"maps/market/manifest.json","demo":"maps/demo/manifest.json","science":"maps/demo/science.json"},"defaultMap":"demo","contentDir":"/private/tmp/competition-2026-next-merge/server/content","dbPath":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/browser-auth-0AfN69/game.sqlite","maxPlayers":4,"sessionTtlMs":43200000,"tickHz":20,"broadcastHz":10,"aoiRadius":64,"staticChunkRadius":3,"disconnectGraceMs":100,"saveIntervalMs":100,"corsOrigins":["http://localhost:5173"],"logWorldAccess":false,"clientDebug":true,"auth":{"maxSessions":5,"passwordless":true},"logs":{"consoleLevel":"debug","fileLevel":"debug","dir":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/browser-auth-0AfN69/data/logs","maxFileMb":20,"maxTotalMb":200,"retentionDays":14},"language":{"adapter":"test","options":{}},"npc":{"adapter":"scripted","maxConcurrent":1,"maxUnfinished":4,"timeoutMs":8000,"streamTimeoutMs":30000,"options":{"delayMs":30}},"env":"development","monitoring":{"token":null,"pingIntervalMs":5000,"validateOutgoing":true}}}
+    09:10:59.339 INFO  [db] База данных открыта (db.opened) {"path":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/browser-auth-0AfN69/game.sqlite","schema":4}
+    09:10:59.345 WARN  [app] Вход без пароля включён (development); в production он запрещён (auth.passwordless.enabled)
+    09:10:59.348 INFO  [npc] Ответчик NPC готов (npc.responder.ready)
+    09:10:59.351 INFO  [language] Переводчик готов (language.ready) {"mode":"test","languages":["ru","en","es"]}
+    09:11:04.109 INFO  [game] Карта готова (world.loaded) {"mapId":"market","chunks":1024,"worldBytes":21088910,"durationMs":4755}
+    09:11:04.110 INFO  [game] Карта готова (world.loaded) {"mapId":"demo","chunks":1024,"worldBytes":18697328,"durationMs":4756}
+    09:11:04.111 INFO  [game] Карта готова (world.loaded) {"mapId":"science","chunks":1024,"worldBytes":18697332,"durationMs":4757}
+    09:11:04.185 INFO  [app] Сервер готов (app.ready) {"host":"127.0.0.1","port":51483,"maps":["market","demo","science"]}
+    ================================================================
+      ВАВИЛОН ЗАПУЩЕН
+
+      Этот компьютер:     http://localhost:51483/
+      Другие устройства:
+        —
+      Экран ведущего:     http://localhost:51483/operator
+
+      ! host = 127.0.0.1: другие устройства не подключатся, доступен только этот компьютер.
+    ================================================================
+
+
+      13 |   let output = '';
+      14 |   await new Promise<void>((resolve, reject) => {
+    > 15 |     const timeout = setTimeout(() => reject(new Error(`Server startup timeout: ${output}`)), 15000);
+         |                                             ^
+      16 |     const failed = (code: number | null) => { clearTimeout(timeout); reject(new Error(`Server exited ${code}: ${output}`)); };
+      17 |     processHandle.once('exit', failed);
+      18 |     processHandle.stderr!.on('data', (chunk) => { output += String(chunk); });
+        at Timeout._onTimeout (/private/tmp/competition-2026-next-merge/client/e2e/server-auth.spec.ts:15:45)
+
+    Error Context: test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/error-context.md
+
+    Error Context: test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/server-auth-real-guest-log-b3d7b-and-reload-forget-the-token/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[38/45] e2e/server-auth.spec.ts:71:1 › real players exchange chat and NPC memory survives a server restart
+[39/45] e2e/server-auth.spec.ts:91:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits
+[40/45] e2e/server-auth.spec.ts:107:1 › a world 401 and client session expiry return to login without automatically posting again
+[41/45] e2e/server-auth.spec.ts:118:1 › switching to the server market enrolls BABEL and opens the authoritative inventory
+(node:74197) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[42/45] e2e/world.spec.ts:6:1 › streams a nearby region, blocks a slow boundary and stays within its reserved budget
+[43/45] e2e/world.spec.ts:39:1 › manifest failure leaves the loop responsive and an explicit retry prepares the world
+(node:74235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[44/45] e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+NEXT backend (node:74236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+NEXT backend 09:11:44.623 INFO  [app] Запуск сервера (app.start) {"env":"development","version":"0.1.0","node":"v24.15.0","platform":"darwin arm64","pid":74236,"config":{"host":"127.0.0.1","port":51589,"clientDir":"/private/tmp/competition-2026-next-merge/client/dist","worldDir":"/private/tmp/competition-2026-next-merge/client/public","maps":{"market":"maps/market/manifest.json","demo":"maps/demo/manifest.json","science":"maps/demo/science.json"},"defaultMap":"market","contentDir":"/private/tmp/competition-2026-next-merge/server/content","dbPath":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-enVPo3/game.sqlite","maxPlayers":4,"sessionTtlMs":43200000,"tickHz":20,"broadcastHz":10,"aoiRadius":64,"staticChunkRadius":3,"disconnectGraceMs":100,"saveIntervalMs":100,"corsOrigins":["http://localhost:5173"],"logWorldAccess":false,"clientDebug":true,"auth":{"maxSessions":5,"passwordless":true},"logs":{"consoleLevel":"debug","fileLevel":"debug","dir":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-enVPo3/data/logs","maxFileMb":20,"maxTotalMb":200,"retentionDays":14},"language":{"adapter":"test","options":{}},"npc":{"adapter":"scripted","maxConcurrent":1,"maxUnfinished":4,"timeoutMs":8000,"streamTimeoutMs":30000,"options":{}},"env":"development","monitoring":{"token":null,"pingIntervalMs":5000,"validateOutgoing":true}}}
+
+NEXT backend 09:11:44.655 INFO  [db] База данных открыта (db.opened) {"path":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-enVPo3/game.sqlite","schema":4}
+
+NEXT backend 09:11:44.658 WARN  [app] Вход без пароля включён (development); в production он запрещён (auth.passwordless.enabled)
+
+NEXT backend 09:11:44.659 INFO  [npc] Ответчик NPC готов (npc.responder.ready)
+
+NEXT backend 09:11:44.659 INFO  [language] Переводчик готов (language.ready) {"mode":"test","languages":["ru","en","es"]}
+
+NEXT backend 09:11:46.643 INFO  [game] Карта готова (world.loaded) {"mapId":"market","chunks":1024,"worldBytes":21088910,"durationMs":1981}
+
+NEXT backend 09:11:46.655 INFO  [game] Карта готова (world.loaded) {"mapId":"demo","chunks":1024,"worldBytes":18697328,"durationMs":1993}
+
+NEXT backend 09:11:46.655 INFO  [game] Карта готова (world.loaded) {"mapId":"science","chunks":1024,"worldBytes":18697332,"durationMs":1994}
+
+NEXT backend 09:11:46.739 INFO  [app] Сервер готов (app.ready) {"host":"127.0.0.1","port":51589,"maps":["market","demo","science"]}
+
+NEXT backend ================================================================
+  ВАВИЛОН ЗАПУЩЕН
+
+  Этот компьютер:     http://localhost:51589/
+  Другие устройства:
+    —
+  Экран ведущего:     http://localhost:51589/operator
+
+  ! host = 127.0.0.1: другие устройства не подключатся, доступен только этот компьютер.
+================================================================
+
+NEXT backend 09:11:56.720 INFO  [app] Получен сигнал остановки (app.signal)
+09:11:56.723 INFO  [app] Остановка сервера (app.stop) {"reason":"shutdown"}
+09:11:56.727 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"modules","durationMs":4}
+
+NEXT backend 09:11:56.748 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"closed","durationMs":25}
+
+NEXT backend 09:11:56.749 INFO  [app] Сервер остановлен (app.stop.done) {"durationMs":26}
+
+  4) e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+
+    Test was interrupted.
+
+    Error: Server exited 0: (node:74236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    09:11:44.623 INFO  [app] Запуск сервера (app.start) {"env":"development","version":"0.1.0","node":"v24.15.0","platform":"darwin arm64","pid":74236,"config":{"host":"127.0.0.1","port":51589,"clientDir":"/private/tmp/competition-2026-next-merge/client/dist","worldDir":"/private/tmp/competition-2026-next-merge/client/public","maps":{"market":"maps/market/manifest.json","demo":"maps/demo/manifest.json","science":"maps/demo/science.json"},"defaultMap":"market","contentDir":"/private/tmp/competition-2026-next-merge/server/content","dbPath":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-enVPo3/game.sqlite","maxPlayers":4,"sessionTtlMs":43200000,"tickHz":20,"broadcastHz":10,"aoiRadius":64,"staticChunkRadius":3,"disconnectGraceMs":100,"saveIntervalMs":100,"corsOrigins":["http://localhost:5173"],"logWorldAccess":false,"clientDebug":true,"auth":{"maxSessions":5,"passwordless":true},"logs":{"consoleLevel":"debug","fileLevel":"debug","dir":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-enVPo3/data/logs","maxFileMb":20,"maxTotalMb":200,"retentionDays":14},"language":{"adapter":"test","options":{}},"npc":{"adapter":"scripted","maxConcurrent":1,"maxUnfinished":4,"timeoutMs":8000,"streamTimeoutMs":30000,"options":{}},"env":"development","monitoring":{"token":null,"pingIntervalMs":5000,"validateOutgoing":true}}}
+    09:11:44.655 INFO  [db] База данных открыта (db.opened) {"path":"/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/world-next-browser-enVPo3/game.sqlite","schema":4}
+    09:11:44.658 WARN  [app] Вход без пароля включён (development); в production он запрещён (auth.passwordless.enabled)
+    09:11:44.659 INFO  [npc] Ответчик NPC готов (npc.responder.ready)
+    09:11:44.659 INFO  [language] Переводчик готов (language.ready) {"mode":"test","languages":["ru","en","es"]}
+    09:11:46.643 INFO  [game] Карта готова (world.loaded) {"mapId":"market","chunks":1024,"worldBytes":21088910,"durationMs":1981}
+    09:11:46.655 INFO  [game] Карта готова (world.loaded) {"mapId":"demo","chunks":1024,"worldBytes":18697328,"durationMs":1993}
+    09:11:46.655 INFO  [game] Карта готова (world.loaded) {"mapId":"science","chunks":1024,"worldBytes":18697332,"durationMs":1994}
+    09:11:46.739 INFO  [app] Сервер готов (app.ready) {"host":"127.0.0.1","port":51589,"maps":["market","demo","science"]}
+    ================================================================
+      ВАВИЛОН ЗАПУЩЕН
+
+      Этот компьютер:     http://localhost:51589/
+      Другие устройства:
+        —
+      Экран ведущего:     http://localhost:51589/operator
+
+      ! host = 127.0.0.1: другие устройства не подключатся, доступен только этот компьютер.
+    ================================================================
+    09:11:56.720 INFO  [app] Получен сигнал остановки (app.signal)
+    09:11:56.723 INFO  [app] Остановка сервера (app.stop) {"reason":"shutdown"}
+    09:11:56.727 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"modules","durationMs":4}
+    09:11:56.748 INFO  [app] Остановка: фаза завершена (app.stop.phase) {"phase":"closed","durationMs":25}
+    09:11:56.749 INFO  [app] Сервер остановлен (app.stop.done) {"durationMs":26}
+
+
+      118 |   await new Promise<void>((done, reject) => {
+      119 |     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 60000);
+    > 120 |     child.once('exit', code => { clearTimeout(timeout); if (!expectedServerStop) console.error('NEXT unexpected backend exit', code, output); reject(new Error(`Server exited ${code}: ${output}`)); });
+          |                                                                                                                                                      ^
+      121 |     const record = (data: Buffer) => { const text = data.toString(); output += text; serverOutput = (serverOutput + text).slice(-200000); console.log('NEXT backend', text.trim()); };
+      122 |     const ready = (data: Buffer) => { record(data); if (output.includes('(app.ready)')) { serverReady = true; clearTimeout(timeout); done(); } };
+      123 |     child.stderr!.on('data', ready);
+        at ChildProcess.<anonymous> (/private/tmp/competition-2026-next-merge/client/e2e/world-next.spec.ts:120:150)
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[45/45] e2e/world-next.spec.ts:282:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+  3 failed
+    e2e/babylon.spec.ts:53:1 › two real players enroll, translate, share stones and restore a private dictionary after restart
+    e2e/quality.spec.ts:8:41 › profiles market sixty seconds offline and checks retained resources after five complete restarts
+    e2e/server-auth.spec.ts:53:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token
+  1 interrupted
+    e2e/world-next.spec.ts:204:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+  7 did not run
+  34 passed (6.9m)

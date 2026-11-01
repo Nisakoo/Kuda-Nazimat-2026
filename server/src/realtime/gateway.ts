@@ -12,6 +12,8 @@ import type { GameService } from '../game/GameService.ts';
 import type { Channel } from '../game/ports.ts';
 import { hashToken } from '../auth/AuthService.ts';
 import { TokenBucket } from '../common/TokenBucket.ts';
+import type { WorldLifeServerMessage } from '../../../shared/world-life/types.ts';
+import { handFailure, parseWorldLifeClientMessage, parseWorldLifeServerMessage, WorldLifeError } from '../../../shared/world-life/validate.ts';
 import { PartialThrottle } from './PartialThrottle.ts';
 
 export interface GatewayDeps {
@@ -37,6 +39,9 @@ const CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
 const INVALID_LIMIT = 10;
 const INVALID_WINDOW_MS = 10_000;
 const MAX_TIMER_MS = 2_147_000_000;
+const MAX_CONTROL_IDS = 4096;
+const MAX_OUTBOUND_PACKETS = 32;
+const MAX_OUTBOUND_BYTES = 1024 * 1024;
 /** PROTO-007: npc-partial at most 10 times per second per question. */
 const PARTIAL_INTERVAL_MS = 100;
 
@@ -105,6 +110,10 @@ class Connection implements Channel {
   private readonly usedRequestIds = new Set<string>();
   private readonly inputBucket: TokenBucket;
   private readonly chatBucket: TokenBucket;
+  private readonly lifeBucket: TokenBucket;
+  private readonly controlBucket: TokenBucket;
+  private outboundPackets = 0;
+  private outboundBytes = 0;
   /** Streamed questions still waiting for their terminal message. */
   private readonly streams = new Map<string, PartialThrottle>();
   private invalidTimes: number[] = [];
@@ -126,6 +135,8 @@ class Connection implements Channel {
     this.log = log.child('realtime', { playerId: this.identity.playerId, connectionId: this.id });
     this.inputBucket = new TokenBucket(deps.clock, 30, 30);
     this.chatBucket = new TokenBucket(deps.clock, 1, 3);
+    this.lifeBucket = new TokenBucket(deps.clock, 5, 5);
+    this.controlBucket = new TokenBucket(deps.clock, 5, 10);
   }
 
   start(): void {
@@ -141,10 +152,36 @@ class Connection implements Channel {
     if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
     this.scheduleExpiry();
     this.socket.on('game', (raw: unknown) => this.receive(raw));
+    this.socket.on('world-life', (raw: unknown) => this.receiveLife(raw));
+    this.socket.conn.on('drain', () => { this.outboundPackets = 0; this.outboundBytes = 0; });
     this.socket.on('disconnect', (reason) => this.onDisconnect(reason));
   }
 
-  send(message: ServerMessage): void { if (this.outgoing(message)) this.socket.emit('game', message); }
+  send(message: ServerMessage): void { if (this.outgoing(message)) this.sendPacket('game', message, false); }
+
+  sendLife(message: WorldLifeServerMessage, volatile = false): void {
+    if (this.closed) return;
+    if (this.deps.validateOutgoing) {
+      try { parseWorldLifeServerMessage(message); }
+      catch { this.log.error('invariant.violated', 'Исходящий пакет не проходит общий контракт', { invariant: 'outgoing.valid', type: message.type }); return; }
+    }
+    this.metrics.packetsOut.inc({ type: message.type });
+    this.sendPacket('world-life', message, volatile);
+  }
+
+  private sendPacket(event: 'game' | 'world-life', message: ServerMessage | WorldLifeServerMessage, volatile: boolean): void {
+    if (this.closed) return;
+    if (volatile) { this.socket.volatile.emit(event, message); return; }
+    const bytes = Buffer.byteLength(JSON.stringify(message), 'utf8');
+    if (this.outboundPackets >= MAX_OUTBOUND_PACKETS || this.outboundBytes + bytes > MAX_OUTBOUND_BYTES) {
+      this.log.warn('realtime.slow_consumer', 'Закрыто медленное соединение', { packets: this.outboundPackets, bytes: this.outboundBytes });
+      this.closed = true;
+      this.socket.conn.close(true);
+      return;
+    }
+    this.outboundPackets++; this.outboundBytes += bytes;
+    this.socket.emit(event, message);
+  }
 
   /** Droppable packets (npc-partial) must not pile up in Socket.IO's offline buffer. */
   private sendVolatile(message: ServerMessage): void { if (this.outgoing(message)) this.socket.volatile.emit('game', message); }
@@ -168,6 +205,23 @@ class Connection implements Channel {
   close(reason: string): void {
     if (!this.closed) this.log.info('realtime.closed_by_server', 'Соединение закрыто сервером', { ip: this.ip, reason });
     this.fail('UNAUTHORIZED', reason);
+  }
+
+  private receiveLife(raw: unknown): void {
+    if (this.deps.clock.now() >= this.expiresAt) { this.close('Сессия истекла.'); return; }
+    if (this.closed || !this.deps.game.isControlling(this)) return;
+    const candidate = raw && typeof raw === 'object' ? (raw as { requestId?: unknown }).requestId : undefined;
+    const requestId = typeof candidate === 'string' && /^[A-Za-z0-9_.:-]{1,80}$/.test(candidate) ? candidate : 'server';
+    if (!this.lifeBucket.take()) { this.sendLife(handFailure(requestId, 'RATE_LIMIT', 'Слишком часто.')); return; }
+    let request;
+    try { request = parseWorldLifeClientMessage(raw); }
+    catch (error) {
+      this.sendLife(handFailure(requestId, error instanceof WorldLifeError ? error.code : 'INVALID', 'Некорректный запрос живого мира.'));
+      this.countInvalid(); return;
+    }
+    if (!this.deps.game.identityOf(this)) { this.sendLife(handFailure(request.requestId, 'NOT_READY', 'Сначала войдите в мир.')); return; }
+    if (request.type === 'hand') this.sendLife(this.deps.game.hand(this, request));
+    this.deps.game.syncLife(this);
   }
 
   private fail(code: ErrorCode, message: string): void {
@@ -213,6 +267,10 @@ class Connection implements Channel {
       return;
     }
     this.metrics.packetsIn.inc({ type: message.type });
+    // MOVE deduplicates by authoritative sequence without retaining every packet ID.
+    if (message.type === 'input') { this.dispatch(message); return; }
+    if (!this.controlBucket.take()) { this.metrics.limited.inc({ type: message.type }); this.error(message.requestId, 'RATE_LIMIT', 'Слишком часто.'); return; }
+    if (this.usedRequestIds.size >= MAX_CONTROL_IDS) { this.fail('UNAVAILABLE', 'Достигнут лимит команд соединения. Подключитесь снова.'); return; }
     if (this.usedRequestIds.has(message.requestId)) { this.log.debug('realtime.packet.invalid', 'Повтор requestId', { type: message.type, requestId: message.requestId, code: 'DUPLICATE' }); this.error(message.requestId, 'INVALID', 'Повтор requestId.'); return; }
     this.usedRequestIds.add(message.requestId);
     this.dispatch(message);
@@ -232,7 +290,7 @@ class Connection implements Channel {
         if (this.deps.sessions.state?.(this.identity).requiresAvatar) { this.error(message.requestId, 'FORBIDDEN', 'Сначала подтвердите облик персонажа.'); return; }
       } catch { this.error(message.requestId, 'UNAVAILABLE', 'Не удалось проверить облик. Повторите позже.'); return; }
       const result = game.join(this, message.mapId);
-      if (result.ok) { this.log.info('realtime.join', 'Вход в мир', { mapId: message.mapId, ip: this.ip, requestId: message.requestId }); this.send(result.message(message.requestId)); }
+      if (result.ok) { this.log.info('realtime.join', 'Вход в мир', { mapId: message.mapId, ip: this.ip, requestId: message.requestId }); this.send(result.message(message.requestId)); game.syncLife(this); }
       else if (result.reason === 'unknown-map') this.error(message.requestId, 'INVALID', 'Неизвестная карта.');
       else if (result.reason === 'already-joined') this.error(message.requestId, 'INVALID', 'Вход в мир уже выполнен.');
       return;
@@ -247,6 +305,7 @@ class Connection implements Channel {
       case 'resync': {
         const snapshot = game.resync(this);
         if (snapshot) this.send(snapshot);
+        game.syncLife(this);
         return;
       }
       case 'interact': {

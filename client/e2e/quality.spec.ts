@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { browserTestOrigin } from '../playwright.settings';
 import { writeFile } from 'node:fs/promises';
 import { expectCapture } from './helpers';
 
@@ -10,7 +11,7 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
   page.on('pageerror', (error) => errors.push(error.message));
   await page.route('**/*', (route) => {
     const url = new URL(route.request().url());
-    if (url.origin !== 'http://127.0.0.1:4173') { external.push(url.href); return route.abort(); }
+    if (url.origin !== browserTestOrigin) { external.push(url.href); return route.abort(); }
     if (url.pathname === '/config.json') return route.fulfill({ json: { mapId, debug: true } });
     return route.continue();
   });
@@ -18,8 +19,8 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
   if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
   // The normal map window fits within the emergency memory guard.
-  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBe(mapId === 'market' ? 25 : 9);
-  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
+  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1]), { timeout: 30000 }).toBe(mapId === 'market' ? 25 : 9);
+  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0', { timeout: 30000 });
   await page.waitForTimeout(5000);
   const cdp = await page.context().newCDPSession(page);
   const heap = async () => { await cdp.send('HeapProfiler.collectGarbage'); return (await cdp.send('Runtime.getHeapUsage')).usedSize as number; };
@@ -51,8 +52,8 @@ for (const mapId of ['demo', 'market']) test(`profiles ${mapId} sixty seconds of
     if (mapId === 'market') await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
     // The normal map window fits within the emergency memory guard.
-  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1])).toBe(mapId === 'market' ? 25 : 9);
-  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0');
+  await expect.poll(async () => Number((await page.getByLabel('Кеш мира').textContent())!.match(/Чанки: (\d+)/)![1]), { timeout: 30000 }).toBe(mapId === 'market' ? 25 : 9);
+  await expect(page.getByLabel('Кеш мира')).toContainText('Ожидание: 0', { timeout: 30000 });
     await page.waitForTimeout(1200);
     expect(await old!.evaluate((element) => (element as HTMLCanvasElement).getContext('webgl2')!.isContextLost())).toBe(true);
     await old!.dispose();

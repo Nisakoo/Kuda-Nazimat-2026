@@ -1,0 +1,488 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/data/worktrees/next-006-010-011-015-2723ff/client/node_modules/.bin/playwright",
+      "test",
+      "e2e/world-next.spec.ts",
+      "--reporter=line,json",
+      "--trace=off"
+    ],
+    "configFile": "/data/worktrees/next-006-010-011-015-2723ff/client/playwright.config.ts",
+    "rootDir": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e",
+        "testIgnore": [
+          "render.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e",
+        "snapshotDir": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e",
+        "testIgnore": "render.spec.ts",
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4291",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "channel": "chromium",
+          "launchOptions": {
+            "args": [
+              "--enable-unsafe-swiftshader"
+            ],
+            "executablePath": "/usr/bin/chromium"
+          },
+          "trace": "off"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --host 127.0.0.1 --port 4291 --strictPort",
+      "url": "http://127.0.0.1:4291",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "world-next.spec.ts",
+      "file": "world-next.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "NEXT: four real roles share the scene; physical F carries one durable apple without repeats",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 252090,
+                  "error": {
+                    "message": "TimeoutError: page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n",
+                    "stack": "TimeoutError: page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\n    at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:249:17",
+                    "location": {
+                      "file": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts",
+                      "column": 17,
+                      "line": 249
+                    },
+                    "snippet": "  247 |   await carrier.keyboard.down('ShiftLeft'); await carrier.keyboard.down('s'); await carrier.waitForTimeout(400);\n  248 |   await carrier.keyboard.press('Space'); await carrier.waitForTimeout(300); await carrier.keyboard.up('s'); await carrier.keyboard.up('ShiftLeft');\n> 249 |   await carrier.screenshot({ path: testInfo.outputPath('carry-move.png') });\n      |                 ^\n  250 |   await carrier.waitForTimeout(1000);\n  251 |   await carrier.keyboard.press('Escape'); await expectCapture(carrier, false);\n  252 |   await carrier.keyboard.down('f'); await carrier.keyboard.up('f');"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts",
+                        "column": 17,
+                        "line": 249
+                      },
+                      "message": "TimeoutError: page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\n\n  247 |   await carrier.keyboard.down('ShiftLeft'); await carrier.keyboard.down('s'); await carrier.waitForTimeout(400);\n  248 |   await carrier.keyboard.press('Space'); await carrier.waitForTimeout(300); await carrier.keyboard.up('s'); await carrier.keyboard.up('ShiftLeft');\n> 249 |   await carrier.screenshot({ path: testInfo.outputPath('carry-move.png') });\n      |                 ^\n  250 |   await carrier.waitForTimeout(1000);\n  251 |   await carrier.keyboard.press('Escape'); await expectCapture(carrier, false);\n  252 |   await carrier.keyboard.down('f'); await carrier.keyboard.up('f');\n    at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:249:17"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "NEXT backend 2026-10-31T23:51:21.251Z INFO [app] Карта готова {\"mapId\":\"market\",\"worldBytes\":21088910,\"chunks\":1024}\n2026-10-31T23:51:21.256Z INFO [app] Карта готова {\"mapId\":\"demo\",\"worldBytes\":18697328,\"chunks\":1024}\n2026-10-31T23:51:21.256Z INFO [app] Карта готова {\"mapId\":\"science\",\"worldBytes\":18697332,\"chunks\":1024}\n2026-10-31T23:51:21.257Z INFO [app] Сервер доступен {\"url\":\"http://localhost:44659/\"}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":17031.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"audio-init\",\"at\":17236.09999999404,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"durationMs\":188.59999999403954}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":18475.90000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":19998.5,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":26914.90000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":22743.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"audio-init\",\"at\":22761.80000001192,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"durationMs\":9.700000017881393}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":24400.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":26182.90000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:52:21.226Z INFO [game] Длительность шага, мс {\"p50\":0.258,\"p95\":1.583,\"max\":20.727,\"players\":2}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":46977.5,\"focus\":true,\"visibility\":\"visible\",\"active\":false,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":29513.30000001192,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"audio-init\",\"at\":29545.70000001788,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"durationMs\":24}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":29598.90000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":29765.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":40190.90000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:53:21.226Z INFO [game] Длительность шага, мс {\"p50\":0.286,\"p95\":1.862,\"max\":18.874,\"players\":3}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":37666.10000002384,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"audio-init\",\"at\":37710.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"durationMs\":29.5}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":39363.70000001788,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":41795.20000001788,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":51670.20000001788,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":139370.30000001192,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":139395.59999999404,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":139447.5,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:54:21.280Z INFO [game] Длительность шага, мс {\"p50\":0.348,\"p95\":4.306,\"max\":39.064,\"players\":4}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:55:21.314Z INFO [game] Длительность шага, мс {\"p50\":0.359,\"p95\":7.422,\"max\":214.196,\"players\":3}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":212750.59999999404,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"visibility\",\"at\":247788.59999999404,\"focus\":true,\"visibility\":\"hidden\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"visibility\",\"at\":174081.90000000596,\"focus\":true,\"visibility\":\"hidden\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"visibility\",\"at\":133873.5,\"focus\":true,\"visibility\":\"hidden\",\"active\":true}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-31T23:51:18.257Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "backend-log",
+                      "contentType": "text/plain",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/backend-log-0d9a7330cb77b2ff49847176d98ac3aa85eb0c1c.txt"
+                    },
+                    {
+                      "name": "final-ui-0",
+                      "contentType": "text/plain",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-0-c4143dcfe5102ab4d48e5a081948e03f23987826.txt"
+                    },
+                    {
+                      "name": "native-pointer-0",
+                      "contentType": "application/json",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-0-82ac619731d27365766ebb72edeb48236ce0f805.json"
+                    },
+                    {
+                      "name": "final-ui-1",
+                      "contentType": "text/plain",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-1-3194a9b26f2830cdbb71468ac42bdc44e96aa677.txt"
+                    },
+                    {
+                      "name": "native-pointer-1",
+                      "contentType": "application/json",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-1-2cd5695125879b2b00a54677b9ea6ea0b60f530f.json"
+                    },
+                    {
+                      "name": "final-ui-2",
+                      "contentType": "text/plain",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-2-caad1ec9827e46dfa8dc53c71717bd787dff5072.txt"
+                    },
+                    {
+                      "name": "native-pointer-2",
+                      "contentType": "application/json",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-2-db6f14445407ae75f4847714e36ba44e34c51ce9.json"
+                    },
+                    {
+                      "name": "final-ui-3",
+                      "contentType": "text/plain",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/final-ui-3-79da7f6cd80a8a6080f446cfffdbfa739e59db15.txt"
+                    },
+                    {
+                      "name": "native-pointer-3",
+                      "contentType": "application/json",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/attachments/native-pointer-3-b6f7ab0fc4b7692ffd62ccd7c61a7cd4e0b02fea.json"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts",
+                    "column": 17,
+                    "line": 249
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "f5097fcb6a7072717fb1-fc83c2b07e8ccdf768a0",
+          "file": "world-next.spec.ts",
+          "line": 204,
+          "column": 1
+        },
+        {
+          "title": "NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 279469,
+                  "error": {
+                    "message": "TimeoutError: page.waitForResponse: Timeout 30000ms exceeded while waiting for event \"response\"",
+                    "stack": "TimeoutError: page.waitForResponse: Timeout 30000ms exceeded while waiting for event \"response\"\n    at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:325:29",
+                    "location": {
+                      "file": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts",
+                      "column": 29,
+                      "line": 325
+                    },
+                    "snippet": "  323 |   await page.keyboard.press('Escape'); await activate(page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Общение', exact: true }));\n  324 |   const countMumbles = () => page.evaluate(() => window.worldAudioProbe.starts.filter(item => Math.abs(item.duration - .57) < .005).length);\n> 325 |   const mumbleLoaded = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/mumble.wav') && response.ok());\n      |                             ^\n  326 |   await page.getByLabel('Сообщение группе').fill('Прогрев');\n  327 |   await activate(page.getByRole('button', { name: 'Отправить', exact: true }));\n  328 |   await (await mumbleLoaded).finished();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts",
+                        "column": 29,
+                        "line": 325
+                      },
+                      "message": "TimeoutError: page.waitForResponse: Timeout 30000ms exceeded while waiting for event \"response\"\n\n  323 |   await page.keyboard.press('Escape'); await activate(page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Общение', exact: true }));\n  324 |   const countMumbles = () => page.evaluate(() => window.worldAudioProbe.starts.filter(item => Math.abs(item.duration - .57) < .005).length);\n> 325 |   const mumbleLoaded = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/mumble.wav') && response.ok());\n      |                             ^\n  326 |   await page.getByLabel('Сообщение группе').fill('Прогрев');\n  327 |   await activate(page.getByRole('button', { name: 'Отправить', exact: true }));\n  328 |   await (await mumbleLoaded).finished();\n    at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:325:29"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "NEXT backend 2026-10-31T23:55:42.548Z INFO [app] Карта готова {\"mapId\":\"market\",\"worldBytes\":21088910,\"chunks\":1024}\n2026-10-31T23:55:42.552Z INFO [app] Карта готова {\"mapId\":\"demo\",\"worldBytes\":18697328,\"chunks\":1024}\n2026-10-31T23:55:42.552Z INFO [app] Карта готова {\"mapId\":\"science\",\"worldBytes\":18697332,\"chunks\":1024}\n2026-10-31T23:55:42.552Z INFO [app] Сервер доступен {\"url\":\"http://localhost:36693/\"}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":23349.69999998808,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"audio-init\",\"at\":23775,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"durationMs\":417.90000000596046}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":26102.79999998212,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":30468,\"focus\":true,\"visibility\":\"visible\",\"active\":false,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":45100.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":false,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:56:42.532Z INFO [game] Длительность шага, мс {\"p50\":0.25,\"p95\":1.12,\"max\":30.433,\"players\":1}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":24071.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"audio-init\",\"at\":24178.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"durationMs\":87.60000002384186}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":26639.29999998212,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":28874.40000000596,\"focus\":true,\"visibility\":\"visible\",\"active\":true,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:57:42.534Z INFO [game] Длительность шага, мс {\"p50\":0.203,\"p95\":0.779,\"max\":24.902,\"players\":1}\n"
+                    },
+                    {
+                      "text": "NEXT audio: muted jump is silent; opening settings\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":47703.29999998212,\"focus\":true,\"visibility\":\"visible\",\"active\":false,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT audio: volume45; close settings and resume\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:58:42.580Z INFO [game] Длительность шага, мс {\"p50\":0.231,\"p95\":0.987,\"max\":12.719,\"players\":1}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"request\",\"at\":124964.5,\"focus\":true,\"visibility\":\"visible\",\"active\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"resolve\",\"at\":130078.79999998212,\"focus\":true,\"visibility\":\"visible\",\"active\":false}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":135424.69999998808,\"focus\":true,\"visibility\":\"visible\",\"active\":false,\"locked\":true}\n"
+                    },
+                    {
+                      "text": "NEXT pointer probe {\"kind\":\"change\",\"at\":149404.5,\"focus\":true,\"visibility\":\"visible\",\"active\":false,\"locked\":false}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:59:42.581Z INFO [game] Длительность шага, мс {\"p50\":0.207,\"p95\":0.834,\"max\":20.093,\"players\":1}\n"
+                    },
+                    {
+                      "text": "NEXT backend 2026-10-31T23:59:59.631Z INFO [app] BABEL language operation {\"kind\":\"chat\",\"durationMs\":23,\"success\":true}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-31T23:55:38.317Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "backend-log",
+                      "contentType": "text/plain",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/backend-log-83636e35e853019f9f5a2d24995e74d46b185a91.txt"
+                    },
+                    {
+                      "name": "final-ui-0",
+                      "contentType": "text/plain",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/final-ui-0-a6c4274dd220658aaeaa3b7a0cf179d85b67dd24.txt"
+                    },
+                    {
+                      "name": "native-pointer-0",
+                      "contentType": "application/json",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/attachments/native-pointer-0-0c8c1c3a59197823a383513c3d1c8733d254e0d9.json"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/data/worktrees/next-006-010-011-015-2723ff/client/test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts",
+                    "column": 29,
+                    "line": 325
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "f5097fcb6a7072717fb1-37ba05204d5e0bbc3e96",
+          "file": "world-next.spec.ts",
+          "line": 282,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-31T23:51:11.181Z",
+    "duration": 553500.905,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

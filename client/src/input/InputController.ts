@@ -11,6 +11,7 @@ export interface InputActions {
   zoom(delta: number): void;
   interact(): void;
   inventory?(): void;
+  carry(): void;
   menu(): void;
   captured(): void;
   interrupted(): void;
@@ -197,6 +198,11 @@ export class InputController {
     if (event.code === 'Space') { event.preventDefault(); if (!event.repeat && !this.keys.has('Space')) this.actions.jump(); this.keys.add('Space'); this.dirty = true; }
     if (event.code === 'KeyE' && !event.repeat) { event.preventDefault(); this.actions.interact(); }
     if (event.code === 'KeyI' && !event.repeat) { event.preventDefault(); this.actions.inventory?.(); }
+    if (event.code === 'KeyF') {
+      event.preventDefault();
+      if (!event.repeat && !this.keys.has('KeyF')) this.actions.carry();
+      this.keys.add('KeyF'); this.dirty = true;
+    }
   };
 
   private readonly keyUp = (event: KeyboardEvent): void => { this.keys.delete(event.code); };

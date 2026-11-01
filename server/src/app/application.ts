@@ -10,6 +10,7 @@ import { BabylonService } from '../babylon/BabylonService.ts';
 import { createLanguagePort, unavailableLanguagePort } from '../babylon/adapters.ts';
 import type { LanguagePort } from '../babylon/ports.ts';
 import { sqliteBabylon } from '../persistence/babylon.ts';
+import { sqliteWorldLife } from '../persistence/worldLife.ts';
 import { randomId } from '../common/ids.ts';
 import { createAuthService, REVOKE_MESSAGES } from '../auth/AuthService.ts';
 import { createResponder } from '../npc/adapters/index.ts';
@@ -95,7 +96,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
         else babylonLog.warn('babylon.translation.failed', 'Языковая операция BABEL не выполнена', { kind, durationMs });
       },
     });
-    game = await createGame(config, { sessions: auth, players: stores.players, avatars: stores.avatars, equipment: stores.equipment, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing });
+    game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), avatars: stores.avatars, equipment: stores.equipment, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing });
     const runtime = game;
     auth.onRevoked((hashes, reason) => runtime.closeSessions(hashes, REVOKE_MESSAGES[reason]));
     const npcService = npc;

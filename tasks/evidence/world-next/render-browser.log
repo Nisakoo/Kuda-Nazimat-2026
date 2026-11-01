@@ -1,0 +1,71 @@
+
+> educational-world-client@0.1.0 test:render
+> playwright test --config playwright.render.config.ts --reporter=line
+
+
+Running 13 tests using 1 worker
+
+[1/13] e2e/render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner
+  1) e2e/render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 30000ms exceeded.
+
+      23 |   expect(await page.evaluate(() => window.renderHarness.stats().entities)).toContain('dynamic');
+      24 |   expect(await page.evaluate(() => window.renderHarness.stats().instances)).toBe(1);
+    > 25 |   await page.evaluate(() => window.renderHarness.entity(false));
+         |              ^
+      26 |   await expect.poll(() => page.evaluate(() => window.renderHarness.stats().models)).toBe(0);
+      27 |   expect(await page.evaluate(() => window.renderHarness.stats().geometries)).toBe(baseline);
+      28 |   expect(await page.evaluate(() => window.renderHarness.stats().textures)).toBe(baselineTextures);
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:25:14
+
+    Error Context: render-test-results/render-shares-real-GPU-res-3ca83-hen-releases-the-last-owner/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-shares-real-GPU-res-3ca83-hen-releases-the-last-owner/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-shares-real-GPU-res-3ca83-hen-releases-the-last-owner/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[2/13] e2e/render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+  2) e2e/render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+      2 | import { writeFile } from 'node:fs/promises';
+      3 |
+    > 4 | test.beforeEach(async ({ page }) => { await page.goto('/e2e/render-harness.html'); await page.waitForFunction(() => Boolean(window.renderHarness)); });
+        |      ^
+      5 |
+      6 | test('shares real GPU resources across two static groups and a dynamic model, then releases the last owner', async ({ page }) => {
+      7 |   let requests = 0;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:4:6
+
+    Error: page.waitForFunction: Test timeout of 30000ms exceeded.
+
+      2 | import { writeFile } from 'node:fs/promises';
+      3 |
+    > 4 | test.beforeEach(async ({ page }) => { await page.goto('/e2e/render-harness.html'); await page.waitForFunction(() => Boolean(window.renderHarness)); });
+        |                                                                                               ^
+      5 |
+      6 | test('shares real GPU resources across two static groups and a dynamic model, then releases the last owner', async ({ page }) => {
+      7 |   let requests = 0;
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:4:95
+
+    Error Context: render-test-results/render-imports-glTF-with-a-dad59-loned-visuals-across-frames/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-imports-glTF-with-a-dad59-loned-visuals-across-frames/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-imports-glTF-with-a-dad59-loned-visuals-across-frames/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[3/13] e2e/render.spec.ts:43:1 › a failed model load keeps frames running and a fresh attempt succeeds

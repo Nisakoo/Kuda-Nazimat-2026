@@ -3,6 +3,9 @@ import type { Socket } from 'socket.io-client';
 import type { AccessContext, Clock, NetworkAdapter } from './NetworkAdapter';
 import type { ClientMessage, NetworkState, ServerMessage, ServerSession } from '../../../shared/protocol/types.ts';
 import { parseClientMessage, parseServerMessage, parseServerSession, ProtocolError } from '../../../shared/protocol/validate.ts';
+import type { WorldLifeClientMessage, WorldLifeServerMessage } from '../../../shared/world-life/types.ts';
+import { WORLD_LIFE_EVENT } from '../../../shared/world-life/types.ts';
+import { parseWorldLifeClientMessage, parseWorldLifeServerMessage } from '../../../shared/world-life/validate.ts';
 
 export type SocketFactory = (url: string, options: Parameters<typeof io>[1]) => Socket;
 
@@ -15,6 +18,7 @@ export class SocketIOAdapter implements NetworkAdapter {
   private attempts = 0;
   private readonly messages = new Set<(message: ServerMessage) => void>();
   private readonly states = new Set<(state: NetworkState) => void>();
+  private readonly worldLife = new Set<(message: WorldLifeServerMessage) => void>();
   private value: NetworkState = { status: 'unauthorized', error: null };
   constructor(private readonly url: string, private readonly clock: Clock, private readonly factory: SocketFactory = io) {}
   get state(): NetworkState { return this.value; }
@@ -50,6 +54,17 @@ export class SocketIOAdapter implements NetworkAdapter {
         if (message.type === 'error' && message.code === 'UNAUTHORIZED') this.unauthorized(message.message);
         else if (message.type === 'error' && message.code === 'VERSION') this.fatal(message.message);
       } catch (error) { this.fatal(error instanceof ProtocolError ? error.message : 'Ошибка игрового протокола.'); }
+    });
+    socket.on(WORLD_LIFE_EVENT, (raw: unknown) => {
+      if (this.socket !== socket) return;
+      try {
+        const message = parseWorldLifeServerMessage(raw);
+        for (const listener of this.worldLife) listener(message);
+        if (message.type === 'hand-result' && !message.ok) {
+          if (message.code === 'UNAUTHORIZED') this.unauthorized(message.message);
+          else if (message.code === 'VERSION') this.fatal(message.message);
+        }
+      } catch (error) { this.fatal(error instanceof Error ? error.message : 'Ошибка протокола живого мира.'); }
     });
     this.scheduleExpiry();
     this.set('connecting'); socket.connect();
@@ -92,9 +107,22 @@ export class SocketIOAdapter implements NetworkAdapter {
     if (this.socket.sendBuffer.length) { this.socket.sendBuffer.length = 0; return false; }
     return true;
   }
+  sendWorldLife(message: WorldLifeClientMessage): boolean {
+    if (this.disposed || this.value.status !== 'connected' || !this.session) return false;
+    if (this.clock.now() >= this.session.expiresAt) { this.unauthorized(); return false; }
+    if (!this.socket?.connected) return false;
+    const packet = parseWorldLifeClientMessage(message);
+    this.socket.emit(WORLD_LIFE_EVENT, packet);
+    if (this.socket.sendBuffer.length) { this.socket.sendBuffer.length = 0; return false; }
+    return true;
+  }
+  subscribeWorldLife(listener: (message: WorldLifeServerMessage) => void): () => void {
+    if (this.disposed) return () => {};
+    this.worldLife.add(listener); return () => { this.worldLife.delete(listener); };
+  }
   disconnect(): void { this.close(); if (!this.disposed) this.set('disconnected'); }
   subscribe(listener: (message: ServerMessage) => void): () => void { if (this.disposed) return () => {}; this.messages.add(listener); return () => { this.messages.delete(listener); }; }
   subscribeState(listener: (state: NetworkState) => void): () => void { if (this.disposed) return () => {}; this.states.add(listener); listener(this.value); return () => { this.states.delete(listener); }; }
   private set(status: NetworkState['status'], error: string | null = null): void { this.value = Object.freeze({ status, error }); for (const listener of this.states) listener(this.value); }
-  dispose(): void { if (this.disposed) return; this.disconnect(); this.disposed = true; this.messages.clear(); this.states.clear(); }
+  dispose(): void { if (this.disposed) return; this.disconnect(); this.disposed = true; this.messages.clear(); this.states.clear(); this.worldLife.clear(); }
 }

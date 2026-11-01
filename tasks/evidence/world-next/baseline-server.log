@@ -1,0 +1,7 @@
+bash: line 1: make: command not found
+
+> educational-world-server@0.1.0 check
+> tsc -p tsconfig.json && tsc -p ../shared/tsconfig.json && depcruise src --config .dependency-cruiser.cjs
+
+
+✔ no dependency violations found (56 modules, 165 dependencies cruised)

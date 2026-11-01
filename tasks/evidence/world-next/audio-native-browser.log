@@ -1,0 +1,96 @@
+Command: PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium node client/src/audio/browser-smoke.mjs
+Scope: observed run during concurrent implementation; not a final whole-branch acceptance claim.
+
+{
+  "result": "PASS",
+  "browser": "156.0.8078.73",
+  "scope": "Isolated native Web Audio smoke; no physical listening, route integration, or target-hardware qualification",
+  "warm": {
+    "stats": {
+      "sources": 3,
+      "buffers": 7,
+      "pending": 0,
+      "reservedBytes": 1209000,
+      "failures": 0,
+      "unlocked": true,
+      "entities": 1,
+      "streams": 1,
+      "messageIds": 3
+    },
+    "budget": {
+      "bytes": 0,
+      "memory": 1209000,
+      "memoryLimit": 67108864,
+      "peakBytes": 141164,
+      "peakMemory": 1209000,
+      "resources": 10
+    },
+    "starts": 8
+  },
+  "cycles": [
+    {
+      "sources": 0,
+      "buffers": 0,
+      "pending": 0,
+      "reservedBytes": 0,
+      "failures": 0,
+      "unlocked": false,
+      "entities": 0,
+      "streams": 0,
+      "messageIds": 0,
+      "budget": 0
+    },
+    {
+      "sources": 0,
+      "buffers": 0,
+      "pending": 0,
+      "reservedBytes": 0,
+      "failures": 0,
+      "unlocked": false,
+      "entities": 0,
+      "streams": 0,
+      "messageIds": 0,
+      "budget": 0
+    },
+    {
+      "sources": 0,
+      "buffers": 0,
+      "pending": 0,
+      "reservedBytes": 0,
+      "failures": 0,
+      "unlocked": false,
+      "entities": 0,
+      "streams": 0,
+      "messageIds": 0,
+      "budget": 0
+    },
+    {
+      "sources": 0,
+      "buffers": 0,
+      "pending": 0,
+      "reservedBytes": 0,
+      "failures": 0,
+      "unlocked": false,
+      "entities": 0,
+      "streams": 0,
+      "messageIds": 0,
+      "budget": 0
+    },
+    {
+      "sources": 0,
+      "buffers": 0,
+      "pending": 0,
+      "reservedBytes": 0,
+      "failures": 0,
+      "unlocked": false,
+      "entities": 0,
+      "streams": 0,
+      "messageIds": 0,
+      "budget": 0
+    }
+  ],
+  "localAudioRequests": 12,
+  "uniqueAudioFiles": 7,
+  "pageErrors": [],
+  "externalRequests": []
+}

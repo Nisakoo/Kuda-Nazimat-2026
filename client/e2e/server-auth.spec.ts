@@ -16,11 +16,12 @@ async function startServer() {
     const timeout = setTimeout(() => reject(new Error(`Server startup timeout: ${output}`)), 15000);
     const failed = (code: number | null) => { clearTimeout(timeout); reject(new Error(`Server exited ${code}: ${output}`)); };
     processHandle.once('exit', failed);
-    processHandle.stderr!.on('data', (chunk) => { output += String(chunk); });
-    processHandle.stdout!.on('data', (chunk) => {
+    const ready = (chunk: Buffer) => {
       output += String(chunk);
-      if (output.includes('Сервер доступен')) { clearTimeout(timeout); processHandle.off('exit', failed); resolve(); }
-    });
+      if (output.includes('(app.ready)')) { clearTimeout(timeout); processHandle.off('exit', failed); resolve(); }
+    };
+    processHandle.stderr!.on('data', ready);
+    processHandle.stdout!.on('data', ready);
   });
 }
 async function stopServer() {

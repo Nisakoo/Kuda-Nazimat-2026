@@ -1,0 +1,5 @@
+Карта готова { mapId: 'market', worldBytes: 21088824, chunks: 1024 }
+Карта готова { mapId: 'demo', worldBytes: 18697328, chunks: 1024 }
+Карта готова { mapId: 'science', worldBytes: 18697332, chunks: 1024 }
+Сервер доступен { url: 'http://localhost:46335/' }
+STARTUP_MS 10506.734827

@@ -20,7 +20,20 @@ export function openDatabase(path: string, now = Date.now()): DatabaseSync {
   try {
     db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 1000');
     const migrations = loadMigrations();
-    transaction(db, () => applyMigrations(db, migrations, now));
+    transaction(db, () => {
+      // Before merging main, the world-life branch used version 3 for apples.
+      // Preserve its data while assigning main's auth schema to 3 and world-life to 4.
+      const table = (name: string) => db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?").get(name);
+      if (table('schema_migrations') && table('world_apples') && table('world_hand_receipts')
+        && !db.prepare('PRAGMA table_info(accounts)').all().some(column => column.name === 'password_hash')) {
+        const versions = db.prepare('SELECT version FROM schema_migrations ORDER BY version').all();
+        if (versions.length !== 3 || versions.some((row, index) => row.version !== index + 1)) throw new Error('Неизвестная версия legacy world-life БД');
+        db.exec(migrations[2]!.sql);
+        db.prepare('UPDATE schema_migrations SET version = 4 WHERE version = 3').run();
+        db.prepare('INSERT INTO schema_migrations(version, applied_at) VALUES (3, ?)').run(now);
+      }
+      applyMigrations(db, migrations, now);
+    });
     return db;
   } catch (error) { db.close(); throw new Error(`Не удалось открыть БД ${path}`, { cause: error }); }
 }

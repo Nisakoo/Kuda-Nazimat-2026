@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { browserTestOrigin } from '../playwright.settings';
 import type { Page } from '@playwright/test';
 import { expectCapture, resume } from './helpers';
 
@@ -18,7 +19,7 @@ test('walks to both NPCs, opens local dialogue, blocks movement and changes came
   page.on('request', (request) => requests.push(request.url()));
   await page.route('**/*', (route) => {
     const url = new URL(route.request().url());
-    if (url.origin !== 'http://127.0.0.1:4173') return route.abort();
+    if (url.origin !== browserTestOrigin) return route.abort();
     if (url.pathname === '/config.json') return route.fulfill({ json: { debug: true } });
     return route.continue();
   });
@@ -70,7 +71,7 @@ test('walks to both NPCs, opens local dialogue, blocks movement and changes came
   expect(after.equals(before)).toBe(false);
   await page.screenshot({ path: 'test-results/demo-gameplay.png' });
   expect(errors).toEqual([]);
-  expect(requests.every((url) => new URL(url).origin === 'http://127.0.0.1:4173')).toBe(true);
+  expect(requests.every((url) => new URL(url).origin === browserTestOrigin)).toBe(true);
 });
 
 test('pauses, clears held keys on blur, restarts and returns to the welcome screen', async ({ page }) => {

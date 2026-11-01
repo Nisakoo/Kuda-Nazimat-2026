@@ -1,0 +1,222 @@
+
+Running 2 tests using 1 worker
+
+[1/2] e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+NEXT backend 2026-10-31T23:35:32.928Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+
+NEXT backend 2026-10-31T23:35:32.931Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:35:32.931Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:35:32.931Z INFO [app] Сервер доступен {"url":"http://localhost:46563/"}
+
+NEXT pointer probe {"kind":"request","at":29093.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":29302.59999999404,"focus":true,"visibility":"visible","active":true,"durationMs":199.59999999403954}
+
+NEXT pointer probe {"kind":"resolve","at":30542.79999998212,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":32035.19999998808,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":40030.5,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT backend 2026-10-31T23:36:32.920Z INFO [game] Длительность шага, мс {"p50":0.217,"p95":1.065,"max":70.355,"players":2}
+
+NEXT pointer probe {"kind":"request","at":46112.59999999404,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":46355.5,"focus":true,"visibility":"visible","active":true,"durationMs":223}
+
+NEXT pointer probe {"kind":"resolve","at":51910.59999999404,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":54483.19999998808,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"visibility","at":98911.5,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":99696.5,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":99453.20000001788,"focus":true,"visibility":"hidden","active":true}
+
+  1) e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+
+    TimeoutError: locator.click: Timeout 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Начать прогулку' })
+        - locator resolved to <button class="primary large">…</button>
+      - attempting click action
+        - waiting for element to be visible, enabled and stable
+        - element is not stable
+      - retrying click action
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - <section class="welcome glass" aria-labelledby="scene-title">…</section> intercepts pointer events
+      - retrying click action
+        - waiting 20ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - performing click action
+
+
+      153 |   }
+      154 |   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
+    > 155 |   await page.bringToFront(); await page.getByRole('button', { name: 'Начать прогулку' }).click();
+          |                                                                                          ^
+      156 |   await expectCapture(page, true);
+      157 | }
+      158 | async function position(page: Page) {
+        at login (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:155:90)
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:205:54
+
+    attachment #1: backend-log (text/plain) ────────────────────────────────────────────────────────
+    2026-10-31T23:35:32.928Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+    2026-10-31T23:35:32.931Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+    2026-10-31T23:35:32.931Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chu...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final-ui-0 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Подключён
+    Настройки
+    Меню Esc
+
+    ВАВИЛОН
+
+    Пастбище у рынка
+
+    Козы пастуха · 0/4
+
+    X 0.0 · Z -26.0 · Y 0.0
+
+    Модели: 3 · Экземпляры: 3
+
+    29802096 / 67108864 байт памяти · Чанки: 1 · Ожидание: 0 · Отложено: 0
+
+    FPS 0.7 · Кадр 1521.4 ms · P95 2203.9 ms · CPU 59.5 ms
+
+    Draw 304 · Ге...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: final-ui-1 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Подключён
+    Настройки
+    Меню Esc
+
+    ВАВИЛОН
+
+    Рынок Вавилона
+
+    Козы пастуха · 0/4
+
+    X 0.0 · Z 8.0 · Y 0.0
+
+    Модели: 8 · Экземпляры: 20
+
+    55623280 / 67108864 байт памяти · Чанки: 5 · Ожидание: 2 · Отложено: 0
+
+    FPS 0.5 · Кадр 2185.6 ms · P95 3306.7 ms · CPU 95.1 ms
+
+    Draw 480 · Геоме...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: final-ui-2 (text/plain) ─────────────────────────────────────────────────────────
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #8: final-ui-3 (text/plain) ─────────────────────────────────────────────────────────
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+
+[2/2] e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+NEXT backend 2026-10-31T23:37:23.284Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+
+NEXT backend 2026-10-31T23:37:23.288Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:37:23.288Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:37:23.291Z INFO [app] Сервер доступен {"url":"http://localhost:37591/"}
+
+NEXT pointer probe {"kind":"request","at":27517.59999999404,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":27843.69999998808,"focus":true,"visibility":"visible","active":true,"durationMs":315.7000000178814}
+
+NEXT pointer probe {"kind":"resolve","at":29900,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":32102.69999998808,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":52535.29999998212,"focus":true,"visibility":"visible","active":false,"locked":false}
+
+NEXT backend 2026-10-31T23:38:23.247Z INFO [game] Длительность шага, мс {"p50":0.248,"p95":0.998,"max":11.925,"players":1}
+
+  2) e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+
+    TimeoutError: locator.click: Timeout 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Настройки', exact: true })
+        - locator resolved to <button class="secondary">Настройки</button>
+      - attempting click action
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - performing click action
+
+
+      294 |   await login(page, 'NEXT audio', '1');
+      295 |   await page.keyboard.press('Escape');
+    > 296 |   await page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Настройки', exact: true }).click();
+          |                                                                                                             ^
+      297 |   const volume = page.getByRole('slider', { name: 'Громкость', exact: true });
+      298 |   await expect(volume).toHaveValue('30');
+      299 |   await volume.focus(); await page.keyboard.press('Home');
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:296:109
+
+    attachment #1: backend-log (text/plain) ────────────────────────────────────────────────────────
+    2026-10-31T23:37:23.284Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+    2026-10-31T23:37:23.288Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+    2026-10-31T23:37:23.288Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chu...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: final-ui-0 (text/plain) ─────────────────────────────────────────────────────────
+    ◈
+    Мир знаний
+    Локальный сервер
+    Подключён
+    Настройки
+    Меню Esc
+
+    ВАВИЛОН
+
+    Рынок Вавилона
+
+    Козы пастуха · 0/4
+
+    X 0.0 · Z 8.0 · Y 0.0
+
+    Модели: 9 · Экземпляры: 33
+
+    57196144 / 67108864 байт памяти · Чанки: 11 · Ожидание: 2 · Отложено: 0
+
+    FPS 0.5 · Кадр 2175.6 ms · P95 3093.8 ms · CPU 57.0 ms
+
+    Draw 670 · Геом...
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+
+  2 failed
+    e2e/world-next.spec.ts:195:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+    e2e/world-next.spec.ts:272:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts

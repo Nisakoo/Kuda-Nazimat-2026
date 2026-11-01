@@ -13,8 +13,9 @@ async function start() {
   await new Promise<void>((done, reject) => {
     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 15000);
     child.once('exit', code => { clearTimeout(timeout); reject(new Error(`Server exited ${code}: ${output}`)); });
-    child.stderr!.on('data', data => { output += data; });
-    child.stdout!.on('data', data => { output += data; if (output.includes('Сервер доступен')) { clearTimeout(timeout); done(); } });
+    const ready = (data: Buffer) => { output += data; if (output.includes('(app.ready)')) { clearTimeout(timeout); done(); } };
+    child.stderr!.on('data', ready);
+    child.stdout!.on('data', ready);
   });
 }
 async function stop() { if (child?.exitCode !== null || child?.signalCode) return; const exited = once(child, 'exit'); child.kill('SIGTERM'); const timer = setTimeout(() => child.kill('SIGKILL'), 11000); const [code] = await exited; clearTimeout(timer); expect(code).toBe(0); }

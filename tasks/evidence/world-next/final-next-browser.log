@@ -1,0 +1,27 @@
+
+Running 2 tests using 1 worker
+
+[1/2] e2e/world-next.spec.ts:162:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+  1) e2e/world-next.spec.ts:162:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+
+    Error: Server exited 1: 2026-10-31T22:50:07.569Z ERROR [app] NPC history-guide: неизвестная карта demo
+
+
+      92 |   await new Promise<void>((done, reject) => {
+      93 |     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 60000);
+    > 94 |     child.once('exit', code => { clearTimeout(timeout); reject(new Error(`Server exited ${code}: ${output}`)); });
+         |                                                                ^
+      95 |     child.stderr!.on('data', data => { output += data; });
+      96 |     child.stdout!.on('data', data => { output += data; if (output.includes('Сервер доступен')) { serverReady = true; clearTimeout(timeout); done(); } });
+      97 |   });
+        at ChildProcess.<anonymous> (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:94:64)
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+
+[2/2] e2e/world-next.spec.ts:238:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+  1 failed
+    e2e/world-next.spec.ts:162:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+  1 did not run

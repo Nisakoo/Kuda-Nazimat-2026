@@ -1,0 +1,49 @@
+[WebServer] (node:75705) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 14 tests using 1 worker
+
+(node:75707) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/14] e2e/render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner
+[2/14] e2e/render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+[3/14] e2e/render.spec.ts:43:1 › a failed model load keeps frames running and a fresh attempt succeeds
+[4/14] e2e/render.spec.ts:54:1 › unloading while HTTP is pending prevents a late visual from appearing
+[5/14] e2e/render.spec.ts:67:1 › NEXT data-only catalogue placement shares duplicate prefabs and releases their owners
+[6/14] e2e/render.spec.ts:80:1 › NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners
+[7/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from front
+Render cadence: {"requestedFps":30,"simulatedFrames":121,"seconds":4.043200000047683,"actualFps":29.92679066050974,"completed":true}
+
+[8/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from side
+Render cadence: {"requestedFps":30,"simulatedFrames":121,"seconds":4.048799999952316,"actualFps":29.88539814301152,"completed":true}
+
+[9/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from front
+Render cadence: {"requestedFps":60,"simulatedFrames":241,"seconds":4.0316000000238414,"actualFps":59.77775572938159,"completed":true}
+
+[10/14] e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from side
+Render cadence: {"requestedFps":60,"simulatedFrames":241,"seconds":4.047899999976158,"actualFps":59.53704389965648,"completed":true}
+
+[11/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front
+Render cadence: {"requestedFps":30,"simulatedFrames":121,"seconds":4.048299999952317,"actualFps":29.889089247690443,"completed":true}
+
+[12/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from side
+Render cadence: {"requestedFps":30,"simulatedFrames":121,"seconds":4.0495,"actualFps":29.880232127423138,"completed":true}
+
+[13/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from front
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from front
+Render cadence: {"requestedFps":60,"simulatedFrames":241,"seconds":4.0325,"actualFps":59.764414135151895,"completed":true}
+
+[14/14] e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from side
+e2e/render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from side
+Render cadence: {"requestedFps":60,"simulatedFrames":241,"seconds":4.031200000047684,"actualFps":59.78368723882449,"completed":true}
+
+  14 passed (41.9s)

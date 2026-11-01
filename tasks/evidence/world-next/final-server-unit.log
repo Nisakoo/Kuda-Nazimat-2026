@@ -1,0 +1,55 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/next-006-010-011-015-2723ff[39m
+
+ [32m✓[39m server/test/babylon.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 4172[2mms[22m[39m
+   [33m[2m✓[22m[39m persists immutable group stones, deduplicates retries and rejects a changed request body [33m 545[2mms[22m[39m
+   [33m[2m✓[22m[39m validates authoritative location and role, keeps wrong food, completes solo and persists inventory [33m 667[2mms[22m[39m
+   [33m[2m✓[22m[39m translates per recipient, skips matching languages and fixes languages for an accepted request [33m 522[2mms[22m[39m
+   [33m[2m✓[22m[39m four roles share one FIFO with legacy NPC work, reject a second generation per player and preserve privacy [33m 314[2mms[22m[39m
+   [33m[2m✓[22m[39m bounds the dictionary, keeps editing possible at capacity and acknowledges the role spawn once [33m 1199[2mms[22m[39m
+ [32m✓[39m server/test/a-realtime.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 3742[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a missing token and a wrong protocol version [33m 683[2mms[22m[39m
+     [33m[2m✓[22m[39m joins with a valid snapshot and bootstrap, then syncs movement through deltas [33m 2621[2mms[22m[39m
+ [32m✓[39m server/test/world-life-realtime.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 9744[2mms[22m[39m
+   [33m[2m✓[22m[39m real HTTP auth, 4 BABEL roles, world-life sockets, pickup race, lost reply, takeover and durable restart agree [33m 9739[2mms[22m[39m
+ [32m✓[39m server/test/a-real-world.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 12295[2mms[22m[39m
+     [33m[2m✓[22m[39m loads market/demo/science with server NPC content and matches the client bootstrap byte for byte [33m 6345[2mms[22m[39m
+     [33m[2m✓[22m[39m MOVE: prepared ceilings in all three real maps stop an otherwise reachable jump [33m 5925[2mms[22m[39m
+ [32m✓[39m server/test/integration.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 8709[2mms[22m[39m
+   [33m[2m✓[22m[39m real HTTP auth, join, private world, periodic/grace save and NPC commit work together [33m 1887[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 jump/sprint are authoritative over a real socket; takeover and a released seat preserve stamina and SQLite saves support [33m 1366[2mms[22m[39m
+   [33m[2m✓[22m[39m BABEL HTTP requires auth and the controlling seat, rejects forged ownership and cannot commit after takeover [33m 1049[2mms[22m[39m
+   [33m[2m✓[22m[39m session expiry closes the real socket and rejects protected HTTP and old tokens [33m 1336[2mms[22m[39m
+   [33m[2m✓[22m[39m takeover cancels a running NPC answer before SQLite commit and preserves the player [33m 1360[2mms[22m[39m
+   [33m[2m✓[22m[39m failed responder startup leaves real movement and chat available with a degraded health status [33m 1033[2mms[22m[39m
+   [33m[2m✓[22m[39m an enrolled BABEL player can still use legacy chat and NPCs on the old maps [33m 635[2mms[22m[39m
+ [32m✓[39m server/test/contracts.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 7517[2mms[22m[39m
+   [33m[2m✓[22m[39m import rules reject a forbidden IO dependency in the domain [33m 7398[2mms[22m[39m
+ [32m✓[39m server/test/application.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 4246[2mms[22m[39m
+   [33m[2m✓[22m[39m assembles exclusively through the frozen contract, restarts with memory and saves on stop [33m 620[2mms[22m[39m
+   [33m[2m✓[22m[39m inspect reads a running WAL database without secrets and backup restores a separate copy [33m 2057[2mms[22m[39m
+   [33m[2m✓[22m[39m SIGTERM closes the process within ten seconds after saving through PlayerStore [33m 1460[2mms[22m[39m
+ [32m✓[39m server/test/building-height.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 4959[2mms[22m[39m
+   [33m[2m✓[22m[39m authoritative market movement climbs the real stair, respects its rails and descends to the courtyard [33m 4942[2mms[22m[39m
+ [32m✓[39m server/test/world-life.test.ts [2m([22m[2m27 tests[22m[2m)[22m[33m 1549[2mms[22m[39m
+ [32m✓[39m server/test/platform.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 2791[2mms[22m[39m
+     [33m[2m✓[22m[39m migrates with WAL/FK/FTS5, restores identity, positions and private history [33m 654[2mms[22m[39m
+     [33m[2m✓[22m[39m backs up a live WAL database and recovers after SIGKILL [33m 321[2mms[22m[39m
+   [33m[2m✓[22m[39m serves public UI/config, strict guest login, protected world and allowlisted CORS without secrets [33m 799[2mms[22m[39m
+   [33m[2m✓[22m[39m the 52nd NPC answer is unavailable when SQLite fails, retaining exactly 50 committed records [33m 676[2mms[22m[39m
+ [32m✓[39m server/test/movement.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 687[2mms[22m[39m
+ [32m✓[39m server/test/migrations.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 239[2mms[22m[39m
+ [32m✓[39m server/test/a-world.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 488[2mms[22m[39m
+ [32m✓[39m server/test/npc.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 322[2mms[22m[39m
+ [32m✓[39m server/test/a-shared-protocol.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+ [32m✓[39m server/test/height.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 78[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m16 passed[39m[22m[90m (16)[39m
+[2m      Tests [22m [1m[32m159 passed[39m[22m[90m (159)[39m
+[2m   Start at [22m 22:08:41
+[2m   Duration [22m 105.79s[2m (transform 8.68s, setup 0ms, import 19.80s, tests 61.66s, environment 12ms)[22m

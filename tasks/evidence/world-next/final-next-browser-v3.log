@@ -1,0 +1,144 @@
+
+Running 2 tests using 1 worker
+
+[1/2] e2e/world-next.spec.ts:164:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+e2e/world-next.spec.ts:164:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+NEXT pointer probe {"kind":"request","at":23448.80000001192,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":23659.70000001788,"focus":true,"visibility":"visible","active":true,"durationMs":204.39999997615814}
+
+NEXT pointer probe {"kind":"resolve","at":24679.30000001192,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":25992.59999999404,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":29147.90000000596,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":53006.80000001192,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":53021.80000001192,"focus":true,"visibility":"visible","active":true,"durationMs":11.900000005960464}
+
+NEXT pointer probe {"kind":"resolve","at":54196.30000001192,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":55708.20000001788,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":67522.60000002384,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":78931.19999998808,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":78946.29999998212,"focus":true,"visibility":"visible","active":true,"durationMs":14.099999994039536}
+
+NEXT pointer probe {"kind":"resolve","at":81714.89999997616,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":83968.59999999404,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":105487,"focus":true,"visibility":"visible","active":false,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":30619.69999998808,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":30636,"focus":true,"visibility":"visible","active":true,"durationMs":9.800000011920929}
+
+NEXT pointer probe {"kind":"resolve","at":31646.5,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":32948.59999999404,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":35845.79999998212,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":209805.40000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"resolve","at":209820.90000000596,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":209833.70000001788,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"visibility","at":602543.2000000179,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":506092.39999997616,"focus":true,"visibility":"hidden","active":true}
+
+NEXT pointer probe {"kind":"visibility","at":400426,"focus":true,"visibility":"hidden","active":true}
+
+  1) e2e/world-next.spec.ts:164:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+
+    Test timeout of 600000ms exceeded.
+
+    Error: keyboard.down: Test timeout of 600000ms exceeded.
+
+      149 |     const here = (await position(page))[axis]; if (Math.abs(here - target) <= .35) return;
+      150 |     const key = axis === 'x' ? (here < target ? 'd' : 'a') : (here < target ? 's' : 'w');
+    > 151 |     await page.keyboard.down(key); await page.waitForTimeout(Math.max(100, Math.min(220, Math.abs(here - target) / 3 * 1000)));
+          |                         ^
+      152 |     await page.keyboard.up(key); await page.waitForTimeout(120);
+      153 |   }
+      154 |   throw new Error(`Blocked at ${JSON.stringify(await position(page))}, ${axis}=${target}`);
+        at walk (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:151:25)
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:194:76
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+    Error Context: test-results/world-next-NEXT-four-real--ed0d2-rable-apple-without-repeats/error-context.md
+
+
+[2/2] e2e/world-next.spec.ts:240:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+e2e/world-next.spec.ts:240:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+NEXT pointer probe {"kind":"request","at":14566.59999999404,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":14760.40000000596,"focus":true,"visibility":"visible","active":true,"durationMs":192.7999999821186}
+
+NEXT pointer probe {"kind":"resolve","at":15788.299999982119,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":16784,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":21444.09999999404,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"request","at":15356.699999988079,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"audio-init","at":15371.199999988079,"focus":true,"visibility":"visible","active":true,"durationMs":13.700000017881393}
+
+NEXT pointer probe {"kind":"resolve","at":16471.899999976158,"focus":true,"visibility":"visible","active":true}
+
+NEXT pointer probe {"kind":"change","at":17490,"focus":true,"visibility":"visible","active":true,"locked":true}
+
+NEXT pointer probe {"kind":"change","at":28163.29999998212,"focus":true,"visibility":"visible","active":true,"locked":false}
+
+NEXT pointer probe {"kind":"visibility","at":554719.8999999762,"focus":true,"visibility":"hidden","active":true}
+
+  2) e2e/world-next.spec.ts:240:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts
+
+    Test timeout of 600000ms exceeded.
+
+    Error: locator.click: Test timeout of 600000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+        - locator resolved to <button disabled>Продолжить</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+          - waiting 100ms
+        859 × waiting for element to be visible, enabled and stable
+            - element is not enabled
+          - retrying click action
+            - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+
+
+      158 |   await releaseOtherCaptures(page);
+      159 |   await page.bringToFront();
+    > 160 |   if (!await page.evaluate(() => Boolean(document.pointerLockElement))) await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
+          |                                                                                                                                             ^
+      161 |   await expectCapture(page, true);
+      162 | }
+      163 |
+        at resume (/data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:160:141)
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/world-next.spec.ts:278:87
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+    Error Context: test-results/world-next-NEXT-audio-real-8d634-and-five-lifecycle-restarts/error-context.md
+
+
+  2 failed
+    e2e/world-next.spec.ts:164:1 › NEXT: four real roles share the scene; physical F carries one durable apple without repeats
+    e2e/world-next.spec.ts:240:1 › NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, and five lifecycle restarts

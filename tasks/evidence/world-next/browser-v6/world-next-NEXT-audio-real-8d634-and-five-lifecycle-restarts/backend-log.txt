@@ -1,0 +1,9 @@
+2026-10-31T23:55:42.548Z INFO [app] Карта готова {"mapId":"market","worldBytes":21088910,"chunks":1024}
+2026-10-31T23:55:42.552Z INFO [app] Карта готова {"mapId":"demo","worldBytes":18697328,"chunks":1024}
+2026-10-31T23:55:42.552Z INFO [app] Карта готова {"mapId":"science","worldBytes":18697332,"chunks":1024}
+2026-10-31T23:55:42.552Z INFO [app] Сервер доступен {"url":"http://localhost:36693/"}
+2026-10-31T23:56:42.532Z INFO [game] Длительность шага, мс {"p50":0.25,"p95":1.12,"max":30.433,"players":1}
+2026-10-31T23:57:42.534Z INFO [game] Длительность шага, мс {"p50":0.203,"p95":0.779,"max":24.902,"players":1}
+2026-10-31T23:58:42.580Z INFO [game] Длительность шага, мс {"p50":0.231,"p95":0.987,"max":12.719,"players":1}
+2026-10-31T23:59:42.581Z INFO [game] Длительность шага, мс {"p50":0.207,"p95":0.834,"max":20.093,"players":1}
+2026-10-31T23:59:59.631Z INFO [app] BABEL language operation {"kind":"chat","durationMs":23,"success":true}

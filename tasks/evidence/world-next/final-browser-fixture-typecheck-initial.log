@@ -1,0 +1,2 @@
+client/e2e/world-next.spec.ts(87,43): error TS18048: 'self.transform' is possibly 'undefined'.
+client/e2e/world-next.spec.ts(87,73): error TS18048: 'self.transform' is possibly 'undefined'.

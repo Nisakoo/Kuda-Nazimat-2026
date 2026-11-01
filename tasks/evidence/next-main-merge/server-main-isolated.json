@@ -1,0 +1,21 @@
+{
+  "baseRevision": "09fd771",
+  "node": "v24.15.0",
+  "players": 4,
+  "durationMs": 61000,
+  "startupMs": 570.61,
+  "backend": "real generated world and temporary SQLite; explicit test LLM",
+  "steps": [
+    {
+      "p50": 0.412,
+      "p95": 1.935,
+      "max": 2.807,
+      "broadcastP95": 101.328,
+      "players": 4
+    }
+  ],
+  "deltas": 2439,
+  "scenePackets": 0,
+  "errors": [],
+  "targetHardware": "darwin/arm64; browser GPU measured separately"
+}

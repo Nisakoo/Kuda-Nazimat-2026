@@ -185,8 +185,10 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     const { token } = (await post('/api/auth/dev', {})).body as { token: string };
     const client = await connect(token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
     const headers = { Authorization: `Bearer ${token}` };
-    const statuses: number[] = [];
-    for (let i = 0; i < 400; i++) statuses.push((await fetch(`${origin}/world/maps/test/manifest.json`, { method: 'HEAD', headers })).status);
+    // A flood must arrive concurrently: sequential requests on a busy machine can be
+    // slower than the refill rate and never exercise the limiter.
+    const statuses = await Promise.all(Array.from({ length: 400 }, async () =>
+      (await fetch(`${origin}/world/maps/test/manifest.json`, { method: 'HEAD', headers })).status));
     expect(statuses.filter((s) => s === 200).length).toBeGreaterThanOrEqual(300); expect(statuses).toContain(429);
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect((await fetch(`${origin}/world/maps/test/manifest.json`, { headers })).status).toBe(200);

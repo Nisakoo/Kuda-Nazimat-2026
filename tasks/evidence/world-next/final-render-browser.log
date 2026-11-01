@@ -1,0 +1,78 @@
+
+> educational-world-client@0.1.0 test:render
+> playwright test --config playwright.render.config.ts --reporter=line --timeout=120000
+
+
+Running 13 tests using 1 worker
+
+[1/13] e2e/render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner
+[2/13] e2e/render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+  1) e2e/render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+
+    Error: Object with guid response@f64a283fec3a531d6d2f88d5f0cbfafb was not bound in the connection
+
+    Error Context: render-test-results/render-imports-glTF-with-a-dad59-loned-visuals-across-frames/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-imports-glTF-with-a-dad59-loned-visuals-across-frames/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-imports-glTF-with-a-dad59-loned-visuals-across-frames/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[3/13] e2e/render.spec.ts:43:1 › a failed model load keeps frames running and a fresh attempt succeeds
+  2) e2e/render.spec.ts:43:1 › a failed model load keeps frames running and a fresh attempt succeeds
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 120000ms exceeded.
+
+      47 |   expect(await page.evaluate(() => window.renderHarness.stats().errors.length)).toBe(1);
+      48 |   const frames = await page.evaluate(() => window.renderHarness.stats().frames);
+    > 49 |   expect(await page.evaluate(() => window.renderHarness.load('west'))).toBe('ready');
+         |                     ^
+      50 |   expect(await page.evaluate(() => window.renderHarness.stats().frames)).toBeGreaterThan(frames);
+      51 |   expect(await page.evaluate(() => window.renderHarness.stats().errors)).toEqual([]);
+      52 | });
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:49:21
+
+    Error Context: render-test-results/render-a-failed-model-load-993d7-nd-a-fresh-attempt-succeeds/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-a-failed-model-load-993d7-nd-a-fresh-attempt-succeeds/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-a-failed-model-load-993d7-nd-a-fresh-attempt-succeeds/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[4/13] e2e/render.spec.ts:54:1 › unloading while HTTP is pending prevents a late visual from appearing
+[5/13] e2e/render.spec.ts:67:1 › NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners
+  3) e2e/render.spec.ts:67:1 › NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation.
+
+      67 | test('NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners', async ({ page }, testInfo) => {
+      68 |   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+    > 69 |   await page.evaluate(() => window.renderHarness.lifeFrame('cats'));
+         |              ^
+      70 |   await expect.poll(() => page.evaluate(() => window.renderHarness.stats().pending)).toBe(0);
+      71 |   await expect.poll(() => page.evaluate(() => window.renderHarness.stats().entities.filter(id => id.startsWith('cat-')).length)).toBe(3);
+      72 |   await page.screenshot({ path: testInfo.outputPath('three-cat-states.png') });
+        at /data/worktrees/next-006-010-011-015-2723ff/client/e2e/render.spec.ts:69:14
+
+    Error Context: render-test-results/render-NEXT-shared-scene-f-9d0ae-eases-unloaded-chunk-owners/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    render-test-results/render-NEXT-shared-scene-f-9d0ae-eases-unloaded-chunk-owners/trace.zip
+    Usage:
+
+        npx playwright show-trace render-test-results/render-NEXT-shared-scene-f-9d0ae-eases-unloaded-chunk-owners/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[6/13] e2e/render.spec.ts:87:107 › MOVE poses › four player poses at 30 FPS from front

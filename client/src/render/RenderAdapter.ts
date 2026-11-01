@@ -1,4 +1,5 @@
 import type { EntityId, Transform, WorldSnapshot } from '../core/types';
+import type { SceneStateMessage } from '../../../shared/world-life/types.ts';
 
 export interface CameraView { readonly yaw: number; readonly pitch: number; readonly distance: number; readonly focusHeight?: number; readonly fieldOfView?: number }
 export interface VisualChunk {
@@ -25,6 +26,8 @@ export interface RenderAdapter {
   syncWorld(previous: WorldSnapshot, current: WorldSnapshot, playerId: EntityId | null): void;
   setCamera(view: CameraView): void;
   setBuildingSymbols(visible: boolean): void;
+  /** Validated, authoritative market scene. Null releases all world-life visuals and hand attachments. */
+  setSceneState(state: SceneStateMessage | null): void;
   registerModels(models: Readonly<Record<string, string>>): void;
   loadChunk(chunk: VisualChunk): Promise<void>;
   unloadChunk(id: string): void;

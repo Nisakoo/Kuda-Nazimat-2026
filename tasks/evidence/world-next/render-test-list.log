@@ -1,0 +1,16 @@
+Listing tests:
+  render.spec.ts:6:1 › shares real GPU resources across two static groups and a dynamic model, then releases the last owner
+  render.spec.ts:33:1 › imports glTF with a local external buffer and spreads many cloned visuals across frames
+  render.spec.ts:43:1 › a failed model load keeps frames running and a fresh attempt succeeds
+  render.spec.ts:54:1 › unloading while HTTP is pending prevents a late visual from appearing
+  render.spec.ts:67:1 › NEXT data-only catalogue placement shares duplicate prefabs and releases their owners
+  render.spec.ts:80:1 › NEXT shared-scene fixture renders three cats and one flock, then releases unloaded chunk owners
+  render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from front
+  render.spec.ts:100:107 › MOVE poses › four player poses at 30 FPS from side
+  render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from front
+  render.spec.ts:100:107 › MOVE poses › four player poses at 60 FPS from side
+  render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from front
+  render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 30 FPS from side
+  render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from front
+  render.spec.ts:100:107 › MOVE poses › four player pickup-carry-place at 60 FPS from side
+Total: 14 tests in 1 file

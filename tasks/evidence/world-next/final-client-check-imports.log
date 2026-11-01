@@ -1,0 +1,6 @@
+
+> educational-world-client@0.1.0 check:imports
+> depcruise src --config .dependency-cruiser.cjs
+
+
+✔ no dependency violations found (126 modules, 397 dependencies cruised)
