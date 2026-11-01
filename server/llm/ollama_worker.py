@@ -547,7 +547,7 @@ class OllamaWorker:
         if translation:
             return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True, translation=True)
         if request.get('locale') in ('en', 'es'):
-            return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True, target=True)
+            return self.generate(prompt, 256, timeout=timeout, expected_tokens=tokens, progress=True, target=True)
         return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True)
 
     def stop(self):
