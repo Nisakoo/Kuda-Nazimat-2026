@@ -28,7 +28,7 @@
     capture: 'idle', captureError: null,
     visualLoading: false, visualError: null, modelStats: '',
     worldReady: false, worldWaiting: false, region: 'Площадь открытий', cacheStats: '', chunkRadius: 1,
-    authRequired: false, authPending: false, authError: null, authName: '',
+    authRequired: false, authPending: false, authError: null, authName: '', authChangeRequired: false, authRevision: 0,
     mapId: 'demo', mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null,
     performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
@@ -73,7 +73,7 @@
   </header>
 
   {#if !error && game && snapshot.authRequired}
-    <Login pending={snapshot.authPending} error={snapshot.authError} initialName={snapshot.authName} login={(name) => game.login(name)} loginPassword={(name, password) => game.loginPassword(name, password)} register={(name, password) => game.register(name, password)} />
+    {#key snapshot.authRevision}<Login pending={snapshot.authPending} error={snapshot.authError} initialName={snapshot.authName} changeRequired={snapshot.authChangeRequired} discoverMode={(signal) => game.discoverAuth(signal)} login={(name, action, password, next) => game.login(name, action, password, next)} />{/key}
   {/if}
 
   {#if !error && game && snapshot.screen === 'welcome' && !snapshot.entryStage && !snapshot.authRequired && snapshot.babylonPanel !== 'setup'}
@@ -92,7 +92,7 @@
       {#if snapshot.captureError || snapshot.capture === 'requesting'}<button class="secondary capture-exit" onclick={() => game.leaveWorld()}>На главный экран</button>{/if}
       {#if snapshot.market}<button class="secondary capture-exit" onclick={() => game.openMarketPanel('intro')}>О мире и управлении</button>{/if}
 
-      <p class="small subtle">{snapshot.mode === 'online' ? 'Позиция и история разговоров сохраняются на сервере.' : 'Демо работает локально. Учебные ответы подготовлены заранее.'}</p>
+      <p class="small subtle">{snapshot.mode === 'online' ? 'Позиция сохраняется на сервере. Память NPC связана с текущей сессией входа.' : 'Демо работает локально. Учебные ответы подготовлены заранее.'}</p>
     </section>
   {/if}
 

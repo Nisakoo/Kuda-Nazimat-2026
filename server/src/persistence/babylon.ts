@@ -1,4 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite';
+import type { NpcReply } from '../../../shared/babylon/types.ts';
 import type { BabylonStore, Profile, Party, Operation } from '../babylon/ports.ts';
 import { transaction } from './database.ts';
 
@@ -8,6 +9,22 @@ export function sqliteBabylon(db: DatabaseSync): BabylonStore {
   const operation = db.prepare('SELECT state FROM babel_operations WHERE player_id = ? AND request_id = ?');
   const parse = <T>(row: Record<string, unknown> | undefined): T | null => row ? JSON.parse(String(row.state)) as T : null;
   return {
+    npcReplies(playerId, sessionId, npcId) {
+      if (!sessionId) return [];
+      return db.prepare('SELECT state FROM babel_npc_dialogue WHERE player_id = ? AND session_id = ? AND (? IS NULL OR npc_id = ?) ORDER BY id')
+        .all(playerId, sessionId, npcId ?? null, npcId ?? null).map(row => JSON.parse(String(row.state)) as NpcReply);
+    },
+    appendNpcReply(playerId, sessionId, reply) {
+      if (!sessionId) throw new Error('Missing AUTH scope');
+      // Called inside the operation transaction. Temporary inherited aggregate 50-reply window across AUTH sessions.
+      db.prepare('INSERT INTO babel_npc_dialogue (session_id, player_id, npc_id, state) VALUES (?, ?, ?, ?)').run(sessionId, playerId, reply.npcId, JSON.stringify(reply));
+      db.prepare('DELETE FROM babel_npc_dialogue WHERE player_id = ? AND id NOT IN (SELECT id FROM babel_npc_dialogue WHERE player_id = ? ORDER BY id DESC LIMIT 50)').run(playerId, playerId);
+      // Legacy profile replies predate scoped replies. Subsequent writes retire them under the SAME aggregate window.
+      const count = Number(db.prepare('SELECT count(*) AS n FROM babel_npc_dialogue WHERE player_id = ?').get(playerId)!.n);
+      const legacy = parse<Profile>(profile.get(playerId))?.replies ?? [];
+      const retained = count >= 50 ? [] : legacy.slice(-(50 - count));
+      if (retained.length !== legacy.length) db.prepare("UPDATE babel_profiles SET state=json_set(state, '$.replies', json(?)) WHERE player_id = ?").run(JSON.stringify(retained), playerId);
+    },
     transaction: action => transaction(db, action),
     profile(id) {
       const value = parse<Profile>(profile.get(id));

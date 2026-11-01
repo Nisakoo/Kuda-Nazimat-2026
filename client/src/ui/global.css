@@ -117,7 +117,7 @@ button.question { font-weight: 500; background: #fffefa; border: 1px solid #cfdd
 .market-panel p, .market-panel li { line-height: 1.65; overflow-wrap: anywhere; }
 .market-items { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
 .market-items button { flex: 1 1 150px; }
-.market-items .selected { outline: 2px solid #246d61; outline-offset: 2px; }
+.market-items .selected, .auth-methods [aria-pressed="true"] { outline: 2px solid #246d61; outline-offset: 2px; }
 .market-notice { padding: 12px; background: #e1eadc; border-radius: 8px; }
 .stone-history { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 16px; }
 .stone-history figure { margin: 0; width: 110px; font-size: 12px; }

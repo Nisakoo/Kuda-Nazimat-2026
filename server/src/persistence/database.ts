@@ -83,6 +83,9 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now, obs
     return hashes;
   };
   const sessions: SessionStore = {
+    isActive(sessionId, playerId, time) {
+      return !!timed('sessions.isActive', () => db.prepare('SELECT 1 FROM sessions s JOIN players p ON p.account_id = s.account_id WHERE s.id = ? AND p.id = ? AND s.revoked_at IS NULL AND s.expires_at > ?').get(sessionId, playerId, time));
+    },
     create(s) {
       timed('sessions.create', () => db.prepare('INSERT INTO sessions (token_hash, account_id, created_at, expires_at, id, created_ip) VALUES (?, ?, ?, ?, ?, ?)')
         .run(s.tokenHash, s.accountId, s.createdAt, s.expiresAt, s.id ?? randomId('s'), s.ip ?? null));
@@ -141,12 +144,15 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now, obs
     },
   };
   const dialogue: DialogueStore = {
-    history(playerId, npcId) {
-      return timed('dialogue.history', () => db.prepare('SELECT question, answer FROM npc_dialogue WHERE player_id = ? AND npc_id = ? ORDER BY created_at DESC, id DESC LIMIT 6').all(playerId, npcId).reverse() as unknown as { question: string; answer: string }[]);
+    history(playerId, npcId, sessionId) {
+      if (!sessionId) return [];
+      return timed('dialogue.history', () => db.prepare('SELECT question, answer FROM npc_dialogue WHERE player_id = ? AND npc_id = ? AND session_id = ? ORDER BY created_at DESC, id DESC LIMIT 6').all(playerId, npcId, sessionId).reverse() as unknown as { question: string; answer: string }[]);
     },
-    append(playerId, npcId, question, answer, time) {
+    append(playerId, npcId, question, answer, time, sessionId) {
+      if (!sessionId) throw new Error('Missing AUTH scope');
       timed('dialogue.append', () => transaction(db, () => {
-        db.prepare('INSERT INTO npc_dialogue (player_id, npc_id, question, answer, created_at) VALUES (?, ?, ?, ?, ?)').run(playerId, npcId, question, answer, time);
+        db.prepare('INSERT INTO npc_dialogue (player_id, npc_id, question, answer, created_at, session_id) VALUES (?, ?, ?, ?, ?, ?)').run(playerId, npcId, question, answer, time, sessionId);
+        // Keep the inherited aggregate rolling window, including legacy rows, across AUTH sessions.
         db.prepare('DELETE FROM npc_dialogue WHERE player_id = ? AND npc_id = ? AND id NOT IN (SELECT id FROM npc_dialogue WHERE player_id = ? AND npc_id = ? ORDER BY created_at DESC, id DESC LIMIT 50)').run(playerId, npcId, playerId, npcId);
       }));
     },

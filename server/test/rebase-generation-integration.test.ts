@@ -6,7 +6,7 @@ import { memoryLogger } from '../src/common/logger.ts';
 import { memoryStores } from './memory.ts';
 import { answerRequest } from './responderContract.ts';
 
-const q = (id = 'p', requestId = 'r', connectionId = 'c') => ({ connectionId, requestId,
+const q = (id = 'p', requestId = 'r', connectionId = 'c') => ({ sessionId: 'test-session', authorize: () => true, connectionId, requestId,
   player: { accountId: 'a' + id, playerId: id, displayName: 'Игрок' }, npc: answerRequest().npc, question: 'Вопрос' });
 afterEach(() => vi.useRealTimers());
 function setup(responder: NpcResponder, timeoutMs = 30000) {
@@ -30,7 +30,7 @@ it('shares the player and unfinished quotas with Babylon and retains cancelled p
   await vi.advanceTimersByTimeAsync(2000); expect(work).not.toHaveBeenCalled();
   finish({ text: 'Поздний' }); await vi.advanceTimersByTimeAsync(0);
   expect((await Promise.all(queued)).every(result => result.ok)).toBe(true);
-  expect(store.dialogue.history('p', 'n')).toEqual([]); expect(npc.state().unfinished).toBe(0);
+  expect(store.dialogue.history('p', 'n', 'test-session')).toEqual([]); expect(npc.state().unfinished).toBe(0);
   await npc.stop();
 });
 

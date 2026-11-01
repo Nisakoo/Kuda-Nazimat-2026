@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { EMPTY_INVENTORY } from '../../../shared/babylon/types.ts';
 import type { BabylonRequest, BabylonResult, BabylonState, BabylonErrorCode, ChatEntry, Language } from '../../../shared/babylon/types.ts';
 import type { PlayerIdentity } from '../contracts.ts';
-import type { BabylonStore, Generate, LanguagePort, Profile, Party, BabylonLocation, Message } from './ports.ts';
+import type { BabylonStore, Generate, LanguagePort, Profile, Party, BabylonLocation, Message, NpcSessionScope, LanguageCallContext } from './ports.ts';
 import { GOATS, GUIDE, ITEMS, NPCS, TASK_TITLE, task } from './content.ts';
 
 export class BabylonError extends Error {
@@ -15,14 +15,14 @@ const clean = (text: string, limit = 4000): string => {
   return text.trim();
 };
 export interface BabylonDeps {
-  store: BabylonStore; language: LanguagePort; generate: Generate; now(): number; id(): string;
+  store: BabylonStore; language: LanguagePort; generate: Generate; now(): number; monotonicNow(): number; id(): string;
   location(accountId: string): BabylonLocation | null;
   peerLocation?(playerId: string): BabylonLocation | null;
   measure?(kind: 'chat' | 'npc' | 'suggest', durationMs: number, success: boolean): void;
 }
 export class BabylonService {
   private readonly deps: BabylonDeps;
-  private readonly pending = new Map<string, { fingerprint: string; promise: Promise<BabylonResult> }>();
+  private readonly pending = new Map<string, { fingerprint: string; npcSessionId?: string; promise: Promise<BabylonResult> }>();
   private readonly recentChat = new Map<string, number>();
   constructor(deps: BabylonDeps) { this.deps = deps; deps.store.interrupt(); }
   enrolled(playerId: string): boolean { return Boolean(this.deps.store.profile(playerId)?.groupId); }
@@ -36,7 +36,8 @@ export class BabylonService {
     const { store } = this.deps;
     store.transaction(() => { const p = store.profile(playerId); if (p?.spawnPending) { p.spawnPending = false; store.saveProfile(playerId, p); } });
   }
-  state(identity: PlayerIdentity): BabylonState {
+  state(identity: PlayerIdentity, scope?: NpcSessionScope): BabylonState {
+    if (scope && (!scope.sessionId || !scope.isActive())) fail('UNAUTHORIZED', 'Сессия истекла');
     const { store, language, now } = this.deps;
     const p = store.profile(identity.playerId), g = p?.groupId ? store.party(p.groupId) : null, open = store.openParty();
     const role = g?.members.find(m => m.id === identity.playerId)?.role ?? 0;
@@ -75,18 +76,29 @@ export class BabylonService {
       taskTitle: p && g ? TASK_TITLE[p.learning] : '',
       taskTarget: g && g.startedAt !== null && g.completedAt === null ? { x: 0, z: -34 } : null,
       goatGuide: p && g && (g.size === 1 || role === 1) ? GUIDE[p.learning] : null,
-      inventory: g?.inventory[identity.playerId] ?? { ...EMPTY_INVENTORY }, fed: g?.fed ?? [], stones: g?.stones ?? [], words: p?.words ?? [], messages, replies: p?.replies ?? [],
+      inventory: g?.inventory[identity.playerId] ?? { ...EMPTY_INVENTORY }, fed: g?.fed ?? [], stones: g?.stones ?? [], words: p?.words ?? [], messages, replies: scope ? store.npcReplies(identity.playerId, scope.sessionId) : [],
     };
   }
-  handle(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, authorize: () => Promise<boolean> = async () => true): Promise<BabylonResult> {
-    if (packet.action.type === 'state') return Promise.resolve({ v: 2, requestId: packet.requestId, state: this.state(identity) });
+  async handle(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, authorize: () => Promise<boolean> = async () => true, scope?: NpcSessionScope): Promise<BabylonResult> {
+    if (scope && (!scope.sessionId || !scope.isActive())) fail('UNAUTHORIZED', 'Сессия истекла');
+    if (packet.action.type === 'npc' && !scope) fail('UNAUTHORIZED', 'Нужна действующая AUTH-сессия');
+    if (packet.action.type === 'npc') this.checkNpcAccess(identity, packet.action.targetId);
+    const result = await this.handleOperation(identity, packet, connectionId, authorize, scope);
+    if (packet.action.type !== 'state' && !await authorize()) fail('UNAUTHORIZED', 'Доступ утрачен');
+    if (packet.action.type === 'npc') this.checkNpcAccess(identity, packet.action.targetId);
+    // Account operations can be pending in another AUTH session. Rebuild every caller snapshot.
+    return { ...result, state: this.state(identity, scope) };
+  }
+  private handleOperation(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, authorize: () => Promise<boolean>, scope?: NpcSessionScope): Promise<BabylonResult> {
+    if (packet.action.type === 'state') return Promise.resolve({ v: 2, requestId: packet.requestId, state: this.state(identity, scope) });
     const key = `${identity.playerId}:${packet.requestId}`, fingerprint = createHash('sha256').update(JSON.stringify(packet.action)).digest('hex');
     const saved = this.deps.store.operation(identity.playerId, packet.requestId);
+    if (packet.action.type === 'npc' && saved && saved.npcSessionId !== scope?.sessionId) return Promise.reject(new BabylonError('CONFLICT', 'Запрос NPC принадлежит другой или прежней сессии'));
     if (saved && saved.fingerprint !== fingerprint) return Promise.reject(new BabylonError('CONFLICT', 'Этот requestId уже использован для другого действия'));
-    if (saved?.status === 'complete') return Promise.resolve({ v: 2, requestId: packet.requestId, state: this.state(identity), ...(saved.notice ? { notice: saved.notice } : {}), ...(saved.suggestion ? { suggestion: saved.suggestion } : {}) });
-    const pending = this.pending.get(key); if (pending) { if (pending.fingerprint !== fingerprint) return Promise.reject(new BabylonError('CONFLICT', 'Повтор с другим содержимым')); return pending.promise; }
-    const promise = this.execute(identity, packet, connectionId, fingerprint, authorize).finally(() => this.pending.delete(key));
-    this.pending.set(key, { fingerprint, promise }); return promise;
+    if (saved?.status === 'complete') return Promise.resolve({ v: 2, requestId: packet.requestId, state: this.state(identity, scope), ...(saved.notice ? { notice: saved.notice } : {}), ...(saved.suggestion ? { suggestion: saved.suggestion } : {}) });
+    const pending = this.pending.get(key); if (pending) { if (packet.action.type === 'npc' && pending.npcSessionId !== scope?.sessionId) return Promise.reject(new BabylonError('CONFLICT', 'Запрос NPC принадлежит другой сессии')); if (pending.fingerprint !== fingerprint) return Promise.reject(new BabylonError('CONFLICT', 'Повтор с другим содержимым')); return pending.promise; }
+    const promise = this.execute(identity, packet, connectionId, fingerprint, authorize, scope).finally(() => this.pending.delete(key));
+    this.pending.set(key, { fingerprint, ...(packet.action.type === 'npc' ? { npcSessionId: scope!.sessionId } : {}), promise }); return promise;
   }
   private pair(native: Language, learning: Language): void {
     if (native === learning || !this.deps.language.languages.includes(native) || !this.deps.language.languages.includes(learning)) fail('INVALID', 'Выберите два разных доступных языка');
@@ -104,13 +116,20 @@ export class BabylonService {
     const location = this.deps.location(identity.accountId);
     if (!location || location.mapId !== 'market' || Math.hypot(location.position.x - target.x, location.position.y, location.position.z - target.z) > 2.7) fail('FORBIDDEN', 'Подойдите ближе к объекту на рынке');
   }
-  private async execute(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, fingerprint: string, authorize: () => Promise<boolean>): Promise<BabylonResult> {
+  /** Synchronous role/range guard. Transports must recheck after their final await before sending an NPC result. */
+  checkNpcAccess(identity: PlayerIdentity, targetId: string): void {
+    const { party, role } = this.player(identity);
+    if (party.size > 1 && role !== 1 && targetId === 'shepherd') fail('FORBIDDEN', 'Список пастуха доступен игроку 1.');
+    const npc = NPCS[targetId]; if (!npc) fail('INVALID', 'Неизвестный собеседник');
+    this.near(identity, npc!);
+  }
+  private async execute(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, fingerprint: string, authorize: () => Promise<boolean>, scope?: NpcSessionScope): Promise<BabylonResult> {
     const { store, id, now } = this.deps, a = packet.action, pid = identity.playerId;
     let notice: string | undefined, suggestion: string | undefined;
     const languageAction = a.type === 'chat' || a.type === 'npc' || a.type === 'suggest';
     if (languageAction) {
       const started = now(); let success = false;
-      try { ({ notice, suggestion } = await this.languageAction(identity, packet, connectionId, fingerprint, authorize)); success = true; }
+      try { ({ notice, suggestion } = await this.languageAction(identity, packet, connectionId, fingerprint, authorize, scope)); success = true; }
       finally { this.deps.measure?.(a.type as 'chat' | 'npc' | 'suggest', now() - started, success); }
     } else store.transaction(() => {
       if (a.type === 'languages') {
@@ -197,11 +216,17 @@ export class BabylonService {
       }
       store.saveOperation(pid, packet.requestId, { fingerprint, status: 'complete', ...(notice ? { notice } : {}) });
     });
-    return { v: 2, requestId: packet.requestId, state: this.state(identity), ...(notice ? { notice } : {}), ...(suggestion ? { suggestion } : {}) };
+    return { v: 2, requestId: packet.requestId, state: this.state(identity, scope), ...(notice ? { notice } : {}), ...(suggestion ? { suggestion } : {}) };
   }
-  private async languageAction(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, fingerprint: string, authorize: () => Promise<boolean>): Promise<{ notice?: string; suggestion?: string }> {
+  private async languageAction(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, fingerprint: string, authorize: () => Promise<boolean>, scope?: NpcSessionScope): Promise<{ notice?: string; suggestion?: string }> {
     const { store, now, language, generate } = this.deps, a = packet.action, pid = identity.playerId;
     const { profile, party, role } = this.player(identity);
+    const operationScope = a.type === 'npc' ? { npcSessionId: scope!.sessionId } : {};
+    const checkNpcSession = () => {
+      if (a.type !== 'npc') return;
+      if (!scope?.sessionId || !scope.isActive()) fail('UNAUTHORIZED', 'Сессия истекла');
+      this.checkNpcAccess(identity, a.targetId);
+    };
     let message: Message | undefined;
     if (a.type === 'chat') {
       message = party.messages.find(m => m.id === packet.requestId && m.authorId === pid);
@@ -222,7 +247,34 @@ export class BabylonService {
       const npc = NPCS[a.targetId]; if (!npc) fail('INVALID', 'Неизвестный собеседник'); this.near(identity, npc!);
     }
     const captured = message;
-    const work = async (signal: AbortSignal, deadline: number, budget?: { expired(): boolean }): Promise<string> => {
+    const work = async (signal: AbortSignal, deadline: number, budget?: { expired(): boolean; deadlineAt?(): number }): Promise<string> => {
+      // Keep a monotonic cap even for injected legacy Generate fixtures. Never recreate it after an await.
+      let monotonicDeadline = this.deps.monotonicNow() + Math.max(0, deadline - now());
+      const remaining = () => {
+        const mono = this.deps.monotonicNow(), wall = now();
+        monotonicDeadline = Math.min(monotonicDeadline, mono + deadline - wall);
+        return monotonicDeadline - mono;
+      };
+      const callBudget = {
+        expired: () => Boolean(budget?.expired() || signal.aborted || remaining() <= 0),
+        deadlineAt: () => Math.min(budget?.deadlineAt?.() ?? deadline, deadline, now() + Math.max(0, remaining())),
+      };
+      const checkBudget = () => { if (callBudget.expired()) fail('UNAVAILABLE', 'Время запроса истекло'); };
+      const context: LanguageCallContext = {
+        sessionId: scope?.sessionId ?? '', player: identity, requestId: packet.requestId,
+        requestKey: JSON.stringify([scope?.sessionId, pid, packet.requestId]), budget: callBudget,
+        isActive: () => scope?.isActive() === true,
+        authorize: async () => {
+          const allowed = await authorize();
+          checkBudget(); checkNpcSession();
+          return allowed;
+        },
+      };
+      checkBudget();
+      if (!await authorize()) fail('UNAUTHORIZED', 'Доступ утрачен');
+      // Admission may wait for authorization. Never restore the original end-to-end budget.
+      checkBudget();
+      checkNpcSession();
       store.transaction(() => {
         if (store.profile(pid)?.groupId !== party.id) fail('CONFLICT', 'Игра сменилась. Старый запрос отменён.');
         if (captured) {
@@ -232,20 +284,25 @@ export class BabylonService {
           if (existing < 0) current.messages.push(captured); else current.messages[existing] = captured;
           store.saveParty(current);
         }
-        store.saveOperation(pid, packet.requestId, { fingerprint, status: 'pending' });
+        store.saveOperation(pid, packet.requestId, { fingerprint, ...operationScope, status: 'pending' });
       });
       const translations = new Map<Language, string>();
       let output = '';
       if (captured) {
         for (const d of Object.values(captured.deliveries)) if (d.status !== 'delivered' && !translations.has(d.language)) {
-          translations.set(d.language, clean(await language.translate(captured.source, captured.sourceLanguage, d.language, signal)));
+          translations.set(d.language, clean(await language.translate(captured.source, captured.sourceLanguage, d.language, signal, context)));
         }
-      } else if (a.type === 'suggest') output = clean(await language.translate(a.word, profile.learning, profile.native, signal), 200);
-      else if (a.type === 'npc') output = clean(await language.answer(NPCS[a.targetId]!, a.text, profile.learning, profile.replies.filter(r => r.npcId === a.targetId).slice(-6), signal));
+      } else if (a.type === 'suggest') output = clean(await language.translate(a.word, profile.learning, profile.native, signal, context), 200);
+      else if (a.type === 'npc') {
+        const history = store.npcReplies(pid, scope!.sessionId, a.targetId).slice(-6);
+        checkBudget(); checkNpcSession();
+        output = clean(await language.answer(NPCS[a.targetId]!, a.text, profile.learning, history, signal, context));
+      }
       if (signal.aborted || now() >= deadline || !await authorize()) fail('UNAUTHORIZED', 'Запрос отменён или сессия истекла');
       // Authorization is asynchronous. Recheck the queue's monotonic budget immediately before the terminal transaction.
-      // Legacy generators and the no-translation path retain their signal/wall-clock guards.
-      if (budget?.expired() || signal.aborted || now() >= deadline) fail('UNAVAILABLE', 'Время запроса истекло');
+      // The no-translation path uses its own injected monotonic budget without reserving an LLM slot.
+      checkBudget();
+      checkNpcSession();
       store.transaction(() => {
         if (store.profile(pid)?.groupId !== party.id) fail('CONFLICT', 'Игра сменилась. Старый запрос отменён.');
         if (captured) {
@@ -254,17 +311,26 @@ export class BabylonService {
           for (const d of Object.values(saved.deliveries)) if (d.status !== 'delivered') { d.text = translations.get(d.language)!; d.status = 'delivered'; delete d.error; }
           store.saveParty(current);
         } else if (a.type === 'npc') {
-          const current = store.profile(pid)!;
-          current.replies.push({ id: packet.requestId, npcId: a.targetId, question: a.text, text: output, language: profile.learning });
-          current.replies = current.replies.slice(-50); store.saveProfile(pid, current);
+          store.appendNpcReply(pid, scope!.sessionId, { id: packet.requestId, npcId: a.targetId, question: a.text, text: output, language: profile.learning });
         }
-        store.saveOperation(pid, packet.requestId, { fingerprint, status: 'complete', ...(a.type === 'suggest' ? { suggestion: output } : {}) });
+        store.saveOperation(pid, packet.requestId, { fingerprint, ...operationScope, status: 'complete', ...(a.type === 'suggest' ? { suggestion: output } : {}) });
       });
       return output || 'delivered';
     };
     // Matching languages and solo messages require no generation slot or model call.
     const noTranslation = captured && Object.values(captured.deliveries).every(d => d.status === 'delivered');
-    const result = noTranslation ? { ok: true as const, text: await work(new AbortController().signal, now() + 8000) } : await generate(pid, connectionId, work, { requestId: packet.requestId, kind: a.type === 'npc' ? 'babel-npc' : a.type });
+    const runWithoutGeneration = async () => {
+      const controller = new AbortController(), deadline = now() + 8000;
+      let monotonicDeadline = this.deps.monotonicNow() + 8000;
+      const budget = { expired: () => {
+        const mono = this.deps.monotonicNow(), wall = now();
+        monotonicDeadline = Math.min(monotonicDeadline, mono + deadline - wall);
+        if (mono >= monotonicDeadline || wall >= deadline) controller.abort();
+        return controller.signal.aborted;
+      } };
+      return { ok: true as const, text: await work(controller.signal, deadline, budget) };
+    };
+    const result = noTranslation ? await runWithoutGeneration() : await generate(pid, connectionId, work, { requestId: packet.requestId, kind: a.type === 'npc' ? 'babel-npc' : a.type });
     if (!result.ok) {
       store.transaction(() => {
         const current = store.party(party.id);
@@ -272,7 +338,7 @@ export class BabylonService {
         if (current && saved) { for (const d of Object.values(saved.deliveries)) if (d.status !== 'delivered') { d.status = 'error'; d.error = 'Не удалось перевести сообщение'; } store.saveParty(current); }
         const operation = store.operation(pid, packet.requestId);
         // A committed result remains authoritative even if completion reaches the queue after its deadline.
-        if (operation?.status !== 'complete') store.saveOperation(pid, packet.requestId, { fingerprint, status: 'failed' });
+        if (operation?.status !== 'complete') store.saveOperation(pid, packet.requestId, { fingerprint, ...operationScope, status: 'failed' });
       });
       const saved = store.operation(pid, packet.requestId);
       if (saved?.status !== 'complete') fail(result.reason === 'player-busy' || result.reason === 'server-busy' ? 'RATE_LIMIT' : 'UNAVAILABLE', 'Переводчик занят или недоступен. Повторите запрос.');

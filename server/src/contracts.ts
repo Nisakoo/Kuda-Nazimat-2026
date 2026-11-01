@@ -17,7 +17,12 @@ export interface PlayerIdentity { readonly accountId: string; readonly playerId:
 /** AUTH-003: token check for the Socket.IO handshake. */
 /** sessionId is the public session id for logs (AUTH-002), never the token. */
 export type SessionCheck = { readonly ok: true; readonly identity: PlayerIdentity; readonly expiresAt: number; readonly sessionId?: string } | { readonly ok: false };
-export interface SessionVerifier { verify(token: string): Promise<SessionCheck>; state?(identity: PlayerIdentity): { requiresAvatar: boolean } }
+export interface SessionVerifier {
+  verify(token: string): Promise<SessionCheck>;
+  state?(identity: PlayerIdentity): { requiresAvatar: boolean };
+  /** Synchronous authoritative check at NPC retrieval/commit/delivery boundaries. */
+  isActive?(sessionId: string, playerId: string): boolean;
+}
 
 /** STORE-001/003: saved player position. */
 export interface SavedPosition { readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
@@ -37,6 +42,10 @@ export interface PlayerStore {
 /** NPC-001–004: part A checks target/distance and delivers; part B queues, calls NpcResponder, stores history. */
 export interface NpcProfile { readonly id: string; readonly name: string; readonly topic: string; readonly persona: string; readonly greeting: string }
 export interface NpcQuestion {
+  /** Assigned by verified AUTH, never supplied by the client. */
+  readonly sessionId: string;
+  /** Rechecks AUTH and current control/access synchronously, including before commit. */
+  readonly authorize: () => boolean;
   readonly connectionId: string;
   readonly requestId: string;
   readonly player: PlayerIdentity;
@@ -107,6 +116,7 @@ export interface GameRuntime {
   setAvatar?(playerId: string, avatarId: AvatarId): void;
   setEquipment?(playerId: string, tool: ToolId | null): void;
   canAct?(accountId: string, sessionKey: string): boolean;
+  controlId?(accountId: string, sessionKey: string): string | null;
   location?(accountId: string): { mapId: string; position: Vector3 } | null;
   /** Active world actor only; no persisted-position fallback or account lookup. */
   playerLocation?(playerId: string): { mapId: string; position: Vector3 } | null;

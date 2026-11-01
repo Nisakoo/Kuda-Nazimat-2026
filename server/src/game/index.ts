@@ -89,6 +89,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
     setAvatar: (playerId, avatarId) => game.setAvatar(playerId, avatarId),
     setEquipment: (playerId, tool) => game.setEquipment(playerId, tool),
     canAct: (accountId, sessionKey) => game.canAct(accountId, sessionKey),
+    controlId: (accountId, sessionKey) => game.controlId(accountId, sessionKey),
     location: accountId => game.locate(accountId),
     playerLocation: playerId => game.playerLocation(playerId),
     maps: [...loaded.maps.values()].map((map) => ({ mapId: map.id, worldBytes: map.manifest.worldBytes, chunks: map.manifest.chunks.length })),

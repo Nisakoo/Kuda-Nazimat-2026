@@ -32,7 +32,7 @@ it('assembles exclusively through the frozen contract, restarts with memory and 
   const address = app.server.address(); if (!address || typeof address === 'string') throw new Error('No address');
   const session = await (await fetch(`http://127.0.0.1:${address.port}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Аня' }) })).json() as { token: string };
   const verified = await deps.sessions.verify(session.token); if (!verified.ok) throw new Error('No session'); savedId = verified.identity.playerId;
-  const question = { connectionId: 'c1', requestId: 'r1', player: verified.identity, npc: { id: 'n', name: 'Пастух', topic: 'Козы', persona: 'Заботливый пастух', greeting: 'Здравствуй' }, question: 'Что ест козлёнок?' };
+  const question = { sessionId: verified.sessionId!, authorize: () => deps.sessions.isActive!(verified.sessionId!, verified.identity.playerId), connectionId: 'c1', requestId: 'r1', player: verified.identity, npc: { id: 'n', name: 'Пастух', topic: 'Козы', persona: 'Заботливый пастух', greeting: 'Здравствуй' }, question: 'Что ест козлёнок?' };
   const first = await deps.npc.ask(question); expect(first.ok).toBe(true);
   const started = Date.now(); await app.stop(); await app.stop(); expect(Date.now() - started).toBeLessThan(10000);
   const secondApp = await startApplication(config, createGame, silentLogger);
@@ -56,7 +56,7 @@ it('fails before listening for missing client/world, invalid adapter, or failed 
 it('inspect reads a running WAL database without secrets and backup restores a separate copy', () => {
   const { config, path, root } = fixture(); const db = openDatabase(config.dbPath); const stores = sqliteStores(db);
   const player = stores.accounts.findOrCreate('Аня', 'аня', 1);
-  const question = 'Q'.repeat(100); stores.dialogue.append(player.playerId, 'npc', question, 'private answer', 1);
+  const question = 'Q'.repeat(100); stores.dialogue.append(player.playerId, 'npc', question, 'private answer', 1, 'test-session');
   stores.sessions.create({ tokenHash: 'secret-token-hash', accountId: player.accountId, createdAt: 1, expiresAt: Date.now() + 10000 });
   try {
     const output = execFileSync(process.execPath, [fileURLToPath(new URL('../src/cli/inspect.ts', import.meta.url)), '--config', path], { encoding: 'utf8' });

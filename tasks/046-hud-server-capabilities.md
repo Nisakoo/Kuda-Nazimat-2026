@@ -4,7 +4,7 @@ type: implementation-task
 status: in-progress
 spec: ../specs/client-game-hud.md
 requirements: [HUD-002, HUD-008, HUD-009, HUD-010, HUD-012, HUD-013, HUD-014, HUD-015, HUD-016, HUD-017]
-depends_on: [TASK-041, TASK-042]
+depends_on: [TASK-074, TASK-075]
 related:
   - spec: ../specs/game-babylon.md
     requirements: [BABEL-018, BABEL-019, BABEL-020, BABEL-021, BABEL-022, BABEL-023]

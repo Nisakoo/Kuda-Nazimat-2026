@@ -171,6 +171,7 @@ describe('application lifecycle', () => {
   });
 
   it('passes a supplied server session through the integration boundary and closes it on logout', () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
     app.dispose();
     const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeWorldLife: vi.fn(() => () => {}), subscribeState: vi.fn((listener) => { listener({ status: 'unauthorized', error: null }); return () => {}; }), dispose: vi.fn() };
     const factory = vi.fn(() => transport);
@@ -268,6 +269,7 @@ describe('application lifecycle', () => {
   });
 
   it('submits one login, passes the validated session to the transport and forgets it on logout', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
     let resolve!: (session: ServerSession) => void;
     const login = vi.fn(() => new Promise<ServerSession>((done) => { resolve = done; }));
     const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeWorldLife: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
@@ -282,6 +284,53 @@ describe('application lifecycle', () => {
     expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: false, authPending: false }));
     app.logout(); expect(transport.dispose).toHaveBeenCalledOnce();
     expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authName: '' }));
+  });
+
+  it('shows the temporary password change requirement without ending a session', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ error: { code: 'PASSWORD_CHANGE_REQUIRED', message: 'Смените пароль' } }, { status: 403 })));
+    app.dispose(); app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    await app.login('Аня', 'login', 'temporary');
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authChangeRequired: true, authError: 'Смените пароль', authPending: false }));
+  });
+
+  it('reports an unconfirmed server logout and clears the local session', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
+    app.dispose(); app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, () => ({ state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeWorldLife: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() }));
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 });
+    app.logout(); await vi.waitFor(() => expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authError: expect.stringContaining('не подтвердил') })));
+  });
+
+  it.each(['settings', 'timeout', 'logout'] as const)('cancels password login on %s and ignores a late response', async (action) => {
+    vi.useFakeTimers(); let resolve!: (response: Response) => void; let requestSignal!: AbortSignal;
+    vi.stubGlobal('fetch', vi.fn((_url: string, init: RequestInit) => { requestSignal = init.signal as AbortSignal; return new Promise<Response>(done => { resolve = done; }); }));
+    app.dispose(); const network = vi.fn();
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, network);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    try {
+      const login = app.login('Аня', 'login', 'secret');
+      if (action === 'settings') app.applySettings('online', 'http://other.local', 'demo', 1, false);
+      else if (action === 'logout') app.logout();
+      else await vi.advanceTimersByTimeAsync(10000);
+      expect(requestSignal.aborted).toBe(true);
+      resolve(Response.json({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 })); await login;
+      expect(network).not.toHaveBeenCalled();
+      if (action === 'timeout') expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authError: expect.stringContaining('10 секунд') }));
+    } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
+  it('invalidates old logout failures after a new login and logout', async () => {
+    let reject!: (error: Error) => void;
+    const fetcher = vi.fn().mockImplementationOnce(() => new Promise((_resolve, fail) => { reject = fail; })).mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetcher); app.dispose();
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, () => ({ state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribe: vi.fn(() => () => {}), subscribeWorldLife: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() }));
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    const session = { token: 'x'.repeat(43), expiresAt: Date.now() + 60000 };
+    app.provideServerSession(session); app.logout(); app.provideServerSession(session); app.logout();
+    reject(new Error('old failure')); await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authError: null }));
+    expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
   it.each(['settings', 'logout', 'restart', 'dispose'] as const)('cancels pending login on %s and ignores stale results', async (action) => {

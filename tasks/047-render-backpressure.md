@@ -4,7 +4,7 @@ type: implementation-task
 status: in-progress
 spec: ../specs/client-input-ui.md
 requirements: [UI-001, UI-002]
-depends_on: [TASK-044]
+depends_on: [TASK-077]
 related:
   - spec: ../specs/character-presentation.md
     requirements: [CHAR-009, CHAR-010, CHAR-013]

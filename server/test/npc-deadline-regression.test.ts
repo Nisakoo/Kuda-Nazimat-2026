@@ -10,7 +10,7 @@ import { answerRequest } from './responderContract.ts';
 // Legacy wall-only fake clock stays deterministic under Vitest timers.
 const deps = { clock: { now: systemClock.now }, scheduler: systemScheduler };
 afterEach(() => vi.useRealTimers());
-function question(id = '1', requestId = 'r'): NpcQuestion { return { connectionId: `c${id}`, requestId, player: { accountId: `a${id}`, playerId: `p${id}`, displayName: 'Аня' }, npc: answerRequest().npc, question: 'Расскажи' }; }
+function question(id = '1', requestId = 'r'): NpcQuestion { return { sessionId: 'test-session', authorize: () => true, connectionId: `c${id}`, requestId, player: { accountId: `a${id}`, playerId: `p${id}`, displayName: 'Аня' }, npc: answerRequest().npc, question: 'Расскажи' }; }
 function service(responder: NpcResponder, options = { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000 }, time: { clock: Clock; scheduler: Scheduler } = deps) {
   const stores = memoryStores(); const errors: unknown[] = [];
   const logger = createLogger(record => { if (record.level === 'error') errors.push(record); }, 'npc-regression');
@@ -45,7 +45,7 @@ it.each([false, true])('preserves only 10 s after a 20 s queue wait, with rollba
   expect(calls).toHaveLength(2); expect(calls[1]!.request.deadlineAt - state.wall).toBe(10000);
   state.mono = 29999; state.wall += 9999;
   calls[1]!.finish({ text: 'Второй' }); expect(await second).toEqual({ ok: true, text: 'Второй' });
-  expect(stores.dialogue.history('p2', 'n')).toHaveLength(1);
+  expect(stores.dialogue.history('p2', 'n', 'test-session')).toHaveLength(1);
   expect(timers.size).toBe(0); await npc.stop();
 });
 it.each(['monotonic', 'wall'] as const)('does not dispatch an expired queued request when the %s deadline passes without timer delivery', async (mode) => {
@@ -56,7 +56,7 @@ it.each(['monotonic', 'wall'] as const)('does not dispatch an expired queued req
   calls[0]!.finish({ text: 'Поздний' });
   expect(await first).toEqual({ ok: false, reason: 'timeout' });
   expect(await second).toEqual({ ok: false, reason: 'timeout' }); expect(calls).toHaveLength(1);
-  expect(stores.dialogue.history('p1', 'n')).toEqual([]); expect(stores.dialogue.history('p2', 'n')).toEqual([]);
+  expect(stores.dialogue.history('p1', 'n', 'test-session')).toEqual([]); expect(stores.dialogue.history('p2', 'n', 'test-session')).toEqual([]);
   expect(timers.size).toBe(0); await npc.stop();
 });
 it.each([29999, 30000, 30001])('checks monotonic time before committing at %i ms after rollback, without timer delivery', async (elapsed) => {
@@ -65,7 +65,7 @@ it.each([29999, 30000, 30001])('checks monotonic time before committing at %i ms
   calls[0]!.finish({ text: 'Ответ' });
   expect(await pending).toEqual(elapsed < 30000 ? { ok: true, text: 'Ответ' } : { ok: false, reason: 'timeout' });
   expect(calls[0]!.signal.aborted).toBe(elapsed >= 30000);
-  expect(stores.dialogue.history('p1', 'n')).toHaveLength(elapsed < 30000 ? 1 : 0);
+  expect(stores.dialogue.history('p1', 'n', 'test-session')).toHaveLength(elapsed < 30000 ? 1 : 0);
   // The player timeout settles before the shared work callback unwinds. Physical quotas remain held until that settlement.
   await Promise.resolve(); expect(timers.size).toBe(0); await npc.stop();
 });
@@ -75,7 +75,7 @@ it.each([45000, 59999, 60000, 60001])('uses the configured 60 s deadline at %i m
   expect(calls[0]!.request.deadlineAt).toBe(160000);
   calls[0]!.finish({ text: 'Ответ' });
   expect(await pending).toEqual(elapsed < 60000 ? { ok: true, text: 'Ответ' } : { ok: false, reason: 'timeout' });
-  expect(stores.dialogue.history('p1', 'n')).toHaveLength(elapsed < 60000 ? 1 : 0);
+  expect(stores.dialogue.history('p1', 'n', 'test-session')).toHaveLength(elapsed < 60000 ? 1 : 0);
   expect(calls[0]!.signal.aborted).toBe(elapsed >= 60000);
   await Promise.resolve(); expect(timers.size).toBe(0); await npc.stop();
 });
@@ -95,7 +95,7 @@ it.each([2000, 10000])('rechecks the budget after a synchronous history read con
   const history = stores.dialogue.history.bind(stores.dialogue);
   stores.dialogue.history = (player, target) => {
     if (player === 'p2') { state.mono += readMs; state.wall -= 60000; }
-    return history(player, target);
+    return history(player, target, 'test-session');
   };
   const first = npc.ask(question('1')); const second = npc.ask(question('2'));
   state.mono = 20000; state.wall += 20000; calls[0]!.finish({ text: 'Первый' }); await first;
@@ -112,13 +112,13 @@ it('does not restore a shorter observed wall budget when the clock rolls back du
   const history = stores.dialogue.history.bind(stores.dialogue);
   stores.dialogue.history = (player, target) => {
     if (player === 'p2') state.wall -= 60000;
-    return history(player, target);
+    return history(player, target, 'test-session');
   };
   const first = npc.ask(question('1')); const second = npc.ask(question('2'));
   state.mono = 10000; state.wall += 25000; calls[0]!.finish({ text: 'Первый' }); await first;
   expect(calls[1]!.request.deadlineAt - state.wall).toBe(5000);
   state.mono = 15000; calls[1]!.finish({ text: 'Поздний' });
-  expect(await second).toEqual({ ok: false, reason: 'timeout' }); expect(history('p2', 'n')).toEqual([]);
+  expect(await second).toEqual({ ok: false, reason: 'timeout' }); expect(history('p2', 'n', 'test-session')).toEqual([]);
   await npc.stop();
 });
 it('FIFO with one slot, four unfinished, one/player and the total 30 s queue deadline', async () => {
@@ -128,7 +128,7 @@ it('FIFO with one slot, four unfinished, one/player and the total 30 s queue dea
   expect(await npc.ask(question('1', 'second'))).toEqual({ ok: false, reason: 'player-busy' });
   expect(await npc.ask(question('5'))).toEqual({ ok: false, reason: 'server-busy' });
   await vi.advanceTimersByTimeAsync(22000); expect(delivered).toEqual(['1', '2']);
-  expect(stores.dialogue.history('p1', 'n')).toHaveLength(1);
+  expect(stores.dialogue.history('p1', 'n', 'test-session')).toHaveLength(1);
   await vi.advanceTimersByTimeAsync(8000); const results = await Promise.all(pending);
   expect(results.map((r) => r.ok)).toEqual([true, true, false, false]);
   expect(results[3]).toEqual({ ok: false, reason: 'timeout' }); await npc.stop();
@@ -138,9 +138,9 @@ it('commits a successful answer after 20 s within the 30 s overall deadline', as
   let settled = false;
   const pending = npc.ask(question()).then(result => { settled = true; return result; });
   await vi.advanceTimersByTimeAsync(19999); expect(settled).toBe(false);
-  expect(stores.dialogue.history('p1', 'n')).toEqual([]);
+  expect(stores.dialogue.history('p1', 'n', 'test-session')).toEqual([]);
   await vi.advanceTimersByTimeAsync(1);
-  expect((await pending).ok).toBe(true); expect(stores.dialogue.history('p1', 'n')).toHaveLength(1);
+  expect((await pending).ok).toBe(true); expect(stores.dialogue.history('p1', 'n', 'test-session')).toHaveLength(1);
   await npc.stop();
 });
 it('passes only the remaining queue budget and holds a timed-out slot until physical settlement', async () => {
@@ -169,7 +169,7 @@ it('passes only the remaining queue budget and holds a timed-out slot until phys
   await vi.advanceTimersByTimeAsync(2000); expect(errors).toHaveLength(1);
   npc.cancelConnection('c3'); expect(await queued).toEqual({ ok: false, reason: 'cancelled' });
   finish({ text: 'Поздний' }); await vi.advanceTimersByTimeAsync(0);
-  expect(stores.dialogue.history('p2', 'n')).toEqual([]);
+  expect(stores.dialogue.history('p2', 'n', 'test-session')).toEqual([]);
   const next = npc.ask(question('2', 'new')); finish({ text: 'Новый' });
   expect(await next).toEqual({ ok: true, text: 'Новый' }); await npc.stop();
 });

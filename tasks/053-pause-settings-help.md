@@ -3,7 +3,7 @@ id: TASK-053
 type: implementation-task
 status: todo
 spec: ../specs/client-pause-menu.md
-requirements: [PAUSE-001–015]
+requirements: [PAUSE-001–009]
 depends_on: [TASK-058, TASK-059]
 related:
   - spec: ../specs/client-game-hud.md

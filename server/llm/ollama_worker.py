@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-from local_common import WorkerError, _unique_pairs, compile_prompt, configure_offline, count_prompt_tokens, emit, normalize_text, read_message, verify_manifest
+from local_common import WorkerError, _unique_pairs, compile_prompt, compile_translation, configure_offline, count_prompt_tokens, emit, normalize_text, normalize_target_text, normalize_translation, read_message, verify_manifest
 
 MODEL = 'qwen3.5:2b-q4_K_M'
 SMALL_MODEL = 'qwen3.5:0.8b-q8_0'
@@ -445,7 +445,7 @@ class OllamaWorker:
             error.diagnostic = 'ollama_response_invalid'
             raise error from None
 
-    def generate(self, prompt, predict, timeout=10, allow_empty=False, expected_tokens=None, progress=False):
+    def generate(self, prompt, predict, timeout=10, allow_empty=False, expected_tokens=None, progress=False, target=False, translation=False):
         if expected_tokens is not None and (not isinstance(expected_tokens, int) or isinstance(expected_tokens, bool) or not 0 <= expected_tokens <= 1792):
             raise WorkerError('input_too_long', 'Input token limit exceeded')
         o = self.options
@@ -487,6 +487,8 @@ class OllamaWorker:
                     raise WorkerError('output_limit', 'Model output limit exceeded')
                 parts.append(text)
                 done = obj.get('done', False)
+                if done and (target or translation) and obj.get('done_reason') != 'stop':
+                    raise invalid()
                 if done and expected_tokens is not None:
                     actual = obj.get('prompt_eval_count')
                     if (not isinstance(actual, int) or isinstance(actual, bool)
@@ -511,13 +513,19 @@ class OllamaWorker:
         if not done:
             raise invalid()
         text = ''.join(parts)
-        text = '' if allow_empty and not text else normalize_text(text)
+        text = '' if allow_empty and not text else (normalize_translation(text) if translation else normalize_target_text(text) if target else normalize_text(text))
         if progress:
             # Do not claim completion until EOF, count, thinking and text checks pass.
             emit({'type': 'progress', 'stage': 'complete', 'outputChunks': chunks})
         return text
 
     def answer(self, request):
+        return self._request(request, translation=False)
+
+    def translate(self, request):
+        return self._request(request, translation=True)
+
+    def _request(self, request, translation):
         began = time.monotonic()
         wall = time.time()
         # Node validates the shared global bound and owns absolute cancellation.
@@ -528,7 +536,7 @@ class OllamaWorker:
         budget = deadline / 1000 - wall
         if not math.isfinite(budget) or budget <= 0:
             raise WorkerError('invalid_message', 'Expired answer deadline')
-        prompt = compile_prompt(request, self.tokenizer)
+        prompt = compile_translation(request, self.tokenizer) if translation else compile_prompt(request, self.tokenizer)
         tokens = count_prompt_tokens(prompt, self.tokenizer)
         # Operational prefill means waiting for first text, including HTTP setup.
         emit({'type': 'progress', 'stage': 'prefill', 'promptTokens': tokens})
@@ -536,6 +544,10 @@ class OllamaWorker:
         timeout = min(deadline / 1000 - time.time(), budget - (time.monotonic() - began))
         if not math.isfinite(timeout) or timeout <= 0:
             raise WorkerError('invalid_message', 'Expired answer deadline')
+        if translation:
+            return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True, translation=True)
+        if request.get('locale') in ('en', 'es'):
+            return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True, target=True)
         return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True)
 
     def stop(self):
@@ -575,9 +587,15 @@ def main():
                 msg = read_message()
                 if msg is None or msg.get('op') == 'stop':
                     break
-                if msg.get('op') != 'answer' or not isinstance(msg.get('request'), dict):
-                    raise WorkerError('invalid_message', 'Expected answer message')
-                emit({'type': 'answer', 'text': worker.answer(msg['request'])})
+                if msg.get('op') not in ('answer', 'translate') or not isinstance(msg.get('request'), dict):
+                    raise WorkerError('invalid_message', 'Expected answer or translation message')
+                request = msg['request']
+                if msg['op'] == 'translate':
+                    text = worker.translate(request)
+                    emit({'type': 'translation', 'text': text, 'finishReason': 'stop'})
+                else:
+                    text = worker.answer(request)
+                    emit({'type': 'answer', 'text': text, **({'finishReason': 'stop'} if request.get('locale') in ('en', 'es') else {})})
         except WorkerError as exc:
             result = {'type': 'error', 'code': exc.code, 'message': str(exc)[:200]}
             diagnostic = getattr(exc, 'diagnostic', None) or (worker.stage if worker is not None else None)

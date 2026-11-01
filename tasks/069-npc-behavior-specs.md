@@ -1,5 +1,5 @@
 ---
-id: TASK-058
+id: TASK-069
 type: implementation-task
 status: done
 spec: ../specs/npc-character-behavior.md

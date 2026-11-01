@@ -22,7 +22,7 @@ function llmLogger(methods: Partial<Logger>): Logger {
 }
 const deps = { clock: systemClock, scheduler: systemScheduler };
 const config = { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000 };
-const q = (player = 'p', id = 'r') => ({ connectionId: 'c' + player, requestId: id,
+const q = (player = 'p', id = 'r') => ({ sessionId: 'test-session', authorize: () => true, connectionId: 'c' + player, requestId: id,
   player: { accountId: 'a' + player, playerId: player, displayName: 'Игрок' }, npc: answerRequest().npc, question: 'Вопрос' });
 afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers(); });
 
@@ -137,7 +137,7 @@ describe('configured game LLM integration without real models', () => {
     };
     const service = createNpcDialogueService({ ...deps, responder, dialogue: store.dialogue, logger: llmLogger({ info }) }, config);
     await service.start(); expect(await service.ask(q())).toEqual({ ok: true, text: 'Ответ' });
-    expect(store.dialogue.history('p', 'n')).toHaveLength(1);
+    expect(store.dialogue.history('p', 'n', 'test-session')).toHaveLength(1);
     expect(info).toHaveBeenLastCalledWith('npc.answer.timing', 'Этапы ответа NPC', { reason: 'completed', stage: 'complete', elapsedMs, promptTokens: 80, firstTokenMs, outputChunks: 4 });
     await service.stop();
   });
@@ -157,7 +157,7 @@ describe('configured game LLM integration without real models', () => {
     expect(responder.start).toHaveBeenCalledTimes(2); expect(responder.answer).not.toHaveBeenCalled();
     expect(service.ready()).toBe(true);
     expect(await service.ask(q('p', 'new'))).toEqual({ ok: true, text: 'Ответ модели' });
-    expect(store.dialogue.history('p', 'n')).toHaveLength(1);
+    expect(store.dialogue.history('p', 'n', 'test-session')).toHaveLength(1);
     await service.stop(); await vi.advanceTimersByTimeAsync(10000); expect(service.ready()).toBe(false);
   });
   it.each([
@@ -180,7 +180,7 @@ describe('configured game LLM integration without real models', () => {
     for (let i = 0; i < 3; i++) expect(await service.ask(q('p2', String(i)))).toEqual({ ok: false, reason: 'unavailable' });
     expect(error).toHaveBeenCalledExactlyOnceWith('npc.responder.failed', 'NpcResponder недоступен во время игры', { code: expected });
     expect(JSON.stringify(error.mock.calls)).not.toContain('secret');
-    expect(stores.dialogue.history('p', 'n')).toEqual([]);
+    expect(stores.dialogue.history('p', 'n', 'test-session')).toEqual([]);
     await vi.advanceTimersByTimeAsync(2000); expect(service.ready()).toBe(true);
     expect(await service.ask(q())).toEqual({ ok: false, reason: 'unavailable' });
     expect(error).toHaveBeenCalledTimes(2);
@@ -250,7 +250,7 @@ describe('configured game LLM integration without real models', () => {
     expect(await first).toEqual({ ok: false, reason: 'unavailable' }); expect(await second).toEqual({ ok: false, reason: 'unavailable' });
     await vi.advanceTimersByTimeAsync(30000);
     expect(starts).toBe(2); expect(responder.answer).toHaveBeenCalledTimes(1); expect(service.ready()).toBe(false);
-    expect(store.dialogue.history('p', 'n')).toEqual([]); await service.stop();
+    expect(store.dialogue.history('p', 'n', 'test-session')).toEqual([]); await service.stop();
   });
   it('does not recover or reuse a slot while physical cancellation remains unsettled', async () => {
     vi.useFakeTimers(); let finish!: (text: { text: string }) => void; let status: 'ready' | 'unavailable' = 'ready';

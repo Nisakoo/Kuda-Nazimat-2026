@@ -64,7 +64,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   async function babel(req: IncomingMessage, res: ServerResponse, babylon: BabylonService, context: RequestContext): Promise<void> {
     const token = bearer(req);
     const session = token ? await deps.auth.verify(token) : { ok: false as const };
-    if (!session.ok) { req.resume(); error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+    if (!session.ok || !session.sessionId || deps.auth.isActive(session.sessionId, session.identity.playerId) !== true) { req.resume(); error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
     context.sessionId = session.sessionId; context.playerId = session.identity.playerId;
     const sessionKey = hashToken(token!);
     if (!babylonLimit(sessionKey)) { req.resume(); limited.inc({ route: '/api/babylon' }); error(res, 429, 'RATE_LIMIT', 'Слишком частые запросы', { retryAfterSeconds: 1 }); return; }
@@ -75,20 +75,29 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
     if (type === 'state') context.route = '/api/babylon:state';
     const gameplay = ['buy', 'feed', 'npc', 'chat', 'carve'].includes(type);
     if (gameplay && !deps.game.canAct?.(session.identity.accountId, sessionKey)) { error(res, 403, 'FORBIDDEN', 'Войдите в мир в этом окне, чтобы выполнить действие'); return; }
-    const connectionId = 'babel:' + sessionKey;
+    const controlId = deps.game.controlId?.(session.identity.accountId, sessionKey) ?? null;
+    if (gameplay && !controlId) { error(res, 403, 'FORBIDDEN', 'Нет управляющего соединения'); return; }
+    const connectionId = controlId ? 'babel:socket:' + controlId : 'babel:' + sessionKey;
+    // AUTH expiry also cancels language actions that do not require a controlling socket.
+    const expiry = setTimeout(() => deps.cancelBabylon?.(connectionId), Math.max(0, session.expiresAt - deps.clock.now()));
     const close = () => { if (!res.writableEnded) deps.cancelBabylon?.(connectionId); };
     res.once('close', close);
     const began = performance.now();
     let result = 'ok';
     try {
-      const value = await babylon.handle(session.identity, packet, connectionId, async () => (await deps.auth.verify(token!)).ok && (!gameplay || !!deps.game.canAct?.(session.identity.accountId, sessionKey)));
+      const scope = { sessionId: session.sessionId, isActive: () => deps.auth.isActive(session.sessionId!, session.identity.playerId) };
+      const authorized = () => scope.isActive() && (!gameplay || (!!deps.game.canAct?.(session.identity.accountId, sessionKey) && deps.game.controlId?.(session.identity.accountId, sessionKey) === controlId));
+      const value = await babylon.handle(session.identity, packet, connectionId, async () => authorized(), scope);
+      // The service promise can settle before this continuation runs. Check again without another await before delivery.
+      if (!authorized()) throw new BabylonError('UNAUTHORIZED', 'Сессия истекла или управление утрачено');
+      if (packet.action.type === 'npc') babylon.checkNpcAccess(session.identity, packet.action.targetId);
       if (!res.destroyed) json(res, 200, value);
     } catch (cause) {
       const failure = cause instanceof BabylonError ? cause : new BabylonError('UNAVAILABLE', 'Сервис временно недоступен');
       result = failure.code;
       if (!(cause instanceof BabylonError)) log.error('http.failed', 'Ошибка BABEL', { route: '/api/babylon', type, error: cause });
       if (!res.destroyed) json(res, BABEL_STATUS[failure.code], { v: 2, requestId: packet.requestId, error: { code: failure.code, message: failure.message } });
-    } finally { res.off('close', close); }
+    } finally { res.off('close', close); clearTimeout(expiry); }
     if (type !== 'state') log.info('babylon.action', 'Действие BABEL', { playerId: session.identity.playerId, sessionId: session.sessionId, requestId: packet.requestId, type, result, durationMs: Math.round(performance.now() - began) });
   }
 

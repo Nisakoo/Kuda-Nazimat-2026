@@ -25,10 +25,10 @@ function fixture(language: LanguagePort = testLanguagePort, withPeerLocation = t
   const peerPositions = new Map<string, BabylonLocation>(), peerQueries: string[] = [];
   const queue = createGenerationQueue({ clock: systemClock, scheduler: systemScheduler, logger: silentLogger }, { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000 });
   let ids = 0, requests = 0;
-  const make = () => new BabylonService({ store: sqliteBabylon(db), language, generate: queue.generate, now: Date.now, id: () => `id${++ids}`, location: id => positions.get(id) ?? null, ...(withPeerLocation ? { peerLocation: (playerId: string) => { peerQueries.push(playerId); return peerPositions.get(playerId) ?? null; } } : {}) });
+  const make = () => new BabylonService({ store: sqliteBabylon(db), language, generate: queue.generate, now: Date.now, monotonicNow: () => performance.now(), id: () => `id${++ids}`, location: id => positions.get(id) ?? null, ...(withPeerLocation ? { peerLocation: (playerId: string) => { peerQueries.push(playerId); return peerPositions.get(playerId) ?? null; } } : {}) });
   let service = make();
   return { people, positions, peerPositions, peerQueries, queue, get service() { return service; }, get db() { return db; },
-    call: (player: PlayerIdentity, action: BabylonAction, requestId = `request${++requests}`) => service.handle(player, parseBabylonRequest({ v: 2, requestId, action }), player.playerId),
+    call: (player: PlayerIdentity, action: BabylonAction, requestId = `request${++requests}`) => service.handle(player, parseBabylonRequest({ v: 2, requestId, action }), player.playerId, undefined, { sessionId: 'test-session', isActive: () => true }),
     restart() { db.close(); db = openDatabase(path); dbs.push(db); service = make(); },
   };
 }
@@ -219,7 +219,7 @@ it('suggests a translation and answers private NPC dialogue in the selected lang
   expect((await f.call(a, { type: 'suggest', word: 'goat' })).suggestion).toBe('коза');
   f.positions.set(a.accountId, { mapId: 'market', position: { x: -3, y: 0, z: -26 } });
   await f.call(a, { type: 'npc', targetId: 'shepherd', text: 'Какой корм нужен?' });
-  expect(f.service.state(a).replies[0]?.text).toContain('white goat');
+  expect(f.service.state(a, { sessionId: 'test-session', isActive: () => true }).replies[0]?.text).toContain('white goat');
   expect(f.service.state(f.people[1]!).replies).toEqual([]); expect(f.service.state(a).inventory.dates).toBe(0);
 });
 it('rejects unbounded, malformed and authoritative fields at the shared boundary', () => {
@@ -356,6 +356,6 @@ it('ignores an NPC answer that finishes after replacing its game', async () => {
   await f.call(a, { type: 'create', size: 1, replacePartyId: initial.state.party!.id });
   release('old answer');
   expect(await pending).toBeInstanceOf(Error);
-  expect(f.service.state(a).replies).toEqual([]);
+  expect(f.service.state(a, { sessionId: 'test-session', isActive: () => true }).replies).toEqual([]);
   expect(f.db.prepare('PRAGMA foreign_key_check').all()).toEqual([]);
 });

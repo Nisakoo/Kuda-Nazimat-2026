@@ -13,8 +13,8 @@ import platform
 import re
 import sys
 
-from local_common import (WorkerError, compile_prompt, configure_offline, emit,
-                          normalize_text, read_message, verify_manifest)
+from local_common import (WorkerError, compile_prompt, compile_translation, configure_offline, emit,
+                          normalize_text, normalize_target_text, normalize_translation, read_message, verify_manifest)
 
 
 class Runtime:
@@ -45,6 +45,7 @@ class Runtime:
         from mlx_lm.sample_utils import make_sampler, make_logits_processors
         self._check_api(load, generate, stream_generate, generate_step, make_sampler, make_logits_processors)
         self.generate = generate
+        self.stream_generate = stream_generate
         self.sampler = make_sampler(temp=1.0, top_p=1.0, top_k=20)
         self.processors = make_logits_processors(presence_penalty=2.0, repetition_penalty=1.0,
                                                  presence_context_size=2048, repetition_context_size=2048)
@@ -110,11 +111,37 @@ class Runtime:
             raise WorkerError('model_unavailable', 'Invalid text-only Qwen3.5 4-bit artifact') from None
 
     def answer(self, request):
-        prompt = compile_prompt(request, self.tokenizer)
+        return self._answer_prompt(compile_prompt(request, self.tokenizer),
+                                   normalize_target_text if request.get('locale') in ('en', 'es') else None)
+
+    def translate(self, request):
+        return self._answer_prompt(compile_translation(request, self.tokenizer), normalize_translation)
+
+    def _answer_prompt(self, prompt, strict_normalize):
         ids = self.tokenizer.encode(prompt, add_special_tokens=False)
         if not isinstance(ids, list) or len(ids) > 1792 or len(ids) + 128 > 2048:
             raise WorkerError('input_too_long', 'Input token limit exceeded')
         with open(os.devnull, 'w') as sink, contextlib.redirect_stdout(sink):
+            if strict_normalize is not None:
+                parts = []
+                size = 0
+                reason = None
+                for count, item in enumerate(self.stream_generate(self.model, self.tokenizer, ids, max_tokens=128,
+                                                                  sampler=self.sampler, logits_processors=self.processors), 1):
+                    chunk = getattr(item, 'text', None)
+                    if count > 128 or not isinstance(chunk, str) or reason is not None:
+                        raise WorkerError('invalid_response', 'Invalid model response')
+                    try:
+                        size += len(chunk.encode('utf-8'))
+                    except UnicodeError:
+                        raise WorkerError('invalid_response', 'Invalid model response') from None
+                    if size > 16384:
+                        raise WorkerError('output_limit', 'Model output limit exceeded')
+                    parts.append(chunk)
+                    reason = getattr(item, 'finish_reason', None)
+                if reason != 'stop':
+                    raise WorkerError('invalid_response', 'Model did not finish normally')
+                return strict_normalize(''.join(parts))
             text = self.generate(self.model, self.tokenizer, ids, max_tokens=128,
                                  sampler=self.sampler, logits_processors=self.processors, verbose=False)
         return normalize_text(text)
@@ -131,7 +158,12 @@ def main():
                 runtime = Runtime(message.get('options'))
                 emit({'type': 'ready'})
             elif message.get('op') == 'answer' and runtime is not None:
-                emit({'type': 'answer', 'text': runtime.answer(message.get('request'))})
+                request = message.get('request')
+                text = runtime.answer(request)
+                emit({'type': 'answer', 'text': text, **({'finishReason': 'stop'} if request.get('locale') in ('en', 'es') else {})})
+            elif message.get('op') == 'translate' and runtime is not None:
+                text = runtime.translate(message.get('request'))
+                emit({'type': 'translation', 'text': text, 'finishReason': 'stop'})
             else:
                 raise WorkerError('invalid_message', 'Invalid worker operation')
         except WorkerError as exc:

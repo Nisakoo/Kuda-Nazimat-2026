@@ -82,14 +82,19 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   let http: ReturnType<typeof createHttpServer> | undefined;
   const languageTime = metrics.histogram('babylon_language_ms', 'Длительность языковой операции BABEL', MS_BUCKETS);
   try {
-    npc = createNpcDialogueService({ responder: createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler }), dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger, metrics }, config.npc);
+    const responder = createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler });
+    npc = createNpcDialogueService({ responder, dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger, metrics }, config.npc);
     await npc.start();
-    language = languagePort ?? createLanguagePort(config.language.adapter, config.language.options);
-    try { await language.start(); languageReady = true; logger.child('language').info('language.ready', 'Переводчик готов', { mode: language.mode, languages: language.languages }); }
+    language = languagePort ?? createLanguagePort(config.language.adapter, config.language.options, { responder, ready: npc.ready, observeRuntimeFailure: npc.observeRuntimeFailure });
+    try {
+      await language.start?.(); languageReady = language.ready?.() ?? true;
+      if (languageReady) logger.child('language').info('language.ready', 'Переводчик готов', { mode: language.mode, languages: language.languages });
+      else logger.child('language').warn('language.unavailable', 'Переводчик настроен, но runtime недоступен', { mode: language.mode });
+    }
     catch (error) { logger.child('language').error('language.unavailable', 'LanguagePort недоступен', { error }); language = unavailableLanguagePort(language); }
     const babylonLog = logger.child('babylon');
     const babylon = new BabylonService({
-      store: sqliteBabylon(db), language, generate: npc.generate, now: Date.now, id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, peerLocation: playerId => game?.playerLocation?.(playerId) ?? null,
+      store: sqliteBabylon(db), language, generate: npc.generate, now: Date.now, monotonicNow: () => systemClock.monotonicNow!(), id: () => randomId('b'), location: accountId => game?.location?.(accountId) ?? null, peerLocation: playerId => game?.playerLocation?.(playerId) ?? null,
       measure: (kind, durationMs, success) => {
         languageTime.observe(durationMs, { kind, success: String(success) });
         if (success) babylonLog.debug('babylon.language', 'Языковая операция BABEL', { kind, durationMs });
@@ -98,7 +103,10 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     });
     game = await createGame(config, { sessions: auth, players: stores.players, worldLife: sqliteWorldLife(db), avatars: stores.avatars, equipment: stores.equipment, npc, babylon, clock: systemClock, scheduler: systemScheduler, logger, metrics, pingIntervalMs: config.monitoring.pingIntervalMs, validateOutgoing: config.monitoring.validateOutgoing });
     const runtime = game;
-    auth.onRevoked((hashes, reason) => runtime.closeSessions(hashes, REVOKE_MESSAGES[reason]));
+    auth.onRevoked((hashes, reason) => {
+      runtime.closeSessions(hashes, REVOKE_MESSAGES[reason]);
+      for (const hash of hashes) npc!.cancelConnection('babel:' + hash);
+    });
     const npcService = npc;
     const counters = new CounterWindow();
     const sample = () => counters.sample(Date.now(), {
@@ -116,13 +124,13 @@ export async function startApplication(config: Config, createGame: CreateGame, l
       try { const fs = statfsSync(dirname(config.dbPath)); diskFreeBytes = fs.bavail * fs.bsize; } catch { /* unknown */ }
       return evaluateHealth({
         tickP95Ms: stats?.tickP95Ms ?? null, broadcastP95Ms: stats?.broadcastP95Ms ?? null, eventLoopP99Ms: obs.process?.().eventLoopP99Ms ?? null,
-        npcReady: npcService.ready(), languageReady, timeoutShare: requests ? counters.delta('timeouts') / requests : null,
+        npcReady: npcService.ready(), languageReady: language?.ready?.() ?? languageReady, timeoutShare: requests ? counters.delta('timeouts') / requests : null,
         dbErrors5m: counters.delta('dbErrors'), logDropped5m: counters.delta('logDropped'), diskFreeBytes, players: runtime.presence(),
       });
     };
     http = createHttpServer(config, {
       auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
-      operator: { languageReady: () => languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
+      operator: { languageReady: () => language?.ready?.() ?? languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
     });
     obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state() }));
     game.attach(http.server);
@@ -137,7 +145,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   } catch (error) {
     log.error('app.start.failed', 'Запуск не удался', { error });
     http?.rejectNewRequests();
-    try { await language?.stop().catch(() => {}); await npc?.stop(); } finally {
+    try { await language?.stop?.().catch(() => {}); await npc?.stop(); } finally {
       try { await game?.stop('startup-failure'); } finally { http?.server.close(); db.close(); }
     }
     throw error;
@@ -162,7 +170,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
         try {
           const npcStopped = npcService.stop(); // Aborts synchronously before closing connections.
           const gameStopped = runtime.stop(reason);
-          const results = await Promise.allSettled([npcStopped, gameStopped, languageService.stop()]);
+          const results = await Promise.allSettled([npcStopped, gameStopped, languageService.stop?.()]);
           phase('modules');
           for (const result of results) if (result.status === 'rejected') log.error('app.stop.failed', 'Модуль не остановился', { error: result.reason });
           if (results.some((result) => result.status === 'rejected')) throw new Error('Ошибка остановки модуля');

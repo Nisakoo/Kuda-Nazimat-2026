@@ -1,10 +1,10 @@
 ---
-id: TASK-044
+id: TASK-077
 type: implementation-task
 status: in-progress
 spec: ../specs/client-game-hud.md
 requirements: [HUD-001, HUD-002, HUD-003, HUD-004, HUD-005, HUD-008, HUD-011, HUD-014, HUD-015, HUD-017]
-depends_on: [TASK-040, TASK-041, TASK-042]
+depends_on: [TASK-073, TASK-074, TASK-075]
 related:
   - spec: ../specs/client-auth-screens.md
     requirements: [ENTRY-001, ENTRY-002, ENTRY-003, ENTRY-006, ENTRY-011]

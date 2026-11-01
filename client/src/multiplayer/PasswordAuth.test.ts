@@ -138,8 +138,8 @@ it('preserves bounded-read errors and maps auth errors without echoing server se
   await expect(request()).rejects.toThrow('Неверное имя или пароль');
 });
 
-it('sends authenticated logout and accepts expiry but reports a server failure', async () => {
-  const fetcher = vi.fn().mockResolvedValueOnce(new Response('', { status: 401 })).mockResolvedValueOnce(new Response('', { status: 503 })); vi.stubGlobal('fetch', fetcher);
+it('sends authenticated logout and requires HTTP 204', async () => {
+  const fetcher = vi.fn().mockResolvedValueOnce(new Response(null, { status: 204 })).mockResolvedValueOnce(new Response('', { status: 401 })); vi.stubGlobal('fetch', fetcher);
   await expect(revokeSession('http://local/', 'token')).resolves.toBeUndefined();
   expect(fetcher.mock.calls[0]).toEqual(['http://local/api/auth/logout', expect.objectContaining({ method: 'POST', headers: { Authorization: 'Bearer token' }, cache: 'no-store', credentials: 'omit', redirect: 'error', signal: expect.any(AbortSignal) })]);
   await expect(revokeSession('http://local', 'token')).rejects.toThrow('Не удалось подтвердить выход');

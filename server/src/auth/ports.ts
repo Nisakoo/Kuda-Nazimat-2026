@@ -27,6 +27,7 @@ export interface StoredSession {
 }
 export type RevokeReason = 'logout' | 'password-changed' | 'password-reset' | 'operator' | 'limit';
 export interface SessionStore {
+  isActive(sessionId: string, playerId: string, now: number): boolean;
   create(session: StoredSession): void;
   find(tokenHash: string): { readonly identity: PlayerIdentity; readonly expiresAt: number; readonly sessionId: string; readonly revokedAt: number | null } | null;
   /** Revokes the given session or every active session of an account; returns token hashes that were active. */

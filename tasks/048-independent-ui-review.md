@@ -4,7 +4,7 @@ type: implementation-task
 status: in-progress
 spec: ../specs/client-auth-screens.md
 requirements: [ENTRY-001–013]
-depends_on: [TASK-040, TASK-041, TASK-042, TASK-043, TASK-044, TASK-045, TASK-046, TASK-047]
+depends_on: [TASK-073, TASK-074, TASK-075, TASK-076, TASK-077, TASK-045, TASK-046, TASK-047]
 related:
   - spec: ../specs/client-game-hud.md
     requirements: [HUD-001–020]

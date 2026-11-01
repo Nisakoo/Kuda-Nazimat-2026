@@ -46,14 +46,14 @@ async function fixture() {
     finally { await cleanup.promise; }
   }, options);
   const store = sqliteBabylon(db); let ids = 0;
-  const service = new BabylonService({ store, language, generate, now: () => state.wall, id: () => `id${++ids}`,
+  const service = new BabylonService({ store, language, generate, now: () => state.wall, monotonicNow: () => state.mono, id: () => `id${++ids}`,
     location: () => ({ mapId: 'market', position: { x: -3, y: 0, z: -26 } }),
   });
   for (const [index, person] of [sender, recipient].entries()) await service.handle(person,
     parseBabylonRequest({ v: 2, requestId: `enroll${index}`, action: { type: 'enroll', size: 2, native: 'ru', learning: 'en' } }), 'enroll');
   const call = (action: BabylonAction, authorize?: () => Promise<boolean>) => service.handle(sender,
-    parseBabylonRequest({ v: 2, requestId: 'late', action }), 'babel:sender', authorize);
-  return { db, sender, recipient, state, timers, logger, queue, service, store, call, translated, translationStarted, cleanup, signal: () => signal };
+    parseBabylonRequest({ v: 2, requestId: 'late', action }), 'babel:sender', authorize, { sessionId: 'test-session', isActive: () => true });
+  return { db, sender, recipient, state, timers, logger, queue, service, store, call, translated, translationStarted, cleanup, language, signal: () => signal };
 }
 
 const actions: BabylonAction[] = [
@@ -64,7 +64,9 @@ const actions: BabylonAction[] = [
 for (const action of actions) it.each(['translation', 'authorization'] as const)(`${action.type}: rejects a late %s after wall rollback before any terminal commit`, async phase => {
   const f = await fixture();
   const authorizationStarted = deferred<void>(), authorized = deferred<boolean>();
+  let authorizationChecks = 0;
   const authorize = vi.fn(async () => {
+    if (++authorizationChecks === 1) return true; // Dispatch check must not consume the terminal-authorization fixture.
     authorizationStarted.resolve();
     return phase === 'authorization' ? authorized.promise : true;
   });
@@ -85,7 +87,7 @@ for (const action of actions) it.each(['translation', 'authorization'] as const)
     authorized.resolve(true);
   }
   await rejected;
-  expect(authorize).toHaveBeenCalledOnce();
+  expect(authorize).toHaveBeenCalledTimes(2);
   expect(f.signal().aborted).toBe(true);
   expect(f.store.operation(f.sender.playerId, 'late')).toMatchObject({ status: 'failed' });
   expect(f.store.operation(f.sender.playerId, 'late')?.suggestion).toBeUndefined();
@@ -106,4 +108,34 @@ for (const action of actions) it.each(['translation', 'authorization'] as const)
   expect(f.store.operation(f.sender.playerId, 'late')?.status).toBe('failed');
   expect(f.service.state(f.recipient).messages).toEqual([]); expect(f.service.state(f.sender).replies).toEqual([]);
   f.queue.stop();
+});
+
+for (const action of actions) it(`BABEL ${action.type}: admission authorization cannot restore time after monotonic expiry`, async () => {
+  const f = await fixture(), allowed = deferred<boolean>();
+  const translate = vi.spyOn(f.language, 'translate'), answer = vi.spyOn(f.language, 'answer');
+  const pending = f.call(action, async () => allowed.promise);
+  const rejected = expect(pending).rejects.toMatchObject({ code: 'UNAVAILABLE' });
+  await flush(); f.state.mono = 1000; f.state.wall -= 60000; allowed.resolve(true);
+  await rejected; expect(f.signal().aborted).toBe(true);
+  expect(translate).not.toHaveBeenCalled(); expect(answer).not.toHaveBeenCalled();
+  expect(f.queue.state().unfinished).toBe(1);
+  f.cleanup.resolve(); await flush(); expect(f.queue.state().unfinished).toBe(0);
+  f.queue.stop();
+});
+
+for (const phase of ['dispatch', 'terminal'] as const) it(`no-translation chat keeps a monotonic budget across ${phase} authorization without an LLM slot`, async () => {
+  const f = await fixture(), authorized = deferred<boolean>(), entered = deferred<void>();
+  const profile = f.store.profile(f.sender.playerId)!, party = f.store.party(profile.groupId)!;
+  party.size = 1; party.members = party.members.filter(m => m.id === f.sender.playerId); f.store.saveParty(party);
+  const translate = vi.spyOn(f.language, 'translate'); let checks = 0;
+  const pending = f.call({ type: 'chat', text: 'solo' }, async () => {
+    if (phase === 'terminal' && ++checks === 1) return true;
+    entered.resolve(); return authorized.promise;
+  });
+  const rejected = expect(pending).rejects.toMatchObject({ code: 'UNAVAILABLE' });
+  await entered.promise; expect(f.queue.state().unfinished).toBe(0);
+  f.state.mono = 8000; f.state.wall -= 60000; authorized.resolve(true);
+  await rejected; expect(translate).not.toHaveBeenCalled();
+  expect(f.store.operation(f.sender.playerId, 'late')?.status).not.toBe('complete');
+  expect(f.queue.state().unfinished).toBe(0); f.queue.stop();
 });

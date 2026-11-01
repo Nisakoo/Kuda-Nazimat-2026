@@ -191,7 +191,7 @@ NPC partial-снимки не меняют правила revision/delta для 
 - Пара `npc-question`/`npc-answer` сохраняет single-final маршрут; PROTO-007 — серверное opt-in дополнение. Клиентский поток и реальные LLM partial ещё не реализованы. Preferences/durable result/ledger — план AI, не часть текущего PROTO-007; отдельный сброс NPC в целевом поведении не предусмотрен.
 - Настраиваемый NPC deadline и ожидание клиента +2 с не подтверждают цели LLM p95 ≤8 с или 4-player burst. Pending клиента ≤32 независим от GenerationQueue ≤4 unfinished и ≤1 на игрока.
 - Bootstrap сохраняет ограничения отдельных полей `worldBytes/10` и `memory ≤32 MiB`; это не процентный лимит клиентского кеша. Окно ≤25 чанков и payload guard 64 MiB заданы MAP.
-- Парольные формы и logout подключены; полная приёмка TASK-044 остаётся отдельной. Реальный LanguagePort ещё не подключён.
+- Парольные формы и logout подключены; полная приёмка TASK-044 остаётся отдельной. Явный local LanguagePort использует общий NPC runtime; качество модели не квалифицировано.
 
 ## Живой мир: PROTO-010 (NEXT-006/010/011/013/014)
 

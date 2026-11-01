@@ -57,6 +57,18 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
     }
     send({type:'ready'});
     if (startup === 'ready-partial') setTimeout(() => process.stdout.write('{'), 20);
+  } else if (event.op === 'translate') {
+    const request = event.request;
+    log({type:'translate',request});
+    if (request.text === 'stall') return;
+    if (request.text === 'deadline-gate') {
+      const timer = setInterval(() => { if (fs.existsSync(${JSON.stringify(dir)}+'/answer')) { clearInterval(timer); send({type:'translation',text:'late',finishReason:'stop'}); } }, 5);
+      return;
+    }
+    if (request.text === 'cap') return send({type:'translation',text:'unfinished',finishReason:'length'});
+    if (request.text === 'bad-type') return send({type:'answer',text:'wrong',finishReason:'stop'});
+    if (request.text === 'long') return send({type:'translation',text:'x'.repeat(4001),finishReason:'stop'});
+    return send({type:'translation',text:'Hello 🙂',finishReason:'stop'});
   } else if (event.op === 'answer') {
     const q = event.request.question;
     log({type:'answer',question:q,history:event.request.history});
@@ -118,6 +130,21 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
     if (q === 'known-error') return send({type:'error',code:'model_unavailable',message:'secret prompt and local path'});
     if (q === 'error-limit') return send({type:'error',code:'model_unavailable',message:'x'.repeat(1025)});
     if (q === 'partial') return process.stdout.write('{"type":"answer","text":"prefix"}');
+    if (event.request.locale !== 'ru') {
+      if (q === 'cap') return send({type:'answer',text:'unfinished',finishReason:'length'});
+      if (q === 'missing-reason') return send({type:'answer',text:'uncertain'});
+      if (q === 'emoji') return send({type:'answer',text:'Hello 🙂',finishReason:'stop'});
+      if (q === 'symbols') return send({type:'answer',text:'¡Hola, señor! 25 °C; ∑ 2 + 2 = 4. ؎ ب‍ب',finishReason:'stop'});
+      if (q === 'flag') return send({type:'answer',text:'🇪🇸',finishReason:'stop'});
+      if (q === 'keycap') return send({type:'answer',text:'1\\u20e3',finishReason:'stop'});
+      if (q === 'zwj-emoji') return send({type:'answer',text:'👩‍🔬',finishReason:'stop'});
+      if (q === 'modifier') return send({type:'answer',text:'🏽',finishReason:'stop'});
+      if (q === 'vs16') return send({type:'answer',text:'text\\ufe0f',finishReason:'stop'});
+      if (q === 'long-output') return send({type:'answer',text:'x'.repeat(801),finishReason:'stop'});
+      if (q === 'astral-output') return send({type:'answer',text:'𐀀'.repeat(800),finishReason:'stop'});
+      if (q === 'bad-output') return send({type:'answer',text:'\\ud800',finishReason:'stop'});
+      return send({type:'answer',text:'Hello.',finishReason:'stop'});
+    }
     setTimeout(() => send({type:'answer',text:'Ответ: '+q}), 60);
   } else if (event.op === 'stop') {
     log({type:'stop'});
@@ -151,7 +178,87 @@ afterEach(async () => {
   for (const { dir } of fixtures.splice(0)) rmSync(dir, { recursive: true, force: true });
 });
 
+it('pins identical Python and TypeScript emoji tables to the documented Unicode properties', () => {
+  const python = readFileSync(new URL('../llm/local_common.py', import.meta.url), 'utf8');
+  const typescript = readFileSync(new URL('../src/npc/adapters/localLlm.ts', import.meta.url), 'utf8');
+  const table = /(?:const )?EMOJI_RANGES = '([^']+)'/;
+  const py = table.exec(python)?.[1], ts = table.exec(typescript)?.[1];
+  expect(py).toBeDefined(); expect(py).toBe(ts);
+  const ranges = ts!.split(',').map(item => {
+    const parts = item.split('-').map(value => parseInt(value, 16));
+    return [parts[0]!, parts[parts.length - 1]!] as const;
+  });
+  // Validate the complete pinned table against Node's matching Unicode version.
+  if (process.versions.unicode !== '17.0') return; // The table stays pinned on older or newer runtimes.
+  const properties = /[\p{Extended_Pictographic}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Regional_Indicator}]/u;
+  let index = 0;
+  for (let point = 0; point <= 0x10ffff; point++) {
+    while (index < ranges.length && point > ranges[index]![1]) index++;
+    const included = index < ranges.length && point >= ranges[index]![0];
+    if (included !== properties.test(String.fromCodePoint(point))) throw new Error(`Unicode property mismatch at ${point.toString(16)}`);
+  }
+});
+
 for (const backend of ['ollama', 'mlx'] as const) {
+  describe(`${backend} translation`, () => {
+    const translation = (text: string) => ({ requestKey: 'private-key', text, source: 'es' as const, target: 'en' as const, deadlineAt: Date.now() + 5000 });
+    it('interleaves translations and NPC answers in one worker and projects only allowed fields', async () => {
+      const { responder, events } = fixture(backend); await responder.start();
+      const request = { ...translation('Hola 🙂'), npc: { persona: 'private' }, history: ['secret'], token: 'credential' };
+      expect(await responder.answer(answerRequest(), new AbortController().signal)).toEqual({ text: 'Ответ: Вопрос' });
+      expect(await responder.translate!(request, new AbortController().signal)).toEqual({ text: 'Hello 🙂' });
+      expect(await responder.answer(answerRequest(), new AbortController().signal)).toEqual({ text: 'Ответ: Вопрос' });
+      const sent = events().find(event => event.type === 'translate') as unknown as { request: Record<string, unknown> };
+      expect(sent.request).toEqual({ text: 'Hola 🙂', source: 'es', target: 'en', deadlineAt: request.deadlineAt });
+      expect(events().filter(event => event.type === 'spawn')).toHaveLength(1);
+    });
+    it.each(['x'.repeat(501), '🙂'.repeat(251), '\ud800', 'x\r'])('rejects invalid input before dispatch', async text => {
+      const { responder, events } = fixture(backend); await responder.start();
+      await expect(responder.translate!(translation(text), new AbortController().signal)).rejects.toThrow('input_too_long');
+      expect(events().some(event => event.type === 'translate')).toBe(false);
+    });
+    it.each(['cap', 'bad-type', 'long'])('rejects %s output', async text => {
+      const { responder } = fixture(backend); await responder.start();
+      await expect(responder.translate!(translation(text), new AbortController().signal)).rejects.toThrow('protocol_error');
+    });
+    it('retains quarantine on cancelled translation until physical cleanup', async () => {
+      let confirm = false; releaseCleanup.push(() => { confirm = true; });
+      const { responder, events } = fixture(backend, 'normal', { groupAlive: async () => !confirm }); await responder.start();
+      const controller = new AbortController(), pending = responder.translate!(translation('stall'), controller.signal);
+      await until(() => events().some(event => event.type === 'translate'));
+      let settled = false; const rejected = pending.catch((error: Error) => { settled = true; expect(error.message).toBe('aborted'); });
+      controller.abort(); await expect(responder.start()).rejects.toThrow('unavailable'); await wait(100);
+      expect(settled).toBe(false); expect(events().filter(event => event.type === 'spawn')).toHaveLength(1);
+      confirm = true; await rejected;
+    });
+    it('keeps the monotonic deadline after wall rollback', async () => {
+      let wall = Date.now(), mono = 0;
+      const { responder, events, releaseAnswer } = fixture(backend, 'normal', { monotonicNow: () => mono }, {}, { ...deps, clock: { now: () => wall } });
+      await responder.start();
+      const pending = responder.translate!({ ...translation('deadline-gate'), deadlineAt: wall + 1000 }, new AbortController().signal);
+      const rejected = expect(pending).rejects.toThrow('timeout');
+      await until(() => events().some(event => event.type === 'translate')); wall -= 60000; mono = 1000; releaseAnswer(); await rejected;
+    });
+  });
+  describe(`${backend} target boundary`, () => {
+    it.each(['en', 'es'] as const)('accepts explicit %s and 800 code points', async locale => {
+      const { responder } = fixture(backend); await responder.start();
+      for (const question of ['x'.repeat(800), '𐀀'.repeat(800)]) {
+        expect(await responder.answer({ ...answerRequest(), locale, question }, new AbortController().signal)).toEqual({ text: 'Hello.' });
+      }
+      expect((await responder.answer({ ...answerRequest(), locale, question: 'astral-output' }, new AbortController().signal)).text).toHaveLength(1600);
+      expect((await responder.answer({ ...answerRequest(), locale, question: 'symbols' }, new AbortController().signal)).text).toBe('¡Hola, señor! 25 °C; ∑ 2 + 2 = 4. ؎ ب‍ب');
+    });
+    it.each(['x'.repeat(801), '𐀀'.repeat(801), '\ud800', '\udc00'])('rejects invalid target question before dispatch', async question => {
+      const { responder, events } = fixture(backend); await responder.start();
+      await expect(responder.answer({ ...answerRequest(), locale: 'en', question }, new AbortController().signal)).rejects.toThrow('input_too_long');
+      expect(events().some(event => event.type === 'answer')).toBe(false);
+    });
+    it.each(['cap', 'missing-reason', 'emoji', 'flag', 'keycap', 'zwj-emoji', 'modifier', 'vs16', 'long-output', 'bad-output'])('rejects target output %s', async question => {
+      const { responder } = fixture(backend); await responder.start();
+      await expect(responder.answer({ ...answerRequest(), locale: 'es', question }, new AbortController().signal)).rejects.toThrow('protocol_error');
+    });
+  });
   describe(`${backend} strict operator options`, () => {
     it('validates required paths, version, unknown keys and numeric limits before spawn', () => {
       const valid = options(backend);

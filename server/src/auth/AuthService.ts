@@ -184,6 +184,9 @@ export function createAuthService(deps: AuthDeps) {
       if (hashes.length) log?.info('auth.logout', 'Выход из игры', { accountId: session?.identity.accountId, sessionId: session?.sessionId });
       notify(hashes, 'logout', { accountId: session?.identity.accountId });
     },
+    isActive(sessionId: string, playerId: string): boolean {
+      return typeof sessionId === 'string' && sessionId.length > 0 && sessions.isActive(sessionId, playerId, clock.now());
+    },
     async verify(token: string): Promise<SessionCheck> {
       if (!TOKEN.test(token)) return { ok: false };
       const session = sessions.find(hashToken(token));

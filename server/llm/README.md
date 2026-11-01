@@ -114,4 +114,4 @@ npm --prefix server run check
 python3 -B -m unittest discover -s server/llm -p 'test_*.py'
 ```
 
-Node subprocess fixtures и Python mocks не скачивают и не запускают Ollama/MLX. Общий контракт проверяет отсутствие внешних Node-соединений и допускает явно заданный loopback; он не наблюдает сеть дочернего Python и не заменяет OS/offline-тест. Фактические результаты и unverified gates — [TASK-045](../../tasks/045-configurable-game-llm.md).
+Node subprocess fixtures и Python mocks не скачивают и не запускают Ollama/MLX. Общий контракт проверяет отсутствие внешних Node-соединений и допускает явно заданный loopback; он не наблюдает сеть дочернего Python и не заменяет OS/offline-тест. Фактические результаты и unverified gates — [TASK-067](../../tasks/067-configurable-game-llm.md).

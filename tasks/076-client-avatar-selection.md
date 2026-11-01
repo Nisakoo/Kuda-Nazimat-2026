@@ -1,10 +1,10 @@
 ---
-id: TASK-043
+id: TASK-076
 type: implementation-task
 status: in-progress
 spec: ../specs/client-avatar-select.md
 requirements: [AVATAR-001, AVATAR-002, AVATAR-003, AVATAR-004, AVATAR-005, AVATAR-006, AVATAR-007, AVATAR-008, AVATAR-009, AVATAR-010, AVATAR-011, AVATAR-012, AVATAR-013, AVATAR-014, AVATAR-015]
-depends_on: [TASK-040]
+depends_on: [TASK-073]
 related:
   - spec: ../specs/character-presentation.md
     requirements: [CHAR-002, CHAR-003, CHAR-004, CHAR-005]

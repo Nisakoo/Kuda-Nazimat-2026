@@ -16,7 +16,7 @@ const ACCOUNTS: Record<string, { accountId: string; playerId: string; displayNam
   'token-boris-00000000002': { accountId: 'a2', playerId: 'p_boris', displayName: 'Борис' },
   'token-vera-000000000003': { accountId: 'a3', playerId: 'p_vera', displayName: 'Вера' },
 };
-const sessions: SessionVerifier = { verify: async (token) => ACCOUNTS[token] ? { ok: true, identity: ACCOUNTS[token]!, expiresAt: Date.now() + 3_600_000 } : { ok: false } };
+const sessions: SessionVerifier = { isActive: () => true, verify: async (token) => ACCOUNTS[token] ? { ok: true, identity: ACCOUNTS[token]!, sessionId: 'session-' + token, expiresAt: Date.now() + 3_600_000 } : { ok: false } };
 const saved = new Map<string, SavedPosition>();
 const players: PlayerStore = { load: (id) => saved.get(id) ?? null, save: (list) => { for (const { id, ...rest } of list) saved.set(id, rest); } };
 const asked: NpcQuestion[] = [];

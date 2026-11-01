@@ -2,7 +2,7 @@
 
 Браузерный клиент образовательного мира в сеттинге Вавилона: прогулка от третьего лица, тематические районы, NPC и общение игроков. Клиентский прототип реализован на **TypeScript strict, Vite, Svelte 5, Three.js, Socket.IO Client и Vitest**.
 
-По умолчанию открывается «Рынок Вавилона»: три лавки, четыре торговых персонажа, пастбище с четырьмя козами, закатный свет и локальный маршрут покупок/кормления. Меню содержит сумку, задание, камень и словарь. В запуске `make client` это локальный стенд со сбросом данных. `make demo` включает настоящий сервер, роли 1–4, сохранения, общие камни и личный словарь; переводчик/NPC пока явно тестовые.
+По умолчанию открывается «Рынок Вавилона»: три лавки, четыре торговых персонажа, пастбище с четырьмя козами, закатный свет и локальный маршрут покупок/кормления. Меню содержит сумку, задание, камень и словарь. В запуске `make client` это локальный стенд со сбросом данных. `make demo` включает настоящий сервер, роли 1–4, сохранения, общие камни и личный словарь; переводчик/NPC по умолчанию тестовые; явный `language.adapter: local` использует общую локальную модель.
 
 Работают локальная прогулка, GLB/glTF и анимации, потоковая карта с коллизиями и лимитом кэша, Pointer Lock, настройки и OnlineSession. Тестовый сетевой режим позволяет вручную проверить чат, ответы NPC, потерю связи и повторный вход без сервера; он явно обозначен в UI. Сервер с входом, SQLite и авторитетным миром реализован в `server/` (раздел «Сервер»); адаптивный ИИ подключается к нему отдельным адаптером. Проверка двух физических ноутбуков и реально отключённого Wi-Fi ещё не выполнена.
 
@@ -52,9 +52,11 @@ make start     # без интернета; make demo — синоним, PORT=9
 
 Сервер должен оставаться запущенным в терминале. Если `localhost:8080` отказывает в соединении, запустите `make start` (подготовленная сборка и сервер) или `make server` (если клиент уже собран). `make client` запускает отдельный локальный стенд на порту 5173.
 
+Новый вход создаёт новую область памяти NPC; продолжение той же действующей AUTH-сессии сохраняет её ограниченное окно истории.
+
 Меню содержит языки, информацию, задание, сумку, общение, камень и личный словарь. Кнопки покупки/кормления обращаются к серверу, неверный корм не расходуется. Слово в задании, переводе или ответе NPC открывает словарь с предложением перевода; запись можно исправить. Штрихи камня не стираются, закрытие окна сохраняет черновик, высеченные камни видит вся группа. Закройте панель и нажмите **Продолжить**, чтобы снова включить управление.
 
-**Переводчик и NPC сейчас тестовые:** например, «Купи финики», «Привет», «Дай воду серому козлёнку». Произвольная фраза может дать видимую ошибку; исходный текст не подставляется вместо перевода. Это не готовая Ollama-интеграция. Другой исполнитель подключает реальную модель через `LanguagePort` (`server/src/babylon/ports.ts`, реестр `server/src/babylon/adapters.ts`, ключ `language.adapter` в config.json); очередь уже общая с NPC. Подробности контракта — [PROTO-009](specs/protocol.md).
+**По умолчанию переводчик и NPC тестовые.** Для подготовленного Ollama/MLX в существующем `server/config.json` задайте `defaultMap: "market"` и `language: { "adapter": "local", "options": {} }`, сохранив свои `npc`/профили и пути моделей. Затем запустите привычный `make start` с нужными `BACKEND`/`MODEL`, если используете каталог профилей. Выберите изучаемый **en или es**, подойдите к NPC и задайте вопрос. BABEL заимствует ту же модель и очередь, без второго worker и fallback в test. Реальный запуск/качество на целевом компьютере ещё требуют проверки; инструкция A2 и fixture-тесты их не доказывают. Подробности — [сервер](server/README.md), [PROTO-009](specs/protocol.md).
 
 Башню можно смотреть и в локальном стенде: от начальной точки рынка идите налево по боковому проходу (Z≈9) в **Двор Вавилонской башни**. Пять ярусов, двор, навес и портал; справа наружная лестница поднимается на площадку 3 м. Верхние террасы и дверь закрыты. В меню есть **Символы над башней**. Исходник — `client/scripts/generate-market-models.mjs`, модель — `client/public/assets/models/market/main-building.glb`.
 
@@ -91,6 +93,8 @@ make start     # без интернета; make demo — синоним, PORT=9
 
 Обновлённые клиент и сервер необходимо развёртывать вместе: старые строгие v3-клиенты не понимают новое поле equipment, старые BABEL v2 — новые поля состояния.
 
+Режимы входа определяются через `/api/auth/mode`: development дополнительно разрешает guest/dev. После reload токен не восстанавливается, а новый вход создаёт новую AUTH-сессию.
+
 ## Проверки
 
 ```sh
@@ -109,7 +113,7 @@ PLAYWRIGHT_CHANNEL=chrome npm --prefix client run test:render
 
 Для UI/AVATAR в этой ветке: `npm --prefix client run build`, затем `cd client && npx playwright test --config playwright.ui.config.ts`. Suite сам запускает настоящий сервер на свободном localhost-порту с отдельной временной SQLite БД. Это не LAN/LLM/аппаратная приёмка. Linux/Node 24/Chromium SwiftShader даёт долгие GPU stalls; диагностика и фактические результаты — [TASK-047](tasks/047-render-backpressure.md) и `tasks/evidence/ui-redesign-2026-07-02/`. Визуальное сравнение, а не наличие файлов, определяет принятие макетов.
 
-`client/scripts/generate-avatar-models.mjs` воспроизводит оригинальные локальные GLB и автоматически входит в world:generate/prebuild/pretest. Опциональный `node client/scripts/generate-avatar-models.mjs --portraits` создаёт портреты через установленный локальный Chromium. Описание источника, общей rig/клипов и визуальные ограничения — `tasks/evidence/avatar-models-2026-07-02/README.md`. TASK-040–048 остаются in-progress, пока не закрыты обязательные сценарии/визуальные и аппаратные вопросы.
+`client/scripts/generate-avatar-models.mjs` воспроизводит оригинальные локальные GLB и автоматически входит в world:generate/prebuild/pretest. Опциональный `node client/scripts/generate-avatar-models.mjs --portraits` создаёт портреты через установленный локальный Chromium. Описание источника, общей rig/клипов и визуальные ограничения — `tasks/evidence/avatar-models-2026-07-02/README.md`. Клиентские TASK-073–077 и TASK-045–048 остаются in-progress, пока не закрыты обязательные сценарии/визуальные и аппаратные вопросы.
 
 [TASK-048](tasks/048-independent-ui-review.md): полная независимая baseline-оценка всех11 refs/экранов/4 моделей/4 размеров завершена, corrections проверяются отдельно. V4 geometry имеет независимое разрешение точных байтов и новый strict golden с сохранением старого. Canonical CPU после публикации: **client289/289, server160/160**, Svelte0 errors/0 warnings, TS/core/import/shared/build/world exit0. Byte/hash/metadata audit проходит; declared conservative market budget66347040/67108864B — не фактический RSS/GPU measurement. Старые **browser47:15pass/32fail, render8:4pass/4fail** сохраняются как failures до нового полного запуска. Actual chooser/cloth dots, fresh correction verification, hardware/LAN/Wi-Fi-off/real-LLM не приняты; подробные timestamps/logs — [UI evidence](tasks/evidence/ui-redesign-2026-07-02/README.md).
 
@@ -175,9 +179,18 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 | 043 | [Сервер: логи, метрики, экран ведущего](tasks/043-server-observability.md) | [OBS](specs/server-observability.md) | 016 |
 | 044 | [Клиент: пароли и отчёты (передача от сервера)](tasks/044-client-auth-observability-handoff.md) | AUTH, OBS-011 | 042, 043 · клиент |
 | 015 | [Сервер: локальные NPC (полный AI)](tasks/015-server-ai.md) | [AI](specs/server-ai.md) | 011, 014, 017, 025 |
-| 045 | [Ollama/MLX в игре, профили и timeout](tasks/045-configurable-game-llm.md) | [LLM](specs/server-llm-runtime.md) | 025 |
-| 046 | [LLM-документация и синхронизация main](tasks/046-llm-docs-main-sync.md) | [LLM](specs/server-llm-runtime.md) | — |
-| 058 | [Согласованные NPC-правила и руководство автора — только спеки](tasks/058-npc-behavior-specs.md) | [NPC-AI](specs/npc-character-behavior.md) | — |
+| 067 | [Ollama/MLX в игре, профили и timeout](tasks/067-configurable-game-llm.md) | [LLM](specs/server-llm-runtime.md) | 025 |
+| 068 | [LLM-документация и синхронизация main](tasks/068-llm-docs-main-sync.md) | [LLM](specs/server-llm-runtime.md) | — |
+| 069 | [Согласованные NPC-правила и руководство автора — только спеки](tasks/069-npc-behavior-specs.md) | [NPC-AI](specs/npc-character-behavior.md) | — |
+| 070 | [AUTH-область разговоров NPC — первый этап реализации](tasks/070-npc-session-foundation.md) | [NPC-AI](specs/npc-character-behavior.md) | 069 |
+| 071 | [Целевой язык и проверки локального адаптера](tasks/071-npc-target-language-boundary.md) | [NPC-AI](specs/npc-character-behavior.md) | 069 |
+| 072 | [BABEL поверх общей локальной модели](tasks/072-shared-local-language-port.md) | [NPC](specs/server-npc-dialogue.md) | 070, 071 |
+| 073 | [Клиент: вход](tasks/073-client-entry-redesign.md) | [ENTRY](specs/client-auth-screens.md) | — |
+| 074 | [Клиент: HUD](tasks/074-client-hud-panels.md) | [HUD](specs/client-game-hud.md) | — |
+| 075 | [Клиент: карта](tasks/075-client-world-map.md) | [HUD](specs/client-game-hud.md) | — |
+| 076 | [Клиент: выбор облика](tasks/076-client-avatar-selection.md) | [AVATAR](specs/client-avatar-select.md) | 073 |
+| 077 | [Клиент: визуальное соответствие](tasks/077-client-visual-fidelity.md) | [HUD](specs/client-game-hud.md) | 073, 074, 075 |
+| 078 | [Интеграция NPC с main](tasks/078-npc-main-sync.md) | [NPC-AI](specs/npc-character-behavior.md) | 070, 071, 072 |
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
 
@@ -188,7 +201,7 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 
 **Установка на своём компьютере с нуля:** [server/llm/SETUP.md](server/llm/SETUP.md). [Справочник runtime](server/llm/README.md), [подготовленные профили](server/llm/PROFILES.md), [timeout в секундах](server/llm/TIMEOUT.md). На уже подготовленной машине не нужно повторять скачивание моделей, установку Python или импорт профилей.
 
-В `NpcResponder` зарегистрированы `scripted`, `ollama`, `mlx`. Реальные варианты: **Ollama Qwen3.5-2B Q4_K_M**, явный кандидат **0.8B Q8_0**, либо **MLX text-only Qwen3.5-2B 4-bit/group64** на Apple Silicon. Native supervisor работает для macOS/Linux POSIX; Windows-версия не реализована. Автоматического выбора, скачивания или fallback нет. Реальный `LanguagePort` для перевода/ответов BABEL ещё не подключён: `language.adapter: test` остаётся явной заглушкой, выбор `npc.adapter: ollama` не переводит BABEL на LLM.
+В `NpcResponder` зарегистрированы `scripted`, `ollama`, `mlx`. Реальные варианты: **Ollama Qwen3.5-2B Q4_K_M**, явный кандидат **0.8B Q8_0**, либо **MLX text-only Qwen3.5-2B 4-bit/group64** на Apple Silicon. Native supervisor работает для macOS/Linux POSIX; Windows-версия не реализована. Автоматического выбора, скачивания или fallback нет. `language.adapter: local` подключает BABEL к тому же responder/worker; `test` остаётся явной заглушкой по умолчанию. Один лишь выбор `npc.adapter: ollama` не меняет BABEL.
 
 ```sh
 make server NPC_TIMEOUT=60                         # текущая подготовленная модель, development
@@ -197,17 +210,17 @@ make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=120 # при наличии prep
 
 `NPC_TIMEOUT` — целые **1–300 секунд на весь вопрос, включая очередь**, только на текущий запуск. Без override применяется `npc.timeoutMs` из config (default30000мс). Клиент получает эффективный срок от сервера и ждёт плюс2с; остальные pending10с. Клиент и сервер необходимо один раз обновить/собрать вместе: игровой протокол теперь **v3**, старая вкладка v1/v2 несовместима. После сборки смена timeout не требует пересборки.
 
-**Окружения:** `make server` сохраняет development-вход по имени. `make start` / `make demo` запускают production с парольной регистрацией и входом. Парольные формы и logout подключены; полная приёмка [TASK-044](tasks/044-client-auth-observability-handoff.md) остаётся отдельной.
+**Окружения:** `make server` сохраняет development-вход по имени. `make start` / `make demo` запускают production, где имя без пароля не принимается. Парольные формы и серверный logout подключены; объём проверок и оставшаяся работа — [TASK-044](tasks/044-client-auth-observability-handoff.md). Для разработки и локальной проверки LLM используйте `make server` с loopback; работа формы не означает аппаратной квалификации модели или всей production-поставки.
 
 Текущий runtime: одна модель, concurrency строго1, общая `GenerationQueue` для NPC/BABEL с ≤4 unfinished и ≤1/player; контекст2048, вход≤1792, выход≤128токенов, thinking выключен. Русский prompt просит1–2предложения/до20слов как мягкую цель, не жёсткую обрезку. SQLite хранит последние50пар на игрока/NPC, в prompt идут не более6; финал сохраняется до доставки, timeout/отмена не создают историю. Слот остаётся занят до подтверждённого cleanup.
 
 Целевой общий пик RAM≤4 000 000 000байт; sampled RSS watchdog с soft threshold3 500 000 000байт **не является гарантированным hard cap**. Скорость p95 полного стандартного ответа≤8с и burst-критерии четверых остаются целями квалификации, не достигнутыми результатами. Длинный timeout их не заменяет.
 
-Серверный opt-in `npc-partial`/`npc-cancel` уже есть (PROTO-007), scripted умеет выдавать partial. Текущий клиент не включает stream ([TASK-041](tasks/041-client-npc-stream.md)); реальные LLM workers возвращают финал и только внутренние числовые стадии, не stream текста игроку. FTS5 grounding, утверждённый корпус, расширенные настройки/ledger и компактная память остаются планом AI, не описанием работающей модели. Прежний план пользовательского reset NPC заменён новой AUTH-сессией; это ещё не реализованная граница памяти.
+Серверный opt-in `npc-partial`/`npc-cancel` уже есть (PROTO-007), scripted умеет выдавать partial. Текущий клиент не включает stream ([TASK-041](tasks/041-client-npc-stream.md)); реальные LLM workers возвращают финал и только внутренние числовые стадии, не stream текста игроку. FTS5 grounding, утверждённый корпус, расширенные настройки/ledger и компактная память остаются планом AI, не описанием работающей модели. Первый срез [TASK-070](tasks/070-npc-session-foundation.md) изолирует ограниченную историю по AUTH sessionId/playerId/npcId, включая BABEL snapshot/replay. Пока сохранены прежние суммарные окна 50/6, не полный архив; новая сессия не получает прежние NPC-тексты.
 
-**Согласовано, ещё не реализовано:** [NPC-AI — характер, знания, отношения и сессионная память](specs/npc-character-behavior.md), [руководство автору/агенту](docs/npc-authoring.md). NPC отвечает на en/es A2, обычно 2–4 коротких предложения без эмодзи, допускает бытовую беседу в рамках авторского Вавилона. Память изолирована по AUTH sessionId/игроку/NPC; новый вход начинает знакомство заново, меню/reconnect с той же сессией — нет. Отношение влияет только на речь, извинение снимает недовольство. Приветствие генерируется, а технический сбой допускает локальную игровую фразу без ложного успешного ответа/запоминания. Цель — по 800 кодовых точек Unicode для вопроса/ответа; кандидат 4096/256 токенов требует квалификации; текущие лимиты выше не изменились. Состояние проектирования и проверки документов — [TASK-058](tasks/058-npc-behavior-specs.md).
+**Согласованная цель, реализована лишь частично:** [NPC-AI — характер, знания, отношения и сессионная память](specs/npc-character-behavior.md), [руководство автору/агенту](docs/npc-authoring.md). NPC отвечает на en/es A2, обычно 2–4 коротких предложения без эмодзи, допускает бытовую беседу в рамках авторского Вавилона. Память изолирована по AUTH sessionId/игроку/NPC; новый вход начинает знакомство заново, меню/reconnect с той же сессией — нет. Отношение влияет только на речь, извинение снимает недовольство. Приветствие генерируется, а технический сбой допускает локальную игровую фразу без ложного успешного ответа/запоминания. Цель — по 800 кодовых точек Unicode для вопроса/ответа; кандидат 4096/256 токенов требует квалификации; текущие лимиты выше не изменились. Состояние проектирования и проверки документов — [TASK-069](tasks/069-npc-behavior-specs.md).
 
-На пользовательском Intel Mac подготовлены и запускались2B/0.8B; сохранённый2B и timeout120с подтверждены логом. Были isolated-ответы и технический отказ измерения памяти; сообщение пользователя «локально заработало» без текста/timing не квалифицирует качество, p95/RAM, offline/OS-изоляцию или стабильную игру. Здесь реальные модели/веса не запускались. Факты и ограничения — [TASK-045](tasks/045-configurable-game-llm.md), синхронизация с main — [TASK-046](tasks/046-llm-docs-main-sync.md).
+На пользовательском Intel Mac подготовлены и запускались2B/0.8B; сохранённый2B и timeout120с подтверждены логом. Были isolated-ответы и технический отказ измерения памяти; сообщение пользователя «локально заработало» без текста/timing не квалифицирует качество, p95/RAM, offline/OS-изоляцию или стабильную игру. Здесь реальные модели/веса не запускались. Факты и ограничения — [TASK-067](tasks/067-configurable-game-llm.md), синхронизация с main — [TASK-068](tasks/068-llm-docs-main-sync.md).
 
 ## Документация и этапы
 

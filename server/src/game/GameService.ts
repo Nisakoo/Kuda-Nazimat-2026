@@ -99,6 +99,11 @@ export class GameService {
 
   canAct(accountId: string, sessionKey: string): boolean { const seat = this.seats.get(accountId); return !!seat?.stream && seat.channel?.sessionKey === sessionKey; }
 
+  controlId(accountId: string, sessionKey: string): string | null {
+    const seat = this.seats.get(accountId);
+    return seat?.stream && seat.channel?.sessionKey === sessionKey ? seat.channel.id : null;
+  }
+
   isControlling(channel: Channel): boolean { return this.seatOf(channel) !== undefined; }
 
   /** REALTIME-006: keep the entity for the grace period, then save and free the seat. */

@@ -84,6 +84,8 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
     queue.failQueuedNpc(); scheduleRecovery();
   }
   const ask: NpcQuestions['ask'] = (q, onPartial) => {
+    const authorized = () => typeof q.sessionId === 'string' && q.sessionId.length > 0 && q.authorize?.() === true;
+    if (!authorized()) return Promise.resolve({ ok: false, reason: 'cancelled' });
     observeFailure();
     if (!available || stopped || !backendReady()) {
       scheduleRecovery();
@@ -94,14 +96,15 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
       let finished = false;
       try {
         if (!available || !backendReady()) throw new Error('unavailable');
-        const history = dialogue.history(q.player.playerId, q.npc.id).slice(-6);
+        if (!authorized()) throw new Error('Access lost');
+        const history = dialogue.history(q.player.playerId, q.npc.id, q.sessionId).slice(-6);
         // Synchronous history IO consumes the original queue budget. Re-read immediately before dispatch.
-        if (budget.expired()) throw new Error('Expired');
+        if (!authorized() || budget.expired()) throw new Error('Expired or access lost');
         const deadlineAt = budget.deadlineAt();
         let partials = 0;
         const partial = onPartial && ((text: string) => {
           const clean = normalizeAnswer(text);
-          if (finished || !clean || signal.aborted || budget.expired()) return;
+          if (finished || !clean || signal.aborted || budget.expired() || !authorized()) return;
           if (partials++ === 0) {
             const ms = Math.max(0, clock.now() - accepted);
             firstPartial.observe(ms);
@@ -114,8 +117,9 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
         const text = normalizeAnswer(result.text);
         if (budget.expired()) throw new Error('Expired');
         if (!text) throw new Error('Empty answer');
+        if (!authorized() || budget.expired()) throw new Error('Access lost');
         // Deadline check and SQLite append are synchronous; cancellation cannot interleave.
-        try { dialogue.append(q.player.playerId, q.npc.id, q.question, text, clock.now()); }
+        try { dialogue.append(q.player.playerId, q.npc.id, q.question, text, clock.now(), q.sessionId); }
         catch (error) { logger.error('db.transaction.failed', 'Не удалось сохранить ответ NPC', { operation: 'dialogue.append', playerId: q.player.playerId, npcId: q.npc.id, error }); throw error; }
         logTiming('completed');
         return text;
@@ -136,6 +140,8 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
   return {
     async start() { stopped = false; recoveryAttempted = false; queue.start(); await startResponder(); },
     ready: () => available && !stopped && backendReady(),
+    /** Borrowed BABEL operations use the same health/recovery path, never replaying their request. */
+    observeRuntimeFailure: observeFailure,
     ask,
     generate: queue.generate,
     cancel: queue.cancel,

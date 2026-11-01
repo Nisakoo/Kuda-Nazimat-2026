@@ -33,15 +33,15 @@ describe('SQLite v1', () => {
     expect(player.playerId).toMatch(/^p_[a-z0-9]{16}$/);
     expect(stores.players.load(player.playerId)).toBeNull();
     stores.players.save([{ id: player.playerId, mapId: 'demo', position: { x: 1, y: 0, z: 2 }, rotationY: 3 }]);
-    for (let i = 0; i < 51; i++) stores.dialogue.append(player.playerId, 'npc', `q${i}`, `a${i}`, i);
+    for (let i = 0; i < 51; i++) stores.dialogue.append(player.playerId, 'npc', `q${i}`, `a${i}`, i, 'test-session');
     expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue').get()!.n).toBe(50);
-    expect(stores.dialogue.history(player.playerId, 'npc').map((d) => d.question)).toEqual(['q45', 'q46', 'q47', 'q48', 'q49', 'q50']);
-    expect(stores.dialogue.history('another', 'npc')).toEqual([]);
+    expect(stores.dialogue.history(player.playerId, 'npc', 'test-session').map((d) => d.question)).toEqual(['q45', 'q46', 'q47', 'q48', 'q49', 'q50']);
+    expect(stores.dialogue.history('another', 'npc', 'test-session')).toEqual([]);
     db.close();
     const reopened = openDatabase(path); databases.push(reopened); const restored = sqliteStores(reopened);
     expect(restored.accounts.findOrCreate('аня', 'аня', 2)).toEqual(player);
     expect(restored.players.load(player.playerId)?.position.x).toBe(1);
-    expect(restored.dialogue.history(player.playerId, 'npc')).toHaveLength(6);
+    expect(restored.dialogue.history(player.playerId, 'npc', 'test-session')).toHaveLength(6);
   });
   it('rolls back partial account creation, batch save and dialogue retention on failures', () => {
     const { db, stores } = database();
@@ -52,8 +52,8 @@ describe('SQLite v1', () => {
     expect(() => stores.players.save([{ id: p.playerId, mapId: 'demo', position: { x: 1, y: 0, z: 0 }, rotationY: 0 }, { id: 'missing', mapId: 'demo', position: { x: 1, y: 0, z: 0 }, rotationY: 0 }])).toThrow();
     expect(stores.players.load(p.playerId)).toBeNull();
     db.exec("CREATE TRIGGER fail_dialogue BEFORE INSERT ON npc_dialogue BEGIN SELECT RAISE(ABORT, 'test'); END");
-    expect(() => stores.dialogue.append(p.playerId, 'npc', 'q', 'a', 1)).toThrow();
-    expect(stores.dialogue.history(p.playerId, 'npc')).toEqual([]);
+    expect(() => stores.dialogue.append(p.playerId, 'npc', 'q', 'a', 1, 'test-session')).toThrow();
+    expect(stores.dialogue.history(p.playerId, 'npc', 'test-session')).toEqual([]);
   });
   it('rejects a future schema and prunes sessions older than one day only', () => {
     const { db, stores, path } = database(); const p = stores.accounts.findOrCreate('Аня', 'аня', 1);
@@ -134,10 +134,10 @@ it('the 52nd NPC answer is unavailable when SQLite fails, retaining exactly 50 c
     responder: { async start() {}, async stop() {}, async answer(request) { return { text: `Ответ ${request.question}` }; } },
   }, { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000 });
   await npc.start();
-  const base = { connectionId: 'c', player, npc: { id: 'n', name: 'Лея', topic: 'История', persona: 'Спокойная', greeting: 'Привет' } };
+  const base = { sessionId: 'test-session', authorize: () => true, connectionId: 'c', player, npc: { id: 'n', name: 'Лея', topic: 'История', persona: 'Спокойная', greeting: 'Привет' } };
   for (let i = 1; i <= 51; i++) expect((await npc.ask({ ...base, requestId: `r${i}`, question: `Вопрос ${i}` })).ok).toBe(true);
   db.exec("CREATE TRIGGER fail_52 BEFORE INSERT ON npc_dialogue BEGIN SELECT RAISE(ABORT, 'disk failure'); END");
   expect(await npc.ask({ ...base, requestId: 'r52', question: 'Вопрос 52' })).toEqual({ ok: false, reason: 'unavailable' });
   expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue').get()!.n).toBe(50);
-  expect(stores.dialogue.history(player.playerId, 'n').at(-1)?.question).toBe('Вопрос 51'); await npc.stop();
+  expect(stores.dialogue.history(player.playerId, 'n', 'test-session').at(-1)?.question).toBe('Вопрос 51'); await npc.stop();
 });

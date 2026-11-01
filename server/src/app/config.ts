@@ -90,6 +90,9 @@ export function parseConfig(raw: unknown, path: string, env: Environment = 'deve
   record(language.options, 'language.options');
   if (typeof npc.adapter !== 'string' || !npc.adapter) throw new Error('Неверный npc.adapter');
   record(npc.options, 'npc.options');
+  if (language.adapter === 'local') {
+    if (Object.keys(language.options).length) throw new Error(`Неизвестный language.options.${Object.keys(language.options)[0]}`);
+  }
   for (const [key, max] of [['maxConcurrent', 2], ['maxUnfinished', 4], ['streamTimeoutMs', NPC_TIMING.maxMs]] as const) integer(npc[key], `npc.${key}`, 1, max);
   if (!validNpcTimeoutMs(npc.timeoutMs)) throw new Error('Неверный npc.timeoutMs');
   if (['ollama', 'mlx'].includes(npc.adapter) && npc.maxConcurrent !== 1) throw new Error('Локальная LLM поддерживает только npc.maxConcurrent: 1; профиль 2 ещё не квалифицирован');

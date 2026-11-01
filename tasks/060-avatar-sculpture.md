@@ -4,7 +4,7 @@ type: implementation-task
 status: done
 spec: ../specs/client-avatar-select.md
 requirements: [AVATAR-006, AVATAR-009–011, AVATAR-015]
-depends_on: [TASK-043]
+depends_on: [TASK-076]
 related:
   - spec: ../specs/character-presentation.md
     requirements: [CHAR-001–004]
