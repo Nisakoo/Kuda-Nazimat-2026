@@ -1,0 +1,50 @@
+{
+  "status": "complete",
+  "startedAt": "2026-11-01T03:15:24.872Z",
+  "candidates": {
+    "lukas": {
+      "sha256": "7c520f452cfbbc8880bec3a4b2855d027ecb5f48049423251f8d99b88c2e6ecd",
+      "bytes": 883556
+    }
+  },
+  "images": [
+    {
+      "id": "lukas",
+      "variant": "baseline",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "shadow-ab/baseline-full.png",
+      "crop": "shadow-ab/baseline-cloth.png",
+      "shadow": {
+        "near": 0.5,
+        "far": 500,
+        "bias": 0,
+        "normalBias": 0
+      }
+    },
+    {
+      "id": "lukas",
+      "variant": "candidate",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "shadow-ab/candidate-full.png",
+      "crop": "shadow-ab/candidate-cloth.png",
+      "shadow": {
+        "near": 0.5,
+        "far": 15,
+        "bias": -0.00005,
+        "normalBias": 0.006
+      }
+    }
+  ],
+  "errors": [],
+  "shadowMap": "PCFShadowMap: explicit supported equivalent of the prior removed PCFSoftShadowMap fallback",
+  "limitations": [
+    "Private candidate GLBs only.",
+    "SwiftShader evidence is not hardware acceptance.",
+    "No tool attachment is rendered."
+  ],
+  "finishedAt": "2026-11-01T03:15:29.424Z"
+}

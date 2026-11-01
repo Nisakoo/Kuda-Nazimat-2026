@@ -1,0 +1,2791 @@
+{
+  "startedAt": "2026-11-01T05:05:29.111Z",
+  "scope": "Final OBSERVATION ONLY. 45s actions and 90s response-event allowance do NOT replace preserved 5s canonical failures. Real password UI, real server, DPR1/full quality. Explicit user Start/retry only. No automatic Pointer Lock or state/response substitution.",
+  "expectedBundle": "index-zupTnY5d.js",
+  "username": "indafter-mvxaqa5w",
+  "gates": [
+    {
+      "label": "explicit Start 5s subgates",
+      "pass": false,
+      "ms": 8898,
+      "error": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })\n    - locator resolved to <button class=\"primary large\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n"
+    }
+  ],
+  "steps": [
+    {
+      "label": "Diagnostic explicit user action only",
+      "button": "Начать прогулку ↗",
+      "locked": true,
+      "notAcceptance": true
+    },
+    {
+      "label": "saved-password-login-and-actual-Dan-Jug",
+      "ok": false,
+      "ms": 37528,
+      "error": "Error: fresh actual server entity not Dan/Jug",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта"
+    },
+    {
+      "label": "actual-HUD-1622x970",
+      "ok": true,
+      "ms": 24338,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта"
+    },
+    {
+      "label": "actual-HUD-1280x800",
+      "ok": true,
+      "ms": 20537,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта"
+    },
+    {
+      "label": "actual-HUD-390x844",
+      "ok": true,
+      "ms": 10633,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта"
+    },
+    {
+      "label": "actual-HUD-640x480",
+      "ok": true,
+      "ms": 10092,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта"
+    },
+    {
+      "label": "narrow-map-center-and-real-horizontal-key-scroll",
+      "ok": true,
+      "ms": 10787,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": false,
+      "title": "Карта Вавилона",
+      "active": {
+        "tag": "DIV",
+        "text": "ЗагонРынокДвор башниТекущее заданиеВы",
+        "label": "Карта: прокрутите по горизонтали для просмотра",
+        "inTop": true
+      },
+      "map": [
+        {
+          "left": 222,
+          "width": 316,
+          "scrollWidth": 600
+        }
+      ],
+      "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "persisted-learned-note-and-real-word-delete",
+      "ok": false,
+      "ms": 55700,
+      "error": "TimeoutError: locator.press: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator('.word-list button').filter({ hasText: 'Buy dates' })\n",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": false,
+      "title": "Мой словарь",
+      "active": {
+        "tag": "BUTTON",
+        "text": "Учу · 1",
+        "label": null,
+        "inTop": true
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEspañol → Русский\n\nПоиск\n Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nJug edited through UI\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\n Изменить\n Удалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    },
+    {
+      "label": "real chat ACK",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "es"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 3951
+          },
+          "availableParty": null,
+          "partyPositions": [],
+          "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+          "taskTitle": "Las cabras del pastor",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    84,
+                    84
+                  ],
+                  [
+                    104,
+                    104
+                  ],
+                  [
+                    124,
+                    124
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    164,
+                    164
+                  ],
+                  [
+                    184,
+                    184
+                  ],
+                  [
+                    204,
+                    204
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793508200628
+            }
+          ],
+          "words": [
+            {
+              "id": "b_bowxx494artkrxyg",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Независимая заметка после коррекции",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_hesf740jdyc9rz9y",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Jug edited through UI",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            },
+            {
+              "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793508103708
+            },
+            {
+              "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793508143839
+            },
+            {
+              "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793509733942
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "label": "new-own-Spanish-message-and-old-records-unchanged",
+      "ok": false,
+      "ms": 17241,
+      "error": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByLabel('История общения')\nExpected substring: \"Hola\"\nReceived string:    \"Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓\"\nTimeout: 5000ms\n\nCall log:\n  - Expect \"toContainText\" getByLabel('История общения') with timeout 5000ms\n  - waiting for getByLabel('История общения')\n    6 × locator resolved to <ol class=\"babel-chat\" aria-label=\"История общения\">…</ol>\n      - unexpected value \"Iindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIindafterpeer-mvxb0dmsBuy datesМашинный перевод · ДоставленоIВыПриветДоставлено✓IВыРисунок на камнеIВыПриветДоставлено✓\"\n",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": false,
+      "title": "Чат с напарниками",
+      "active": {
+        "tag": "BUTTON",
+        "text": "✕",
+        "label": "Закрыть окно",
+        "inTop": true
+      },
+      "map": [],
+      "text": "щий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · indafterpeer-mvxb0dms и вы\n\nI\nindafterpeer-mvxb0dms\nBuy dates\nМашинный перевод · Доставлено\nI\nindafterpeer-mvxb0dms\nBuy dates\nМашинный перевод · Доставлено\nI\nindafterpeer-mvxb0dms\nBuy dates\nМашинный перевод · Доставлено\nI\nВы\nПривет\nДоставлено✓\nI\nВы\nРисунок на камне\nI\nВы\nПривет\nДоставлено✓\n Нарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+    }
+  ],
+  "screens": [
+    {
+      "label": "failure-saved-password-login-and-actual-Dan-Jug",
+      "file": "correction-final-observation/failure-saved-password-login-and-actual-Dan-Jug.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3790
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "hud-1622x970",
+      "file": "correction-final-observation/hud-1622x970.png",
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3814
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "hud-1280x800",
+      "file": "correction-final-observation/hud-1280x800.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3830
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "hud-390x844",
+      "file": "correction-final-observation/hud-390x844.png",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3850
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "hud-640x480",
+      "file": "correction-final-observation/hud-640x480.png",
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер Подключён  М",
+        "label": null,
+        "inTop": false
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nВыносливость\n100%\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nСцена открыта",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3866
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "map-centered-390x844",
+      "file": "correction-final-observation/map-centered-390x844.png",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": false,
+      "title": "Карта Вавилона",
+      "active": {
+        "tag": "BUTTON",
+        "text": " К игроку",
+        "label": null,
+        "inTop": true
+      },
+      "map": [
+        {
+          "left": 142,
+          "width": 316,
+          "scrollWidth": 600
+        }
+      ],
+      "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3874
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "dictionary-persistence-1280x800",
+      "file": "correction-final-observation/dictionary-persistence-1280x800.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": false,
+      "title": "Мой словарь",
+      "active": {
+        "tag": "BUTTON",
+        "text": "Выучено · 1",
+        "label": null,
+        "inTop": true
+      },
+      "map": [],
+      "text": "Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEspañol → Русский\n\nПоиск\n Добавить\nУчу · 1\nВыучено · 1\nbasket\nкорзина\nНезависимая заметка после коррекции\n›\nbasket\n\nкорзина\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nВернуть в «Учу»\n Изменить\n Удалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3884
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "failure-persisted-learned-note-and-real-word-delete",
+      "file": "correction-final-observation/failure-persisted-learned-note-and-real-word-delete.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": false,
+      "title": "Мой словарь",
+      "active": {
+        "tag": "BUTTON",
+        "text": "Учу · 1",
+        "label": null,
+        "inTop": true
+      },
+      "map": [],
+      "text": "Вавилон\nИзучаю Español\n⌄\nПодключён\nМеню Esc\n✓\nLas cabras del pastor· 0 / 4\n⌄\nМой словарь\n✕\n\nТестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nEspañol → Русский\n\nПоиск\n Добавить\nУчу · 1\nВыучено · 1\njug\nкувшин\nJug edited through UI\n›\njug\n\nкувшин\n\nПример \nПеревод примера \nМоя заметка \nСохранить заметку и пример\nЗапомнил\n Изменить\n Удалить\nЗакрыть\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3938
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "failure-new-own-Spanish-message-and-old-records-unchanged",
+      "file": "correction-final-observation/failure-new-own-Spanish-message-and-old-records-unchanged.png",
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "locked": false,
+      "title": "Чат с напарниками",
+      "active": {
+        "tag": "BUTTON",
+        "text": "✕",
+        "label": "Закрыть окно",
+        "inTop": true
+      },
+      "map": [],
+      "text": "щий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.\n\nУчастники задания · indafterpeer-mvxb0dms и вы\n\nI\nindafterpeer-mvxb0dms\nBuy dates\nМашинный перевод · Доставлено\nI\nindafterpeer-mvxb0dms\nBuy dates\nМашинный перевод · Доставлено\nI\nindafterpeer-mvxb0dms\nBuy dates\nМашинный перевод · Доставлено\nI\nВы\nПривет\nДоставлено✓\nI\nВы\nРисунок на камне\nI\nВы\nПривет\nДоставлено✓\n Нарисовать камень\nСообщение\nОтправить\nЗакрыть\n\nПишите на родном — читайте на изучаемом\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен",
+      "entity": null,
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 3959
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          },
+          {
+            "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793509733942
+          }
+        ],
+        "replies": []
+      }
+    }
+  ],
+  "http": [
+    {
+      "path": "/api/auth/login",
+      "at": 1793509531856,
+      "status": 200,
+      "body": {
+        "token": "[REDACTED: credential excluded from Git]",
+        "expiresAt": 1793552731793
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "at": 1793509532432,
+      "action": "languages",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "94307bd7-0258-4292-bce4-9e1c931a5d6e",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "es"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 3750
+          },
+          "availableParty": null,
+          "partyPositions": [],
+          "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+          "taskTitle": "Las cabras del pastor",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    84,
+                    84
+                  ],
+                  [
+                    104,
+                    104
+                  ],
+                  [
+                    124,
+                    124
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    164,
+                    164
+                  ],
+                  [
+                    184,
+                    184
+                  ],
+                  [
+                    204,
+                    204
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793508200628
+            }
+          ],
+          "words": [
+            {
+              "id": "b_bowxx494artkrxyg",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Независимая заметка после коррекции",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_hesf740jdyc9rz9y",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Jug edited through UI",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            },
+            {
+              "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793508103708
+            },
+            {
+              "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793508143839
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/babylon",
+      "at": 1793509736014,
+      "action": "chat",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "es"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 3951
+          },
+          "availableParty": null,
+          "partyPositions": [],
+          "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+          "taskTitle": "Las cabras del pastor",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    84,
+                    84
+                  ],
+                  [
+                    104,
+                    104
+                  ],
+                  [
+                    124,
+                    124
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    164,
+                    164
+                  ],
+                  [
+                    184,
+                    184
+                  ],
+                  [
+                    204,
+                    204
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793508200628
+            }
+          ],
+          "words": [
+            {
+              "id": "b_bowxx494artkrxyg",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Независимая заметка после коррекции",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_hesf740jdyc9rz9y",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Jug edited through UI",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            },
+            {
+              "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793508103708
+            },
+            {
+              "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793508143839
+            },
+            {
+              "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793509733942
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "path": "/api/auth/logout",
+      "at": 1793509756915,
+      "status": 204,
+      "body": null
+    }
+  ],
+  "errors": [],
+  "capture": [
+    {
+      "type": "pointerlockchange",
+      "at": 32711,
+      "locked": true
+    },
+    {
+      "type": "pointerlockchange",
+      "at": 126069.5,
+      "locked": false
+    }
+  ],
+  "savedMode": true,
+  "savedLearning": "es",
+  "persistedEntity": null,
+  "narrowMapInitial": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "dpr": 1
+    },
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+    ],
+    "locked": false,
+    "title": "Карта Вавилона",
+    "active": {
+      "tag": "BUTTON",
+      "text": "×",
+      "label": "Закрыть",
+      "inTop": true
+    },
+    "map": [
+      {
+        "left": 0,
+        "width": 316,
+        "scrollWidth": 600
+      }
+    ],
+    "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+  },
+  "narrowMapAfterKeys": {
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "dpr": 1
+    },
+    "bundle": [
+      "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+    ],
+    "locked": false,
+    "title": "Карта Вавилона",
+    "active": {
+      "tag": "DIV",
+      "text": "ЗагонРынокДвор башниТекущее заданиеВы",
+      "label": "Карта: прокрутите по горизонтали для просмотра",
+      "inTop": true
+    },
+    "map": [
+      {
+        "left": 185,
+        "width": 316,
+        "scrollWidth": 600
+      }
+    ],
+    "text": "Вавилон\nИзучаю Español\n⌄\n✓\nLas cabras del pastor· 0 / 4\n⌄\nКарта Вавилона\n\nРынок и окрестности\n\n×\nЗагон\nРынок\nДвор башни\nВы\nС\n↗\n\nСхема реальных областей · Позиции с сервера. Показаны только участники вашего задания.\n\nВы\nНапарник\n◆\nЗадание\n\n К игроку\n−\n+\n\nEsc — закрыть\n\nИнвентарь\nКарта\nСловарь\nЧат\nПастбище у рынка\n\nПросмотр приостановлен"
+  },
+  "persistedDictionary": {
+    "v": 2,
+    "playerId": "p_d5w1o440fuyfxno4",
+    "backend": "test",
+    "languages": [
+      "ru",
+      "en",
+      "es"
+    ],
+    "profile": {
+      "native": "ru",
+      "learning": "es"
+    },
+    "introSeen": true,
+    "party": {
+      "id": "b_s8rzrbswf058jfhn",
+      "size": 2,
+      "count": 2,
+      "role": 1,
+      "members": [
+        {
+          "id": "p_d5w1o440fuyfxno4",
+          "name": "indafter-mvxaqa5w",
+          "role": 1
+        },
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "name": "indafterpeer-mvxb0dms",
+          "role": 2
+        }
+      ],
+      "started": true,
+      "completed": false,
+      "seconds": 3884
+    },
+    "availableParty": null,
+    "partyPositions": [],
+    "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+    "taskTitle": "Las cabras del pastor",
+    "taskTarget": {
+      "x": 0,
+      "z": -34
+    },
+    "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+    "inventory": {
+      "dates": 0,
+      "red-fruit": 0,
+      "yellow-fruit": 0,
+      "water": 0,
+      "fabric": 0
+    },
+    "fed": [],
+    "stones": [
+      {
+        "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+        "authorId": "p_d5w1o440fuyfxno4",
+        "authorName": "indafter-mvxaqa5w",
+        "drawing": [
+          [
+            [
+              64,
+              64
+            ],
+            [
+              84,
+              84
+            ],
+            [
+              104,
+              104
+            ],
+            [
+              124,
+              124
+            ],
+            [
+              144,
+              144
+            ],
+            [
+              164,
+              164
+            ],
+            [
+              184,
+              184
+            ],
+            [
+              204,
+              204
+            ],
+            [
+              224,
+              224
+            ]
+          ]
+        ],
+        "createdAt": 1793508200628
+      }
+    ],
+    "words": [
+      {
+        "id": "b_bowxx494artkrxyg",
+        "native": "ru",
+        "learning": "en",
+        "word": "basket",
+        "translation": "корзина",
+        "note": "Независимая заметка после коррекции",
+        "learned": true,
+        "example": "Bring the basket to the market.",
+        "exampleTranslation": "Принеси корзину на рынок."
+      },
+      {
+        "id": "b_hesf740jdyc9rz9y",
+        "native": "ru",
+        "learning": "en",
+        "word": "jug",
+        "translation": "кувшин",
+        "note": "Jug edited through UI",
+        "learned": false,
+        "example": "Fill the jug with water.",
+        "exampleTranslation": "Наполни кувшин водой."
+      }
+    ],
+    "messages": [
+      {
+        "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+        "authorId": "p_yy2bt5jku8ez3lx0",
+        "authorName": "indafterpeer-mvxb0dms",
+        "text": "Buy dates",
+        "language": "en",
+        "translated": true,
+        "status": "delivered",
+        "createdAt": 1793505873100
+      },
+      {
+        "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+        "authorId": "p_yy2bt5jku8ez3lx0",
+        "authorName": "indafterpeer-mvxb0dms",
+        "text": "Buy dates",
+        "language": "en",
+        "translated": true,
+        "status": "delivered",
+        "createdAt": 1793507361131
+      },
+      {
+        "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+        "authorId": "p_yy2bt5jku8ez3lx0",
+        "authorName": "indafterpeer-mvxb0dms",
+        "text": "Buy dates",
+        "language": "en",
+        "translated": true,
+        "status": "delivered",
+        "createdAt": 1793508103708
+      },
+      {
+        "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+        "authorId": "p_d5w1o440fuyfxno4",
+        "authorName": "indafter-mvxaqa5w",
+        "text": "Привет",
+        "language": "ru",
+        "translated": false,
+        "status": "delivered",
+        "createdAt": 1793508143839
+      }
+    ],
+    "replies": []
+  },
+  "messagesBeforeSpanish": [
+    {
+      "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+      "authorId": "p_yy2bt5jku8ez3lx0",
+      "authorName": "indafterpeer-mvxb0dms",
+      "text": "Buy dates",
+      "language": "en",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793505873100
+    },
+    {
+      "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+      "authorId": "p_yy2bt5jku8ez3lx0",
+      "authorName": "indafterpeer-mvxb0dms",
+      "text": "Buy dates",
+      "language": "en",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793507361131
+    },
+    {
+      "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+      "authorId": "p_yy2bt5jku8ez3lx0",
+      "authorName": "indafterpeer-mvxb0dms",
+      "text": "Buy dates",
+      "language": "en",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793508103708
+    },
+    {
+      "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+      "authorId": "p_d5w1o440fuyfxno4",
+      "authorName": "indafter-mvxaqa5w",
+      "text": "Привет",
+      "language": "ru",
+      "translated": false,
+      "status": "delivered",
+      "createdAt": 1793508143839
+    }
+  ],
+  "logoutStatus": 204,
+  "finishedAt": "2026-11-01T05:09:16.918Z"
+}

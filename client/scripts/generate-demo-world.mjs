@@ -2,6 +2,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { Box3, Matrix4, Quaternion, Vector3 } from 'three';
 import { ceilingVolumesFromGlb, placeVolumes } from './ceiling-volumes.mjs';
+import { generateAvatarModels, AVATAR_IDS } from './generate-avatar-models.mjs';
+await generateAvatarModels();
 const publicRoot = new URL('../public/', import.meta.url);
 const root = new URL('maps/demo/', publicRoot);
 await mkdir(new URL('chunks/', root), { recursive: true });
@@ -38,6 +40,13 @@ for (const name of ['courtyard', 'history', 'science', 'tablet']) {
   }
   for (const node of gltf.scenes[gltf.scene ?? 0].nodes) visit(node, new Matrix4());
   collisionProfiles[name] = rectangles;
+}
+const avatarModels = {};
+for (const id of AVATAR_IDS) {
+  const path = `assets/models/avatars/${id}.glb`;
+  const bytes = await readFile(new URL(path, publicRoot));
+  assets[path] = { bytes: bytes.length, memory: Math.max(bytes.length * 2, 1024 * 1024) };
+  avatarModels[`avatar-${id}`] = `avatars/${id}.glb`;
 }
 const chunks = [];
 const hashes = new Set();
@@ -82,7 +91,7 @@ for (let z = -16; z < 16; z++) for (let x = -16; x < 16; x++) {
   if (ceilingVolumes.length > 128) throw new Error(`Too many ceilings in ${id}`);
   chunks.push({ id, x, z, region, url, bytes: Buffer.byteLength(json), collisionUrl: collisionFile, collisionBytes: data.length, assets: [...new Set(objects.map((object) => object.assetId))], ceilingVolumes });
 }
-const manifest = { mapId: 'demo', version: 1, worldBytes: resourcesBytes, chunkSize: 32, collisionResolution: resolution, spawn: { x: 0, y: 0, z: 6 }, origin: { x: -16, z: -16 }, chunks, models: { 'demo-tablet': 'demo/tablet.glb', courtyard: 'demo/courtyard.glb', 'district-history': 'demo/history.glb', 'district-science': 'demo/science.glb' }, assets };
+const manifest = { mapId: 'demo', version: 1, worldBytes: resourcesBytes, chunkSize: 32, collisionResolution: resolution, spawn: { x: 0, y: 0, z: 6 }, origin: { x: -16, z: -16 }, chunks, models: { ...avatarModels, 'demo-tablet': 'demo/tablet.glb', courtyard: 'demo/courtyard.glb', 'district-history': 'demo/history.glb', 'district-science': 'demo/science.glb' }, assets };
 let text = '';
 for (let pass = 0; pass < 10; pass++) {
   text = JSON.stringify(manifest);

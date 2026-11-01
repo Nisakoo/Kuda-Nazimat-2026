@@ -1,0 +1,112 @@
+
+Running 4 tests using 1 worker
+
+  ✘  1 e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug (1.8m)
+  ✓  2 e2e/ui-hud.spec.ts:63:1 › real guest entry preserves only the connection address and returns from mode with Escape (6.5s)
+  ✘  3 e2e/ui-hud.spec.ts:80:1 › real registration resumes mandatory appearance and uses password authentication (1.6m)
+  ✘  4 e2e/ui-hud.spec.ts:85:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (53.7s)
+
+
+  1) e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+
+    Error: Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at avatarWorldScenario (/data/worktrees/ui-hud-669eb5/client/e2e/avatar-world-scenario.ts:39:11)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:60:3
+
+    Error Context: test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    Error Context: test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/ui-hud.spec.ts:80:1 › real registration resumes mandatory appearance and uses password authentication 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('alert')
+    Expected: "Неверное имя или пароль"
+    Received: "Неверное имя или пароль."
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="entry-error">Неверное имя или пароль.</p>
+           - unexpected value "Неверное имя или пароль."
+
+
+       at auth-avatar-scenario.ts:180
+
+      178 |
+      179 |     expect((await credentials('login', 'wrong-password-44')).status()).toBe(401);
+    > 180 |     await expect(page.getByRole('alert')).toHaveText('Неверное имя или пароль');
+          |                                           ^
+      181 |     await expect(passwordInput).toHaveValue('');
+      182 |     await expect(avatar).toBeHidden();
+      183 |     await expect(mode).toBeHidden();
+        at authAvatarScenario (/data/worktrees/ui-hud-669eb5/client/e2e/auth-avatar-scenario.ts:180:43)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:82:3
+
+    Error Context: test-results/ui-hud/ui-hud-real-registration-r-8412e-ses-password-authentication/error-context.md
+
+    Error Context: test-results/ui-hud/ui-hud-real-registration-r-8412e-ses-password-authentication/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-hud/ui-hud-real-registration-r-8412e-ses-password-authentication/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-hud/ui-hud-real-registration-r-8412e-ses-password-authentication/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) e2e/ui-hud.spec.ts:85:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture 
+
+    Error: Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/data/worktrees/ui-hud-669eb5/client/e2e/helpers.ts:5:86)
+        at enroll (/data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:50:9)
+        at /data/worktrees/ui-hud-669eb5/client/e2e/ui-hud.spec.ts:88:3
+
+    Error Context: test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/error-context.md
+
+    Error Context: test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-hud/ui-hud-real-server-HUD-swi-41dcc-d-requires-explicit-capture/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+    e2e/ui-hud.spec.ts:80:1 › real registration resumes mandatory appearance and uses password authentication 
+    e2e/ui-hud.spec.ts:85:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture 
+  1 passed (5.1m)

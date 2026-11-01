@@ -1,4 +1,4 @@
-import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFSoftShadowMap } from 'three';
+import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFShadowMap } from 'three';
 import type { CameraView, RenderAdapter, VisualChunk, RenderDiagnostics } from '../RenderAdapter';
 import type { EntityId, WorldSnapshot } from '../../core/types';
 import { SceneAssets } from './SceneAssets';
@@ -9,6 +9,7 @@ import { GltfLibrary } from './GltfLibrary';
 import { VisualChunks } from './VisualChunks';
 import { CameraObstruction } from './CameraObstruction';
 import { damp } from './CharacterMotion';
+import { FrameFence } from './FrameFence';
 import type { SceneStateMessage } from '../../../../shared/world-life/types.ts';
 import { WorldLifeVisuals } from './WorldLifeVisuals';
 
@@ -31,12 +32,20 @@ export class ThreeRenderer implements RenderAdapter {
   private focusHeight = .8;
   private sun: DirectionalLight | null = null;
   private readonly errors = new Map<string, string>();
+  private frameFence: FrameFence | null = null;
+  private readonly contextLost = (): void => { this.frameFence?.contextLost(); this.errors.set('gpu', 'Графический контекст потерян.'); };
+  private readonly contextRestored = (): void => { this.frameFence?.contextRestored(); this.errors.delete('gpu'); };
 
   constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true, private readonly marketStyle = false) {}
 
   mount(container: HTMLElement): void {
     if (this.renderer) throw new Error('Сцена уже создана.');
     this.renderer = new WebGLRenderer({ antialias: true });
+    const gl = this.renderer.getContext();
+    if (!('fenceSync' in gl)) throw new Error('Требуется WebGL2 для управления очередью кадров.');
+    this.frameFence = new FrameFence(gl);
+    this.renderer.domElement.addEventListener('webglcontextlost', this.contextLost);
+    this.renderer.domElement.addEventListener('webglcontextrestored', this.contextRestored);
     this.renderer.domElement.setAttribute('aria-label', 'Трёхмерная сцена');
     this.renderer.domElement.setAttribute('role', 'img');
     this.scene = new Scene();
@@ -47,7 +56,7 @@ export class ThreeRenderer implements RenderAdapter {
     sun.position.set(this.marketStyle ? 18 : -8, this.marketStyle ? 12 : 18, this.marketStyle ? -12 : 10);
     if (this.marketStyle) {
       this.renderer.toneMapping = ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.05;
-      this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = PCFSoftShadowMap;
+      this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = PCFShadowMap;
       sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
       Object.assign(sun.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24, near: 1, far: 85 });
       sun.shadow.normalBias = .035; sun.shadow.bias = -.0001;
@@ -81,12 +90,13 @@ export class ThreeRenderer implements RenderAdapter {
       throw error;
     }
   }
+  revealChunks(): void { this.chunks?.reveal(); }
   unloadChunk(id: string): void { this.chunks?.unload(id); this.errors.delete(`chunk:${id}`); }
   retryFailedModels(): void { this.errors.clear(); this.visuals?.retryFailed(); this.life?.retryFailed(); }
   getDiagnostics(): RenderDiagnostics {
     const stats = this.library?.stats;
     return { chunks: this.chunks?.ids ?? [], entities: [...this.visuals?.ids ?? [], ...this.life?.ids ?? []], models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
-      pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
+      appearing: this.chunks?.appearing ?? 0, pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
   }
 
   resize(width: number, height: number, pixelRatio: number): void {
@@ -128,9 +138,14 @@ export class ThreeRenderer implements RenderAdapter {
       halfHeight*this.camera.aspect,halfHeight,this.scene.children.filter(child=>child.name.startsWith('chunk:')),delta);
     this.camera.position.copy(this.target).addScaledVector(this.cameraDirection,allowed);
     this.camera.lookAt(this.target);
+    if (!this.frameFence?.canSubmit()) {
+      if (this.frameFence?.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
+      return;
+    }
     this.scene.matrixWorldAutoUpdate = false;
-    try { this.renderer.render(this.scene, this.camera); }
+    try { this.renderer.render(this.scene, this.camera); this.frameFence.submitted(); }
     finally { this.scene.matrixWorldAutoUpdate = true; }
+    if (this.frameFence.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
   }
 
   dispose(): void {
@@ -142,6 +157,9 @@ export class ThreeRenderer implements RenderAdapter {
     this.sun?.shadow.dispose(); this.sun = null;
     this.scene?.clear();
     if (this.renderer) {
+      this.renderer.domElement.removeEventListener('webglcontextlost', this.contextLost);
+      this.renderer.domElement.removeEventListener('webglcontextrestored', this.contextRestored);
+      this.frameFence?.dispose(); this.frameFence = null;
       this.renderer.dispose();
       this.renderer.forceContextLoss();
       this.renderer.domElement.remove();

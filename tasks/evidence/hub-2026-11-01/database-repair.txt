@@ -1,0 +1,5 @@
+Working DB: server/data/game.sqlite
+Before: migration markers 1–6; players.avatar_id absent; integrity_check=ok.
+Consistent backup: server/data/backups/game-before-schema-repair-1793521399397.sqlite
+After: avatar_id present; all 11 existing players readable; integrity_check=ok; foreign_key_check empty.
+Smoke on separate backup of repaired working DB: real application startup, password registration, avatar save and pre-game language profile save passed. Source DB not changed by smoke.

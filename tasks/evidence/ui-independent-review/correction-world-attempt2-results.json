@@ -1,0 +1,1753 @@
+{
+  "startedAt": "2026-11-01T04:11:46.939Z",
+  "username": "indafter-mvxaqa5w",
+  "peerName": "indafterpeer-mvxbcj97",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "One actual rendered client and one real authenticated peer. Pending-only cases use 2500ms CDP transport latency, never response/body/state replacement; not performance evidence.",
+  "steps": [
+    {
+      "label": "password-login-enroll-real-two-person-task",
+      "ok": false,
+      "ms": 6843,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('radio', { name: /^С друзьями/ })\n    - locator resolved to <input type=\"radio\" name=\"entry-mode\"/>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 500ms\n",
+      "at": 6817.700000017881,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Куда отправимся?",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\n\nПродолжение сохранённого задания. Режим и прогресс сохраняются.\n\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n→\nЧисло игроков\n2\n3\n4\nДалее: языки →\n← Назад"
+    },
+    {
+      "label": "R06-initial-I-immediate-and-delayed-natural-ACK",
+      "ok": false,
+      "ms": 5044,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Инвентарь', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Инвентарь', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Инвентарь', exact: true })\n",
+      "at": 12186.200000017881,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Куда отправимся?",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\n\nПродолжение сохранённого задания. Режим и прогресс сохраняются.\n\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n→\nЧисло игроков\n2\n3\n4\nДалее: языки →\n← Назад"
+    },
+    {
+      "label": "real-authenticated-protocol-peer",
+      "ok": true,
+      "ms": 198,
+      "at": 12685.200000017881,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Куда отправимся?",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\n\nПродолжение сохранённого задания. Режим и прогресс сохраняются.\n\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n→\nЧисло игроков\n2\n3\n4\nДалее: языки →\n← Назад"
+    },
+    {
+      "label": "R06-pending-ACK-focus-recovery-controlled-transport",
+      "ok": false,
+      "ms": 5055,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 17757.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "R06-user-focus-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 5027,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 23119.80000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "R06-new-map-modal-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 5016,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 28443.20000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "R06-Settings-before-ACK-is-preserved",
+      "ok": false,
+      "ms": 5057,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 33766.20000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "CDP real transport latency",
+      "ms": 0,
+      "notPerformanceAcceptance": true
+    },
+    {
+      "label": "dictionary-create-note-example-learn-edit-search-delete",
+      "ok": false,
+      "ms": 5009,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })\n",
+      "at": 39172.20000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "real-peer-chat-translation-add-word-own-delivery-stone",
+      "ok": false,
+      "ms": 9,
+      "failure": "Error: {\"v\":2,\"requestId\":\"57fd9b3b-72d6-4472-b61d-18bdf78f4761\",\"error\":{\"code\":\"NOT_READY\",\"message\":\"Дождитесь всех участников\"}}",
+      "at": 39532,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "map-real-authority-zoom-center-and-live-peer-movement",
+      "ok": false,
+      "ms": 5018,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })\n",
+      "at": 44823.20000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "all-windows-1622x970",
+      "ok": false,
+      "ms": 5068,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 50181.20000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "all-windows-1280x800",
+      "ok": false,
+      "ms": 5059,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 55785.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "all-windows-390x844",
+      "ok": false,
+      "ms": 5202,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 61277.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "all-windows-640x480",
+      "ok": false,
+      "ms": 5046,
+      "failure": "TimeoutError: locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })\n",
+      "at": 66541.70000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "languages-real-ACK-new-message-old-message-preservation",
+      "ok": false,
+      "ms": 5035,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 71722.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "live-appearance-Dan-server-and-peer",
+      "ok": false,
+      "ms": 5015,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 77020.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "map-excludes-real-outsider-sequential-peer-socket",
+      "ok": false,
+      "ms": 59,
+      "failure": "Error: {\"v\":2,\"requestId\":\"58ee1ae9-03b9-4e70-b3f5-a6b0758a5ba9\",\"error\":{\"code\":\"CONFLICT\",\"message\":\"Режим группы уже выбран первым игроком\"}}",
+      "at": 77416.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    },
+    {
+      "label": "password-relogin-persistence",
+      "ok": false,
+      "ms": 5009,
+      "failure": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+      "at": 82696.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя."
+    }
+  ],
+  "screens": [
+    {
+      "label": "failure-password-login-enroll-real-two-person-task",
+      "file": "correction-world/failure-password-login-enroll-real-two-person-task.png",
+      "at": 6827.200000017881,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Куда отправимся?",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\n\nПродолжение сохранённого задания. Режим и прогресс сохраняются.\n\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n→\nЧисло игроков\n2\n3\n4\nДалее: языки →\n← Назад",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 531
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-initial-I-immediate-and-delayed-natural-ACK",
+      "file": "correction-world/failure-R06-initial-I-immediate-and-delayed-natural-ACK.png",
+      "at": 12207.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →",
+        "inTop": true
+      },
+      "dialogs": [
+        {
+          "title": "Куда отправимся?",
+          "modal": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 800
+          },
+          "width": 1280,
+          "scrollWidth": 1280,
+          "height": 800,
+          "scrollHeight": 800
+        }
+      ],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nКуда отправимся?\n△\n\nПродолжение сохранённого задания. Режим и прогресс сохраняются.\n\nВыберите режим\nОдному\nГород и его жители\n→\nС друзьями\nОбщее приключение\n→\nЧисло игроков\n2\n3\n4\nДалее: языки →\n← Назад",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-pending-ACK-focus-recovery-controlled-transport",
+      "file": "correction-world/failure-R06-pending-ACK-focus-recovery-controlled-transport.png",
+      "at": 17769.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-user-focus-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-user-focus-before-ACK-is-preserved.png",
+      "at": 23129.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-new-map-modal-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-new-map-modal-before-ACK-is-preserved.png",
+      "at": 28449.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-R06-Settings-before-ACK-is-preserved",
+      "file": "correction-world/failure-R06-Settings-before-ACK-is-preserved.png",
+      "at": 33785.90000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-dictionary-create-note-example-learn-edit-search-delete",
+      "file": "correction-world/failure-dictionary-create-note-example-learn-edit-search-delete.png",
+      "at": 39183.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-real-peer-chat-translation-add-word-own-delivery-stone",
+      "file": "correction-world/failure-real-peer-chat-translation-add-word-own-delivery-stone.png",
+      "at": 39543.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-map-real-authority-zoom-center-and-live-peer-movement",
+      "file": "correction-world/failure-map-real-authority-zoom-center-and-live-peer-movement.png",
+      "at": 44829.30000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-1622x970",
+      "file": "correction-world/failure-all-windows-1622x970.png",
+      "at": 50186.20000001788,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-1280x800",
+      "file": "correction-world/failure-all-windows-1280x800.png",
+      "at": 55791.80000001192,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-390x844",
+      "file": "correction-world/failure-all-windows-390x844.png",
+      "at": 61286.40000000596,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-all-windows-640x480",
+      "file": "correction-world/failure-all-windows-640x480.png",
+      "at": 66545.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-languages-real-ACK-new-message-old-message-preservation",
+      "file": "correction-world/failure-languages-real-ACK-new-message-old-message-preservation.png",
+      "at": 71726.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-live-appearance-Dan-server-and-peer",
+      "file": "correction-world/failure-live-appearance-Dan-server-and-peer.png",
+      "at": 77026.59999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-map-excludes-real-outsider-sequential-peer-socket",
+      "file": "correction-world/failure-map-excludes-real-outsider-sequential-peer-socket.png",
+      "at": 77421.5,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    },
+    {
+      "label": "failure-password-relogin-persistence",
+      "file": "correction-world/failure-password-relogin-persistence.png",
+      "at": 82700.09999999404,
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "locked": false,
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город △ Вход Регистрация Имя игрока",
+        "inTop": false
+      },
+      "dialogs": [],
+      "scroll": [],
+      "dock": [],
+      "alerts": [],
+      "text": "Вавилон\n\nВАВИЛОН\n\nВойти в город\n△\nВход\nРегистрация\nИмя игрока\nПароль\nНачать путешествие →\nНастроить подключение\nДемонстрационный вход по имени\n\nБез пароля и регистрации. Любой участник может использовать это имя.",
+      "party": {
+        "id": "b_s8rzrbswf058jfhn",
+        "size": 2,
+        "count": 2,
+        "role": 1,
+        "members": [
+          {
+            "id": "p_d5w1o440fuyfxno4",
+            "name": "indafter-mvxaqa5w",
+            "role": 1
+          },
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "role": 2
+          }
+        ],
+        "started": true,
+        "completed": false,
+        "seconds": 537
+      },
+      "partyPositions": []
+    }
+  ],
+  "gates": [],
+  "errors": [],
+  "http": [],
+  "peerEvents": [
+    {
+      "action": {
+        "type": "enroll",
+        "size": 2,
+        "native": "ru",
+        "learning": "en"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "f62292e4-ff68-44bf-ba1a-7ecef77cd469",
+        "state": {
+          "v": 2,
+          "playerId": "p_jr7yz3dkn1ad0uve",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": false,
+          "party": {
+            "id": "b_9lf05xhwrhf3ruuo",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_jr7yz3dkn1ad0uve",
+                "name": "indafterpeer-mvxbcj97",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "kind": "joined",
+      "name": "indafterpeer-mvxbcj97",
+      "playerId": "p_jr7yz3dkn1ad0uve",
+      "world": {
+        "manifestUrl": "maps/market/manifest.json",
+        "worldBytes": 23648595,
+        "manifestBytes": 1415164,
+        "assets": {
+          "assets/models/demo/history.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/science.glb": {
+            "bytes": 52080,
+            "memory": 3145728
+          },
+          "assets/models/demo/tablet.glb": {
+            "bytes": 46836,
+            "memory": 3145728
+          },
+          "assets/models/avatars/lukas.glb": {
+            "bytes": 883556,
+            "memory": 1767112
+          },
+          "assets/models/avatars/nic.glb": {
+            "bytes": 883560,
+            "memory": 1767120
+          },
+          "assets/models/avatars/dan.glb": {
+            "bytes": 883568,
+            "memory": 1767136
+          },
+          "assets/models/avatars/ksu.glb": {
+            "bytes": 720372,
+            "memory": 1440744
+          },
+          "assets/models/market/market.glb": {
+            "bytes": 808632,
+            "memory": 8388608
+          },
+          "assets/models/market/pasture.glb": {
+            "bytes": 409960,
+            "memory": 6291456
+          },
+          "assets/models/market/main-building.glb": {
+            "bytes": 453240,
+            "memory": 6291456
+          }
+        }
+      },
+      "snapshot": {
+        "tick": 36207,
+        "entities": [
+          {
+            "id": "p_jr7yz3dkn1ad0uve",
+            "character": {
+              "kind": "player",
+              "name": "indafterpeer-mvxbcj97"
+            },
+            "transform": {
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 3.141592653589793
+            },
+            "movement": {
+              "direction": {
+                "x": 0,
+                "z": 0
+              },
+              "speed": 3
+            },
+            "motion": {
+              "grounded": true,
+              "phase": "grounded",
+              "verticalVelocity": 0,
+              "locomotion": "idle",
+              "stamina": 100,
+              "sprintBlocked": false,
+              "jumpAck": 0
+            },
+            "renderable": {
+              "assetId": "demo-player"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "shepherd",
+            "character": {
+              "kind": "npc",
+              "name": "Пастух"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -26
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Козы и пастбище"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fabric-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговка тканями"
+            },
+            "transform": {
+              "position": {
+                "x": -3,
+                "y": 0,
+                "z": -5.2
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Ткани и узоры"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "potter",
+            "character": {
+              "kind": "npc",
+              "name": "Гончар"
+            },
+            "transform": {
+              "position": {
+                "x": 4.6,
+                "y": 0,
+                "z": -0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Керамика"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          },
+          {
+            "id": "fruit-seller",
+            "character": {
+              "kind": "npc",
+              "name": "Торговец фруктами"
+            },
+            "transform": {
+              "position": {
+                "x": -4.5,
+                "y": 0,
+                "z": 0.5
+              },
+              "rotationY": 0
+            },
+            "interactable": {
+              "radius": 2.7,
+              "label": "Фрукты и финики"
+            },
+            "animationState": {
+              "name": "idle"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "action": {
+        "type": "intro-seen"
+      },
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "219903b5-b95c-4e9d-bf57-e5bc34228b17",
+        "state": {
+          "v": 2,
+          "playerId": "p_jr7yz3dkn1ad0uve",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_9lf05xhwrhf3ruuo",
+            "size": 2,
+            "count": 1,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_jr7yz3dkn1ad0uve",
+                "name": "indafterpeer-mvxbcj97",
+                "role": 1
+              }
+            ],
+            "started": false,
+            "completed": false,
+            "seconds": 0
+          },
+          "availableParty": {
+            "size": 2,
+            "count": 1
+          },
+          "partyPositions": [],
+          "task": "Waiting for the other players.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": null,
+          "goatGuide": "The white goat with a bell eats dates. The black goat with long horns eats red fruit. The spotted ginger goat eats yellow fruit. The little grey kid drinks water from a jug.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [],
+          "words": [],
+          "messages": [],
+          "replies": []
+        }
+      }
+    },
+    {
+      "action": {
+        "type": "chat",
+        "text": "Купи финики"
+      },
+      "status": 409,
+      "body": {
+        "v": 2,
+        "requestId": "57fd9b3b-72d6-4472-b61d-18bdf78f4761",
+        "error": {
+          "code": "NOT_READY",
+          "message": "Дождитесь всех участников"
+        }
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    },
+    {
+      "action": {
+        "type": "enroll",
+        "size": 1,
+        "native": "ru",
+        "learning": "en"
+      },
+      "status": 409,
+      "body": {
+        "v": 2,
+        "requestId": "58ee1ae9-03b9-4e70-b3f5-a6b0758a5ba9",
+        "error": {
+          "code": "CONFLICT",
+          "message": "Режим группы уже выбран первым игроком"
+        }
+      }
+    },
+    {
+      "kind": "logout",
+      "status": 204
+    }
+  ],
+  "focusTrace": [
+    {
+      "type": "focusout",
+      "at": 12723.09999999404,
+      "target": {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Далее: языки →"
+      },
+      "related": {},
+      "active": {
+        "tag": "BODY",
+        "label": null,
+        "text": "\n      Вавилон     Вавилон Войти в город"
+      },
+      "locked": false
+    }
+  ],
+  "firstIAt": 1793506315062,
+  "firstIDelayAfterStartReturn": null,
+  "peerId": "p_jr7yz3dkn1ad0uve",
+  "outsiderName": "indoutside-mvxbe7ph",
+  "cleanupError": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Пауза', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+  "finishedAt": "2026-11-01T04:13:15.894Z"
+}

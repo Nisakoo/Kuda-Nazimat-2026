@@ -1,0 +1,15 @@
+Sun Nov  1 02:37:03 UTC 2026
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5[39m
+
+ [32m✓[39m server/test/a-real-world.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 5433[2mms[22m[39m
+     [33m[2m✓[22m[39m loads market/demo/science with server NPC content and matches the client bootstrap byte for byte [33m 2679[2mms[22m[39m
+     [33m[2m✓[22m[39m MOVE: prepared ceilings in all three real maps stop an otherwise reachable jump [33m 2747[2mms[22m[39m
+ [32m✓[39m server/test/building-height.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 2600[2mms[22m[39m
+   [33m[2m✓[22m[39m authoritative market movement climbs the real stair, respects its rails and descends to the courtyard [33m 2596[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+[2m   Start at [22m 02:37:04
+[2m   Duration [22m 9.37s[2m (transform 440ms, setup 0ms, import 672ms, tests 8.03s, environment 1ms)[22m
+

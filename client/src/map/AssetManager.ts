@@ -28,6 +28,7 @@ export class HttpAssetSource implements AssetSource {
     const token = this.access?.token();
     if (this.access && !token) throw new Error('Для загрузки мира требуется серверная сессия.');
     const response = await fetch(url, { signal, cache: 'no-store', credentials: 'omit', redirect: 'error', headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    signal.throwIfAborted();
     if (response.status === 401 || response.status === 403) this.access?.unauthorized();
     if (!response.ok) throw new Error(`Asset HTTP ${response.status}`);
     if (Number(response.headers.get('content-length')) > maxBytes) { await response.body?.cancel(); throw new Error('Asset exceeds declared size'); }

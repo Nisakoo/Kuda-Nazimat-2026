@@ -6,10 +6,14 @@ import { abortError } from '../../shared/AsyncLeaseCache';
 import { VisualWind } from './VisualWind';
 import type { WorldLifeDefinition } from '../../../../shared/world-life/types.ts';
 
-interface ChunkState { readonly controller: AbortController; readonly root: Group; readonly models: ModelInstance[]; readonly winds: VisualWind[]; ready: boolean }
+interface ChunkState { readonly controller: AbortController; readonly root: Group; readonly models: ModelInstance[]; readonly winds: VisualWind[]; loaded: boolean; progress: number }
 
 export class VisualChunks {
   private symbolsVisible = true;
+  private revealed = false;
+  private readonly reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  reveal(): void { this.revealed = true; }
+  get appearing(): number { return [...this.chunks.values()].filter(state => state.progress < 1).length; }
   setBuildingSymbols(visible: boolean): void {
     this.symbolsVisible = visible;
     for (const state of this.chunks.values()) for (const model of state.models) {
@@ -20,12 +24,14 @@ export class VisualChunks {
   private readonly chunks = new Map<string, ChunkState>();
   constructor(private readonly scene: Scene, private readonly library: GltfLibrary) {}
   get ids(): readonly string[] { return [...this.chunks.keys()]; }
-  get readyIds(): readonly string[] { return [...this.chunks].filter(([,state])=>state.ready).map(([id])=>id); }
+  get readyIds(): readonly string[] { return [...this.chunks].filter(([,state])=>state.loaded).map(([id])=>id); }
 
   async load(chunk: VisualChunk): Promise<void> {
     if (new Set(chunk.objects.map((object) => object.id)).size !== chunk.objects.length) throw new Error('Duplicate visual object');
     this.unload(chunk.id);
-    const state: ChunkState = { controller: new AbortController(), root: new Group(), models: [], winds: [], ready: false };
+    const state: ChunkState = { controller: new AbortController(), root: new Group(), models: [], winds: [], loaded: false, progress: 0 };
+    state.root.visible = false;
+    state.root.position.y = this.reduced ? 0 : -3;
     state.root.name = `chunk:${chunk.id}`;
     this.chunks.set(chunk.id, state);
     this.scene.add(state.root);
@@ -46,7 +52,7 @@ export class VisualChunks {
         state.root.add(root);
         state.winds.push(new VisualWind(model.root, chunk.id === '0_0' && object.assetId === 'market'));
       }));
-      if (this.chunks.get(chunk.id) === state) state.ready = true;
+      state.loaded = true;
     } catch (error) {
       if (this.chunks.get(chunk.id) === state) this.unload(chunk.id);
       throw error;
@@ -55,6 +61,11 @@ export class VisualChunks {
 
   animate(delta: number, timeMs = 0, wind?: WorldLifeDefinition['wind']): void {
     for (const state of this.chunks.values()) {
+      if (this.revealed && state.loaded) {
+        state.root.visible = true;
+        state.progress = Math.min(1, state.progress + delta / (this.reduced ? .1 : .6));
+        state.root.position.y = this.reduced || state.progress === 1 ? 0 : -3 * Math.pow(1 - state.progress, 3);
+      }
       state.models.forEach((model, index) => model.animate(String(state.root.children[index]?.userData.animation ?? 'idle'), delta));
       for (const flexible of state.winds) flexible.animate(timeMs, wind);
     }

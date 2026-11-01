@@ -1,0 +1,406 @@
+[
+  {
+    "id": "lukas",
+    "row": 1,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/lukas-preview-front-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 1,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/lukas-preview-side-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 1,
+    "column": 3,
+    "lighting": "preview",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/lukas-preview-back-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 2,
+    "column": 1,
+    "lighting": "neutral",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/lukas-neutral-front-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 2,
+    "column": 2,
+    "lighting": "neutral",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/lukas-neutral-side-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 2,
+    "column": 3,
+    "lighting": "neutral",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/lukas-neutral-back-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 3,
+    "column": 1,
+    "lighting": "market",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/lukas-market-front-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 3,
+    "column": 2,
+    "lighting": "market",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/lukas-market-side-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 3,
+    "column": 3,
+    "lighting": "market",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/lukas-market-back-idle.png"
+  },
+  {
+    "id": "lukas",
+    "row": 4,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/lukas-preview-front-walk.png"
+  },
+  {
+    "id": "lukas",
+    "row": 4,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/lukas-preview-side-walk.png"
+  },
+  {
+    "id": "nic",
+    "row": 1,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/nic-preview-front-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 1,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/nic-preview-side-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 1,
+    "column": 3,
+    "lighting": "preview",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/nic-preview-back-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 2,
+    "column": 1,
+    "lighting": "neutral",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/nic-neutral-front-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 2,
+    "column": 2,
+    "lighting": "neutral",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/nic-neutral-side-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 2,
+    "column": 3,
+    "lighting": "neutral",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/nic-neutral-back-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 3,
+    "column": 1,
+    "lighting": "market",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/nic-market-front-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 3,
+    "column": 2,
+    "lighting": "market",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/nic-market-side-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 3,
+    "column": 3,
+    "lighting": "market",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/nic-market-back-idle.png"
+  },
+  {
+    "id": "nic",
+    "row": 4,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/nic-preview-front-walk.png"
+  },
+  {
+    "id": "nic",
+    "row": 4,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/nic-preview-side-walk.png"
+  },
+  {
+    "id": "dan",
+    "row": 1,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/dan-preview-front-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 1,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/dan-preview-side-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 1,
+    "column": 3,
+    "lighting": "preview",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/dan-preview-back-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 2,
+    "column": 1,
+    "lighting": "neutral",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/dan-neutral-front-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 2,
+    "column": 2,
+    "lighting": "neutral",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/dan-neutral-side-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 2,
+    "column": 3,
+    "lighting": "neutral",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/dan-neutral-back-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 3,
+    "column": 1,
+    "lighting": "market",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/dan-market-front-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 3,
+    "column": 2,
+    "lighting": "market",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/dan-market-side-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 3,
+    "column": 3,
+    "lighting": "market",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/dan-market-back-idle.png"
+  },
+  {
+    "id": "dan",
+    "row": 4,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/dan-preview-front-walk.png"
+  },
+  {
+    "id": "dan",
+    "row": 4,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/dan-preview-side-walk.png"
+  },
+  {
+    "id": "ksu",
+    "row": 1,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/ksu-preview-front-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 1,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/ksu-preview-side-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 1,
+    "column": 3,
+    "lighting": "preview",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/ksu-preview-back-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 2,
+    "column": 1,
+    "lighting": "neutral",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/ksu-neutral-front-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 2,
+    "column": 2,
+    "lighting": "neutral",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/ksu-neutral-side-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 2,
+    "column": 3,
+    "lighting": "neutral",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/ksu-neutral-back-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 3,
+    "column": 1,
+    "lighting": "market",
+    "view": "front",
+    "pose": "idle",
+    "file": "captures/ksu-market-front-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 3,
+    "column": 2,
+    "lighting": "market",
+    "view": "side",
+    "pose": "idle",
+    "file": "captures/ksu-market-side-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 3,
+    "column": 3,
+    "lighting": "market",
+    "view": "back",
+    "pose": "idle",
+    "file": "captures/ksu-market-back-idle.png"
+  },
+  {
+    "id": "ksu",
+    "row": 4,
+    "column": 1,
+    "lighting": "preview",
+    "view": "front",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/ksu-preview-front-walk.png"
+  },
+  {
+    "id": "ksu",
+    "row": 4,
+    "column": 2,
+    "lighting": "preview",
+    "view": "side",
+    "pose": "walk",
+    "seconds": 0.225,
+    "file": "captures/ksu-preview-side-walk.png"
+  }
+]

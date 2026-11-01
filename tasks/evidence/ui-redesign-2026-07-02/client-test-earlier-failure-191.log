@@ -1,0 +1,184 @@
+npm --prefix client test
+
+> educational-world-client@0.1.0 pretest
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 18697328 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 20277145 bytes.
+
+> educational-world-client@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5/client[39m
+
+ [31m❯[39m src/app/GameApp.test.ts [2m([22m[2m24 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 1171[2mms[22m[39m
+     [32m✓[39m has one loop and observer across repeated start/stop, and releases everything on dispose[32m 167[2mms[22m[39m
+     [32m✓[39m replaces the renderer on restart, retaining only one active loop[32m 21[2mms[22m[39m
+     [32m✓[39m allows a fresh application after disposing the previous instance[32m 23[2mms[22m[39m
+     [32m✓[39m resizes from the actual viewport and removes resize listeners when stopped[32m 19[2mms[22m[39m
+     [32m✓[39m suspends a hidden page and avoids a time jump on return[32m 13[2mms[22m[39m
+     [32m✓[39m reports initialization failure, cleans partial resources and allows retry[32m 27[2mms[22m[39m
+     [32m✓[39m cleans up after a rendering error without leaving a frame or observer[32m 18[2mms[22m[39m
+     [32m✓[39m shows login without creating a renderer or connection before authorization[32m 27[2mms[22m[39m
+     [32m✓[39m passes a supplied server session through the integration boundary and closes it on logout[32m 54[2mms[22m[39m
+     [32m✓[39m prepares the authoritative saved position instead of the manifest spawn in an online session[32m 162[2mms[22m[39m
+[31m     [31m×[31m applies authoritative online deltas while the map has stopped gameplay[39m[32m 211[2mms[22m[39m
+     [32m✓[39m submits one login, passes the validated session to the transport and forgets it on logout[32m 40[2mms[22m[39m
+     [32m✓[39m cancels pending login on settings and ignores stale results[32m 21[2mms[22m[39m
+     [32m✓[39m cancels pending login on logout and ignores stale results[32m 22[2mms[22m[39m
+     [32m✓[39m cancels pending login on restart and ignores stale results[32m 29[2mms[22m[39m
+     [32m✓[39m cancels pending login on dispose and ignores stale results[32m 22[2mms[22m[39m
+     [32m✓[39m times out login after ten seconds and allows retry without accepting the late response[32m 36[2mms[22m[39m
+     [32m✓[39m supports unsubscribing and clears subscriptions on dispose[32m 25[2mms[22m[39m
+     [32m✓[39m updates LocalSession with fixed steps and keeps simulation data out of UI notifications[32m 51[2mms[22m[39m
+     [32m✓[39m cleans the session when WebGL initialization fails[32m 15[2mms[22m[39m
+     [32m✓[39m publishes the final coordinates on pause and resumes without replaying held movement[32m 32[2mms[22m[39m
+     [32m✓[39m switches HUD panels and blocks capture until the map closes[32m 30[2mms[22m[39m
+[31m     [31m×[31m uses I to open and close the inventory without resuming capture[39m[32m 51[2mms[22m[39m
+     [32m✓[39m cleans the loop, session and renderer when a simulation step fails[32m 18[2mms[22m[39m
+ [32m✓[39m src/render/three/CameraRaycast.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1684[2mms[22m[39m
+   [33m[2m✓[22m[39m matches exact mesh intersections for transformed indexed and nonindexed walls, roofs and material sides [33m 1513[2mms[22m[39m
+ [32m✓[39m src/input/InputController.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 658[2mms[22m[39m
+ [32m✓[39m src/render/three/EntityVisuals.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 390[2mms[22m[39m
+ [32m✓[39m src/multiplayer/BabylonClient.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 494[2mms[22m[39m
+   [33m[2m✓[22m[39m does not overwrite an action result with an older polling response [33m 450[2mms[22m[39m
+ [32m✓[39m src/multiplayer/GuestAuth.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 438[2mms[22m[39m
+   [33m[2m✓[22m[39m validates names and posts only name to the configured server path [33m 371[2mms[22m[39m
+ [32m✓[39m src/map/AssetManager.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 629[2mms[22m[39m
+   [33m[2m✓[22m[39m requires server credentials for protected HTTP and reports expiry without a public fallback [33m 418[2mms[22m[39m
+ [32m✓[39m src/session/LocalSession.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 358[2mms[22m[39m
+ [32m✓[39m src/render/three/GltfLibrary.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 487[2mms[22m[39m
+     [33m[2m✓[22m[39m parses once, shares template geometry, runs independent mixers and frees ownership [33m 391[2mms[22m[39m
+ [32m✓[39m src/session/OnlineSession.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 358[2mms[22m[39m
+ [32m✓[39m src/app/GameLoop.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 570[2mms[22m[39m
+ [32m✓[39m src/map/ChunkManager.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 266[2mms[22m[39m
+ [32m✓[39m src/multiplayer/SocketIOAdapter.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 216[2mms[22m[39m
+ [32m✓[39m src/session/MarketSession.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 297[2mms[22m[39m
+ [32m✓[39m src/core/GameWorld.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 189[2mms[22m[39m
+ [32m✓[39m src/shared/protocol/validate.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 189[2mms[22m[39m
+ [32m✓[39m src/core/EntityManager.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 110[2mms[22m[39m
+ [32m✓[39m src/shared/AsyncLeaseCache.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 176[2mms[22m[39m
+ [32m✓[39m src/render/three/CharacterMotion.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 135[2mms[22m[39m
+ [32m✓[39m src/app/connectionPreference.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m src/app/config.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 195[2mms[22m[39m
+ [32m✓[39m src/render/three/CameraObstruction.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 114[2mms[22m[39m
+ [32m✓[39m src/app/FrameMetrics.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m src/map/WorldBudget.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 99[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/GameApp.test.ts[2m > [22mapplication lifecycle[2m > [22mapplies authoritative online deltas while the map has stopped gameplay
+[31m[1mAssertionError[22m: expected 8 to be 9 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 9[39m
+[31m+ 8[39m
+
+[36m [2m❯[22m src/app/GameApp.test.ts:[2m212:74[22m[39m
+    [90m210|[39m       transport.receive({ v: 3, type: 'delta', revision: 1, baseRevisi…
+    [90m211|[39m       [35mawait[39m vi[33m.[39m[34madvanceTimersByTimeAsync[39m([34m1[39m)[33m;[39m
+    [90m212|[39m       [34mexpect[39m(transport[33m.[39mstate[33m.[39mstatus)[33m.[39m[34mtoBe[39m([32m'connected'[39m)[33m;[39m
+    [90m   |[39m                                                                          [31m^[39m
+    [90m213|[39m       [34mexpect[39m(pending[33m.[39msize)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m214|[39m       [34madvance[39m([34m100[39m)[33m;[39m [34madvance[39m([34m120[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/GameApp.test.ts[2m > [22mapplication lifecycle[2m > [22muses I to open and close the inventory without resuming capture
+[31m[1mAssertionError[22m: expected last "vi.fn()" call to have been called with [ ObjectContaining{…} ][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  [[22m
+[2m    {[22m
+[31m+     "authError": null,[39m
+[31m+     "authName": "",[39m
+[31m+     "authPending": false,[39m
+[31m+     "authRequired": false,[39m
+[31m+     "babylon": null,[39m
+[31m+     "babylonPanel": null,[39m
+[31m+     "babylonTarget": null,[39m
+[31m+     "babylonWord": "",[39m
+[31m+     "buildingSymbols": true,[39m
+[31m+     "cacheStats": "",[39m
+[2m      "capture": "idle",[22m
+[32m-     "marketPanel": null,[39m
+[31m+     "captureError": null,[39m
+[31m+     "chatError": null,[39m
+[31m+     "chatMessages": [],[39m
+[31m+     "chatOpen": false,[39m
+[31m+     "chunkRadius": 2,[39m
+[31m+     "coordinates": "",[39m
+[31m+     "debug": false,[39m
+[31m+     "dialog": null,[39m
+[31m+     "dialogError": null,[39m
+[31m+     "dialogPending": false,[39m
+[31m+     "mapId": "market",[39m
+[31m+     "mapOpen": false,[39m
+[31m+     "mapPlayer": null,[39m
+[31m+     "market": {[39m
+[31m+       "completed": false,[39m
+[31m+       "fed": [],[39m
+[31m+       "inventory": {[39m
+[31m+         "dates": 0,[39m
+[31m+         "fabric": 0,[39m
+[31m+         "red-fruit": 0,[39m
+[31m+         "water": 0,[39m
+[31m+         "yellow-fruit": 0,[39m
+[31m+       },[39m
+[31m+       "notice": null,[39m
+[31m+       "runId": 2,[39m
+[31m+       "seconds": 0,[39m
+[31m+       "selected": null,[39m
+[31m+       "stones": [],[39m
+[31m+       "words": [],[39m
+[31m+       "wordsAdded": 0,[39m
+[31m+     },[39m
+[31m+     "marketPanel": "inventory",[39m
+[31m+     "marketTarget": null,[39m
+[31m+     "message": null,[39m
+[31m+     "mode": "local",[39m
+[31m+     "modelStats": "",[39m
+[31m+     "nearby": null,[39m
+[31m+     "networkError": null,[39m
+[31m+     "networkStatus": "unauthorized",[39m
+[31m+     "performance": "",[39m
+[2m      "phase": "stopped",[22m
+[31m+     "region": "Площадь открытий",[39m
+[31m+     "renderStats": "",[39m
+[31m+     "screen": "playing",[39m
+[31m+     "settingsError": null,[39m
+[31m+     "settingsOpen": false,[39m
+[31m+     "sprintBlocked": false,[39m
+[31m+     "stamina": 100,[39m
+[31m+     "visualError": null,[39m
+[31m+     "visualLoading": false,[39m
+[31m+     "worldReady": true,[39m
+[31m+     "worldWaiting": false,[39m
+[2m    },[22m
+[2m  ][22m
+
+[36m [2m❯[22m src/app/GameApp.test.ts:[2m397:24[22m[39m
+    [90m395|[39m       app.dispose(); app = new GameApp(parseConfig({ mapId: 'market' }…
+    [90m396|[39m       const listener = vi.fn(); app.subscribe(listener); app.start(hos…
+    [90m397|[39m       window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI'…
+    [90m   |[39m                        [31m^[39m
+    [90m398|[39m       expect(listener).toHaveBeenLastCalledWith(expect.objectContainin…
+    [90m399|[39m       window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI'…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m23 passed[39m[22m[90m (24)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m189 passed[39m[22m[90m (191)[39m
+[2m   Start at [22m 21:33:43
+[2m   Duration [22m 85.05s[2m (transform 9.29s, setup 0ms, import 19.15s, tests 9.33s, environment 9.29s)[22m
+
+make: *** [Makefile:25: client-test] Error 1

@@ -3,6 +3,8 @@
  */
 import type { Server as HttpServer } from 'node:http';
 import type { Vector3 } from '../../shared/world/types.ts';
+import type { AvatarId } from '../../shared/avatar/types.ts';
+import type { ToolId } from '../../shared/equipment/types.ts';
 import type { Logger } from './common/logger.ts';
 import type { Metrics } from './common/metrics.ts';
 import type { NpcDefinition, NpcSource } from './world/npcContent.ts';
@@ -16,10 +18,18 @@ export interface PlayerIdentity { readonly accountId: string; readonly playerId:
 /** AUTH-003: token check for the Socket.IO handshake. */
 /** sessionId is the public session id for logs (AUTH-002), never the token. */
 export type SessionCheck = { readonly ok: true; readonly identity: PlayerIdentity; readonly expiresAt: number; readonly sessionId?: string } | { readonly ok: false };
-export interface SessionVerifier { verify(token: string): Promise<SessionCheck> }
+export interface SessionVerifier { verify(token: string): Promise<SessionCheck>; state?(identity: PlayerIdentity): { requiresAvatar: boolean } }
 
 /** STORE-001/003: saved player position. */
 export interface SavedPosition { readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
+export interface AvatarStore {
+  load(playerId: string): AvatarId | null;
+  save(playerId: string, avatarId: AvatarId): void;
+}
+export interface EquipmentStore {
+  load(playerId: string): ToolId | null;
+  save(playerId: string, tool: ToolId | null): void;
+}
 export interface PlayerStore {
   load(playerId: string): SavedPosition | null;
   save(players: readonly (SavedPosition & { readonly id: string })[]): void;
@@ -81,6 +91,8 @@ export interface GameDeps {
   readonly babylon?: { enrolled(playerId: string): boolean; spawn(playerId: string): { mapId: string; position: Vector3; force: boolean } | null; entered(playerId: string): void };
   readonly sessions: SessionVerifier;
   readonly players: PlayerStore;
+  readonly avatars?: AvatarStore;
+  readonly equipment?: EquipmentStore;
   readonly npc: NpcQuestions;
   readonly clock: Clock;
   readonly scheduler: Scheduler;
@@ -94,8 +106,13 @@ export interface GameDeps {
   readonly validateOutgoing?: boolean;
 }
 export interface GameRuntime {
+  canAdmit?(accountId: string): boolean;
+  setAvatar?(playerId: string, avatarId: AvatarId): void;
+  setEquipment?(playerId: string, tool: ToolId | null): void;
   canAct?(accountId: string, sessionKey: string): boolean;
   location?(accountId: string): { mapId: string; position: Vector3 } | null;
+  /** Active world actor only; no persisted-position fallback or account lookup. */
+  playerLocation?(playerId: string): { mapId: string; position: Vector3 } | null;
   readonly maps: readonly MapSummary[];
   /** Access check by the account's authoritative position; B verifies the Bearer token first. */
   worldFile(path: string, accountId: string): WorldFileAccess;

@@ -5,8 +5,10 @@ import { handFailure } from '../../../shared/world-life/validate.ts';
 import type { WorldLifeStore } from './worldLifePorts.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
+import type { AvatarStore, EquipmentStore, PlayerPresence, PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
+import type { ToolId } from '../../../shared/equipment/types.ts';
+import type { AvatarId } from '../../../shared/avatar/types.ts';
 import { MetricsRegistry, type Counter, type Histogram, type Metrics } from '../common/metrics.ts';
-import type { PlayerIdentity, PlayerPresence, PlayerStore, SavedPosition } from '../contracts.ts';
 import type { PlayerLocation } from '../world/access.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
 import { AoiStream } from './AoiStream.ts';
@@ -47,13 +49,16 @@ export class GameService {
   private readonly scheduler: Scheduler;
   private readonly settings: GameSettings;
   private readonly log: Logger;
+  private readonly avatars: AvatarStore | undefined;
+  private readonly equipment: EquipmentStore | undefined;
   private readonly lifeStore?: WorldLifeStore;
   private readonly seatEvents: Counter;
   private readonly spawnFallbacks: Counter;
   private readonly deltaBytes: Histogram;
   private readonly packets: Counter;
 
-  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger, metrics: Metrics = new MetricsRegistry(), lifeStore?: WorldLifeStore) {
+  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger, avatars?: AvatarStore, equipment?: EquipmentStore, metrics: Metrics = new MetricsRegistry(), lifeStore?: WorldLifeStore) {
+    this.avatars = avatars; this.equipment = equipment;
     this.lifeStore = lifeStore;
     this.world = world; this.players = players; this.clock = clock; this.scheduler = scheduler; this.settings = settings; this.log = log;
     this.startedAt = clock.now().toString(36);
@@ -142,6 +147,8 @@ export class GameService {
       if ('fallback' in placement) { this.spawnFallbacks.inc(); this.log.warn('game.spawn.fallback', 'Нет свободной точки появления, использована базовая', { playerId, mapId }); }
       this.world.add({ id: playerId, name: displayName, mapId, position: placement.position, rotationY: placement.rotationY });
       this.log.debug('game.spawn', 'Точка появления выбрана', { playerId, mapId, position: placement.position, saved: usable });
+      this.world.setAvatar(playerId, this.avatars?.load(playerId) ?? null);
+      this.world.setEquipment(playerId, this.equipment?.load(playerId) ?? null);
     }
     if (force) {
       // Save the role spawn before acknowledging it, so a reconnect never restores an old demo position.
@@ -157,6 +164,8 @@ export class GameService {
     return { ok: true, message: (requestId) => ({ v: 3, type: 'joined', requestId, playerId, revision: stream.revision, snapshot, world: map.bootstrap }) };
   }
 
+  setAvatar(playerId: string, avatarId: AvatarId): void { this.world.setAvatar(playerId, avatarId); }
+  setEquipment(playerId: string, tool: ToolId | null): void { this.world.setEquipment(playerId, tool); }
   syncLife(channel: Channel, periodic = false, cache?: Map<string, SceneStateMessage>, now = this.clock.now()): void {
     const seat = this.joinedSeat(channel); const life = this.world.life;
     if (!seat || !life) return;
@@ -221,6 +230,11 @@ export class GameService {
 
   /** Who is asking, for services that act on behalf of a joined controlling connection. */
   identityOf(channel: Channel): PlayerIdentity | null { return this.joinedSeat(channel)?.identity ?? null; }
+
+  playerLocation(playerId: string): PlayerLocation | null {
+    const actor = this.world.locate(playerId);
+    return actor ? { mapId: actor.mapId, position: { ...actor.position } } : null;
+  }
 
   locate(accountId: string): PlayerLocation | null {
     const seat = this.seats.get(accountId);

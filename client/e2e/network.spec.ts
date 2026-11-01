@@ -52,14 +52,14 @@ test('changes the map and restores local play after an unauthorized real session
   await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
   await page.getByRole('button', { name: 'Начать прогулку' }).click();
   await expectCapture(page, true);
-  await expect(page.getByRole('heading', { name: 'Сады науки' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Сады науки', exact: true })).toBeVisible();
   await expect(page.getByLabel('Положение игрока')).toContainText('Z 38.0');
   expect(await old!.evaluate((element) => element.isConnected)).toBe(false);
   await page.keyboard.press('Escape');
   await page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.getByLabel('Режим сессии').selectOption('online');
   await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
-  await expect(page.getByRole('heading', { name: 'Войти в мир' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Войти в город' })).toBeVisible();
   await expect(page.locator('canvas')).toHaveCount(0);
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.getByLabel('Режим сессии').selectOption('local');

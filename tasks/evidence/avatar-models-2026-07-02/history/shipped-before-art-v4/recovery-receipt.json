@@ -1,0 +1,46 @@
+{
+  "sourceCommit": "4587fa13bd4568d997a1cae233ebea305e5da6f4",
+  "source": "Git blobs recovered after publication; public model paths were clean in git status immediately before publication.",
+  "historicalGeometryFixture": "../../geometry-neutral-before.json",
+  "historicalFixtureSha256": "181de06467582bba3d490e43b46de4b060e8620fe0fb8cd855d9e133fb1b247c",
+  "records": [
+    {
+      "file": "lukas.glb",
+      "bytes": 760932,
+      "sha256": "df28e3be7f6cbe3f188315edd69b7e4994dfd97980c158d8afd35013bfa66d69",
+      "gitBlob": "1750834d9aa36c021797f94849eddcedfe27e7c4",
+      "geometrySha256": "11bd24a14d607e78c0b7423a4e18387897ad843bcb7dc8e5100bab4ba87393a7",
+      "preCorrectionNeutralMatchedWithYNormalization": true
+    },
+    {
+      "file": "nic.glb",
+      "bytes": 760940,
+      "sha256": "35dce034ea20f55a2658d1b508f8a232f9c91dafa5da0782a127b5ce61e2b79a",
+      "gitBlob": "2e6759ff491f589b9bb1c6b800ea7fe6bbc4a0ef",
+      "geometrySha256": "7e6f4a0fbb4612aad7171b8bfb6ff7e2628c31065dcdd5151aff35c3318bfbbe",
+      "preCorrectionNeutralMatchedWithYNormalization": true
+    },
+    {
+      "file": "dan.glb",
+      "bytes": 760948,
+      "sha256": "c30616282873678cdad3835ab7e62ef7b67ec8bfa1a1e83c4e53221cb4227038",
+      "gitBlob": "4f2831f87f47f8fe650bffd368f6210d4e58fcbf",
+      "geometrySha256": "ae8a601e7070e22af475d79de42a306f6681678aa080b52ad99f1586f5603b4a",
+      "preCorrectionNeutralMatchedWithYNormalization": true
+    },
+    {
+      "file": "ksu.glb",
+      "bytes": 687564,
+      "sha256": "efdb7e1384fb0cf535577246851ad5ec6663358b51c398a00a881b6b4a68f994",
+      "gitBlob": "a1042d4fd40f93b66e7a5b68321312c51d18e072",
+      "geometrySha256": "da0c0f9c19238f50562dfe7220c607f01574ec50f303b780c9c53bc8de8c3d45",
+      "preCorrectionNeutralMatchedWithYNormalization": true
+    },
+    {
+      "file": "models.json",
+      "bytes": 2717,
+      "sha256": "ff789524c89c3dbde2e534ad54fdaca6224f63d38cc7cc3b51cd90d60a5b87e3",
+      "gitBlob": "877e5f84a2f53cb3f43ec9243bdedc3b985f4d12"
+    }
+  ]
+}

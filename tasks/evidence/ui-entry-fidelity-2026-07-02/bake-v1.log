@@ -1,0 +1,63 @@
+{
+  "at": "2026-11-01T02:39:25.477Z",
+  "sourceSha256": "b7f14096594c08e3b059633968cb35c35a762f44af6eccaa9e7fe95930a9fbb1",
+  "width": 1622,
+  "height": 970,
+  "note": "Original static Three.js scenery. Not game FPS, LAN, or hardware acceptance. No remote resources or drawn UI.",
+  "scenes": [
+    {
+      "scene": "gates",
+      "width": 1622,
+      "height": 970,
+      "dpr": 1,
+      "calls": 881,
+      "triangles": 22852,
+      "renderSubmitMs": 716.1000000238419,
+      "camera": {
+        "position": [
+          0,
+          4.3,
+          15.5
+        ],
+        "fov": 34
+      },
+      "resources": {
+        "geometries": 294,
+        "textures": 3
+      },
+      "filename": "city-gates.png",
+      "bytes": 430206,
+      "sha256": "6ba2fec014dece074a7e768d9db16ea492c411fb97f37784353d15824d7f8b31",
+      "errors": [],
+      "failedRequests": [],
+      "externalResources": []
+    },
+    {
+      "scene": "street",
+      "width": 1622,
+      "height": 970,
+      "dpr": 1,
+      "calls": 1164,
+      "triangles": 25132,
+      "renderSubmitMs": 636.7999999821186,
+      "camera": {
+        "position": [
+          0,
+          4.3,
+          15.5
+        ],
+        "fov": 34
+      },
+      "resources": {
+        "geometries": 476,
+        "textures": 3
+      },
+      "filename": "babylon-market-day.png",
+      "bytes": 439366,
+      "sha256": "c56b1b8bfb88cd668312df19c619520960ad5316786e446865bb5c621393e1c6",
+      "errors": [],
+      "failedRequests": [],
+      "externalResources": []
+    }
+  ]
+}

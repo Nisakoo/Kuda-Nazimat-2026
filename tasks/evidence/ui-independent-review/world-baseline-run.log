@@ -1,0 +1,95 @@
+START login-enroll-two
+CAPTURE welcome-loading-1280x800
+START real-headless-peer
+real-headless-peer TypeError: auth.status is not a function
+    at connectPeer (file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:17:251)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:22:44
+    at async step (file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:14:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:22:2
+CAPTURE failure-real-headless-peer
+START explicit-start-capture
+CAPTURE hud-1280x800
+START inventory-equip-focus-second-I
+CAPTURE inventory-after-equip-1280x800
+CAPTURE inventory-second-I-1280x800
+START Escape-explicit-resume
+CAPTURE world-ksu-jug-1280x800
+START dictionary-real-UI-populate
+CAPTURE dictionary-empty-1280x800
+CAPTURE dictionary-learned-1280x800
+START chat-real-peer-and-stone
+chat-real-peer-and-stone locator.click: Timeout 60000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Отправить', exact: true })
+    - locator resolved to <button disabled>Отправить</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    18 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:27:186
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:14:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:27:2 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Отправить', exact: true })",
+    '    - locator resolved to <button disabled>Отправить</button>',
+    '  - attempting click action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not enabled',
+    '    - retrying click action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not enabled',
+    '    - retrying click action',
+    '      - waiting 100ms',
+    '    18 × waiting for element to be visible, enabled and stable',
+    '       - element is not enabled',
+    '     - retrying click action',
+    '       - waiting 500ms',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-chat-real-peer-and-stone
+START map-real-peer-and-zoom
+map-real-peer-and-zoom locator.click: Timeout 60000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'К игроку', exact: true })
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:28:506
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:14:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/world-baseline.mjs:28:2 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'К игроку', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-map-real-peer-and-zoom
+START responsive-1622x970
+CAPTURE inventory-1622x970
+CAPTURE map-1622x970
+CAPTURE dictionary-1622x970
+CAPTURE chat-1622x970
+CAPTURE hud-1622x970
+START responsive-1280x800
+CAPTURE inventory-1280x800
+CAPTURE map-1280x800
+CAPTURE dictionary-1280x800
+CAPTURE chat-1280x800
+CAPTURE hud-1280x800
+START responsive-390x844
+CAPTURE inventory-390x844
+CAPTURE map-390x844
+CAPTURE dictionary-390x844
+CAPTURE chat-390x844

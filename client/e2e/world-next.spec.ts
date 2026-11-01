@@ -1,4 +1,5 @@
 import { expect as baseExpect, test, type Page, type Locator } from '@playwright/test';
+import { createFromHub, joinFromHub, resume as resumeWindow } from './helpers';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -8,7 +9,6 @@ import { once } from 'node:events';
 async function expectCapture(page: Page, captured: boolean) {
   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
   if (captured) {
-    await expect(page.getByLabel('Руки')).toBeVisible();
     await expect(page.getByLabel('Состояние связи')).toHaveText('Подключён');
   }
 }
@@ -119,7 +119,7 @@ async function start() {
     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 60000);
     child.once('exit', code => { clearTimeout(timeout); if (!expectedServerStop) console.error('NEXT unexpected backend exit', code, output); reject(new Error(`Server exited ${code}: ${output}`)); });
     const record = (data: Buffer) => { const text = data.toString(); output += text; serverOutput = (serverOutput + text).slice(-200000); console.log('NEXT backend', text.trim()); };
-    const ready = (data: Buffer) => { record(data); if (output.includes('(app.ready)')) { serverReady = true; clearTimeout(timeout); done(); } };
+    const ready = (data: Buffer) => { record(data); if ((output.includes('(app.ready)') || output.includes('ВАВИЛОН ЗАПУЩЕН'))) { serverReady = true; clearTimeout(timeout); done(); } };
     child.stderr!.on('data', ready);
     child.stdout!.on('data', ready);
   });
@@ -151,18 +151,11 @@ async function login(page: Page, name: string, size?: string, chunkRadius: numbe
   await releaseOtherCaptures(page);
   await page.route('**/config.json', route => route.fulfill({ json: { session: 'online', serverUrl: origin, mapId: 'market', debug: true, chunkRadius } }));
   await page.goto(origin); await page.getByLabel('Имя игрока').fill(name);
-  await activate(page.getByRole('button', { name: 'Войти', exact: true }));
+  await activate(page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }));
   if (size) {
-    await expect(page.getByRole('dialog', { name: 'Подготовка путешествия' })).toBeVisible();
-    const select = page.getByLabel('Число игроков'); if (await select.isEnabled()) await select.selectOption(size);
-    await activate(page.getByRole('button', { name: 'Далее: языки' }));
-    await page.getByLabel('Изучаемый язык').selectOption('en');
-    await activate(page.getByRole('button', { name: 'Войти в Вавилон' }));
-    await expect(page.getByRole('dialog', { name: 'Добро пожаловать в Вавилон' })).toBeVisible();
-    await activate(page.getByRole('button', { name: 'Закрыть', exact: true }));
-  }
-  await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
-  await page.bringToFront(); await activate(page.getByRole('button', { name: 'Начать прогулку' }));
+    if (size === '1' || name.endsWith('1')) await createFromHub(page, size);
+    else { await activate(page.getByRole('button', { name: 'Сохранить профиль', exact: true })); await joinFromHub(page); }
+  } else await joinFromHub(page);
   await expectCapture(page, true);
 }
 async function position(page: Page) {
@@ -196,8 +189,7 @@ async function resume(page: Page) {
   await releaseOtherCaptures(page);
   await page.bringToFront();
   if (!await page.evaluate(() => Boolean(document.pointerLockElement))) {
-    await expect(page.getByRole('button', { name: 'Продолжить', exact: true })).toBeEnabled();
-    await activate(page.getByRole('button', { name: 'Продолжить', exact: true }));
+    await resumeWindow(page);
   }
   await expectCapture(page, true);
 }
@@ -237,7 +229,7 @@ test('NEXT: four real roles share the scene; physical F carries one durable appl
   const before = data.sent.filter(packet => packet.type === 'hand').length;
   await carrier.keyboard.down('f'); await carrier.waitForTimeout(400);
   await carrier.keyboard.down('f'); await carrier.waitForTimeout(600);
-  await expect(carrier.getByLabel('Руки')).toContainText('В руках: яблоко');
+  await expect(carrier.getByLabel('Предмет в руке')).toContainText('В руке яблоко');
   expect(data.sent.filter(packet => packet.type === 'hand')).toHaveLength(before + 1);
   await carrier.keyboard.up('f');
   const held = data.state!.apples.find(item => item.state === 'held');
@@ -256,22 +248,22 @@ test('NEXT: four real roles share the scene; physical F carries one durable appl
   expect(data.sent.filter(packet => packet.type === 'hand')).toHaveLength(before + 1);
   // Restart while held. The database must preserve the unique apple and its owner.
   await stop(); await start(); await login(carrier, 'NEXT role 2');
-  await expect(carrier.getByLabel('Руки')).toContainText('В руках: яблоко');
+  await expect(carrier.getByLabel('Предмет в руке')).toContainText('В руке яблоко');
   await expect.poll(() => data.state?.apples.find(item => item.id === held.id)).toEqual(held);
   expect(data.state!.apples).toHaveLength(5);
   await carrier.screenshot({ path: testInfo.outputPath('restored-hand.png') });
   await carrier.keyboard.press('f');
-  await expect(carrier.getByLabel('Руки')).toContainText('Руки свободны');
+  await expect.poll(() => data.state?.apples.some(item => item.state === 'held' && item.holderId === data.playerId)).toBe(false);
   await expect.poll(() => data.state!.apples.find(item => item.id === held.id)?.state).toBe('world');
   await carrier.screenshot({ path: testInfo.outputPath('placed-apple.png') });
   await walk(carrier, 'x', 0); await walk(carrier, 'z', -25);
-  await expect(carrier.getByRole('heading', { name: 'Пастбище у рынка', exact: true })).toBeVisible();
+  await expect(carrier.getByLabel('Область мира')).toHaveText('Пастбище у рынка');
   await carrier.screenshot({ path: testInfo.outputPath('pasture-live-scene.png') });
   await walk(carrier, 'z', 9); await walk(carrier, 'x', -32);
-  await expect(carrier.getByRole('heading', { name: 'Двор Вавилонской башни', exact: true })).toBeVisible();
+  await expect(carrier.getByLabel('Область мира')).toHaveText('Двор Вавилонской башни');
   await carrier.screenshot({ path: testInfo.outputPath('courtyard-live-scene.png') });
   await walk(carrier, 'x', 0);
-  await expect(carrier.getByRole('heading', { name: 'Рынок Вавилона', exact: true })).toBeVisible();
+  await expect(carrier.getByLabel('Область мира')).toHaveText('Рынок Вавилона');
   await expect(carrier.getByLabel('Кеш мира')).toContainText('Чанки: 25 · Ожидание: 0 · Отложено: 0');
   await expect(carrier.getByLabel('Состояние связи')).toContainText('Подключён');
   const scenePath = testInfo.outputPath('scene-contract.json'); await writeFile(scenePath, JSON.stringify({ initial, restored: data.state }));
@@ -310,8 +302,9 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   await volume.focus(); await page.keyboard.press('Home');
   await expect(volume).toHaveValue('0');
   await page.reload(); await page.getByLabel('Имя игрока').fill('NEXT audio');
-  await activate(page.getByRole('button', { name: 'Войти', exact: true }));
-  await activate(page.getByRole('button', { name: 'Начать прогулку' })); await expectCapture(page, true);
+  await activate(page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }));
+  await joinFromHub(page);
+  await expectCapture(page, true);
   await page.keyboard.press('Space'); await page.waitForTimeout(1400);
   expect(await page.evaluate(() => window.worldAudioProbe.starts)).toEqual([]);
   console.log('NEXT audio: muted jump is silent; opening settings');
@@ -321,7 +314,7 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   await expect(volume).toHaveValue('45');
   console.log('NEXT audio: volume45; close settings and resume');
   await activate(page.getByRole('button', { name: 'Закрыть настройки', exact: true })); await resume(page);
-  await page.keyboard.press('Escape'); await activate(page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Общение', exact: true }));
+  await page.keyboard.press('Digit1');
   const countMumbles = () => page.evaluate(() => window.worldAudioProbe.starts.filter(item => Math.abs(item.duration - .57) < .005).length);
   const mumbleLoaded = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/mumble.wav') && response.ok());
   await page.getByLabel('Сообщение группе').fill('Прогрев');
@@ -335,7 +328,7 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   await expect.poll(countMumbles).toBe(oldMumbles + 1);
   await page.waitForTimeout(2200); expect(await countMumbles()).toBe(oldMumbles + 1);
   await activate(page.getByRole('button', { name: 'Закрыть', exact: true })); await resume(page);
-  await page.keyboard.press('Escape'); await activate(page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Общение', exact: true }));
+  await page.keyboard.press('Digit1');
   await page.waitForTimeout(1300); expect(await countMumbles()).toBe(oldMumbles + 1);
   await activate(page.getByRole('button', { name: 'Закрыть', exact: true })); await resume(page);
   // Warm the local jump clip, then hold the next press through a complete jump.
@@ -360,11 +353,11 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   // Stay inside the interaction radius even with the route's 0.35 m arrival tolerance.
   await walk(page, 'z', .5); await walk(page, 'x', -2.5);
   await page.keyboard.press('e');
-  await expect(page.getByRole('dialog', { name: 'Торговец фруктами', exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Разговор с жителем', exact: true })).toBeVisible();
   await page.waitForTimeout(400); const beforeReply = await countMumbles();
   await page.getByLabel('Вопрос NPC').fill('Расскажи о финиках');
   await activate(page.getByRole('button', { name: 'Спросить', exact: true }));
-  await expect(page.locator('.dialog-history')).toContainText('test merchant reply');
+  await expect(page.locator('.resident-history')).toContainText('test merchant reply');
   await expect.poll(countMumbles).toBe(beforeReply + 2);
   await activate(page.getByRole('button', { name: 'Закрыть', exact: true })); await resume(page);
   // A second browser window keeps the listener visible; a background tab suspends
@@ -381,16 +374,15 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   const beforeReconnect = await countMumbles(); await stop(); await start();
   await expect(page.getByLabel('Имя игрока')).toBeVisible();
   await page.getByLabel('Имя игрока').fill('NEXT audio');
-  await activate(page.getByRole('button', { name: 'Войти', exact: true }));
+  await activate(page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }));
+  await joinFromHub(page);
   await expect(page.getByLabel('Состояние связи')).toContainText('Подключён', { timeout: 30000 });
   await page.waitForTimeout(1400); expect(await countMumbles()).toBe(beforeReconnect);
-  await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
-  await activate(page.getByRole('button', { name: 'Начать прогулку' })); await expectCapture(page, true);
+  await expectCapture(page, true);
   const audioCycles: (Awaited<ReturnType<typeof audioMemory>> & { worldBytesWithoutAudio: number })[] = [];
   for (let cycle = 0; cycle < 5; cycle++) {
-    await page.keyboard.press('Escape'); await activate(page.getByRole('button', { name: 'Перезапустить сцену', exact: true }));
-    await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
-    await activate(page.getByRole('button', { name: 'Начать прогулку' })); await expectCapture(page, true);
+    await page.keyboard.press('Escape'); await activate(page.getByRole('button', { name: 'На главный экран', exact: true }));
+    await joinFromHub(page);
     await expect(page.getByLabel('Звук', { exact: true })).toContainText('Буферы: 0');
     const warmAck = observed.motion!.jumpAck;
     await page.keyboard.press('Space');
@@ -421,8 +413,9 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   await expect(volume).toHaveValue('45');
   await page.screenshot({ path: testInfo.outputPath('volume-persisted.png') });
   await page.reload(); await page.getByLabel('Имя игрока').fill('NEXT audio');
-  await activate(page.getByRole('button', { name: 'Войти', exact: true }));
-  await activate(page.getByRole('button', { name: 'Начать прогулку' })); await expectCapture(page, true);
+  await activate(page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }));
+  await joinFromHub(page);
+  await expectCapture(page, true);
   await page.keyboard.press('Escape'); await activate(page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Настройки', exact: true }));
   await expect(volume).toHaveValue('45');
   const audioPath = testInfo.outputPath('audio-browser-probe.json'); await writeFile(audioPath, JSON.stringify({ probe, audioCycles }));

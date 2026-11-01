@@ -1,0 +1,148 @@
+
+> educational-world-client@0.1.0 test:coverage
+> npm run world:generate && vitest run --coverage
+
+
+> educational-world-client@0.1.0 world:generate
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 21928618 bytes.
+market: 728488 bytes; 26 collision rectangles; 223 ceiling volumes
+pasture: 420000 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 421808 bytes; 29 collision rectangles; 187 ceiling volumes
+cat: 31776 bytes; 0 collision rectangles; 0 ceiling volumes
+bird: 11240 bytes; 0 collision rectangles; 0 ceiling volumes
+pushable-pot: 11168 bytes; 0 collision rectangles; 0 ceiling volumes
+pickup-apple: 9848 bytes; 0 collision rectangles; 0 ceiling volumes
+house: 39416 bytes; 1 collision rectangles; 29 ceiling volumes
+wall: 2048 bytes; 1 collision rectangles; 0 ceiling volumes
+fence: 4352 bytes; 1 collision rectangles; 0 ceiling volumes
+paving: 2116 bytes; 0 collision rectangles; 0 ceiling volumes
+table: 5044 bytes; 1 collision rectangles; 0 ceiling volumes
+shelf: 2856 bytes; 1 collision rectangles; 0 ceiling volumes
+crate: 3612 bytes; 1 collision rectangles; 0 ceiling volumes
+basket: 16112 bytes; 0 collision rectangles; 0 ceiling volumes
+fruit: 3280 bytes; 0 collision rectangles; 0 ceiling volumes
+dates: 3280 bytes; 0 collision rectangles; 0 ceiling volumes
+textile-sign: 9164 bytes; 0 collision rectangles; 5 ceiling volumes
+fabric-roll: 2528 bytes; 0 collision rectangles; 0 ceiling volumes
+canopy: 32312 bytes; 4 collision rectangles; 24 ceiling volumes
+cart: 36824 bytes; 1 collision rectangles; 0 ceiling volumes
+bench: 4316 bytes; 1 collision rectangles; 0 ceiling volumes
+scroll-table: 6236 bytes; 1 collision rectangles; 0 ceiling volumes
+bowl: 4776 bytes; 0 collision rectangles; 0 ceiling volumes
+jar: 11156 bytes; 0 collision rectangles; 0 ceiling volumes
+palm: 32804 bytes; 1 collision rectangles; 11 ceiling volumes
+planter: 8320 bytes; 1 collision rectangles; 0 ceiling volumes
+vines: 6560 bytes; 0 collision rectangles; 0 ceiling volumes
+grass: 1764 bytes; 0 collision rectangles; 0 ceiling volumes
+merchant: 39016 bytes; 0 collision rectangles; 1 ceiling volumes
+shepherd: 39012 bytes; 0 collision rectangles; 1 ceiling volumes
+goat: 29732 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-ground: 17820 bytes; 5 collision rectangles; 0 ceiling volumes
+stepped-building: 209160 bytes; 1 collision rectangles; 124 ceiling volumes
+main-portal: 21576 bytes; 0 collision rectangles; 8 ceiling volumes
+exterior-stair: 69244 bytes; 3 collision rectangles; 9 ceiling volumes
+courtyard-arch: 6040 bytes; 2 collision rectangles; 2 ceiling volumes
+rest-canopy: 46980 bytes; 6 collision rectangles; 23 ceiling volumes
+courtyard-plants: 50872 bytes; 6 collision rectangles; 21 ceiling volumes
+courtyard-lanterns: 5988 bytes; 6 collision rectangles; 0 ceiling volumes
+babel-symbols: 6396 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-vessel: 11204 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-planter: 9472 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-palm: 32864 bytes; 0 collision rectangles; 11 ceiling volumes
+courtyard-lantern: 5056 bytes; 0 collision rectangles; 0 ceiling volumes
+Market world 24320200 bytes.
+
+ RUN  v4.1.12 /Users/nisakoo/Documents/competition-2026/client
+      Coverage enabled with v8
+
+
+ Test Files  50 passed (50)
+      Tests  426 passed (426)
+   Start at  13:30:10
+   Duration  9.28s (transform 688ms, setup 0ms, import 1.74s, tests 10.20s, environment 1.01s)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   66.87 |    63.47 |   66.73 |   73.62 |                   
+ src               |       0 |        0 |       0 |       0 |                   
+  main.ts          |       0 |        0 |       0 |       0 | 8-31              
+ src/app           |   75.83 |    72.16 |   71.64 |   85.04 |                   
+  FrameMetrics.ts  |      90 |    64.28 |     100 |     100 | 9-18              
+  GameApp.ts       |    72.8 |    68.24 |   66.47 |    82.4 | ...1059-1060,1111 
+  GameLoop.ts      |   92.85 |     91.8 |     100 |     100 | 73-82,93-97       
+ src/audio         |    95.5 |    93.64 |      88 |   99.08 |                   
+  WorldAudio.ts    |    95.5 |    93.64 |      88 |   99.08 | 200,234           
+ src/core          |   95.39 |    92.35 |     100 |   99.13 |                   
+  EntityManager.ts |   96.77 |    97.29 |     100 |     100 | 22                
+  GameWorld.ts     |   95.04 |    90.83 |     100 |   98.91 | 35                
+ src/input         |   96.48 |    93.45 |   96.15 |    99.3 |                   
+  ...Controller.ts |   96.48 |    93.45 |   96.15 |    99.3 | 97                
+ src/map           |   70.81 |    73.52 |   78.87 |   78.22 |                   
+  AssetManager.ts  |   57.81 |    75.47 |      90 |    61.7 | 34-51,73          
+  ChunkManager.ts  |   88.29 |    77.77 |   86.84 |   95.38 | 153-160,174       
+  HttpMapSource.ts |       0 |        0 |       0 |       0 | 10-51             
+  WorldBudget.ts   |   90.76 |    90.24 |     100 |   97.61 | 56                
+ src/multiplayer   |   82.15 |    73.37 |   81.25 |      91 |                   
+  AvatarClient.ts  |   95.55 |    83.33 |   85.71 |     100 | 30-36,43          
+  BabylonClient.ts |    88.7 |    87.01 |    92.3 |   98.46 | 25                
+  ...mentClient.ts |   95.55 |    82.35 |   85.71 |     100 | 22-26,29          
+  GuestAuth.ts     |     100 |     90.9 |     100 |     100 | 23                
+  ...orkAdapter.ts |   84.15 |    68.88 |   87.09 |     100 | ...28,33,45-63,65 
+  MockWorldLife.ts |   91.52 |       80 |   94.44 |     100 | ...49,51-53,58,62 
+  PasswordAuth.ts  |   88.46 |    85.71 |   83.33 |     100 | 9,14-16,18-23,33  
+  ...tIOAdapter.ts |   77.65 |    69.15 |   73.33 |   97.75 | 55,124            
+  mockDemo.ts      |       0 |        0 |       0 |       0 | 12-46             
+  ...oundedJson.ts |   95.65 |    85.71 |     100 |     100 | 4                 
+ src/render/three  |   72.62 |    71.12 |   76.74 |   73.31 |                   
+  CameraRaycast.ts |     100 |    92.85 |     100 |     100 | 20-31             
+  EntityVisuals.ts |   92.97 |    87.56 |      85 |      96 | 59,203,212-214    
+  FrameFence.ts    |   97.72 |    96.29 |     100 |     100 | 22                
+  GltfLibrary.ts   |   75.52 |    63.06 |    92.3 |   89.62 | ...65-174,183-185 
+  ResourcePool.ts  |    87.5 |    83.33 |     100 |     100 | 13                
+  SceneAssets.ts   |   35.29 |    41.66 |   53.84 |   31.81 | ...23,37-62,73-90 
+  ...tarPreview.ts |   90.28 |       68 |   92.85 |      93 | 107,128-133       
+  ThreeRenderer.ts |       0 |        0 |       0 |       0 | 17-176            
+  VisualChunks.ts  |   84.93 |    83.78 |   81.25 |    90.9 | 18-21,26          
+  VisualWind.ts    |     100 |    86.95 |     100 |     100 | 30                
+  WindInstances.ts |   96.07 |    90.47 |     100 |     100 | 23,48             
+  ...ifeVisuals.ts |   90.05 |    85.71 |   90.47 |   97.61 | 108,111           
+  demoScenery.ts   |       0 |        0 |       0 |       0 | 7-96              
+  heldTool.ts      |      75 |       50 |     100 |      75 | 11-14             
+ src/session       |   88.77 |    81.03 |   97.11 |   96.94 |                   
+  MarketSession.ts |   91.48 |    88.33 |     100 |     100 | 76-82,84,87,98-99 
+  OnlineSession.ts |   87.13 |    81.91 |   94.82 |   96.12 | ...34-236,262-266 
+  demoDialogue.ts  |   78.57 |    37.03 |     100 |    90.9 | 39                
+ src/shared        |    97.1 |    93.33 |     100 |     100 |                   
+  ...LeaseCache.ts |   96.66 |    93.33 |     100 |     100 | 13,59             
+ src/ui            |   10.74 |    11.62 |    7.89 |   14.78 |                   
+  App.svelte       |       0 |        0 |       0 |       0 | 20-185            
+  ...ection.svelte |       0 |        0 |       0 |       0 | 9-69              
+  ...nPanel.svelte |       0 |        0 |       0 |       0 | 15-175            
+  Chat.svelte      |       0 |        0 |       0 |       0 | 4-22              
+  Dialog.svelte    |       0 |        0 |       0 |       0 | 5-27              
+  ...Chrome.svelte |       0 |      100 |       0 |       0 | 3-7               
+  ...ySetup.svelte |       0 |        0 |       0 |       0 | 10-154            
+  HudDock.svelte   |       0 |      100 |       0 |       0 | 4-9               
+  Icon.svelte      |       0 |        0 |       0 |       0 | 2-14              
+  ...ngText.svelte |       0 |        0 |       0 |       0 | 2-4               
+  Login.svelte     |       0 |        0 |       0 |       0 | 9-70              
+  ...tPanel.svelte |       0 |        0 |       0 |       0 | 8-76              
+  ...ntChat.svelte |       0 |        0 |       0 |       0 | 6-39              
+  ...tWords.svelte |       0 |        0 |       0 |       0 | 4-40              
+  Settings.svelte  |       0 |        0 |       0 |       0 | 6-29              
+  Stamina.svelte   |       0 |      100 |       0 |       0 | 2-10              
+  ...ration.svelte |       0 |        0 |       0 |       0 | 3-26              
+  WorldMap.svelte  |       0 |        0 |       0 |       0 | 7-107             
+  modal.ts         |    95.9 |    87.25 |   93.33 |   97.77 | 84-85             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 66.87% ( 4252/6358 )
+Branches     : 63.47% ( 2868/4518 )
+Functions    : 66.73% ( 640/959 )
+Lines        : 73.62% ( 2978/4045 )
+================================================================================

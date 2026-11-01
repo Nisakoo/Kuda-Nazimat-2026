@@ -1,0 +1,79 @@
+{
+  "description": "CPU-only torso geometry and sampled front-ray depth intersections. A static test cannot identify GPU shadow acne.",
+  "models": {
+    "baseline": {
+      "sha256": "df28e3be7f6cbe3f188315edd69b7e4994dfd97980c158d8afd35013bfa66d69",
+      "torsoTriangles": 294,
+      "exactDuplicateTriangles": 0,
+      "degenerateTriangles": 0,
+      "samples": 529,
+      "hits": 529,
+      "nearPairsUnder1mm": 2,
+      "examples": [
+        {
+          "x": 0.1437130434782609,
+          "y": 0.8353695652173914,
+          "gap": 0.0004972967810434881,
+          "faces": [
+            285,
+            195
+          ]
+        },
+        {
+          "x": 0.1437130434782609,
+          "y": 0.8505869565217392,
+          "gap": 0.000674709657206618,
+          "faces": [
+            195,
+            285
+          ]
+        }
+      ],
+      "materials": {
+        "type": "MeshStandardMaterial",
+        "opacity": 1,
+        "transparent": false,
+        "texture": false,
+        "roughness": 1,
+        "metalness": 0
+      }
+    },
+    "candidate": {
+      "sha256": "e1a337342f2187f30d96a5f51ed6f1097812ea4fdd77b7c24c7354f53460ca12",
+      "torsoTriangles": 294,
+      "exactDuplicateTriangles": 0,
+      "degenerateTriangles": 0,
+      "samples": 529,
+      "hits": 529,
+      "nearPairsUnder1mm": 2,
+      "examples": [
+        {
+          "x": 0.1437130434782609,
+          "y": 0.8353695652173914,
+          "gap": 0.0004972967810434881,
+          "faces": [
+            285,
+            195
+          ]
+        },
+        {
+          "x": 0.1437130434782609,
+          "y": 0.8505869565217392,
+          "gap": 0.000674709657206618,
+          "faces": [
+            195,
+            285
+          ]
+        }
+      ],
+      "materials": {
+        "type": "MeshStandardMaterial",
+        "opacity": 1,
+        "transparent": false,
+        "texture": false,
+        "roughness": 1,
+        "metalness": 0
+      }
+    }
+  }
+}

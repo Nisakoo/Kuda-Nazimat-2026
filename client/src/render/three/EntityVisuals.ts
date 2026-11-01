@@ -1,5 +1,5 @@
 import { Group } from 'three';
-import type { Scene } from 'three';
+import type { Scene, Object3D } from 'three';
 import type { Entity, EntityId, Transform, WorldSnapshot } from '../../core/types';
 import { DEMO_NPCS } from '../../shared/demo';
 import type { SceneAssets } from './SceneAssets';
@@ -7,6 +7,7 @@ import type { GltfLibrary, ModelInstance } from './GltfLibrary';
 import { createCharacter } from './CharacterRig';
 import type { CharacterRig } from './CharacterRig';
 import { CHARACTER_MOTION, approach, damp, turnTowards } from './CharacterMotion';
+import { createHeldTool } from './heldTool';
 import type { MotionStatus } from '../../../../shared/world/types.ts';
 
 interface Visual {
@@ -23,6 +24,7 @@ interface Visual {
   snap: boolean;
   readonly controller: AbortController;
   model: ModelInstance | null;
+  held: Group | null;
   rig: CharacterRig | null;
   failed: boolean;
   motion: MotionStatus | undefined;
@@ -49,7 +51,10 @@ export class EntityVisuals {
     }
     this.held = new Map(held);
   }
-  handAnchor(id: string): Group | undefined { return this.visuals.get(id)?.rig?.hand; }
+  handAnchor(id: string): Object3D | undefined {
+    const visual = this.visuals.get(id);
+    return visual?.model?.root.getObjectByName('wrist-right') ?? visual?.rig?.hand;
+  }
   constructor(private readonly scene: Scene, private readonly assets: SceneAssets, private readonly library?: GltfLibrary, private readonly report: (id: string, error: string | null) => void = () => {}, private readonly marketStyle = false) {}
   get ids(): readonly string[] { return [...this.visuals.keys()]; }
 
@@ -59,7 +64,7 @@ export class EntityVisuals {
     for (const entity of current.entities) {
       if (!entity.transform || !entity.renderable) continue;
       live.add(entity.id);
-      const token = `${entity.renderable.assetId}:${entity.character?.name ?? ''}:${entity.id === playerId}:${this.library?.has(entity.renderable.assetId) ?? false}`;
+      const token = `${entity.renderable.assetId}:${entity.character?.name ?? ''}:${entity.id === playerId}:${this.library?.has(entity.renderable.assetId) ?? false}:${entity.equipment?.tool ?? ''}`;
       let visual = this.visuals.get(entity.id);
       if (visual && visual.token !== token) { this.remove(entity.id); visual = undefined; }
       if (!visual) {
@@ -123,8 +128,27 @@ export class EntityVisuals {
         { carrying: this.held.has(id), action: visual.handAction, progress: visual.handTime/.65 });
       visual.handTime = Math.min(.65,visual.handTime+dt);
       if (visual.handTime >= .65) visual.handAction = null;
-      const name = visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
-      visual.model?.animate(name,dt,name==='walk' ? Math.max(.2,visual.speed/3) : 1);
+      const name = visual.motion && !visual.motion.grounded ? 'jump'
+        : visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
+      // Avatar stride metadata includes source normalization; legacy models keep speed/3.
+      const pace = name === 'walk'
+        ? visual.model?.walkPace?.(speed) ?? Math.max(.2, visual.speed / 3)
+        : 1;
+      visual.model?.animate(name,dt,pace);
+      if (visual.held) visual.held.visible = !this.held.has(id);
+      // Apply the confirmed hand pose after the GLB mixer; airborne arms retain the jump clip.
+      if (visual.model && visual.airWeight < .5 && (this.held.has(id) || visual.handAction)) {
+        const shoulder = visual.model.root.getObjectByName('shoulder-right');
+        const elbow = visual.model.root.getObjectByName('elbow-right');
+        const progress = visual.handTime / .65;
+        const reach = visual.handAction ? Math.sin(Math.PI * progress) : 0;
+        const weight = visual.handAction === 'pickup' ? progress : visual.handAction === 'place' ? 1-progress : 1;
+        if (shoulder && elbow) {
+          shoulder.rotation.x += (-.28 - shoulder.rotation.x) * weight - reach * .5;
+          shoulder.rotation.z += (-.12 - shoulder.rotation.z) * weight;
+          elbow.rotation.x += (-.98 - elbow.rotation.x) * weight + reach * .7;
+        }
+      }
       visual.snap = false;
     }
   }
@@ -134,7 +158,7 @@ export class EntityVisuals {
 
   private remove(id: EntityId): void {
     const visual = this.visuals.get(id);
-    if (visual) { visual.controller.abort(); visual.model?.dispose(); this.assets.release(visual.group); this.report(id, null); }
+    if (visual) { visual.controller.abort(); if (visual.held) this.assets.release(visual.held); visual.model?.dispose(); this.assets.release(visual.group); this.report(id, null); }
     this.visuals.delete(id);
   }
 
@@ -143,7 +167,7 @@ export class EntityVisuals {
     const group = new Group(); group.name = `entity:${entity.id}`;
     group.position.set(transform.position.x,transform.position.y,transform.position.z);
     group.rotation.y = transform.rotationY;
-    const visual: Visual = { group, token, previous:transform, current:transform, animation:entity.animationState?.name??'idle', speedLimit:entity.movement?.speed??3, phase:0, weight:0, speed:0, elapsed:0, snap:true, controller:new AbortController(), model:null, rig:null, failed:false,
+    const visual: Visual = { group, token, previous:transform, current:transform, animation:entity.animationState?.name??'idle', speedLimit:entity.movement?.speed??3, phase:0, weight:0, speed:0, elapsed:0, snap:true, controller:new AbortController(), model:null, held:null, rig:null, failed:false,
       motion: entity.motion, observedTick: -1, sprintWeight: 0, airWeight: 0, fallWeight: 0, takeoff: 0, landing: 0, handAction: null, handTime: .65 };
     if (this.library?.has(entity.renderable!.assetId)) this.loadModel(entity.id,entity.renderable!.assetId,visual,entity,player);
     else this.addCharacter(visual,entity,player);
@@ -158,9 +182,22 @@ export class EntityVisuals {
     if (entity.character?.kind === 'player') visual.rig.root.scale.set(1, .83, 1);
     visual.group.add(visual.rig.root);
     visual.rig.pose(0,0,0,0);
+    this.addEquipment(visual, entity);
     const label = this.assets.label(player?'Вы':`${npc?.name??entity.character?.name??'Гость'}${npc?.topic?` · ${npc.topic}`:''}`);
     if (player) label.scale.set(1,.4,1);
     label.position.y=2.45; visual.group.add(label);
+  }
+
+  private addEquipment(visual: Visual, entity: Entity): void {
+    if (!entity.equipment) return;
+    const held = createHeldTool(this.assets, entity.equipment.tool);
+    const character = visual.model?.root ?? visual.rig?.root;
+    const wrist = character?.getObjectByName('wrist-right');
+    const elbow = character?.getObjectByName('shoulder-right')?.getObjectByName('elbow');
+    const joint = wrist ?? elbow ?? visual.group;
+    if (elbow && !wrist) held.position.y = -.265;
+    else if (!wrist) held.position.set(.42, .84, 0);
+    joint.add(held); visual.held = held;
   }
 
   retryFailed(): void { for (const [id,visual] of [...this.visuals]) if (visual.failed) this.remove(id); }
@@ -168,7 +205,9 @@ export class EntityVisuals {
   private loadModel(id: string, assetId: string, visual: Visual, entity: Entity, player: boolean): void {
     void this.library!.instantiate(assetId,visual.controller.signal).then(model=>{
       if (visual.controller.signal.aborted || this.visuals.get(id)!==visual) { model.dispose(); return; }
-      visual.model=model; visual.group.add(model.root); this.report(id,null);
+      visual.model=model; visual.group.add(model.root);
+      if (entity.character) { const label = this.assets.label(player ? 'Вы' : entity.character.name); label.position.y = 2.25; visual.group.add(label); }
+      this.addEquipment(visual, entity); this.report(id,null);
     },(error:unknown)=>{
       if (visual.controller.signal.aborted) return;
       visual.failed=true; this.addCharacter(visual,entity,player);

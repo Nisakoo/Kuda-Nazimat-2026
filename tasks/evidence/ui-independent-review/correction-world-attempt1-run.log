@@ -1,0 +1,684 @@
+START password-login-enroll-real-two-person-task
+FAIL password-login-enroll-real-two-person-task locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })
+    - locator resolved to <button class="primary large">…</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+    - element is not enabled
+  - retrying click action
+    - waiting for element to be visible, enabled and stable
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:16:1055
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:16:1 {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Начать прогулку', exact: true })",
+    '    - locator resolved to <button class="primary large">…</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is not enabled',
+    '  - retrying click action',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-password-login-enroll-real-two-person-task
+START R06-initial-I-immediate-and-delayed-natural-ACK
+FAIL R06-initial-I-immediate-and-delayed-natural-ACK ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Инвентарь', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Инвентарь', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Инвентарь', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:17:664
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:17:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Инвентарь', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Инвентарь', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Инвентарь', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Инвентарь', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Инвентарь', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-R06-initial-I-immediate-and-delayed-natural-ACK
+START real-authenticated-protocol-peer
+PASS real-authenticated-protocol-peer
+START R06-pending-ACK-focus-recovery-controlled-transport
+FAIL R06-pending-ACK-focus-recovery-controlled-transport ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:200)
+    at async resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:252)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:20:76
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:20:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-R06-pending-ACK-focus-recovery-controlled-transport
+START R06-user-focus-before-ACK-is-preserved
+FAIL R06-user-focus-before-ACK-is-preserved ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:200)
+    at async resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:252)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:21:63
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:21:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-R06-user-focus-before-ACK-is-preserved
+START R06-new-map-modal-before-ACK-is-preserved
+FAIL R06-new-map-modal-before-ACK-is-preserved ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:200)
+    at async resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:252)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:22:66
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:22:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-R06-new-map-modal-before-ACK-is-preserved
+START R06-Settings-before-ACK-is-preserved
+FAIL R06-Settings-before-ACK-is-preserved ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:200)
+    at async resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:252)
+    at async inventoryFromWorld (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:14:37)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:23:61
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:23:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-R06-Settings-before-ACK-is-preserved
+START dictionary-create-note-example-learn-edit-search-delete
+FAIL dictionary-create-note-example-learn-edit-search-delete locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:24:80
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:24:1 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Словарь', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-dictionary-create-note-example-learn-edit-search-delete
+START real-peer-chat-translation-add-word-own-delivery-stone
+FAIL real-peer-chat-translation-add-word-own-delivery-stone locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:25:130
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:25:1 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-real-peer-chat-translation-add-word-own-delivery-stone
+START map-real-authority-zoom-center-and-live-peer-movement
+FAIL map-real-authority-zoom-center-and-live-peer-movement locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:26:78
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:26:1 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-map-real-authority-zoom-center-and-live-peer-movement
+START all-windows-1622x970
+FAIL all-windows-1622x970 locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:274
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:70 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-1622x970
+START all-windows-1280x800
+FAIL all-windows-1280x800 locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:274
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:70 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-1280x800
+START all-windows-390x844
+FAIL all-windows-390x844 locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:274
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:70 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-390x844
+START all-windows-640x480
+FAIL all-windows-640x480 locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:274
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:27:70 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Инвентарь', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-640x480
+START languages-real-ACK-new-message-old-message-preservation
+FAIL languages-real-ACK-new-message-old-message-preservation ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:28:132
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:28:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-languages-real-ACK-new-message-old-message-preservation
+START live-appearance-Dan-server-and-peer
+FAIL live-appearance-Dan-server-and-peer ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:29:60
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:29:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-live-appearance-Dan-server-and-peer
+START map-excludes-real-outsider-sequential-peer-socket
+FAIL map-excludes-real-outsider-sequential-peer-socket locator.click: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })
+
+    at dock (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:122)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:9:353)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:30:181
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:30:1 {
+  log: [
+    "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Карта', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-map-excludes-real-outsider-sequential-peer-socket
+START password-relogin-persistence
+FAIL password-relogin-persistence ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('dialog', { name: 'Пауза', exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms
+  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeVisible (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at pause (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:8:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:31:53
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:81)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:31:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('dialog', { name: 'Пауза', exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms\n` +
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      `  - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза', exact: true }) with timeout 5000ms`,
+      "  - waiting for getByRole('dialog', { name: 'Пауза', exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - text: Локальный сервер\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Рынок Вавилона.":\n' +
+      '    - paragraph: Добро пожаловать в Вавилон\n' +
+      '    - heading "Рынок Вавилона." [level=1]\n' +
+      '    - paragraph: Золотистый камень, тень навесов и три лавки. За лестницей — пастух и четыре козы, которым нужна ваша помощь.\n' +
+      '    - paragraph: Сетевая игра использует локальный сервер.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Начать прогулку"\n' +
+      '    - paragraph: W A S D движение относительно камеры\n' +
+      '    - paragraph: Space прыжок · Shift спринт\n' +
+      '    - paragraph: E разговор с персонажем\n' +
+      '    - paragraph: Мышь обзор · колесо — масштаб\n' +
+      '    - paragraph: Esc освободить курсор и открыть меню\n' +
+      '    - paragraph: Позиция и история разговоров сохраняются на сервере.\n' +
+      '  - status: Сцена открыта'
+  }
+}
+CAPTURE failure-password-relogin-persistence
+CORRECTION WORLD CLOSED; GPU AVAILABLE AFTER EXPLICIT REVIEWER RELEASE

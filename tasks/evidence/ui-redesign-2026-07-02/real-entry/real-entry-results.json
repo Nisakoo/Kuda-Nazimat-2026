@@ -1,0 +1,2367 @@
+{
+  "origin": "http://127.0.0.1:4387",
+  "capturedAt": "2026-11-01T00:45:56.613Z",
+  "note": "Manual evidence only. No enrollment or world entry.",
+  "flows": [
+    {
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "deviceScaleFactor": 1
+      },
+      "screenshots": [
+        {
+          "screen": "login",
+          "file": "login-1622x970.png",
+          "innerWidth": 1622,
+          "innerHeight": 970,
+          "documentWidth": 1622,
+          "documentHeight": 970,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1532,
+                "y": 882,
+                "width": 62,
+                "height": 62,
+                "right": 1594,
+                "bottom": 944
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 579,
+                "y": 359.6,
+                "width": 219,
+                "height": 52,
+                "right": 798,
+                "bottom": 411.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 824,
+                "y": 359.6,
+                "width": 219,
+                "height": 52,
+                "right": 1043,
+                "bottom": 411.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 579,
+                "y": 466.6,
+                "width": 464,
+                "height": 58,
+                "right": 1043,
+                "bottom": 524.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 579,
+                "y": 574.6,
+                "width": 464,
+                "height": 58,
+                "right": 1043,
+                "bottom": 632.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 989,
+                "y": 578.6,
+                "width": 50,
+                "height": 50,
+                "right": 1039,
+                "bottom": 628.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Начать путешествие →",
+              "disabled": true,
+              "bounds": {
+                "x": 579,
+                "y": 656.6,
+                "width": 464,
+                "height": 64,
+                "right": 1043,
+                "bottom": 720.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 700.7,
+                "y": 731.6,
+                "width": 220.6,
+                "height": 44,
+                "right": 921.3,
+                "bottom": 775.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 688.5,
+                "y": 804.6,
+                "width": 244.9,
+                "height": 44,
+                "right": 933.5,
+                "bottom": 848.6
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "registration",
+          "file": "registration-1622x970.png",
+          "innerWidth": 1622,
+          "innerHeight": 970,
+          "documentWidth": 1622,
+          "documentHeight": 970,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1532,
+                "y": 882,
+                "width": 62,
+                "height": 62,
+                "right": 1594,
+                "bottom": 944
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 579,
+                "y": 359.6,
+                "width": 219,
+                "height": 52,
+                "right": 798,
+                "bottom": 411.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 824,
+                "y": 359.6,
+                "width": 219,
+                "height": 52,
+                "right": 1043,
+                "bottom": 411.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 579,
+                "y": 466.6,
+                "width": 464,
+                "height": 58,
+                "right": 1043,
+                "bottom": 524.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 579,
+                "y": 574.6,
+                "width": 464,
+                "height": 58,
+                "right": 1043,
+                "bottom": 632.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 989,
+                "y": 578.6,
+                "width": 50,
+                "height": 50,
+                "right": 1039,
+                "bottom": 628.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Зарегистрироваться →",
+              "disabled": true,
+              "bounds": {
+                "x": 579,
+                "y": 656.6,
+                "width": 464,
+                "height": 64,
+                "right": 1043,
+                "bottom": 720.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 700.7,
+                "y": 731.6,
+                "width": 220.6,
+                "height": 44,
+                "right": 921.3,
+                "bottom": 775.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 688.5,
+                "y": 804.6,
+                "width": 244.9,
+                "height": 44,
+                "right": 933.5,
+                "bottom": 848.6
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "mode",
+          "file": "mode-1622x970.png",
+          "innerWidth": 1622,
+          "innerHeight": 970,
+          "documentWidth": 1622,
+          "documentHeight": 970,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1532,
+                "y": 882,
+                "width": 62,
+                "height": 62,
+                "right": 1594,
+                "bottom": 944
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 491,
+                "y": 445.1,
+                "width": 1,
+                "height": 1,
+                "right": 492,
+                "bottom": 446.1
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 491,
+                "y": 597.1,
+                "width": 1,
+                "height": 1,
+                "right": 492,
+                "bottom": 598.1
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Далее: языки →",
+              "disabled": false,
+              "bounds": {
+                "x": 581,
+                "y": 682.1,
+                "width": 460,
+                "height": 52,
+                "right": 1041,
+                "bottom": 734.1
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 706,
+                "y": 755.1,
+                "width": 210,
+                "height": 67,
+                "right": 916,
+                "bottom": 822.1
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "languages",
+          "file": "languages-1622x970.png",
+          "innerWidth": 1622,
+          "innerHeight": 970,
+          "documentWidth": 1622,
+          "documentHeight": 970,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1532,
+                "y": 882,
+                "width": 62,
+                "height": 62,
+                "right": 1594,
+                "bottom": 944
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 517,
+                "y": 469.6,
+                "width": 588,
+                "height": 58,
+                "right": 1105,
+                "bottom": 527.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 517,
+                "y": 572.6,
+                "width": 588,
+                "height": 58,
+                "right": 1105,
+                "bottom": 630.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Войти в Вавилон →",
+              "disabled": false,
+              "bounds": {
+                "x": 517,
+                "y": 646.6,
+                "width": 588,
+                "height": 64,
+                "right": 1105,
+                "bottom": 710.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 706,
+                "y": 752.6,
+                "width": 210,
+                "height": 67,
+                "right": 916,
+                "bottom": 819.6
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1622,
+                "height": 970,
+                "right": 1622,
+                "bottom": 970
+              },
+              "clientWidth": 1622,
+              "scrollWidth": 1622,
+              "clientHeight": 970,
+              "scrollHeight": 970
+            }
+          ],
+          "websocketCount": 0
+        }
+      ],
+      "errors": [],
+      "websocketCount": 0,
+      "finalCanvasCount": 0,
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "deviceScaleFactor": 1
+      },
+      "screenshots": [
+        {
+          "screen": "login",
+          "file": "login-1280x800.png",
+          "innerWidth": 1280,
+          "innerHeight": 800,
+          "documentWidth": 1280,
+          "documentHeight": 800,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1190,
+                "y": 712,
+                "width": 62,
+                "height": 62,
+                "right": 1252,
+                "bottom": 774
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 430,
+                "y": 269.5,
+                "width": 197,
+                "height": 44,
+                "right": 627,
+                "bottom": 313.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 653,
+                "y": 269.5,
+                "width": 197,
+                "height": 44,
+                "right": 850,
+                "bottom": 313.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 430,
+                "y": 358.5,
+                "width": 420,
+                "height": 54,
+                "right": 850,
+                "bottom": 412.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 430,
+                "y": 462.5,
+                "width": 420,
+                "height": 54,
+                "right": 850,
+                "bottom": 516.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 796,
+                "y": 466.5,
+                "width": 50,
+                "height": 46,
+                "right": 846,
+                "bottom": 512.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Начать путешествие →",
+              "disabled": true,
+              "bounds": {
+                "x": 430,
+                "y": 540.5,
+                "width": 420,
+                "height": 52,
+                "right": 850,
+                "bottom": 592.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 542,
+                "y": 603.5,
+                "width": 196.1,
+                "height": 44,
+                "right": 738,
+                "bottom": 647.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 517.5,
+                "y": 662.5,
+                "width": 244.9,
+                "height": 44,
+                "right": 762.5,
+                "bottom": 706.5
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 800
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "registration",
+          "file": "registration-1280x800.png",
+          "innerWidth": 1280,
+          "innerHeight": 800,
+          "documentWidth": 1280,
+          "documentHeight": 800,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1190,
+                "y": 712,
+                "width": 62,
+                "height": 62,
+                "right": 1252,
+                "bottom": 774
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 430,
+                "y": 269.5,
+                "width": 197,
+                "height": 44,
+                "right": 627,
+                "bottom": 313.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 653,
+                "y": 269.5,
+                "width": 197,
+                "height": 44,
+                "right": 850,
+                "bottom": 313.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 430,
+                "y": 358.5,
+                "width": 420,
+                "height": 54,
+                "right": 850,
+                "bottom": 412.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 430,
+                "y": 462.5,
+                "width": 420,
+                "height": 54,
+                "right": 850,
+                "bottom": 516.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 796,
+                "y": 466.5,
+                "width": 50,
+                "height": 46,
+                "right": 846,
+                "bottom": 512.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Зарегистрироваться →",
+              "disabled": true,
+              "bounds": {
+                "x": 430,
+                "y": 540.5,
+                "width": 420,
+                "height": 52,
+                "right": 850,
+                "bottom": 592.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 542,
+                "y": 603.5,
+                "width": 196.1,
+                "height": 44,
+                "right": 738,
+                "bottom": 647.5
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 517.5,
+                "y": 662.5,
+                "width": 244.9,
+                "height": 44,
+                "right": 762.5,
+                "bottom": 706.5
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 800
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "mode",
+          "file": "mode-1280x800.png",
+          "innerWidth": 1280,
+          "innerHeight": 800,
+          "documentWidth": 1280,
+          "documentHeight": 800,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1190,
+                "y": 712,
+                "width": 62,
+                "height": 62,
+                "right": 1252,
+                "bottom": 774
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 320,
+                "y": 363.6,
+                "width": 1,
+                "height": 1,
+                "right": 321,
+                "bottom": 364.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 320,
+                "y": 515.6,
+                "width": 1,
+                "height": 1,
+                "right": 321,
+                "bottom": 516.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Далее: языки →",
+              "disabled": false,
+              "bounds": {
+                "x": 410,
+                "y": 600.6,
+                "width": 460,
+                "height": 52,
+                "right": 870,
+                "bottom": 652.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 535,
+                "y": 673.6,
+                "width": 210,
+                "height": 67,
+                "right": 745,
+                "bottom": 740.6
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 800
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 817
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "languages",
+          "file": "languages-1280x800.png",
+          "innerWidth": 1280,
+          "innerHeight": 800,
+          "documentWidth": 1280,
+          "documentHeight": 800,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 1190,
+                "y": 712,
+                "width": 62,
+                "height": 62,
+                "right": 1252,
+                "bottom": 774
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 346,
+                "y": 385.9,
+                "width": 588,
+                "height": 58,
+                "right": 934,
+                "bottom": 443.9
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 346,
+                "y": 488.9,
+                "width": 588,
+                "height": 58,
+                "right": 934,
+                "bottom": 546.9
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Войти в Вавилон →",
+              "disabled": false,
+              "bounds": {
+                "x": 346,
+                "y": 562.9,
+                "width": 588,
+                "height": 52,
+                "right": 934,
+                "bottom": 614.9
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 535,
+                "y": 656.9,
+                "width": 210,
+                "height": 67,
+                "right": 745,
+                "bottom": 723.9
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 800
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 1280,
+                "height": 800,
+                "right": 1280,
+                "bottom": 800
+              },
+              "clientWidth": 1280,
+              "scrollWidth": 1280,
+              "clientHeight": 800,
+              "scrollHeight": 800
+            }
+          ],
+          "websocketCount": 0
+        }
+      ],
+      "errors": [],
+      "websocketCount": 0,
+      "finalCanvasCount": 0,
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "deviceScaleFactor": 1
+      },
+      "screenshots": [
+        {
+          "screen": "login",
+          "file": "login-390x844.png",
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "documentWidth": 390,
+          "documentHeight": 844,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 300,
+                "y": 756,
+                "width": 62,
+                "height": 62,
+                "right": 362,
+                "bottom": 818
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 42,
+                "y": 283.3,
+                "width": 145.5,
+                "height": 48,
+                "right": 187.5,
+                "bottom": 331.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 202.5,
+                "y": 283.3,
+                "width": 145.5,
+                "height": 48,
+                "right": 348,
+                "bottom": 331.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 42,
+                "y": 377.3,
+                "width": 306,
+                "height": 58,
+                "right": 348,
+                "bottom": 435.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 42,
+                "y": 482.3,
+                "width": 306,
+                "height": 58,
+                "right": 348,
+                "bottom": 540.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 294,
+                "y": 486.3,
+                "width": 50,
+                "height": 50,
+                "right": 344,
+                "bottom": 536.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Начать путешествие →",
+              "disabled": true,
+              "bounds": {
+                "x": 42,
+                "y": 564.3,
+                "width": 306,
+                "height": 58,
+                "right": 348,
+                "bottom": 622.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 97,
+                "y": 633.3,
+                "width": 196.1,
+                "height": 44,
+                "right": 293,
+                "bottom": 677.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 81.3,
+                "y": 706.3,
+                "width": 227.4,
+                "height": 44,
+                "right": 308.7,
+                "bottom": 750.3
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 844
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 903
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "registration",
+          "file": "registration-390x844.png",
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "documentWidth": 390,
+          "documentHeight": 844,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 300,
+                "y": 756,
+                "width": 62,
+                "height": 62,
+                "right": 362,
+                "bottom": 818
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 42,
+                "y": 283.3,
+                "width": 145.5,
+                "height": 48,
+                "right": 187.5,
+                "bottom": 331.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 202.5,
+                "y": 283.3,
+                "width": 145.5,
+                "height": 48,
+                "right": 348,
+                "bottom": 331.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 42,
+                "y": 377.3,
+                "width": 306,
+                "height": 58,
+                "right": 348,
+                "bottom": 435.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 42,
+                "y": 482.3,
+                "width": 306,
+                "height": 58,
+                "right": 348,
+                "bottom": 540.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 294,
+                "y": 486.3,
+                "width": 50,
+                "height": 50,
+                "right": 344,
+                "bottom": 536.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Зарегистрироваться →",
+              "disabled": true,
+              "bounds": {
+                "x": 42,
+                "y": 564.3,
+                "width": 306,
+                "height": 58,
+                "right": 348,
+                "bottom": 622.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 97,
+                "y": 633.3,
+                "width": 196.1,
+                "height": 44,
+                "right": 293,
+                "bottom": 677.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 81.3,
+                "y": 706.3,
+                "width": 227.4,
+                "height": 44,
+                "right": 308.7,
+                "bottom": 750.3
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 844
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 903
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "mode",
+          "file": "mode-390x844.png",
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "documentWidth": 390,
+          "documentHeight": 844,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 300,
+                "y": 756,
+                "width": 62,
+                "height": 62,
+                "right": 362,
+                "bottom": 818
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 17,
+                "y": 364.6,
+                "width": 1,
+                "height": 1,
+                "right": 18,
+                "bottom": 365.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 17,
+                "y": 486.6,
+                "width": 1,
+                "height": 1,
+                "right": 18,
+                "bottom": 487.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Далее: языки →",
+              "disabled": false,
+              "bounds": {
+                "x": 27,
+                "y": 551.6,
+                "width": 336,
+                "height": 52,
+                "right": 363,
+                "bottom": 603.6
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 90,
+                "y": 619.6,
+                "width": 210,
+                "height": 60,
+                "right": 300,
+                "bottom": 679.6
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 844
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 844
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "languages",
+          "file": "languages-390x844.png",
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "documentWidth": 390,
+          "documentHeight": 844,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 300,
+                "y": 756,
+                "width": 62,
+                "height": 62,
+                "right": 362,
+                "bottom": 818
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 35,
+                "y": 384.8,
+                "width": 320,
+                "height": 58,
+                "right": 355,
+                "bottom": 442.8
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 35,
+                "y": 484.8,
+                "width": 320,
+                "height": 58,
+                "right": 355,
+                "bottom": 542.8
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Войти в Вавилон →",
+              "disabled": false,
+              "bounds": {
+                "x": 35,
+                "y": 558.8,
+                "width": 320,
+                "height": 58,
+                "right": 355,
+                "bottom": 616.8
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 90,
+                "y": 650.8,
+                "width": 210,
+                "height": 60,
+                "right": 300,
+                "bottom": 710.8
+              },
+              "outsideViewport": false
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 844
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 390,
+                "height": 844,
+                "right": 390,
+                "bottom": 844
+              },
+              "clientWidth": 390,
+              "scrollWidth": 390,
+              "clientHeight": 844,
+              "scrollHeight": 844
+            }
+          ],
+          "websocketCount": 0
+        }
+      ],
+      "errors": [],
+      "websocketCount": 0,
+      "finalCanvasCount": 0,
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "deviceScaleFactor": 1
+      },
+      "screenshots": [
+        {
+          "screen": "login",
+          "file": "login-640x480.png",
+          "innerWidth": 640,
+          "innerHeight": 480,
+          "documentWidth": 640,
+          "documentHeight": 480,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 550,
+                "y": 392,
+                "width": 62,
+                "height": 62,
+                "right": 612,
+                "bottom": 454
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 110,
+                "y": 248.3,
+                "width": 197,
+                "height": 44,
+                "right": 307,
+                "bottom": 292.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 333,
+                "y": 248.3,
+                "width": 197,
+                "height": 44,
+                "right": 530,
+                "bottom": 292.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 110,
+                "y": 334.3,
+                "width": 420,
+                "height": 54,
+                "right": 530,
+                "bottom": 388.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 110,
+                "y": 435.3,
+                "width": 420,
+                "height": 54,
+                "right": 530,
+                "bottom": 489.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 476,
+                "y": 439.3,
+                "width": 50,
+                "height": 46,
+                "right": 526,
+                "bottom": 485.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Начать путешествие →",
+              "disabled": true,
+              "bounds": {
+                "x": 110,
+                "y": 513.3,
+                "width": 420,
+                "height": 52,
+                "right": 530,
+                "bottom": 565.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 222,
+                "y": 576.3,
+                "width": 196.1,
+                "height": 44,
+                "right": 418,
+                "bottom": 620.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 197.5,
+                "y": 635.3,
+                "width": 244.9,
+                "height": 44,
+                "right": 442.5,
+                "bottom": 679.3
+              },
+              "outsideViewport": true
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 480
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 752
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "registration",
+          "file": "registration-640x480.png",
+          "innerWidth": 640,
+          "innerHeight": 480,
+          "documentWidth": 640,
+          "documentHeight": 480,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 550,
+                "y": 392,
+                "width": 62,
+                "height": 62,
+                "right": 612,
+                "bottom": 454
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Вход",
+              "disabled": false,
+              "bounds": {
+                "x": 110,
+                "y": 248.3,
+                "width": 197,
+                "height": 44,
+                "right": 307,
+                "bottom": 292.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Регистрация",
+              "disabled": false,
+              "bounds": {
+                "x": 333,
+                "y": 248.3,
+                "width": 197,
+                "height": 44,
+                "right": 530,
+                "bottom": 292.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "playerName",
+              "disabled": false,
+              "bounds": {
+                "x": 110,
+                "y": 334.3,
+                "width": 420,
+                "height": 54,
+                "right": 530,
+                "bottom": 388.3
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "password",
+              "disabled": false,
+              "bounds": {
+                "x": 110,
+                "y": 435.3,
+                "width": 420,
+                "height": 54,
+                "right": 530,
+                "bottom": 489.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Показать пароль",
+              "disabled": false,
+              "bounds": {
+                "x": 476,
+                "y": 439.3,
+                "width": 50,
+                "height": 46,
+                "right": 526,
+                "bottom": 485.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Зарегистрироваться →",
+              "disabled": true,
+              "bounds": {
+                "x": 110,
+                "y": 513.3,
+                "width": 420,
+                "height": 52,
+                "right": 530,
+                "bottom": 565.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Настроить подключение",
+              "disabled": false,
+              "bounds": {
+                "x": 222,
+                "y": 576.3,
+                "width": 196.1,
+                "height": 44,
+                "right": 418,
+                "bottom": 620.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Демонстрационный вход по имени",
+              "disabled": true,
+              "bounds": {
+                "x": 197.5,
+                "y": 635.3,
+                "width": 244.9,
+                "height": 44,
+                "right": 442.5,
+                "bottom": 679.3
+              },
+              "outsideViewport": true
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 480
+            },
+            {
+              "tag": "div",
+              "className": "entry-login-screen",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 752
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "mode",
+          "file": "mode-640x480.png",
+          "innerWidth": 640,
+          "innerHeight": 480,
+          "documentWidth": 640,
+          "documentHeight": 480,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 550,
+                "y": 392,
+                "width": 62,
+                "height": 62,
+                "right": 612,
+                "bottom": 454
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 55,
+                "y": 298.8,
+                "width": 1,
+                "height": 1,
+                "right": 56,
+                "bottom": 299.8
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "input",
+              "name": "entry-mode",
+              "disabled": false,
+              "bounds": {
+                "x": 55,
+                "y": 415.8,
+                "width": 1,
+                "height": 1,
+                "right": 56,
+                "bottom": 416.8
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "button",
+              "name": "Далее: языки →",
+              "disabled": false,
+              "bounds": {
+                "x": 90,
+                "y": 476.3,
+                "width": 460,
+                "height": 52,
+                "right": 550,
+                "bottom": 528.3
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 215,
+                "y": 542.3,
+                "width": 210,
+                "height": 67,
+                "right": 425,
+                "bottom": 609.3
+              },
+              "outsideViewport": true
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 480
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 664
+            }
+          ],
+          "websocketCount": 0
+        },
+        {
+          "screen": "languages",
+          "file": "languages-640x480.png",
+          "innerWidth": 640,
+          "innerHeight": 480,
+          "documentWidth": 640,
+          "documentHeight": 480,
+          "canvasCount": 0,
+          "controls": [
+            {
+              "tag": "button",
+              "name": "Настройки",
+              "disabled": false,
+              "bounds": {
+                "x": 550,
+                "y": 392,
+                "width": 62,
+                "height": 62,
+                "right": 612,
+                "bottom": 454
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 81,
+                "y": 355.7,
+                "width": 478,
+                "height": 58,
+                "right": 559,
+                "bottom": 413.7
+              },
+              "outsideViewport": false
+            },
+            {
+              "tag": "select",
+              "name": "Русский\nEnglish\nEspañol",
+              "disabled": false,
+              "bounds": {
+                "x": 81,
+                "y": 455.7,
+                "width": 478,
+                "height": 58,
+                "right": 559,
+                "bottom": 513.7
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "Войти в Вавилон →",
+              "disabled": false,
+              "bounds": {
+                "x": 81,
+                "y": 529.7,
+                "width": 478,
+                "height": 52,
+                "right": 559,
+                "bottom": 581.7
+              },
+              "outsideViewport": true
+            },
+            {
+              "tag": "button",
+              "name": "← Назад",
+              "disabled": false,
+              "bounds": {
+                "x": 215,
+                "y": 616.7,
+                "width": 210,
+                "height": 67,
+                "right": 425,
+                "bottom": 683.7
+              },
+              "outsideViewport": true
+            }
+          ],
+          "scrollable": [
+            {
+              "tag": "body",
+              "className": "",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 480
+            },
+            {
+              "tag": "dialog",
+              "className": "entry-setup",
+              "bounds": {
+                "x": 0,
+                "y": 0,
+                "width": 640,
+                "height": 480,
+                "right": 640,
+                "bottom": 480
+              },
+              "clientWidth": 640,
+              "scrollWidth": 640,
+              "clientHeight": 480,
+              "scrollHeight": 739
+            }
+          ],
+          "websocketCount": 0
+        }
+      ],
+      "errors": [],
+      "websocketCount": 0,
+      "finalCanvasCount": 0,
+      "logoutStatus": 204,
+      "ok": true
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import type { ChatEntry, ItemId, Languages, NpcReply, PartySize, Tablet, Word, Language } from '../../../shared/babylon/types.ts';
 import type { NpcAnswer, NpcProfile } from '../contracts.ts';
 
-export interface Profile extends Languages { groupId: string; introSeen: boolean; spawnPending: boolean; words: Word[]; replies: NpcReply[] }
+export interface Profile extends Languages { groupId: string | null; introSeen: boolean; spawnPending: boolean; words: Word[]; replies: NpcReply[] }
 export interface Message { id: string; authorId: string; authorName: string; source: string; sourceLanguage: Language; createdAt: number; deliveries: Record<string, { language: Language; text: string | null; translated: boolean; status: ChatEntry['status']; error?: string }> }
 export interface Party {
   id: string; size: PartySize; members: { id: string; name: string; role: number }[];
@@ -16,6 +16,7 @@ export interface BabylonStore {
   party(id: string): Party | null;
   openParty(): Party | null;
   saveParty(party: Party): void;
+  deleteParty(id: string): void;
   operation(playerId: string, requestId: string): Operation | null;
   saveOperation(playerId: string, requestId: string, operation: Operation): void;
   interrupt(): void;

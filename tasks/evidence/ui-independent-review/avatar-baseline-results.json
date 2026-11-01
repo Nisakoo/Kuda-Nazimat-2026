@@ -1,0 +1,408 @@
+{
+  "startedAt": "2026-11-01T01:17:50.663Z",
+  "origin": "http://127.0.0.1:4387",
+  "username": "indbaseline-mvx54ukn",
+  "screens": [
+    {
+      "label": "lukas-1622x970",
+      "file": "fresh-avatar-baseline/lukas-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "DIV",
+        "label": "Вращение персонажа"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 734,
+          "scrollHeight": 734
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "DIALOG",
+      "selected": [
+        "lukas"
+      ]
+    },
+    {
+      "label": "nic-1622x970",
+      "file": "fresh-avatar-baseline/nic-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 2"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 734,
+          "scrollHeight": 734
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "DIALOG",
+      "selected": [
+        "nic"
+      ]
+    },
+    {
+      "label": "dan-1622x970",
+      "file": "fresh-avatar-baseline/dan-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 3"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 734,
+          "scrollHeight": 734
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "DIALOG",
+      "selected": [
+        "dan"
+      ]
+    },
+    {
+      "label": "ksu-1622x970",
+      "file": "fresh-avatar-baseline/ksu-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 734,
+          "scrollHeight": 734
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "DIALOG",
+      "selected": [
+        "ksu"
+      ]
+    },
+    {
+      "label": "chooser-1280x800",
+      "file": "fresh-avatar-baseline/chooser-1280x800.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 644,
+          "scrollHeight": 644
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "DIALOG",
+      "selected": [
+        "ksu"
+      ]
+    },
+    {
+      "label": "chooser-controls-1280x800",
+      "file": "fresh-avatar-baseline/chooser-controls-1280x800.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 1062,
+          "scrollWidth": 1062,
+          "height": 644,
+          "scrollHeight": 644
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "DIALOG",
+      "selected": [
+        "ksu"
+      ]
+    },
+    {
+      "label": "chooser-390x844",
+      "file": "fresh-avatar-baseline/chooser-390x844.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 340,
+          "scrollWidth": 478,
+          "height": 792,
+          "scrollHeight": 934
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "IMG",
+      "selected": [
+        "ksu"
+      ]
+    },
+    {
+      "label": "chooser-controls-390x844",
+      "file": "fresh-avatar-baseline/chooser-controls-390x844.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 340,
+          "scrollWidth": 478,
+          "height": 792,
+          "scrollHeight": 934
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "BUTTON",
+      "selected": [
+        "ksu"
+      ]
+    },
+    {
+      "label": "chooser-640x480",
+      "file": "fresh-avatar-baseline/chooser-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 590,
+          "scrollWidth": 590,
+          "height": 428,
+          "scrollHeight": 971
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "IMG",
+      "selected": [
+        "ksu"
+      ]
+    },
+    {
+      "label": "chooser-controls-640x480",
+      "file": "fresh-avatar-baseline/chooser-controls-640x480.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-Bb8RXsDf.js"
+      ],
+      "canvas": 1,
+      "locked": false,
+      "viewport": {
+        "width": 640,
+        "height": 480,
+        "dpr": 1
+      },
+      "active": {
+        "tag": "INPUT",
+        "label": "Облик 4"
+      },
+      "dialogs": [
+        {
+          "label": "avatar-title",
+          "modal": true,
+          "width": 590,
+          "scrollWidth": 590,
+          "height": 428,
+          "scrollHeight": 971
+        }
+      ],
+      "rootGear": true,
+      "gearHit": "BUTTON",
+      "selected": [
+        "ksu"
+      ]
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:4387/api/auth/register"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/auth/state"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/lukas.glb"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/nic.glb"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/dan.glb"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/ksu.glb"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/lukas.glb"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/nic.glb"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/dan.glb"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4387/api/avatar/models/ksu.glb"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:4387/api/avatar"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:4387/api/babylon",
+      "action": "state"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:4387/api/auth/logout"
+    }
+  ],
+  "hashes": {
+    "lukas": "df28e3be7f6cbe3f188315edd69b7e4994dfd97980c158d8afd35013bfa66d69",
+    "nic": "35dce034ea20f55a2658d1b508f8a232f9c91dafa5da0782a127b5ce61e2b79a",
+    "dan": "c30616282873678cdad3835ab7e62ef7b67ec8bfa1a1e83c4e53221cb4227038",
+    "ksu": "efdb7e1384fb0cf535577246851ad5ec6663358b51c398a00a881b6b4a68f994"
+  },
+  "notes": [],
+  "allFourBaselineCapturedAt": "2026-11-01T01:18:08.586Z",
+  "logoutStatus": 204,
+  "ok": true,
+  "finishedAt": "2026-11-01T01:18:19.302Z"
+}

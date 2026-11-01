@@ -1,0 +1,9 @@
+{
+  "node": "v24.15.0",
+  "playersBefore": 12,
+  "playersAfter": 12,
+  "integrity": "ok",
+  "foreignKeyViolations": 0,
+  "schema": 7,
+  "missingMigratedPasswords": 0
+}

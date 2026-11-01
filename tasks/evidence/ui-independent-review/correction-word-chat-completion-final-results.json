@@ -1,0 +1,1852 @@
+{
+  "startedAt": "2026-11-01T05:25:56.170Z",
+  "scope": "OBSERVATION ONLY: 45s native UI actions, 90s readiness/response observation. Does NOT replace failed 5s gates. Real peer sends a new message to the Spanish-learning recipient. Own messages must stay in the native language. No state/response substitution or automatic capture.",
+  "steps": [
+    {
+      "label": "actual capture failure before explicit diagnostic retry",
+      "notAcceptance": true,
+      "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate"
+    },
+    {
+      "label": "explicit diagnostic user retry",
+      "button": "Начать прогулку ↗",
+      "notAcceptance": true
+    },
+    {
+      "label": "actual peer state",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "36923acb-3796-4220-8c8f-309537c3b1b9",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 5026
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    84,
+                    84
+                  ],
+                  [
+                    104,
+                    104
+                  ],
+                  [
+                    124,
+                    124
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    164,
+                    164
+                  ],
+                  [
+                    184,
+                    184
+                  ],
+                  [
+                    204,
+                    204
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793508200628
+            }
+          ],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            },
+            {
+              "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793508103708
+            },
+            {
+              "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Hello",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793508143839
+            },
+            {
+              "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Hello",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793509733942
+            },
+            {
+              "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793510550746
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "label": "actual peer chat",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "3533183a-243a-4eab-924c-e33ae347684d",
+        "state": {
+          "v": 2,
+          "playerId": "p_yy2bt5jku8ez3lx0",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "en"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 2,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 5026
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "x": 0,
+              "z": -26
+            }
+          ],
+          "task": "Contact player 1. Find out which food is needed, buy it at the market and feed the goats.",
+          "taskTitle": "The Shepherd’s Goats",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": null,
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    84,
+                    84
+                  ],
+                  [
+                    104,
+                    104
+                  ],
+                  [
+                    124,
+                    124
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    164,
+                    164
+                  ],
+                  [
+                    184,
+                    184
+                  ],
+                  [
+                    204,
+                    204
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793508200628
+            }
+          ],
+          "words": [],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            },
+            {
+              "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Купи финики",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793508103708
+            },
+            {
+              "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Hello",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793508143839
+            },
+            {
+              "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Hello",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793509733942
+            },
+            {
+              "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793510550746
+            },
+            {
+              "id": "3533183a-243a-4eab-924c-e33ae347684d",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793510808601
+            }
+          ],
+          "replies": []
+        }
+      }
+    }
+  ],
+  "screens": [
+    {
+      "label": "hud-overlap-390x844",
+      "file": "correction-word-chat-completion-final/hud-overlap-390x844.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "locked": true,
+      "active": {
+        "tag": "BODY",
+        "text": "\n      Вавилон Изучаю Español⌄ Локальный сервер По",
+        "inTop": false
+      },
+      "scroll": [],
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 5023
+        },
+        "availableParty": null,
+        "partyPositions": [],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          },
+          {
+            "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793509733942
+          },
+          {
+            "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Hola",
+            "language": "es",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793510550746
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "chat-es-new-old-preserved-1622x970",
+      "file": "correction-word-chat-completion-final/chat-es-new-old-preserved-1622x970.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "title": "Чат с напарниками",
+      "active": {
+        "tag": "DIV",
+        "text": "Чат с напарниками✕ Тестовый переводчик и NPC. Сохр",
+        "inTop": true
+      },
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "width": 856,
+          "scrollWidth": 856,
+          "top": 0,
+          "height": 776,
+          "scrollHeight": 776
+        },
+        {
+          "class": "babel-content",
+          "width": 856,
+          "scrollWidth": 856,
+          "top": 0,
+          "height": 776,
+          "scrollHeight": 791
+        },
+        {
+          "class": "babel-chat",
+          "width": 796,
+          "scrollWidth": 796,
+          "top": 809,
+          "height": 369,
+          "scrollHeight": 1178
+        }
+      ],
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 5064
+        },
+        "availableParty": null,
+        "partyPositions": [
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "x": 2.9999999999999933,
+            "z": 8
+          }
+        ],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          },
+          {
+            "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793509733942
+          },
+          {
+            "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Hola",
+            "language": "es",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793510550746
+          },
+          {
+            "id": "3533183a-243a-4eab-924c-e33ae347684d",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Hola",
+            "language": "es",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793510808601
+          }
+        ],
+        "replies": []
+      }
+    },
+    {
+      "label": "failure",
+      "file": "correction-word-chat-completion-final/failure.png",
+      "bundle": [
+        "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+      ],
+      "viewport": {
+        "width": 1622,
+        "height": 970,
+        "dpr": 1
+      },
+      "locked": false,
+      "title": "Мой словарь",
+      "active": {
+        "tag": "INPUT",
+        "text": "",
+        "inTop": true
+      },
+      "scroll": [
+        {
+          "class": "panel market-panel babel-panel",
+          "width": 856,
+          "scrollWidth": 856,
+          "top": 0,
+          "height": 776,
+          "scrollHeight": 776
+        },
+        {
+          "class": "babel-content",
+          "width": 856,
+          "scrollWidth": 856,
+          "top": 0,
+          "height": 776,
+          "scrollHeight": 1109
+        }
+      ],
+      "state": {
+        "v": 2,
+        "playerId": "p_d5w1o440fuyfxno4",
+        "backend": "test",
+        "languages": [
+          "ru",
+          "en",
+          "es"
+        ],
+        "profile": {
+          "native": "ru",
+          "learning": "es"
+        },
+        "introSeen": true,
+        "party": {
+          "id": "b_s8rzrbswf058jfhn",
+          "size": 2,
+          "count": 2,
+          "role": 1,
+          "members": [
+            {
+              "id": "p_d5w1o440fuyfxno4",
+              "name": "indafter-mvxaqa5w",
+              "role": 1
+            },
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "role": 2
+            }
+          ],
+          "started": true,
+          "completed": false,
+          "seconds": 5179
+        },
+        "availableParty": null,
+        "partyPositions": [
+          {
+            "id": "p_yy2bt5jku8ez3lx0",
+            "name": "indafterpeer-mvxb0dms",
+            "x": 2.9999999999999933,
+            "z": 8
+          }
+        ],
+        "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+        "taskTitle": "Las cabras del pastor",
+        "taskTarget": {
+          "x": 0,
+          "z": -34
+        },
+        "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+        "inventory": {
+          "dates": 0,
+          "red-fruit": 0,
+          "yellow-fruit": 0,
+          "water": 0,
+          "fabric": 0
+        },
+        "fed": [],
+        "stones": [
+          {
+            "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "drawing": [
+              [
+                [
+                  64,
+                  64
+                ],
+                [
+                  84,
+                  84
+                ],
+                [
+                  104,
+                  104
+                ],
+                [
+                  124,
+                  124
+                ],
+                [
+                  144,
+                  144
+                ],
+                [
+                  164,
+                  164
+                ],
+                [
+                  184,
+                  184
+                ],
+                [
+                  204,
+                  204
+                ],
+                [
+                  224,
+                  224
+                ]
+              ]
+            ],
+            "createdAt": 1793508200628
+          }
+        ],
+        "words": [
+          {
+            "id": "b_bowxx494artkrxyg",
+            "native": "ru",
+            "learning": "en",
+            "word": "basket",
+            "translation": "корзина",
+            "note": "Независимая заметка после коррекции",
+            "learned": true,
+            "example": "Bring the basket to the market.",
+            "exampleTranslation": "Принеси корзину на рынок."
+          },
+          {
+            "id": "b_hesf740jdyc9rz9y",
+            "native": "ru",
+            "learning": "en",
+            "word": "jug",
+            "translation": "кувшин",
+            "note": "Jug edited through UI",
+            "learned": false,
+            "example": "Fill the jug with water.",
+            "exampleTranslation": "Наполни кувшин водой."
+          }
+        ],
+        "messages": [
+          {
+            "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793505873100
+          },
+          {
+            "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793507361131
+          },
+          {
+            "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Buy dates",
+            "language": "en",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793508103708
+          },
+          {
+            "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793508143839
+          },
+          {
+            "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+            "authorId": "p_d5w1o440fuyfxno4",
+            "authorName": "indafter-mvxaqa5w",
+            "text": "Привет",
+            "language": "ru",
+            "translated": false,
+            "status": "delivered",
+            "createdAt": 1793509733942
+          },
+          {
+            "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Hola",
+            "language": "es",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793510550746
+          },
+          {
+            "id": "3533183a-243a-4eab-924c-e33ae347684d",
+            "authorId": "p_yy2bt5jku8ez3lx0",
+            "authorName": "indafterpeer-mvxb0dms",
+            "text": "Hola",
+            "language": "es",
+            "translated": true,
+            "status": "delivered",
+            "createdAt": 1793510808601
+          }
+        ],
+        "replies": []
+      }
+    }
+  ],
+  "http": [
+    {
+      "action": "languages",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "2a4580bf-0ec4-4587-bd6b-a7ec5e482307",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "es"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 4977
+          },
+          "availableParty": null,
+          "partyPositions": [],
+          "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+          "taskTitle": "Las cabras del pastor",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    84,
+                    84
+                  ],
+                  [
+                    104,
+                    104
+                  ],
+                  [
+                    124,
+                    124
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    164,
+                    164
+                  ],
+                  [
+                    184,
+                    184
+                  ],
+                  [
+                    204,
+                    204
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793508200628
+            }
+          ],
+          "words": [
+            {
+              "id": "b_bowxx494artkrxyg",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Независимая заметка после коррекции",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_hesf740jdyc9rz9y",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Jug edited through UI",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            },
+            {
+              "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793508103708
+            },
+            {
+              "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793508143839
+            },
+            {
+              "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793509733942
+            },
+            {
+              "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Hola",
+              "language": "es",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793510550746
+            }
+          ],
+          "replies": []
+        }
+      }
+    },
+    {
+      "action": "suggest",
+      "status": 200,
+      "body": {
+        "v": 2,
+        "requestId": "6562f9d7-a6f3-4b46-a5d7-ec3eb239f330",
+        "state": {
+          "v": 2,
+          "playerId": "p_d5w1o440fuyfxno4",
+          "backend": "test",
+          "languages": [
+            "ru",
+            "en",
+            "es"
+          ],
+          "profile": {
+            "native": "ru",
+            "learning": "es"
+          },
+          "introSeen": true,
+          "party": {
+            "id": "b_s8rzrbswf058jfhn",
+            "size": 2,
+            "count": 2,
+            "role": 1,
+            "members": [
+              {
+                "id": "p_d5w1o440fuyfxno4",
+                "name": "indafter-mvxaqa5w",
+                "role": 1
+              },
+              {
+                "id": "p_yy2bt5jku8ez3lx0",
+                "name": "indafterpeer-mvxb0dms",
+                "role": 2
+              }
+            ],
+            "started": true,
+            "completed": false,
+            "seconds": 5087
+          },
+          "availableParty": null,
+          "partyPositions": [
+            {
+              "id": "p_yy2bt5jku8ez3lx0",
+              "name": "indafterpeer-mvxb0dms",
+              "x": 2.9999999999999933,
+              "z": 8
+            }
+          ],
+          "task": "Ayuda a tus compañeros a alimentar a las cabras: explica sus rasgos y su comida. Solo tú tienes la lista.",
+          "taskTitle": "Las cabras del pastor",
+          "taskTarget": {
+            "x": 0,
+            "z": -34
+          },
+          "goatGuide": "La cabra blanca con campana come dátiles. La cabra negra con cuernos largos come frutos rojos. La cabra rojiza con manchas come fruta amarilla. El cabrito gris pequeño bebe agua de una jarra.",
+          "inventory": {
+            "dates": 0,
+            "red-fruit": 0,
+            "yellow-fruit": 0,
+            "water": 0,
+            "fabric": 0
+          },
+          "fed": [],
+          "stones": [
+            {
+              "id": "de656bad-e13d-46f5-b81a-2e46cbc16db2",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "drawing": [
+                [
+                  [
+                    64,
+                    64
+                  ],
+                  [
+                    84,
+                    84
+                  ],
+                  [
+                    104,
+                    104
+                  ],
+                  [
+                    124,
+                    124
+                  ],
+                  [
+                    144,
+                    144
+                  ],
+                  [
+                    164,
+                    164
+                  ],
+                  [
+                    184,
+                    184
+                  ],
+                  [
+                    204,
+                    204
+                  ],
+                  [
+                    224,
+                    224
+                  ]
+                ]
+              ],
+              "createdAt": 1793508200628
+            }
+          ],
+          "words": [
+            {
+              "id": "b_bowxx494artkrxyg",
+              "native": "ru",
+              "learning": "en",
+              "word": "basket",
+              "translation": "корзина",
+              "note": "Независимая заметка после коррекции",
+              "learned": true,
+              "example": "Bring the basket to the market.",
+              "exampleTranslation": "Принеси корзину на рынок."
+            },
+            {
+              "id": "b_hesf740jdyc9rz9y",
+              "native": "ru",
+              "learning": "en",
+              "word": "jug",
+              "translation": "кувшин",
+              "note": "Jug edited through UI",
+              "learned": false,
+              "example": "Fill the jug with water.",
+              "exampleTranslation": "Наполни кувшин водой."
+            }
+          ],
+          "messages": [
+            {
+              "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793505873100
+            },
+            {
+              "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793507361131
+            },
+            {
+              "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Buy dates",
+              "language": "en",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793508103708
+            },
+            {
+              "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793508143839
+            },
+            {
+              "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+              "authorId": "p_d5w1o440fuyfxno4",
+              "authorName": "indafter-mvxaqa5w",
+              "text": "Привет",
+              "language": "ru",
+              "translated": false,
+              "status": "delivered",
+              "createdAt": 1793509733942
+            },
+            {
+              "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Hola",
+              "language": "es",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793510550746
+            },
+            {
+              "id": "3533183a-243a-4eab-924c-e33ae347684d",
+              "authorId": "p_yy2bt5jku8ez3lx0",
+              "authorName": "indafterpeer-mvxb0dms",
+              "text": "Hola",
+              "language": "es",
+              "translated": true,
+              "status": "delivered",
+              "createdAt": 1793510808601
+            }
+          ],
+          "replies": []
+        },
+        "suggestion": "Привет"
+      }
+    }
+  ],
+  "errors": [],
+  "startActualCapture": true,
+  "hud390": {
+    "language": {
+      "x": 144.984375,
+      "y": 74,
+      "w": 170.015625,
+      "h": 44
+    },
+    "task": {
+      "x": 28,
+      "y": 92,
+      "w": 298.390625,
+      "h": 49
+    },
+    "languageCenterHit": "Изучаю Español⌄",
+    "languageCenterHitsLanguage": true,
+    "intersects": true,
+    "locked": true
+  },
+  "sameParty": true,
+  "actualPeerJoined": {
+    "v": 3,
+    "type": "joined",
+    "requestId": "c6873eb7-6a9f-4ad9-bfea-f5f0d048d13a",
+    "playerId": "p_yy2bt5jku8ez3lx0",
+    "revision": 0,
+    "snapshot": {
+      "tick": 125968,
+      "entities": [
+        {
+          "id": "p_yy2bt5jku8ez3lx0",
+          "character": {
+            "kind": "player",
+            "name": "indafterpeer-mvxb0dms"
+          },
+          "transform": {
+            "position": {
+              "x": 2.9999999999999933,
+              "y": 0,
+              "z": 8
+            },
+            "rotationY": 1.5707963267948966
+          },
+          "movement": {
+            "direction": {
+              "x": 0,
+              "z": 0
+            },
+            "speed": 3
+          },
+          "motion": {
+            "grounded": true,
+            "phase": "grounded",
+            "verticalVelocity": 0,
+            "locomotion": "idle",
+            "stamina": 100,
+            "sprintBlocked": false,
+            "jumpAck": 0
+          },
+          "renderable": {
+            "assetId": "demo-player"
+          },
+          "animationState": {
+            "name": "idle"
+          }
+        },
+        {
+          "id": "potter",
+          "character": {
+            "kind": "npc",
+            "name": "Гончар"
+          },
+          "transform": {
+            "position": {
+              "x": 4.6,
+              "y": 0,
+              "z": -0.5
+            },
+            "rotationY": 0
+          },
+          "interactable": {
+            "radius": 2.7,
+            "label": "Керамика"
+          },
+          "animationState": {
+            "name": "idle"
+          }
+        },
+        {
+          "id": "fruit-seller",
+          "character": {
+            "kind": "npc",
+            "name": "Торговец фруктами"
+          },
+          "transform": {
+            "position": {
+              "x": -4.5,
+              "y": 0,
+              "z": 0.5
+            },
+            "rotationY": 0
+          },
+          "interactable": {
+            "radius": 2.7,
+            "label": "Фрукты и финики"
+          },
+          "animationState": {
+            "name": "idle"
+          }
+        },
+        {
+          "id": "fabric-seller",
+          "character": {
+            "kind": "npc",
+            "name": "Торговка тканями"
+          },
+          "transform": {
+            "position": {
+              "x": -3,
+              "y": 0,
+              "z": -5.2
+            },
+            "rotationY": 0
+          },
+          "interactable": {
+            "radius": 2.7,
+            "label": "Ткани и узоры"
+          },
+          "animationState": {
+            "name": "idle"
+          }
+        },
+        {
+          "id": "p_d5w1o440fuyfxno4",
+          "character": {
+            "kind": "player",
+            "name": "indafter-mvxaqa5w"
+          },
+          "transform": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": -26
+            },
+            "rotationY": 3.141592653589793
+          },
+          "movement": {
+            "direction": {
+              "x": 0,
+              "z": 0
+            },
+            "speed": 3
+          },
+          "motion": {
+            "grounded": true,
+            "phase": "grounded",
+            "verticalVelocity": 0,
+            "locomotion": "idle",
+            "stamina": 100,
+            "sprintBlocked": false,
+            "jumpAck": 0
+          },
+          "renderable": {
+            "assetId": "avatar-dan"
+          },
+          "equipment": {
+            "tool": "jug"
+          },
+          "animationState": {
+            "name": "idle"
+          }
+        },
+        {
+          "id": "shepherd",
+          "character": {
+            "kind": "npc",
+            "name": "Пастух"
+          },
+          "transform": {
+            "position": {
+              "x": -3,
+              "y": 0,
+              "z": -26
+            },
+            "rotationY": 0
+          },
+          "interactable": {
+            "radius": 2.7,
+            "label": "Козы и пастбище"
+          },
+          "animationState": {
+            "name": "idle"
+          }
+        }
+      ]
+    },
+    "world": {
+      "manifestUrl": "maps/market/manifest.json",
+      "worldBytes": 23648595,
+      "manifestBytes": 1415164,
+      "assets": {
+        "assets/models/demo/history.glb": {
+          "bytes": 52080,
+          "memory": 3145728
+        },
+        "assets/models/demo/science.glb": {
+          "bytes": 52080,
+          "memory": 3145728
+        },
+        "assets/models/demo/tablet.glb": {
+          "bytes": 46836,
+          "memory": 3145728
+        },
+        "assets/models/avatars/lukas.glb": {
+          "bytes": 883556,
+          "memory": 1767112
+        },
+        "assets/models/avatars/nic.glb": {
+          "bytes": 883560,
+          "memory": 1767120
+        },
+        "assets/models/avatars/dan.glb": {
+          "bytes": 883568,
+          "memory": 1767136
+        },
+        "assets/models/avatars/ksu.glb": {
+          "bytes": 720372,
+          "memory": 1440744
+        },
+        "assets/models/market/market.glb": {
+          "bytes": 808632,
+          "memory": 8388608
+        },
+        "assets/models/market/pasture.glb": {
+          "bytes": 409960,
+          "memory": 6291456
+        },
+        "assets/models/market/main-building.glb": {
+          "bytes": 453240,
+          "memory": 6291456
+        }
+      }
+    }
+  },
+  "persistedSelfFromActualPeer": {
+    "id": "p_d5w1o440fuyfxno4",
+    "character": {
+      "kind": "player",
+      "name": "indafter-mvxaqa5w"
+    },
+    "transform": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -26
+      },
+      "rotationY": 3.141592653589793
+    },
+    "movement": {
+      "direction": {
+        "x": 0,
+        "z": 0
+      },
+      "speed": 3
+    },
+    "motion": {
+      "grounded": true,
+      "phase": "grounded",
+      "verticalVelocity": 0,
+      "locomotion": "idle",
+      "stamina": 100,
+      "sprintBlocked": false,
+      "jumpAck": 0
+    },
+    "renderable": {
+      "assetId": "avatar-dan"
+    },
+    "equipment": {
+      "tool": "jug"
+    },
+    "animationState": {
+      "name": "idle"
+    }
+  },
+  "oldMessagesBefore": [
+    {
+      "id": "5fd3761d-0a4d-440c-8a55-af0d974a5601",
+      "authorId": "p_yy2bt5jku8ez3lx0",
+      "authorName": "indafterpeer-mvxb0dms",
+      "text": "Buy dates",
+      "language": "en",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793505873100
+    },
+    {
+      "id": "faa29ceb-f18e-4b1a-88b8-880dfb1be74e",
+      "authorId": "p_yy2bt5jku8ez3lx0",
+      "authorName": "indafterpeer-mvxb0dms",
+      "text": "Buy dates",
+      "language": "en",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793507361131
+    },
+    {
+      "id": "9f71be82-ac39-4d96-81c3-a67a00cc6b65",
+      "authorId": "p_yy2bt5jku8ez3lx0",
+      "authorName": "indafterpeer-mvxb0dms",
+      "text": "Buy dates",
+      "language": "en",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793508103708
+    },
+    {
+      "id": "7b7f7b46-cc94-490d-8059-f9b0d21afb68",
+      "authorId": "p_d5w1o440fuyfxno4",
+      "authorName": "indafter-mvxaqa5w",
+      "text": "Привет",
+      "language": "ru",
+      "translated": false,
+      "status": "delivered",
+      "createdAt": 1793508143839
+    },
+    {
+      "id": "d56fddd4-5b8d-4be5-ba75-6c236e8b50e1",
+      "authorId": "p_d5w1o440fuyfxno4",
+      "authorName": "indafter-mvxaqa5w",
+      "text": "Привет",
+      "language": "ru",
+      "translated": false,
+      "status": "delivered",
+      "createdAt": 1793509733942
+    },
+    {
+      "id": "7180c268-5a64-4e56-b6b3-5f4bf9ea6ca6",
+      "authorId": "p_yy2bt5jku8ez3lx0",
+      "authorName": "indafterpeer-mvxb0dms",
+      "text": "Hola",
+      "language": "es",
+      "translated": true,
+      "status": "delivered",
+      "createdAt": 1793510550746
+    }
+  ],
+  "oldMessagesStable": true,
+  "realChatWordSeed": "Hola",
+  "failure": "TimeoutError: page.waitForResponse: Timeout 90000ms exceeded while waiting for event \"response\"",
+  "peerLogout": 204,
+  "logout": 204,
+  "finishedAt": "2026-11-01T05:29:41.456Z"
+}

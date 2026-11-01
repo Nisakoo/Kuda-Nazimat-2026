@@ -27,7 +27,8 @@ test('building courtyard streams from market, stairs rise to landing, symbols to
   await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
   await page.clock.runFor(300);
   await walk(page, 'z', 9); await walk(page, 'x', -32); await walk(page, 'z', 10);
-  await expect(page.getByRole('heading', { name: 'Двор Вавилонской башни', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Двор Вавилонской башни');
   await page.addStyleTag({ content: '.debug { visibility: hidden; }' });
   await page.screenshot({ path: 'test-results/building-courtyard.png' });
   await page.keyboard.press('Escape');
@@ -43,7 +44,8 @@ test('building courtyard streams from market, stairs rise to landing, symbols to
   const after = await position(page); expect(after.y).toBe(3); expect(after.x - before.x).toBeLessThan(1);
   await walk(page, 'x', -23); await walk(page, 'z', 9); expect((await position(page)).y).toBe(0);
   await walk(page, 'x', 0);
-  await expect(page.getByRole('heading', { name: 'Рынок Вавилона', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Текущая область', exact: true })).toHaveText('Рынок Вавилона');
   const budget = (await page.getByLabel('Кеш мира').textContent())!.match(/^(\d+) \/ (\d+)/)!;
   expect(Number(budget[1])).toBeLessThanOrEqual(Number(budget[2]));
   expect(errors).toEqual([]);

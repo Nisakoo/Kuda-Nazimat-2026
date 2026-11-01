@@ -1,0 +1,13 @@
+WAIT ENABLED
+CONSOLE warning [.WebGL-0x2f84001caa00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+CONSOLE warning [.WebGL-0x2f84001caa00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+CONSOLE warning [.WebGL-0x2f84001caa00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+CONSOLE warning [.WebGL-0x2f84001caa00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+ENABLED
+RECT { x: 82.1875, y: 421.734375, width: 298, height: 44 }
+START CLICK
+CLICK COMPLETE
+EVALUATE
+LOCK true
+STOP PROFILE
+PROFILE SAVED

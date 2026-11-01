@@ -28,7 +28,8 @@ export async function setup(overrides: Record<string, unknown> = {}, language?: 
     return await response.json() as { token: string; expiresAt: number };
   };
   async function connect(token: string, host = '127.0.0.1') {
-    const socket = io(`http://${host}:${port}/game`, { auth: { version: 3, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
+    const endpoint = host.startsWith('http://') || host.startsWith('https://') ? host : `http://${host}:${port}`;
+    const socket = io(`${endpoint}/game`, { auth: { version: 3, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
     cleanups.push(async () => { socket.disconnect(); });
     const packets: ServerMessage[] = []; socket.on('game', (raw) => packets.push(parseServerMessage(raw)));
     const connected = new Promise<void>((resolve, reject) => { socket.once('connect', resolve); socket.once('connect_error', reject); }); socket.connect(); await connected;

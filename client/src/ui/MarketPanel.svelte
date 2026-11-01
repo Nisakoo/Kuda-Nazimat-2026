@@ -1,9 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { GameApp, MarketPanel } from '../app/GameApp';
   import { MARKET_GOATS, MARKET_ITEMS, MARKET_PEOPLE } from '../session/MarketSession';
   import type { MarketState, StonePoint, Word } from '../session/MarketSession';
   import { modal } from './modal';
-  const { game, market, panel, target }: { game: GameApp; market: MarketState; panel: MarketPanel | null; target: string | null } = $props();
+  import { inventoryShortcut } from './inventoryShortcut';
+  const { game, market, panel, target, navigation }: { game: GameApp; market: MarketState; panel: MarketPanel | null; target: string | null; navigation?: Snippet } = $props();
   const actor = $derived([...MARKET_PEOPLE, ...MARKET_GOATS].find(actor => actor.id === target));
   const goat = $derived(MARKET_GOATS.find(goat => goat.id === target));
   const titles = { intro: 'Добро пожаловать в Вавилон', task: 'Козы пастуха', inventory: 'Ваша сумка', stone: 'Высечь камень', words: 'Личный словарь', interaction: 'Взаимодействие', results: 'Спасибо за помощь!' };
@@ -19,7 +21,7 @@
 
 {#if panel}
   <div class="modal-backdrop">
-    <dialog use:modal class="panel market-panel" aria-labelledby="market-title" oncancel={(event) => { event.preventDefault(); drawing = false; game.closeMarketPanel(); }}>
+    <dialog use:modal class="panel market-panel" aria-labelledby="market-title" onkeydown={event => inventoryShortcut(event, panel, () => game.closeMarketPanel())} oncancel={(event) => { event.preventDefault(); drawing = false; game.closeMarketPanel(); }}>
       <div class="panel-top"><div><p class="eyebrow">Рынок Вавилона · локальное демо</p><h2 id="market-title">{panel === 'interaction' ? actor?.name ?? titles.interaction : titles[panel]}</h2></div><button class="icon-button" aria-label="Закрыть окно рынка" onclick={() => { drawing = false; game.closeMarketPanel(); }}>✕</button></div>
       {#if panel === 'intro'}
         <p>Вы — путник в городе, где смешались языки. На рынке продают фрукты, ткани и глиняную посуду. За лестницей пасутся козы.</p>
@@ -71,6 +73,11 @@
       {#if market.notice}<p class="market-notice" role="status">{market.notice}</p>{/if}
       <p class="small subtle">Только локальный стенд · без серверного сохранения</p>
       <button class="secondary" onclick={() => game.closeMarketPanel()}>Закрыть</button>
+      {#if navigation}<div class="market-navigation">{@render navigation()}</div>{/if}
     </dialog>
   </div>
 {/if}
+
+<style>
+  .market-navigation { position: sticky; bottom: 0; background: #fafaf2; padding-top: 8px; z-index: 1; }
+</style>

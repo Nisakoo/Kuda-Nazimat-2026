@@ -1,0 +1,5812 @@
+{
+  "startedAt": "2026-11-01T03:49:12.581Z",
+  "expectedBundle": "index-zupTnY5d.js",
+  "scope": "Independent correction static entry; actual UI guest auth, no enroll/world. Mandatory UI assertions keep 5s.",
+  "flows": [
+    {
+      "width": 1622,
+      "height": 970,
+      "errors": [],
+      "screens": [
+        {
+          "label": "login",
+          "file": "correction-static/login-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-first-action-settings",
+          "file": "correction-static/login-first-action-settings-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-draft-settings",
+          "file": "correction-static/login-draft-settings-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration",
+          "file": "correction-static/registration-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Регистрация",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration-settings",
+          "file": "correction-static/registration-settings-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode",
+          "file": "correction-static/mode-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-settings",
+          "file": "correction-static/mode-settings-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends-size4-settings",
+          "file": "correction-static/friends-size4-settings-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 829
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends",
+          "file": "correction-static/friends-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Настройки",
+            "text": "",
+            "gear": true,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 829
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages",
+          "file": "correction-static/languages-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "A",
+            "label": "Вавилон — главная",
+            "text": " Вавилон",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-settings",
+          "file": "correction-static/languages-settings-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-controls",
+          "file": "correction-static/languages-controls-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 798
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-return",
+          "file": "correction-static/mode-return-1622x970.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1622,
+            "height": 970,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1522,
+            "y": 878,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1622,
+              "scrollWidth": 1622,
+              "height": 798,
+              "scrollHeight": 829
+            }
+          ],
+          "alerts": []
+        }
+      ],
+      "actions": [
+        {
+          "label": "login-first-action",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login-draft",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login draft survived Settings",
+          "name": "",
+          "passwordPreserved": true
+        },
+        {
+          "label": "registration",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "registration tabs",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Показать пароль",
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Настроить подключение",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Создать героя △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        },
+        {
+          "label": "mode",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "mode tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            }
+          ]
+        },
+        {
+          "label": "friends-size4",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 829
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 829
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1622,
+              "height": 970,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1522,
+              "y": 878,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1622,
+                "scrollWidth": 1622,
+                "height": 798,
+                "scrollHeight": 798
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        }
+      ],
+      "websockets": 0,
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "errors": [],
+      "screens": [
+        {
+          "label": "login",
+          "file": "correction-static/login-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 640
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-first-action-settings",
+          "file": "correction-static/login-first-action-settings-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 640
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-draft-settings",
+          "file": "correction-static/login-draft-settings-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 640
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration",
+          "file": "correction-static/registration-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Регистрация",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 640
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration-settings",
+          "file": "correction-static/registration-settings-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 640
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode",
+          "file": "correction-static/mode-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 703
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-settings",
+          "file": "correction-static/mode-settings-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 703
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends-size4-settings",
+          "file": "correction-static/friends-size4-settings-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 25,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 820
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends",
+          "file": "correction-static/friends-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Настройки",
+            "text": "",
+            "gear": true,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 25,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 820
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages",
+          "file": "correction-static/languages-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "A",
+            "label": "Вавилон — главная",
+            "text": " Вавилон",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 54,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 686
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-settings",
+          "file": "correction-static/languages-settings-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 54,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 686
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-controls",
+          "file": "correction-static/languages-controls-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 54,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 686
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-return",
+          "file": "correction-static/mode-return-1280x800.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 1280,
+            "height": 800,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 1180,
+            "y": 708,
+            "w": 72,
+            "h": 72,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 54,
+              "width": 1280,
+              "scrollWidth": 1280,
+              "height": 628,
+              "scrollHeight": 820
+            }
+          ],
+          "alerts": []
+        }
+      ],
+      "actions": [
+        {
+          "label": "login-first-action",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 640
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 640
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login-draft",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 640
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 640
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login draft survived Settings",
+          "name": "",
+          "passwordPreserved": true
+        },
+        {
+          "label": "registration",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 640
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 640
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "registration tabs",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Показать пароль",
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Настроить подключение",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Создать героя △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        },
+        {
+          "label": "mode",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 703
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 703
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "mode tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            }
+          ]
+        },
+        {
+          "label": "friends-size4",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 25,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 820
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 25,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 820
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 54,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 686
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 1280,
+              "height": 800,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 1180,
+              "y": 708,
+              "w": 72,
+              "h": 72,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 54,
+                "width": 1280,
+                "scrollWidth": 1280,
+                "height": 628,
+                "scrollHeight": 686
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        }
+      ],
+      "websockets": 0,
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "errors": [],
+      "screens": [
+        {
+          "label": "login",
+          "file": "correction-static/login-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 648,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-first-action-settings",
+          "file": "correction-static/login-first-action-settings-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 648,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-draft-settings",
+          "file": "correction-static/login-draft-settings-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 648,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration",
+          "file": "correction-static/registration-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Регистрация",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 648,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration-settings",
+          "file": "correction-static/registration-settings-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 648,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode",
+          "file": "correction-static/mode-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 692
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-settings",
+          "file": "correction-static/mode-settings-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 692
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends-size4-settings",
+          "file": "correction-static/friends-size4-settings-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 709
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends",
+          "file": "correction-static/friends-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Настройки",
+            "text": "",
+            "gear": true,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 709
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages",
+          "file": "correction-static/languages-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "A",
+            "label": "Вавилон — главная",
+            "text": " Вавилон",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 692
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-settings",
+          "file": "correction-static/languages-settings-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 692
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-controls",
+          "file": "correction-static/languages-controls-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 692
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-return",
+          "file": "correction-static/mode-return-390x844.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 390,
+            "height": 844,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 322,
+            "y": 776,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 390,
+              "scrollWidth": 390,
+              "height": 692,
+              "scrollHeight": 709
+            }
+          ],
+          "alerts": []
+        }
+      ],
+      "actions": [
+        {
+          "label": "login-first-action",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 648,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 648,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login-draft",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 648,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 648,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login draft survived Settings",
+          "name": "",
+          "passwordPreserved": true
+        },
+        {
+          "label": "registration",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 648,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 648,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "registration tabs",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Показать пароль",
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Настроить подключение",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Создать героя △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        },
+        {
+          "label": "mode",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 692,
+                "scrollHeight": 692
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 692,
+                "scrollHeight": 692
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "mode tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            }
+          ]
+        },
+        {
+          "label": "friends-size4",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 692,
+                "scrollHeight": 709
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 692,
+                "scrollHeight": 709
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 692,
+                "scrollHeight": 692
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 390,
+              "height": 844,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 322,
+              "y": 776,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 390,
+                "scrollWidth": 390,
+                "height": 692,
+                "scrollHeight": 692
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        }
+      ],
+      "websockets": 0,
+      "logoutStatus": 204,
+      "ok": true
+    },
+    {
+      "width": 640,
+      "height": 480,
+      "errors": [],
+      "screens": [
+        {
+          "label": "login",
+          "file": "correction-static/login-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 284,
+              "scrollHeight": 600
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-first-action-settings",
+          "file": "correction-static/login-first-action-settings-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 284,
+              "scrollHeight": 600
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "login-draft-settings",
+          "file": "correction-static/login-draft-settings-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 134,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 284,
+              "scrollHeight": 600
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration",
+          "file": "correction-static/registration-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": null,
+            "text": "Регистрация",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": false
+          },
+          "dialogs": [],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 134,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 284,
+              "scrollHeight": 600
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "registration-settings",
+          "file": "correction-static/registration-settings-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-login-screen",
+              "top": 134,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 284,
+              "scrollHeight": 600
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode",
+          "file": "correction-static/mode-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 574
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-settings",
+          "file": "correction-static/mode-settings-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 0,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 574
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends-size4-settings",
+          "file": "correction-static/friends-size4-settings-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 63,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 684
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "friends",
+          "file": "correction-static/friends-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Настройки",
+            "text": "",
+            "gear": true,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 63,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 684
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages",
+          "file": "correction-static/languages-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "A",
+            "label": "Вавилон — главная",
+            "text": " Вавилон",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 321,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-settings",
+          "file": "correction-static/languages-settings-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BUTTON",
+            "label": "Закрыть настройки",
+            "text": "✕",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": false,
+            "inModal": false
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            },
+            {
+              "title": "Настройки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 321,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "languages-controls",
+          "file": "correction-static/languages-controls-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "BODY",
+            "label": null,
+            "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+            "gear": false,
+            "inModal": false
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Ваши языки",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 284,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 649
+            }
+          ],
+          "alerts": []
+        },
+        {
+          "label": "mode-return",
+          "file": "correction-static/mode-return-640x480.png",
+          "bundle": [
+            "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+          ],
+          "viewport": {
+            "width": 640,
+            "height": 480,
+            "dpr": 1
+          },
+          "canvas": 0,
+          "locked": false,
+          "active": {
+            "tag": "INPUT",
+            "label": null,
+            "text": "",
+            "gear": false,
+            "inModal": true
+          },
+          "visibleGears": 1,
+          "visibleBrands": 1,
+          "gear": {
+            "x": 572,
+            "y": 412,
+            "w": 56,
+            "h": 56,
+            "hitIsGear": true,
+            "inModal": true
+          },
+          "dialogs": [
+            {
+              "title": "Куда отправимся?",
+              "modal": true
+            }
+          ],
+          "scroll": [
+            {
+              "class": "entry-setup-body",
+              "top": 284,
+              "width": 640,
+              "scrollWidth": 640,
+              "height": 328,
+              "scrollHeight": 684
+            }
+          ],
+          "alerts": []
+        }
+      ],
+      "actions": [
+        {
+          "label": "login-first-action",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Войти в город △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 284,
+                "scrollHeight": 600
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 0,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 284,
+                "scrollHeight": 600
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login-draft",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 134,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 284,
+                "scrollHeight": 600
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 134,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 284,
+                "scrollHeight": 600
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "login draft survived Settings",
+          "name": "",
+          "passwordPreserved": true
+        },
+        {
+          "label": "registration",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 134,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 284,
+                "scrollHeight": 600
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": false
+            },
+            "dialogs": [],
+            "scroll": [
+              {
+                "class": "entry-login-screen",
+                "top": 134,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 284,
+                "scrollHeight": 600
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "registration tabs",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Показать пароль",
+              "text": "",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Настроить подключение",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n      Вавилон     Вавилон Создать героя △ Вход Ре",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": false
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Регистрация",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        },
+        {
+          "label": "mode",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 328,
+                "scrollHeight": 574
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 0,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 328,
+                "scrollHeight": 574
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "mode tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Далее: языки →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Куда отправим",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            }
+          ]
+        },
+        {
+          "label": "friends-size4",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "INPUT",
+              "label": null,
+              "text": "",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 63,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 328,
+                "scrollHeight": 684
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Куда отправимся?",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 63,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 328,
+                "scrollHeight": 684
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages",
+          "kind": "settings-pointer-close",
+          "before": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 321,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 328,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "after": {
+            "bundle": [
+              "http://127.0.0.1:4387/assets/index-zupTnY5d.js"
+            ],
+            "viewport": {
+              "width": 640,
+              "height": 480,
+              "dpr": 1
+            },
+            "canvas": 0,
+            "locked": false,
+            "active": {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            "visibleGears": 1,
+            "visibleBrands": 1,
+            "gear": {
+              "x": 572,
+              "y": 412,
+              "w": 56,
+              "h": 56,
+              "hitIsGear": true,
+              "inModal": true
+            },
+            "dialogs": [
+              {
+                "title": "Ваши языки",
+                "modal": true
+              }
+            ],
+            "scroll": [
+              {
+                "class": "entry-setup-body",
+                "top": 321,
+                "width": 640,
+                "scrollWidth": 640,
+                "height": 328,
+                "scrollHeight": 649
+              }
+            ],
+            "alerts": []
+          },
+          "focusReturnedToGear": true
+        },
+        {
+          "label": "languages tab containment",
+          "kind": "tabs",
+          "order": [
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            },
+            {
+              "tag": "A",
+              "label": "Вавилон — главная",
+              "text": " Вавилон",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": "Настройки",
+              "text": "",
+              "gear": true,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "SELECT",
+              "label": null,
+              "text": "РусскийEnglishEspañol",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "Войти в Вавилон →",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BUTTON",
+              "label": null,
+              "text": "← Назад",
+              "gear": false,
+              "inModal": true
+            },
+            {
+              "tag": "BODY",
+              "label": null,
+              "text": "\n                  Вавилон   Вавилон Ваши языки △ ",
+              "gear": false,
+              "inModal": false
+            }
+          ]
+        }
+      ],
+      "websockets": 0,
+      "logoutStatus": 204,
+      "ok": true
+    }
+  ],
+  "finishedAt": "2026-11-01T03:49:53.591Z"
+}

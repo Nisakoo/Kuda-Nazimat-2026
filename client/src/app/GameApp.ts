@@ -3,8 +3,18 @@ import { ThreeRenderer } from '../render/three/ThreeRenderer';
 import type { Entity, GameCommand, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from '../session/GameSession';
 import { BabylonClient } from '../multiplayer/BabylonClient';
+import { AvatarClient } from '../multiplayer/AvatarClient';
+import { EquipmentClient } from '../multiplayer/EquipmentClient';
+import type { EquipmentView } from '../multiplayer/EquipmentClient';
+import type { ToolId } from '../../../shared/equipment/types';
+export type { EquipmentView };
+import type { AvatarView } from '../multiplayer/AvatarClient';
+import type { AvatarId } from '../../../shared/avatar/types';
+import { ThreeAvatarPreview } from '../render/three/ThreeAvatarPreview';
+import type { AvatarPreview, AvatarPreviewEvents } from '../render/AvatarPreview';
+export type { AvatarView, AvatarPreview, AvatarPreviewEvents };
 import type { BabylonView } from '../multiplayer/BabylonClient';
-import type { BabylonAction } from '../../../shared/babylon/types.ts';
+import type { BabylonAction, Language, PartySize } from '../../../shared/babylon/types.ts';
 import { MARKET_GOATS, MARKET_PEOPLE } from '../session/MarketSession';
 import { MarketSession } from '../session/MarketSession';
 import type { MarketState, MarketItem, Stone } from '../session/MarketSession';
@@ -17,6 +27,7 @@ import { InputController } from '../input/InputController';
 import { DEMO_NPCS, DEMO_SPAWN } from '../shared/demo';
 import { GameLoop } from './GameLoop';
 import { parseConfig } from './config';
+import { rememberConnection } from './connectionPreference';
 import type { ClientConfig } from './config';
 import { AssetManager, HttpAssetSource } from '../map/AssetManager';
 import { WorldBudget } from '../map/WorldBudget';
@@ -33,6 +44,7 @@ import type { Clock, NetworkAdapter } from '../multiplayer/NetworkAdapter';
 import type { ConnectionStatus, ServerSession, WorldDescriptor } from '../../../shared/protocol/types.ts';
 import { parseServerSession } from '../../../shared/protocol/validate.ts';
 import { guestName, requestGuestSession } from '../multiplayer/GuestAuth';
+import { requestPasswordSession, revokeSession } from '../multiplayer/PasswordAuth';
 import { FrameMetrics } from './FrameMetrics';
 import { WorldAudio } from '../audio/WorldAudio';
 import type { AudioOrigin } from '../audio/WorldAudio';
@@ -43,6 +55,9 @@ export type BabylonPanel = 'setup' | 'languages' | 'intro' | 'task' | 'inventory
 export type { BabylonView };
 export type MarketPanel = 'intro' | 'task' | 'inventory' | 'stone' | 'words' | 'interaction' | 'results';
 export type ClientMode = 'local' | 'mock' | 'online';
+export type HudPanel = 'inventory' | 'map' | 'words' | 'chat';
+export interface MapPlayer { readonly x: number; readonly z: number; readonly yaw: number; readonly authoritative: boolean }
+export interface MapPeer { readonly id: string; readonly name: string; readonly x: number; readonly z: number }
 
 const localEntities: readonly Entity[] = [
   {
@@ -62,10 +77,22 @@ const localEntities: readonly Entity[] = [
 
 interface Nearby { readonly id: string; readonly name: string }
 export interface AppSnapshot {
+  readonly pauseOpen: boolean;
+  readonly controlsHint: boolean;
+  readonly entryStage: 'profile' | 'mode' | 'connect' | 'loading' | null;
+  readonly entryReveal: boolean;
+  readonly avatarRequired: boolean;
   readonly babylon: BabylonView | null;
   readonly babylonPanel: BabylonPanel | null;
   readonly babylonTarget: string | null;
   readonly babylonWord: string;
+  readonly avatar: AvatarView | null;
+  readonly equipment: EquipmentView | null;
+  readonly avatarOpen: boolean;
+  readonly avatarPurpose: 'first' | 'settings';
+  readonly mapOpen: boolean;
+  readonly mapPlayer: MapPlayer | null;
+  readonly mapPeers: readonly MapPeer[];
   readonly phase: 'idle' | 'running' | 'stopped' | 'unavailable' | 'error' | 'disposed';
   readonly message: string | null;
   readonly screen: 'welcome' | 'playing';
@@ -117,6 +144,8 @@ export interface AppSnapshot {
 /** Composition root; all UI/input commands cross this facade. */
 export class GameApp {
   private babylonClient: BabylonClient | null = null;
+  private avatarClient: AvatarClient | null = null;
+  private equipmentClient: EquipmentClient | null = null;
   private renderer: RenderAdapter | null = null;
   private audio: WorldAudio | null = null;
   private audioPrevious: WorldSnapshot | null = null;
@@ -129,6 +158,13 @@ export class GameApp {
   private generation = 0;
   private mock = false;
   private serverSession: ServerSession | null = null;
+  private requiresAvatar = false;
+  private entryPending = false;
+  private pendingConnect = false;
+  private connectionRequest: AbortController | null = null;
+  requestJoinAfterLogin(): void { this.pendingConnect = true; }
+  private autoCaptureEntry = false;
+  private entryAction: 'create' | 'join' | null = null;
   private authRequest: AbortController | null = null;
   private authTimer: number | null = null;
   private network: NetworkAdapter | null = null;
@@ -162,8 +198,10 @@ export class GameApp {
     if (config.mapId === 'market') this.camera = { yaw: 0, pitch: .5, distance: 18 };
     this.audio = new WorldAudio(this.worldBudget);
     this.snapshot = Object.freeze({
-      phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null,
-      babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '',
+      controlsHint: false,
+      entryStage: null, entryReveal: false, avatarRequired: false,
+      phase: 'idle', message: null, screen: 'welcome', nearby: null, dialog: null, pauseOpen: false,
+      babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '', mapOpen: false, mapPlayer: null, mapPeers: [], avatar: null, avatarOpen: false, avatarPurpose: 'settings', equipment: null,
       debug: config.debug, buildingSymbols: true, coordinates: '',
       capture: 'idle', captureError: null,
       visualLoading: false, visualError: null, modelStats: '',
@@ -196,13 +234,14 @@ export class GameApp {
     try {
       if (this.host && this.host !== host) this.releaseResources();
       this.host = host;
+      if (this.config.session === 'online' && this.config.mapId !== 'market' && this.requiresAvatar && this.serverSession) { if (!this.snapshot.avatarOpen) this.openAvatar(); return; }
       if (this.config.session === 'online' && !this.session) {
         if (!this.mock && (!this.serverSession || this.serverSession.expiresAt <= browserClock.now())) {
           this.serverSession = null; this.patch({ authRequired: true, worldReady: false }); this.setState('idle'); return;
         }
         if (!this.mock && this.config.mapId === 'market' && this.serverSession) {
           if (!this.babylonClient) { this.startBabylon(); return; }
-          if (!this.snapshot.babylon?.state?.profile) return;
+          if (!this.snapshot.babylon?.state?.party || this.entryPending || this.requiresAvatar) return;
         }
         this.network = this.createNetwork(this.mock, this.config.serverUrl, browserClock);
         const online = new OnlineSession(this.network, this.config.mapId, browserClock);
@@ -269,16 +308,18 @@ export class GameApp {
           jump: () => { this.session?.send({ type: 'jump' }); },
           clearInput: () => { this.session?.send({ type: 'clear-input' }); },
           interact: () => this.interact(),
+          shortcut: code => this.handleShortcut(code),
+          controlsHint: visible => this.patch({ controlsHint: visible }),
           carry: () => this.carry(),
           menu: () => this.toggleMenu(),
           captured: () => {
             if (this.session instanceof MarketSession) this.session.beginTour();
-            this.patch({ capture: 'locked', captureError: null, screen: 'playing' });
+            this.patch({ capture: 'locked', captureError: null, screen: 'playing', pauseOpen: false });
             if (this.host) this.start(this.host);
             this.updateHud(true);
           },
           interrupted: () => {
-            this.patch({ capture: 'idle', captureError: null });
+            this.patch({ capture: 'idle', captureError: null, pauseOpen: this.snapshot.screen === 'playing' && !this.overlayOpen });
             if (!this.snapshot.dialog && this.snapshot.screen === 'playing') this.stop();
           },
           captureFailed: (captureError) => this.patch({ capture: 'error', captureError }),
@@ -297,13 +338,21 @@ export class GameApp {
         }, {
           beforeUpdate: () => this.input?.sample(),
           update: (delta) => {
-            if (this.snapshot.phase !== 'running') return;
+            if (this.snapshot.phase !== 'running') {
+              // Menus pause local simulation, not authoritative network delivery.
+              if (this.session instanceof OnlineSession) {
+                this.session.update(0);
+                this.current = this.session.getSnapshot();
+                this.updateHud();
+              }
+              return;
+            }
             this.audio?.update(delta);
             if (this.world && !this.world.manifest) return;
             const localPosition = this.current?.entities.find(entity => entity.id === this.session?.playerId)?.transform?.position;
             if (this.world && this.session instanceof LocalSession && localPosition && !this.world.isPrepared(localPosition)) return;
             this.previous = this.current;
-            if (this.session instanceof OnlineSession) this.session.setPreparedChunks(this.world?.preparedChunks ?? []);
+            if (this.session instanceof OnlineSession) this.session.setPreparedChunks(this.snapshot.entryStage === 'loading' ? [] : this.world?.preparedChunks ?? []);
             this.session?.update(delta);
             this.current = this.session?.getSnapshot() ?? null;
             if (!(this.session instanceof OnlineSession) && this.current) this.feedAudioMovement(this.current, 'live');
@@ -321,7 +370,7 @@ export class GameApp {
             } else this.renderer?.render(elapsed, alpha);
             this.updateVisualStatus();
             if (this.snapshot.debug) this.updateMetrics(began);
-            if (this.snapshot.phase === 'stopped' && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
+            if (this.snapshot.phase === 'stopped' && !(this.session instanceof OnlineSession) && !this.world?.stats.loading && !this.renderer?.getDiagnostics().pending) this.loop?.stop();
           },
           onError: () => this.fail('Не удалось обновить сцену. Попробуйте перезапустить прогулку.'),
         });
@@ -331,6 +380,8 @@ export class GameApp {
       this.observer = new ResizeObserver(this.resize);
       this.observer.observe(host);
       document.addEventListener('visibilitychange', this.onVisibilityChange);
+      window.addEventListener('blur', this.cancelEntryCapture);
+      document.addEventListener('keydown', this.onEntryKey);
       window.addEventListener('resize', this.resize);
       this.setState('running');
       this.frameMetrics.reset(); this.lastMetrics = performance.now();
@@ -347,11 +398,15 @@ export class GameApp {
   }
 
   resume(): void {
-    if (this.snapshot.phase === 'stopped' && this.host) this.requestPlay();
+    if (this.snapshot.phase === 'stopped' && this.host && !this.overlayOpen) {
+      this.patch({ pauseOpen: false });
+      this.requestPlay();
+    }
   }
 
   private requestPlay(): void {
-    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.babylonPanel) return;
+    this.updateVisualStatus();
+    if (!this.input || this.snapshot.capture === 'requesting' || !this.snapshot.worldReady || this.snapshot.visualLoading || this.snapshot.babylonPanel || this.snapshot.mapOpen || this.snapshot.avatarOpen || this.snapshot.settingsOpen || this.snapshot.chatOpen || this.snapshot.marketPanel || this.snapshot.dialog) return;
     this.patch({ capture: 'requesting', captureError: null });
     this.input.requestCapture();
     void this.audio?.unlock();
@@ -364,31 +419,50 @@ export class GameApp {
     this.detach();
     this.updateHud(true);
     this.setState('stopped');
-    if (this.world?.stats.loading || this.renderer?.getDiagnostics().pending) this.loop?.start();
+    if (this.session instanceof OnlineSession || this.world?.stats.loading || this.renderer?.getDiagnostics().pending) this.loop?.start();
   }
 
   toggleMenu(): void {
+    if (this.snapshot.settingsOpen) { this.closeSettings(); return; }
+    if (this.snapshot.chatOpen) { this.closeChat(); return; }
+    if (this.snapshot.avatarOpen) { this.closeAvatar(); return; }
+    if (this.snapshot.mapOpen) { this.closeMap(); return; }
     if (this.snapshot.babylonPanel) { void this.closeBabylonPanel(); return; }
     if (this.snapshot.marketPanel) { this.closeMarketPanel(); return; }
     if (this.snapshot.dialog) { this.closeDialog(); return; }
     if (this.snapshot.screen !== 'playing' || !this.host) return;
-    if (this.snapshot.phase === 'running') this.stop();
+    if (this.snapshot.pauseOpen) { this.resume(); return; }
+    this.patch({ pauseOpen: true });
+    this.stop();
+  }
+
+  private get overlayOpen(): boolean {
+    const s = this.snapshot;
+    return Boolean(s.settingsOpen || s.chatOpen || s.avatarOpen || s.mapOpen || s.babylonPanel || s.marketPanel || s.dialog);
+  }
+
+  private returnFromOverlay(): void {
+    // A close gesture can restore capture. Browser rejection uses recovery,
+    // never an implicit pause menu. Explicitly opened pause keeps its parent role.
+    if (this.snapshot.screen === 'playing' && !this.snapshot.entryStage && !this.snapshot.pauseOpen && !this.overlayOpen) this.resume();
   }
 
   restart(host: HTMLElement): void {
     this.cancelLogin();
     if (this.snapshot.phase === 'disposed') throw new Error('Приложение уже завершено.');
     const screen = 'welcome';
+    if (this.serverSession && this.config.mapId === 'market' && !this.entryPending) { this.autoCaptureEntry = true; this.patch({ entryStage: 'loading', entryReveal: false }); }
     this.detach();
     this.releaseResources();
     this.camera = { yaw: 0, pitch: this.config.mapId === 'market' ? .5 : .7, distance: this.config.mapId === 'market' ? 18 : 15 };
-    this.patch({ screen, dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null, market: null, marketPanel: null, marketTarget: null });
+    this.patch({ screen, pauseOpen: false, mapOpen: false, mapPlayer: null, mapPeers: [], dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogError: null, market: null, marketPanel: null, marketTarget: null });
     this.setState('idle');
     this.start(host);
   }
 
   leaveWorld(): void {
     if (!this.host) return;
+    if (this.serverSession && this.config.mapId === 'market') { this.cancelEntry(); return; }
     this.patch({ screen: 'welcome', dialog: null, nearby: null });
     this.restart(this.host);
   }
@@ -411,6 +485,7 @@ export class GameApp {
     this.npcRequest = null;
     this.patch({ dialog: null, dialogPending: false, dialogError: null });
     this.stop();
+    this.returnFromOverlay();
   }
 
   submitDialog(text: string): void {
@@ -461,16 +536,24 @@ export class GameApp {
     this.world?.setRadius(radius); this.config = Object.freeze({ ...this.config, chunkRadius: radius }); this.patch({ chunkRadius: radius });
   }
 
-  openSettings(): void { this.input?.stop(); this.stop(); this.patch({ settingsOpen: true, settingsError: null }); }
-  closeSettings(): void { this.patch({ settingsOpen: false }); if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host); }
+  openSettings(): void {
+    this.babylonClient?.cancelNpc();
+    this.connectionRequest?.abort(); this.connectionRequest = null;
+    this.input?.stop(); this.stop();
+    this.patch({ mapOpen: false, chatOpen: false, marketPanel: null, babylonPanel: this.snapshot.babylonPanel === 'setup' ? 'setup' : null, settingsOpen: true, settingsError: null });
+  }
+  closeSettings(): void { this.patch({ settingsOpen: false }); if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host); else this.returnFromOverlay(); }
   applySettings(mode: ClientMode, serverUrl: string, mapId: string, chunkRadius: number, debug: boolean): boolean {
     try {
       const config = parseConfig({ session: mode === 'local' ? 'local' : 'online', serverUrl, mapId, chunkRadius, debug }, window.location.origin);
       if ((mode === 'local' || mode === 'mock') && !['demo', 'science', 'market'].includes(mapId)) throw new Error('Для локальной прогулки доступны market, demo и science.');
       if (mode === 'mock' && mapId === 'market') throw new Error('Рынок пока доступен в локальной прогулке. Тестовая сеть использует demo или science.');
       this.cancelLogin(); this.stopBabylon();
-      if (config.serverUrl !== this.config.serverUrl || mode !== 'online') { this.serverSession = null; this.patch({ authName: '' }); }
+      if (config.serverUrl !== this.config.serverUrl || mode !== 'online') { this.serverSession = null; this.requiresAvatar = false; this.patch({ authName: '', avatarRequired: false }); }
+      this.entryPending = mode === 'online' && config.mapId === 'market';
+      this.patch({ entryStage: this.serverSession && this.entryPending ? 'profile' : null, entryReveal: false });
       this.mock = mode === 'mock'; this.config = config;
+      try { rememberConnection(config.serverUrl, window.localStorage); } catch { /* Storage is optional; never persist authentication. */ }
       this.patch({ authRequired: mode === 'online' && !this.serverSession, authPending: false, authError: null, mapId: config.mapId, mode, debug, chunkRadius, settingsOpen: false, settingsError: null, networkError: null, networkStatus: 'unauthorized' });
       if (this.host) this.restart(this.host);
       return true;
@@ -496,7 +579,24 @@ export class GameApp {
       if (this.authRequest === request) this.patch({ authError: error instanceof Error ? error.message : 'Не удалось войти. Попробуйте снова.' });
     } finally { if (this.authRequest === request) this.cancelLogin(); }
   }
+  loginPassword(name: string, password: string): Promise<void> { return this.authenticate(name, password, 'login'); }
+  register(name: string, password: string): Promise<void> { return this.authenticate(name, password, 'register'); }
+  private async authenticate(rawName: string, password: string, mode: 'login' | 'register'): Promise<void> {
+    if (!this.snapshot.authRequired || this.snapshot.authPending || this.snapshot.phase === 'disposed') return;
+    let name: string;
+    try { name = guestName(rawName); } catch (error) { this.patch({ authError: (error as Error).message }); return; }
+    const request = new AbortController(); this.authRequest = request;
+    this.patch({ authPending: true, authError: null, authName: name });
+    this.authTimer = window.setTimeout(() => { if (this.authRequest === request) { this.cancelLogin(); this.patch({ authError: mode === 'register' ? 'Сервер не ответил за 10 секунд. Аккаунт мог быть создан. Перейдите во «Вход» и попробуйте войти с тем же паролем.' : 'Сервер не ответил за 10 секунд. Повторите попытку.' }); } }, 10000);
+    try {
+      const result = await requestPasswordSession(this.config.serverUrl, mode, name, password, request.signal);
+      if (this.authRequest === request) this.provideServerSession(result.session, result.requiresAvatar);
+    } catch (error) {
+      if (this.authRequest === request) this.patch({ authError: error instanceof Error ? error.message : 'Не удалось войти.' });
+    } finally { if (this.authRequest === request) this.cancelLogin(); }
+  }
   private cancelLogin(): void {
+    this.connectionRequest?.abort(); this.connectionRequest = null;
     const request = this.authRequest; this.authRequest = null;
     if (this.authTimer !== null) window.clearTimeout(this.authTimer);
     this.authTimer = null; request?.abort();
@@ -504,17 +604,21 @@ export class GameApp {
   }
 
   /** Integration boundary: only the local server's login flow supplies this context. */
-  provideServerSession(raw: unknown): void {
+  provideServerSession(raw: unknown, requiresAvatar = false): void {
     const session = parseServerSession(raw, browserClock.now());
     this.cancelLogin();
     this.stopBabylon();
-    this.serverSession = session; this.mock = false; this.config = Object.freeze({ ...this.config, session: 'online' });
+    this.serverSession = session; this.requiresAvatar = requiresAvatar; this.entryPending = this.config.mapId === 'market'; this.mock = false; this.config = Object.freeze({ ...this.config, session: 'online' });
     this.patch({ authRequired: false, authPending: false, authError: null, mode: 'online', networkError: null, networkStatus: 'unauthorized' });
+    this.patch({ avatarRequired: requiresAvatar, entryStage: this.config.mapId === 'market' ? (this.pendingConnect ? 'connect' : 'profile') : null });
+    this.pendingConnect = false;
     if (this.host) this.restart(this.host);
   }
   logout(): void {
-    this.cancelLogin(); this.stopBabylon(); this.serverSession = null;
-    this.patch({ authRequired: this.snapshot.mode === 'online', authError: null, authName: '', networkError: null, networkStatus: 'unauthorized' });
+    const previous = this.serverSession;
+    this.cancelLogin(); this.stopBabylon(); this.serverSession = null; this.requiresAvatar = false;
+    if (previous) void revokeSession(this.config.serverUrl, previous.token).catch(() => { if (!this.serverSession && this.snapshot.phase !== 'disposed') this.patch({ authError: 'Вы вышли на этом устройстве. Сервер не подтвердил отзыв сессии; проверьте подключение.' }); });
+    this.patch({ entryStage: null, entryReveal: false, avatarRequired: false, authRequired: this.snapshot.mode === 'online', authError: null, authName: '', networkError: null, networkStatus: 'unauthorized' });
     if (this.mock) { this.mock = false; this.config = Object.freeze({ ...this.config, session: 'local' }); this.patch({ mode: 'local' }); }
     if (this.host) this.restart(this.host);
   }
@@ -523,9 +627,9 @@ export class GameApp {
   openChat(): void {
     if (this.snapshot.babylon?.state?.profile) { this.openBabylonPanel('chat'); return; }
     this.input?.stop(); this.stop();
-    this.patch({ chatOpen: true, chatError: this.session instanceof OnlineSession ? null : 'Общение игроков доступно в сетевом или тестовом режиме.' });
+    this.patch({ pauseOpen: false, chatOpen: true, chatError: this.session instanceof OnlineSession ? null : 'Общение игроков доступно в сетевом или тестовом режиме.' });
   }
-  closeChat(): void { this.patch({ chatOpen: false }); }
+  closeChat(): void { this.patch({ chatOpen: false }); this.returnFromOverlay(); }
   sendChat(text: string): boolean {
     if (!(this.session instanceof OnlineSession)) return false;
     const requestId = this.session.chat(text);
@@ -542,10 +646,10 @@ export class GameApp {
   }
   private expireServerSession(message = 'Серверная сессия истекла или отклонена. Войдите снова.'): void {
     const host = this.host;
-    this.cancelLogin(); this.stopBabylon(); this.serverSession = null;
+    this.cancelLogin(); this.stopBabylon(); this.serverSession = null; this.requiresAvatar = false;
     this.detach(); this.releaseResources();
     this.host = host;
-    this.patch({ authRequired: true, authPending: false, authError: message, screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, chatMessages: [], dialogPending: false, dialogError: null, networkStatus: 'unauthorized', networkError: null });
+    this.patch({ entryStage: null, entryReveal: false, authRequired: true, authPending: false, authError: message, screen: 'welcome', worldReady: false, dialog: null, chatOpen: false, chatMessages: [], dialogPending: false, dialogError: null, networkStatus: 'unauthorized', networkError: null });
     this.setState('idle');
   }
   private readonly onOnlineNotice = (notice: OnlineNotice): void => {
@@ -617,12 +721,24 @@ export class GameApp {
   private updateVisualStatus(): void {
     const diagnostics = this.renderer?.getDiagnostics();
     if (!diagnostics) return;
-    const visualLoading = diagnostics.pending > 0;
+    if (this.snapshot.entryStage !== 'loading') this.renderer?.revealChunks?.();
     const worldStats = this.world?.stats;
+    // Chunk fetches enqueue visuals later; an empty renderer queue alone is not readiness.
+    const visualLoading = diagnostics.pending > 0 || Boolean(worldStats?.loading);
     const visualError = this.worldFailure || worldStats?.errors.length ? 'Не удалось загрузить участок мира. Повторите загрузку в меню.' : diagnostics.errors.length ? 'Не удалось загрузить часть оформления. Откройте меню, чтобы повторить загрузку.' : null;
     const modelStats = `Модели: ${diagnostics.models} · Экземпляры: ${diagnostics.instances}`;
     const position = this.current?.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
     const worldReady = (this.world ? Boolean(position && this.world.isPrepared(position)) : this.createMap === null) && (!(this.session instanceof OnlineSession) || this.session.state.status === 'connected');
+    if (this.snapshot.entryStage === 'loading' && worldReady && !this.worldStarting && !visualLoading && !diagnostics.errors.length && !this.worldFailure && !worldStats?.errors.length) {
+      this.renderer?.revealChunks?.();
+      if (!this.snapshot.entryReveal) this.patch({ entryReveal: true });
+    }
+    if (this.snapshot.entryStage === 'loading' && worldReady && !this.worldStarting && this.snapshot.entryReveal && !visualLoading && !visualError && !(this.renderer?.getDiagnostics().appearing ?? 0)) {
+      this.patch({ entryStage: null, entryReveal: false, screen: 'playing', worldReady: true, visualLoading: false });
+      this.stop();
+      if (this.autoCaptureEntry && !document.hidden && document.hasFocus()) this.requestPlay();
+      else this.patch({ captureError: 'Мир готов. Вернитесь в окно и нажмите «Вернуть управление».' });
+    }
     const worldWaiting = this.waitingForWorld && Boolean(worldStats?.loading || worldStats?.deferred);
     const region = position ? this.world?.region(position) || 'Площадь открытий' : 'Площадь открытий';
     const budget = this.worldBudget.stats;
@@ -662,7 +778,7 @@ export class GameApp {
   }
 
   private canControl(): boolean {
-    return this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen && !this.snapshot.marketPanel && !this.snapshot.babylonPanel;
+    return !this.snapshot.entryStage && this.snapshot.phase === 'running' && this.snapshot.screen === 'playing' && this.snapshot.capture === 'locked' && this.snapshot.worldReady && !this.snapshot.dialog && !this.snapshot.chatOpen && !this.snapshot.settingsOpen && !this.snapshot.marketPanel && !this.snapshot.babylonPanel && !this.snapshot.mapOpen && !this.snapshot.avatarOpen;
   }
 
   private readonly onSessionEvents = (events: readonly WorldEvent[]): void => {
@@ -686,11 +802,12 @@ export class GameApp {
     if (panel === 'interaction' && MARKET_PEOPLE.some(person => person.id === target)) {
       this.audioMessage(`market-dialog:${++this.audioMessageSequence}`, 'market-npc', 'live');
     }
-    this.patch({ marketPanel: panel, marketTarget: target, market: this.session.market });
+    this.patch({ pauseOpen: false, marketPanel: panel, marketTarget: target, market: this.session.market, chatOpen: false, mapOpen: false, settingsOpen: false });
   }
   closeMarketPanel(): void {
     this.patch({ marketPanel: null, marketTarget: null });
     if (this.snapshot.screen === 'welcome' && this.host) this.start(this.host);
+    else this.returnFromOverlay();
   }
   marketBuy(id: MarketItem): void {
     if (!(this.session instanceof MarketSession) || !this.snapshot.marketTarget) return;
@@ -717,40 +834,188 @@ export class GameApp {
     this.babylonClient = new BabylonClient(this.config.serverUrl, this.serverSession, view => {
       const before = this.snapshot.babylon?.state;
       let panel = this.snapshot.babylonPanel;
-      if (view.state && !view.state.profile) panel = 'setup';
-      else if (view.state?.profile && (!before?.profile || panel === 'setup')) panel = view.state.introSeen ? null : 'intro';
-      if (view.state?.party?.completed && before?.party && !before.party.completed) { this.input?.stop(); this.stop(); panel = 'task'; }
+      if (this.entryPending) panel = 'setup';
+      const completed = Boolean(view.state?.party?.completed && before?.party && !before.party.completed);
+      if (completed) { this.input?.stop(); this.stop(); panel = 'task'; }
       if (view.state) for (const event of babylonAudioChanges(before, view.state, panel, this.snapshot.babylonTarget)) {
         this.audioMessage(event.id, event.stream, event.origin);
       }
-      this.patch({ babylon: view, babylonPanel: panel });
-      if (view.state?.profile && !this.session && this.host) this.start(this.host);
+      this.patch({ babylon: view, babylonPanel: panel, ...(completed ? { avatarOpen: false, mapOpen: false, chatOpen: false, settingsOpen: false, marketPanel: null, dialog: null } : {}) });
+      if (view.state?.party && !this.entryPending && !this.session && this.host) this.start(this.host);
     }, () => this.expireServerSession('Сессия истекла. Войдите снова.'));
-    this.patch({ babylonPanel: 'setup' });
+    this.patch({ babylonPanel: 'setup', entryStage: this.snapshot.entryStage ?? 'profile' });
+    this.avatarClient ??= new AvatarClient(this.config.serverUrl, this.serverSession, avatar => this.patch({ avatar }), () => this.expireServerSession());
+    void this.avatarClient.load();
     void this.babylonClient.start();
   }
   private stopBabylon(): void {
+    this.equipmentClient?.dispose(); this.equipmentClient = null;
+    this.patch({ equipment: null });
+    this.avatarClient?.dispose(); this.avatarClient = null;
+    this.patch({ avatar: null, avatarOpen: false });
     this.babylonClient?.dispose(); this.babylonClient = null;
     this.patch({ babylon: null, babylonPanel: null, babylonTarget: null, babylonWord: '' });
   }
   openBabylonPanel(panel: BabylonPanel, target: string | null = null): void {
+    if (this.snapshot.babylonPanel === 'interaction' && (panel !== 'interaction' || target !== this.snapshot.babylonTarget)) this.babylonClient?.cancelNpc();
     if (!this.babylonClient) return;
-    this.input?.stop(); this.stop(); this.patch({ babylonPanel: panel, babylonTarget: target });
+    if (panel === 'inventory' && this.serverSession) {
+      this.equipmentClient ??= new EquipmentClient(this.config.serverUrl, this.serverSession, equipment => this.patch({ equipment }), () => this.expireServerSession());
+      void this.equipmentClient.load();
+    }
+    this.input?.stop(); this.stop(); this.patch({ mapOpen: false, chatOpen: false, settingsOpen: false, pauseOpen: false, babylonPanel: panel, babylonTarget: target });
+  }
+  private handleShortcut(code: string): boolean {
+    if (this.snapshot.screen !== 'playing' || this.snapshot.entryStage || this.snapshot.authRequired || this.snapshot.avatarOpen || this.snapshot.dialog) return false;
+    if (code === 'Escape' && !this.overlayOpen && !this.input?.hasCapture) { this.toggleMenu(); return true; }
+    if (this.snapshot.settingsOpen) return false;
+    const panel = ({ Digit1: 'chat', Digit2: 'words', Digit3: 'map' } as const)[code as 'Digit1' | 'Digit2' | 'Digit3'];
+    if (panel) { this.toggleHudPanel(panel); return true; }
+    // Tab belongs to native focus navigation once a modal releases the cursor.
+    if (code === 'Tab' && !this.input?.hasCapture) return false;
+    if (code === 'Tab' || code === 'Digit4') {
+      const target = code === 'Tab' ? 'task' : 'languages';
+      if (this.snapshot.babylon?.state?.profile) {
+        if (this.snapshot.babylonPanel === target) void this.closeBabylonPanel(); else this.openBabylonPanel(target);
+        return true;
+      }
+      if (target === 'task' && this.snapshot.market) {
+        if (this.snapshot.marketPanel === 'task') this.closeMarketPanel(); else this.openMarketPanel('task');
+        return true;
+      }
+    }
+    return false;
+  }
+  toggleHudPanel(panel: HudPanel): void {
+    if (this.snapshot.babylonPanel === 'interaction') this.babylonClient?.cancelNpc();
+    if (this.snapshot.screen !== 'playing' || this.snapshot.avatarOpen || this.snapshot.settingsOpen || this.snapshot.dialog || this.snapshot.babylonPanel === 'intro') return;
+    if (panel === 'map') {
+      if (this.snapshot.mapOpen) { this.closeMap(); return; }
+      this.input?.stop(); this.stop();
+      this.patch({ pauseOpen: false, mapOpen: true, babylonPanel: null, babylonTarget: null, marketPanel: null, chatOpen: false });
+      this.updateHud(true);
+      return;
+    }
+    this.patch({ mapOpen: false });
+    if (this.snapshot.babylon?.state?.profile) {
+      if (this.snapshot.babylonPanel === panel) void this.closeBabylonPanel();
+      else this.openBabylonPanel(panel);
+    } else if (panel === 'chat') {
+      if (this.snapshot.chatOpen) this.closeChat(); else { this.patch({ marketPanel: null }); this.openChat(); }
+    } else if (this.snapshot.market) {
+      this.patch({ chatOpen: false });
+      if (this.snapshot.marketPanel === panel) this.closeMarketPanel(); else this.openMarketPanel(panel);
+    }
+  }
+  equipTool(tool: ToolId | null): Promise<boolean> { return this.equipmentClient?.save(tool) ?? Promise.resolve(false); }
+  closeMap(): void { this.patch({ mapOpen: false }); this.returnFromOverlay(); }
+  openAvatar(): void {
+    if (!this.serverSession || this.mock || this.snapshot.mode !== 'online') return;
+    this.input?.stop(); this.stop();
+    this.patch({ avatarOpen: true, avatarPurpose: this.requiresAvatar ? 'first' : 'settings', settingsOpen: false, mapOpen: false, babylonPanel: null, marketPanel: null, chatOpen: false, dialog: null });
+    this.avatarClient ??= new AvatarClient(this.config.serverUrl, this.serverSession, avatar => this.patch({ avatar }), () => this.expireServerSession());
+    void this.avatarClient.load();
+  }
+  closeAvatar(): void {
+    if (this.entryPending) { this.patch({ avatarOpen: false, babylonPanel: 'setup', entryStage: 'profile' }); return; }
+    this.avatarClient?.dispose(); this.avatarClient = null;
+    this.patch({ avatarOpen: false, avatar: null, settingsOpen: true });
+  }
+  async saveAvatar(id: AvatarId): Promise<boolean> {
+    const client = this.avatarClient;
+    const saved = await client?.save(id) ?? false;
+    if (client !== this.avatarClient || !this.snapshot.avatarOpen) return false;
+    if (saved && this.requiresAvatar) {
+      this.requiresAvatar = false; this.patch({ avatarRequired: false, avatarPurpose: 'settings' });
+      if (this.entryPending) this.closeAvatar();
+      else { this.patch({ avatarOpen: false }); if (this.host) this.restart(this.host); }
+    } else if (saved) this.closeAvatar();
+    return saved;
+  }
+  createAvatarPreview(host: HTMLElement, events: AvatarPreviewEvents): AvatarPreview {
+    if (!this.serverSession) throw new Error('Для выбора облика требуется вход.');
+    const root = new URL(`${this.config.serverUrl.replace(/\/$/, '')}/api/avatar/models/`);
+    const metadata = this.activeBootstrap?.assets ?? (this.config.mapId === 'market' ? MARKET_WORLD.assets : DEMO_WORLD.assets);
+    const sizes = new Map(Object.entries(metadata).filter(([path]) => path.startsWith('assets/models/avatars/')).map(([path, size]) => [new URL(path.slice('assets/models/avatars/'.length), root).href, size]));
+    return new ThreeAvatarPreview(host, new AssetManager(new HttpAssetSource(root.href, this.httpAccess()), this.worldBudget, url => sizes.get(url)), events);
   }
   async closeBabylonPanel(): Promise<void> {
     if (this.snapshot.babylonPanel === 'setup') return;
     if (this.snapshot.babylonPanel === 'intro' && !this.snapshot.babylon?.state?.introSeen) {
       if (!await this.babylonAction({ type: 'intro-seen' })) return;
     }
+    if (this.snapshot.babylonPanel === 'interaction') this.babylonClient?.cancelNpc();
     this.patch({ babylonPanel: null, babylonTarget: null, babylonWord: '' });
+    this.returnFromOverlay();
   }
+  setEntryStage(stage: 'profile' | 'mode' | 'connect'): void {
+    if (!this.entryPending || this.snapshot.babylon?.busy) return;
+    this.connectionRequest?.abort(); this.connectionRequest = null;
+    this.babylonClient?.clearError(); this.entryAction = null;
+    this.patch({ entryStage: stage });
+  }
+  saveEntryLanguages(native: Language, learning: Language): Promise<boolean> {
+    this.entryAction = null;
+    return this.babylonAction({ type: 'languages', native, learning });
+  }
+  async createEntryGame(size: PartySize, replacePartyId?: string): Promise<boolean> {
+    if (this.requiresAvatar || !this.snapshot.babylon?.state?.profile) return false;
+    this.entryAction = 'create';
+    return this.finishEntry(await this.babylonAction({ type: 'create', size, ...(replacePartyId === undefined ? {} : { replacePartyId }) }));
+  }
+  async connectEntryGame(serverUrl: string): Promise<boolean> {
+    if (serverUrl !== this.config.serverUrl) {
+      if (this.connectionRequest) return false;
+      const request = new AbortController(); this.connectionRequest = request;
+      const timer = window.setTimeout(() => request.abort(), 5000);
+      try {
+        const response = await fetch(`${serverUrl}/api/health`, { credentials: 'omit', cache: 'no-store', redirect: 'error', signal: request.signal });
+        if (!response.ok) throw new Error('Сервер недоступен или останавливается. Попробуйте позже.');
+        const health = await response.json() as { protocol?: number; status?: string };
+        if (health.protocol !== 3 || health.status !== 'ok') throw new Error('Несовместимая версия сервера. Обновите клиент и сервер.');
+        request.signal.throwIfAborted();
+        if (this.serverSession) await revokeSession(this.config.serverUrl, this.serverSession.token);
+        request.signal.throwIfAborted();
+        this.serverSession = null;
+        this.connectionRequest = null;
+        this.logout();
+        window.location.assign(`${serverUrl}/?join=1`);
+      } catch (error) {
+        if (error instanceof TypeError || error instanceof SyntaxError || request.signal.aborted) throw new Error('Не удалось подключиться. Проверьте IP, порт и доступность сервера.');
+        throw error;
+      }
+      finally { window.clearTimeout(timer); if (this.connectionRequest === request) this.connectionRequest = null; }
+      return false;
+    }
+    if (this.requiresAvatar || !this.snapshot.babylon?.state?.profile) throw new Error('Вернитесь в профиль: подтвердите персонажа и сохраните языки.');
+    this.entryAction = 'join';
+    return this.finishEntry(await this.babylonAction({ type: 'join' }));
+  }
+  async retryEntryAction(): Promise<boolean> {
+    const saved = await this.retryBabylon();
+    return this.entryAction ? this.finishEntry(saved) : saved;
+  }
+  private finishEntry(saved: boolean): boolean {
+    if (!saved || !this.serverSession || !this.entryPending || !this.snapshot.babylon?.state?.party) return false;
+    this.entryPending = false; this.autoCaptureEntry = true;
+    this.patch({ babylonPanel: null, entryStage: 'loading', entryReveal: false });
+    if (this.host) this.start(this.host);
+    return true;
+  }
+  cancelEntry(): void {
+    if (!this.serverSession || !this.host) return;
+    this.entryPending = true;
+    this.patch({ entryStage: 'profile', entryReveal: false, babylonPanel: 'setup' });
+    this.restart(this.host);
+  }
+
   babylonAction(action: BabylonAction, requestId?: string): Promise<boolean> { return this.babylonClient?.send(action, requestId) ?? Promise.resolve(false); }
   retryBabylon(): Promise<boolean> { return this.babylonClient?.repeat() ?? Promise.resolve(false); }
   learnWord(word: string): void {
     const clean = word.trim().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').slice(0, 200);
     if (!clean) return;
     this.openBabylonPanel('words'); this.patch({ babylonWord: clean });
-    void this.babylonAction({ type: 'suggest', word: clean });
+    if (!this.snapshot.babylon?.state?.words.some(entry => entry.word.normalize('NFC').toLocaleLowerCase() === clean.normalize('NFC').toLocaleLowerCase())) void this.babylonAction({ type: 'suggest', word: clean });
   }
 
   private audioDiagnostics(): string {
@@ -781,7 +1046,8 @@ export class GameApp {
 
   private updateHud(force = false): void {
     if (!this.current || this.snapshot.screen !== 'playing') return;
-    const player = this.current.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
+    const transform = this.current.entities.find((entity) => entity.id === this.session?.playerId)?.transform;
+    const player = transform?.position;
     if (!player) return;
     let nearby: Nearby | null = null;
     let distance = Infinity;
@@ -799,6 +1065,23 @@ export class GameApp {
       if (candidate <= 2.7 && candidate < distance) { nearby = { id: goat.id, name: goat.name }; distance = candidate; }
     }
     const changes: Partial<AppSnapshot> = {};
+    if (this.snapshot.mapOpen) {
+      const mapPlayer = { x: player.x, z: player.z, yaw: transform!.rotationY, authoritative: this.session instanceof OnlineSession };
+      const old = this.snapshot.mapPlayer;
+      if (!old || old.x !== mapPlayer.x || old.z !== mapPlayer.z || old.yaw !== mapPlayer.yaw) Object.assign(changes, { mapPlayer });
+      const members = this.snapshot.babylon?.state?.party?.members ?? [];
+      const peers: MapPeer[] = [...(this.snapshot.babylon?.state?.partyPositions ?? [])];
+      if (this.session instanceof OnlineSession) for (const member of members) {
+        if (member.id === this.session.playerId) continue;
+        const transform = this.current.entities.find(entity => entity.id === member.id)?.transform;
+        if (transform) {
+          const peer = { id: member.id, name: member.name, x: transform.position.x, z: transform.position.z };
+          const index = peers.findIndex(item => item.id === member.id);
+          if (index === -1) peers.push(peer); else peers[index] = peer;
+        }
+      }
+      if (JSON.stringify(peers) !== JSON.stringify(this.snapshot.mapPeers)) Object.assign(changes, { mapPeers: peers });
+    }
     const motion = this.current.entities.find(entity => entity.id === this.session?.playerId)?.motion;
     if (motion && (motion.stamina !== this.snapshot.stamina || motion.sprintBlocked !== this.snapshot.sprintBlocked)) Object.assign(changes, { stamina: motion.stamina, sprintBlocked: motion.sprintBlocked });
     if (nearby?.id !== this.snapshot.nearby?.id) Object.assign(changes, { nearby });
@@ -824,9 +1107,12 @@ export class GameApp {
     this.renderer?.resize(Math.max(1, width), Math.max(1, height), Math.min(window.devicePixelRatio || 1, 2));
   };
 
+  private readonly cancelEntryCapture = (): void => { if (this.snapshot.entryStage === 'loading') this.autoCaptureEntry = false; };
+  private readonly onEntryKey = (event: KeyboardEvent): void => { if (event.key === 'Escape') this.cancelEntryCapture(); };
+
   private readonly onVisibilityChange = (): void => {
     this.frameMetrics.reset();
-    if (document.hidden) this.input?.reset();
+    if (document.hidden) { this.input?.reset(); this.cancelEntryCapture(); }
     this.loop?.setSuspended(document.hidden);
   };
 
@@ -835,6 +1121,8 @@ export class GameApp {
     this.observer?.disconnect();
     this.observer = null;
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    window.removeEventListener('blur', this.cancelEntryCapture);
+    document.removeEventListener('keydown', this.onEntryKey);
     window.removeEventListener('resize', this.resize);
   }
 

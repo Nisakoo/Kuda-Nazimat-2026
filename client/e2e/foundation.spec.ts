@@ -73,8 +73,9 @@ test('runtime config selects guest login before opening online channels', async 
     json: { session: 'online', serverUrl: 'http://school.local' },
   }));
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Войти в мир' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Войти', exact: true })).toBeDisabled();
+  await expect(page.getByRole('heading', { name: 'Войти в город' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Начать путешествие →', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true })).toBeDisabled();
   await expect(page.locator('canvas')).toHaveCount(0);
   expect(connections).toEqual([]);
 });

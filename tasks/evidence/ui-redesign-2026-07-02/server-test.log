@@ -1,0 +1,85 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5[39m
+
+ [32m✓[39m server/test/integration.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 10224[2mms[22m[39m
+   [33m[2m✓[22m[39m real HTTP auth, join, private world, periodic/grace save and NPC commit work together [33m 1975[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 jump/sprint are authoritative over a real socket; takeover and a released seat preserve stamina and SQLite saves support [33m 1437[2mms[22m[39m
+   [33m[2m✓[22m[39m BABEL HTTP requires auth and the controlling seat, rejects forged ownership and cannot commit after takeover [33m 1305[2mms[22m[39m
+   [33m[2m✓[22m[39m session expiry closes the real socket and rejects protected HTTP and old tokens [33m 1636[2mms[22m[39m
+   [33m[2m✓[22m[39m takeover cancels a running NPC answer before SQLite commit and preserves the player [33m 1870[2mms[22m[39m
+   [33m[2m✓[22m[39m failed responder startup leaves real movement and chat available with a degraded health status [33m 926[2mms[22m[39m
+   [33m[2m✓[22m[39m an enrolled BABEL player can still use legacy chat and NPCs on the old maps [33m 1068[2mms[22m[39m
+ [32m✓[39m server/test/babylon.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 3743[2mms[22m[39m
+   [33m[2m✓[22m[39m enrolls a fixed group, starts only when full, restores roles/languages and hides private dictionary data [33m 633[2mms[22m[39m
+   [33m[2m✓[22m[39m persists immutable group stones, deduplicates retries and rejects a changed request body [33m 378[2mms[22m[39m
+   [33m[2m✓[22m[39m four roles share one FIFO with legacy NPC work, reject a second generation per player and preserve privacy [33m 339[2mms[22m[39m
+   [33m[2m✓[22m[39m bounds the dictionary, keeps editing possible at capacity and acknowledges the role spawn once [33m 1493[2mms[22m[39m
+ [32m✓[39m server/test/movement.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 942[2mms[22m[39m
+ [32m✓[39m server/test/platform.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 3876[2mms[22m[39m
+     [33m[2m✓[22m[39m migrates with WAL/FK/FTS5, restores identity, positions and private history [33m 843[2mms[22m[39m
+     [33m[2m✓[22m[39m backs up a live WAL database and recovers after SIGKILL [33m 677[2mms[22m[39m
+   [33m[2m✓[22m[39m serves public UI/config, strict guest login, protected world and allowlisted CORS without secrets [33m 1249[2mms[22m[39m
+   [33m[2m✓[22m[39m the 52nd NPC answer is unavailable when SQLite fails, retaining exactly 50 committed records [33m 575[2mms[22m[39m
+ [32m✓[39m server/test/a-realtime.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 4053[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a missing token and a wrong protocol version [33m 410[2mms[22m[39m
+     [33m[2m✓[22m[39m joins with a valid snapshot and bootstrap, then syncs movement through deltas [33m 2565[2mms[22m[39m
+ [32m✓[39m server/test/application.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 7364[2mms[22m[39m
+   [33m[2m✓[22m[39m assembles exclusively through the frozen contract, restarts with memory and saves on stop [33m 1172[2mms[22m[39m
+   [33m[2m✓[22m[39m inspect reads a running WAL database without secrets and backup restores a separate copy [33m 3876[2mms[22m[39m
+   [33m[2m✓[22m[39m SIGTERM closes the process within ten seconds after saving through PlayerStore [33m 2160[2mms[22m[39m
+ [32m✓[39m server/test/npc.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 395[2mms[22m[39m
+ [32m✓[39m server/test/a-world.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 732[2mms[22m[39m
+ [32m✓[39m server/test/migrations.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 263[2mms[22m[39m
+ [31m❯[39m server/test/a-real-world.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 30151[2mms[22m[39m
+[31m     [31m×[31m loads market/demo/science with server NPC content and matches the client bootstrap byte for byte[39m[33m 15096[2mms[22m[39m
+[31m     [31m×[31m MOVE: prepared ceilings in all three real maps stop an otherwise reachable jump[39m[33m 15018[2mms[22m[39m
+ [32m✓[39m server/test/contracts.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 6685[2mms[22m[39m
+   [33m[2m✓[22m[39m import rules reject a forbidden IO dependency in the domain [33m 6546[2mms[22m[39m
+ [32m✓[39m server/test/a-shared-protocol.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 105[2mms[22m[39m
+ [32m✓[39m server/test/height.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 148[2mms[22m[39m
+ [31m❯[39m server/test/building-height.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 15357[2mms[22m[39m
+[31m   [31m×[31m authoritative market movement climbs the real stair, respects its rails and descends to the courtyard[39m[33m 15323[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m server/test/a-real-world.test.ts[2m > [22mreal client worlds (SERVER-WORLD S1, SERVER-DEMO-005)[2m > [22mloads market/demo/science with server NPC content and matches the client bootstrap byte for byte
+[31m[1mError[22m: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+[36m [2m❯[22m server/test/a-real-world.test.ts:[2m18:3[22m[39m
+    [90m 16|[39m // Requires `npm --prefix client run world:generate`; skipped (= unver…
+    [90m 17|[39m describe.runIf(ready)('real client worlds (SERVER-WORLD S1, SERVER-DEM…
+    [90m 18|[39m   it('loads market/demo/science with server NPC content and matches th…
+    [90m   |[39m   [31m^[39m
+    [90m 19|[39m     [35mconst[39m world [33m=[39m [35mawait[39m [34mloadWorld[39m({
+    [90m 20|[39m       worldDir[33m:[39m publicDir[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m server/test/a-real-world.test.ts[2m > [22mreal client worlds (SERVER-WORLD S1, SERVER-DEMO-005)[2m > [22mMOVE: prepared ceilings in all three real maps stop an otherwise reachable jump
+[31m[1mError[22m: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+[36m [2m❯[22m server/test/a-real-world.test.ts:[2m30:3[22m[39m
+
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m server/test/building-height.test.ts[2m > [22mauthoritative market movement climbs the real stair, respects its rails and descends to the courtyard
+[31m[1mError[22m: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+[36m [2m❯[22m server/test/building-height.test.ts:[2m6:1[22m[39m
+
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m12 passed[39m[22m[90m (14)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m128 passed[39m[22m[90m (131)[39m
+[2m   Start at [22m 21:33:38
+[2m   Duration [22m 122.89s[2m (transform 4.26s, setup 0ms, import 12.97s, tests 84.04s, environment 15ms)[22m
+
+make: *** [Makefile:33: server-test] Error 1

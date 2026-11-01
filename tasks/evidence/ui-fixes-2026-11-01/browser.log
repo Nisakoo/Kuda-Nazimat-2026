@@ -1,0 +1,12 @@
+
+Running 5 tests using 1 worker
+
+(node:64530) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug (3.5s)
+  ✓  2 e2e/ui-hud.spec.ts:63:1 › real guest entry preserves only the connection address and returns from mode with Escape (1.0s)
+  ✓  3 e2e/ui-hud.spec.ts:92:1 › real registration resumes mandatory appearance and uses password authentication (4.1s)
+  ✓  4 e2e/ui-hud.spec.ts:97:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (8.7s)
+  ✓  5 e2e/ui-hud.spec.ts:183:1 › connection errors allow retry and disappear after entry polling recovers (1.8s)
+
+  5 passed (21.1s)

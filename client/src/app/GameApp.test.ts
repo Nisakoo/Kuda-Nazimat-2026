@@ -39,6 +39,11 @@ describe('application lifecycle', () => {
       return nextFrame;
     });
     vi.stubGlobal('cancelAnimationFrame', (id: number) => { pending.delete(id); });
+    // Unit tests never contact the LAN. Individual tests override this stub for their own routes.
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, options?: RequestInit) => {
+      if (String(input).endsWith('/api/auth/logout') && options?.method === 'POST') return Promise.resolve(new Response(null, { status: 204 }));
+      return Promise.reject(new Error(`Unexpected unit-test fetch: ${String(input)}`));
+    }));
     vi.stubGlobal('ResizeObserver', class {
       observe(): void { observerCount++; }
       disconnect(): void { observerCount--; }
@@ -175,7 +180,44 @@ describe('application lifecycle', () => {
     app.provideServerSession(context);
     expect(transport.connect).toHaveBeenCalledWith({ kind: 'server', session: context });
     app.logout(); expect(transport.dispose).toHaveBeenCalledOnce();
+    expect(vi.mocked(fetch)).toHaveBeenCalledWith('http://school.local/api/auth/logout', expect.objectContaining({ method: 'POST', headers: { Authorization: `Bearer ${context.token}` } }));
     expect(factory).toHaveBeenCalledOnce(); expect(pending.size).toBe(0);
+  });
+
+  it('does not start a world or transport for a first avatar until the server confirms selection', async () => {
+    app.dispose(); let finish!: (response: Response) => void;
+    const fetcher = vi.fn((_url: string, options: RequestInit) => options.method === 'POST'
+      ? new Promise<Response>(resolve => { finish = resolve; })
+      : Promise.resolve(new Response(JSON.stringify({ avatarId: null }))));
+    vi.stubGlobal('fetch', fetcher);
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribeWorldLife: vi.fn(() => () => {}), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    const factory = vi.fn(() => transport);
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, factory);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 }, true);
+    await vi.waitFor(() => expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: true, avatarPurpose: 'first', avatar: expect.objectContaining({ state: { avatarId: null }, busy: false }) })));
+    app.start(host); expect(factory).not.toHaveBeenCalled(); expect(createRenderer).not.toHaveBeenCalled();
+    const saving = app.saveAvatar('dan'); expect(factory).not.toHaveBeenCalled(); expect(createRenderer).not.toHaveBeenCalled();
+    finish(new Response(JSON.stringify({ avatarId: 'dan' })));
+    expect(await saving).toBe(true); expect(factory).toHaveBeenCalledOnce(); expect(transport.connect).toHaveBeenCalledOnce();
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: false, authRequired: false }));
+  });
+
+  it('ignores a late avatar save after settings selector closes', async () => {
+    app.dispose(); let finish!: (response: Response) => void; let saveSignal!: AbortSignal;
+    vi.stubGlobal('fetch', vi.fn((_url: string, options: RequestInit) => {
+      if (options.method === 'POST') { saveSignal = options.signal!; return new Promise<Response>(resolve => { finish = resolve; }); }
+      return Promise.resolve(new Response(JSON.stringify({ avatarId: 'nic' })));
+    }));
+    const transport: NetworkAdapter = { state: { status: 'unauthorized', error: null }, connect: vi.fn(), disconnect: vi.fn(), send: vi.fn(() => false), sendWorldLife: vi.fn(() => false), subscribeWorldLife: vi.fn(() => () => {}), subscribe: vi.fn(() => () => {}), subscribeState: vi.fn(() => () => {}), dispose: vi.fn() };
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, () => transport);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    app.provideServerSession({ token: 'x'.repeat(43), expiresAt: Date.now() + 60000 }); app.openAvatar();
+    await vi.waitFor(() => expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatar: expect.objectContaining({ state: { avatarId: 'nic' }, busy: false }) })));
+    const saving = app.saveAvatar('dan'); app.closeAvatar(); expect(saveSignal.aborted).toBe(true);
+    app.closeSettings(); expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: false, settingsOpen: false }));
+    finish(new Response(JSON.stringify({ avatarId: 'dan' })));
+    expect(await saving).toBe(false); expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ avatarOpen: false, settingsOpen: false, avatar: null }));
   });
 
   it('prepares the authoritative saved position instead of the manifest spawn in an online session', async () => {
@@ -193,6 +235,36 @@ describe('application lifecycle', () => {
       expect(loaded[0]).toBe('3'); expect(loaded).not.toContain('0');
       expect(app.getWorldSnapshot()?.entities[0]!.transform!.position.x).toBe(100);
     } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
+  it('applies authoritative online deltas while the map has stopped gameplay', async () => {
+    app.dispose(); vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null; let transport!: MockNetworkAdapter;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: () => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); } });
+    const player = (x: number) => ({ id: 'saved-player', motion: motionStatus(initialMotion({ x, y: 0, z: 8 })), character: { kind: 'player' as const, name: 'Saved' }, transform: { position: { x, y: 0, z: 8 }, rotationY: 0 } });
+    try {
+      app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, (_mock, _url, clock) => transport = new MockNetworkAdapter(clock, (message, network) => {
+        if (message.type === 'join') network.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'saved-player', revision: 0, snapshot: { tick: 0, entities: [player(8)] }, world: DEMO_WORLD });
+      }));
+      const listener = vi.fn(); app.subscribe(listener); app.start(host); app.applySettings('mock', 'http://school.local', 'demo', 1, false);
+      await vi.advanceTimersByTimeAsync(100); advance(0); app.enterWorld(); app.toggleHudPanel('map');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ phase: 'stopped', mapOpen: true }));
+      transport.receive({ v: 3, type: 'delta', revision: 1, baseRevision: 0, tick: 6, upsert: [player(9)], remove: [] });
+      await vi.advanceTimersByTimeAsync(1);
+      expect(transport.state.status).toBe('connected');
+      expect(pending.size).toBeGreaterThan(0);
+      advance(100); advance(120);
+      expect(app.getWorldSnapshot()?.entities[0]?.transform?.position.x).toBe(9);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapPlayer: expect.objectContaining({ x: 9, authoritative: true }) }));
+    } finally {
+      app.dispose(); vi.useRealTimers();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
   });
 
   it('submits one login, passes the validated session to the transport and forgets it on logout', async () => {
@@ -236,6 +308,31 @@ describe('application lifecycle', () => {
       resolve({ token: 'x'.repeat(43), expiresAt: Date.now() + 10000 }); await pendingLogin; expect(network).not.toHaveBeenCalled();
       login.mockRejectedValueOnce(new Error('Сервер недоступен')); await app.login('Аня');
       expect(login).toHaveBeenCalledTimes(2); expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authError: 'Сервер недоступен', authPending: false }));
+    } finally { app.dispose(); vi.useRealTimers(); }
+  });
+
+  it('explains registration timeout recovery and revokes a cancelled late issued token', async () => {
+    vi.useFakeTimers();
+    let resolve!: (response: Response) => void;
+    const fetch = vi.fn((url: string, init?: RequestInit): Promise<Response> => {
+      if (url.endsWith('/api/auth/register')) return new Promise(done => { resolve = done; });
+      if (url.endsWith('/api/auth/logout')) { expect(init?.headers).toEqual({ Authorization: `Bearer ${'x'.repeat(43)}` }); return Promise.resolve(new Response(null, { status: 204 })); }
+      throw new Error(`Unexpected request ${url}`);
+    });
+    vi.stubGlobal('fetch', fetch);
+    app.dispose(); const network = vi.fn();
+    app = new GameApp(parseConfig({ session: 'online' }, 'http://school.local'), createRenderer, undefined, null, network);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    try {
+      const pending = app.register('Аня', 'registration-password');
+      await vi.advanceTimersByTimeAsync(10000);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ authRequired: true, authPending: false, authError: expect.stringContaining('Аккаунт мог быть создан') }));
+      expect(listener.mock.lastCall?.[0].authError).toContain('Вход');
+      resolve(new Response(JSON.stringify({ token: 'x'.repeat(43), expiresAt: Date.now() + 10000 }), { status: 201 }));
+      await pending;
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual(['http://school.local/api/auth/register', 'http://school.local/api/auth/logout']);
+      expect(network).not.toHaveBeenCalled();
+      expect(listener.mock.lastCall?.[0].authError).toContain('Аккаунт мог быть создан');
     } finally { app.dispose(); vi.useRealTimers(); }
   });
 
@@ -326,10 +423,11 @@ describe('application lifecycle', () => {
     const messages = vi.spyOn(WorldAudio.prototype, 'message').mockImplementation(() => {});
     let state: BabylonState = {
       v: 2, playerId: 'p1', backend: 'test', languages: ['ru', 'en'], profile: { native: 'ru', learning: 'en' }, introSeen: true,
-      party: null, availableParty: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
+      party: null, availableParty: null, partyPositions: [], taskTitle: '', taskTarget: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
       fed: [], stones: [], words: [], messages: [], replies: [{ id: 'old', npcId: 'fruit-seller', question: 'Old question', text: 'Old answer', language: 'en' }],
     };
     vi.stubGlobal('fetch', vi.fn(async (_url: unknown, options: RequestInit) => {
+      if (String(_url).endsWith('/api/avatar')) return new Response(JSON.stringify({ avatarId: 'dan' }));
       const request = JSON.parse(String(options.body)) as BabylonRequest;
       if (request.action.type === 'npc') state = { ...state, replies: [...state.replies, { id: 'new', npcId: request.action.targetId, question: request.action.text, text: 'New answer', language: 'en' }] };
       return new Response(JSON.stringify({ v: 2, requestId: request.requestId, state }));
@@ -343,6 +441,8 @@ describe('application lifecycle', () => {
       const ready = new Promise<void>(resolve => { loaded = resolve; });
       app.subscribe(snapshot => { if (snapshot.babylon?.state) loaded(); });
       app.start(host); await ready;
+      state = { ...state, party: { id: 'audio-party', size: 1, count: 1, role: 1, members: [{ id: 'p1', name: 'Audio', role: 1 }], started: true, completed: false, seconds: 0 } };
+      expect(await app.connectEntryGame(app.config.serverUrl)).toBe(true);
       const views = vi.fn(); app.subscribe(views);
       expect(messages.mock.calls.map(([event]) => event)).toEqual([
         expect.objectContaining({ id: 'babel-npc:old:question', origin: 'history' }),
@@ -537,6 +637,132 @@ describe('application lifecycle', () => {
       else Reflect.deleteProperty(document, 'pointerLockElement');
       if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty);
       else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
+  it('switches HUD panels and blocks capture until the map closes', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    const request = vi.fn(() => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: request });
+    try {
+      app.dispose(); app = new GameApp(parseConfig({ mapId: 'market' }, 'http://school.local'), createRenderer, undefined, null);
+      const listener = vi.fn(); app.subscribe(listener); app.start(host); app.closeMarketPanel(); app.enterWorld();
+      expect(locked).toBe(host);
+      app.toggleHudPanel('inventory');
+      expect(locked).toBeNull();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'inventory', mapOpen: false, phase: 'stopped' }));
+      app.toggleHudPanel('map');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, mapOpen: true, mapPlayer: expect.objectContaining({ authoritative: false }) }));
+      app.resume(); expect(request).toHaveBeenCalledTimes(1);
+      app.toggleHudPanel('words');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, marketPanel: 'words' }));
+      app.toggleHudPanel('words');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'running', pauseOpen: false }));
+      app.resume(); expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      app.dispose();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
+  it('keeps visual loading active while chunk HTTP is pending even with an empty renderer queue', async () => {
+    app.dispose();
+    const manifest: WorldManifest = { mapId: 'demo', version: 3, worldBytes: DEMO_WORLD.worldBytes, chunkSize: 32, collisionResolution: 4, spawn: { x: 8, y: 0, z: 8 }, origin: { x: 0, z: 0 }, models: {}, assets: {}, chunks: [{ id: '0', x: 0, z: 0, region: 'test', url: '0', bytes: 1, collisionUrl: 'c', collisionBytes: 16, assets: [] }] };
+    let finish!: (value: Awaited<ReturnType<MapSource['chunk']>>) => void;
+    const source: MapSource = { bootstrap: DEMO_WORLD, budgetEpoch: 0, manifest: async () => manifest, chunk: vi.fn(() => new Promise<Awaited<ReturnType<MapSource['chunk']>>>(resolve => { finish = resolve; })), dispose: vi.fn() };
+    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, () => source);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    await vi.waitFor(() => expect(source.chunk).toHaveBeenCalled());
+    advance(100);
+    expect(renderer.getDiagnostics().pending).toBe(0);
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ visualLoading: true }));
+    const entry = manifest.chunks[0]!;
+    finish({ entry, visual: { id: entry.id, objects: [] }, collision: new Uint8Array(16), release: vi.fn() });
+    await vi.waitFor(() => expect(renderer.loadChunk).toHaveBeenCalled());
+    await vi.waitFor(() => {
+      advance(performance.now());
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ visualLoading: false }));
+    });
+  });
+
+  it('waits for queued visuals before capture and still requires explicit start or resume', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null, loading = true;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    const request = vi.fn(() => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: request });
+    const diagnostics = renderer.getDiagnostics();
+    vi.mocked(renderer.getDiagnostics).mockImplementation(() => ({ ...diagnostics, pending: loading ? 1 : 0 }));
+    const listener = vi.fn(); app.subscribe(listener);
+    try {
+      app.start(host); advance(100); app.enterWorld();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ visualLoading: true, capture: 'idle' }));
+      expect(request).not.toHaveBeenCalled();
+      loading = false; advance(200);
+      expect(request).not.toHaveBeenCalled();
+      app.enterWorld(); expect(request).toHaveBeenCalledTimes(1);
+      loading = true; app.stop(); app.resume();
+      expect(request).toHaveBeenCalledTimes(1); expect(locked).toBeNull();
+      loading = false; advance(300);
+      expect(request).toHaveBeenCalledTimes(1);
+      app.resume(); expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      app.dispose();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
+    }
+  });
+
+  it('opens tasks with Tab, closes HUD windows into play and preserves only an explicit parent pause', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
+    let locked: Element | null = null;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
+    const request = vi.fn(() => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: request });
+    try {
+      app.dispose(); app = new GameApp(parseConfig({ mapId: 'market' }, 'http://school.local'), createRenderer, undefined, null);
+      const listener = vi.fn(); app.subscribe(listener); app.start(host); app.closeMarketPanel(); app.enterWorld();
+      expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(1);
+      const key = (code: string) => window.dispatchEvent(new KeyboardEvent('keydown', { code, cancelable: true }));
+      for (const oldKey of ['KeyI', 'KeyM', 'KeyK', 'KeyJ', 'KeyL', 'KeyO', 'Enter']) key(oldKey);
+      expect(locked).toBe(host);
+      key('Tab');
+      expect(locked).toBeNull();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'task', phase: 'stopped', capture: 'idle' }));
+      key('Digit3');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: true, marketPanel: null }));
+      key('Tab');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: true, marketPanel: null }));
+      key('Digit2');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, marketPanel: 'words' }));
+      key('Digit2');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'running', capture: 'locked', pauseOpen: false }));
+      key('Digit1');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ chatOpen: true }));
+      key('Digit1');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ chatOpen: false }));
+      expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(3);
+      app.toggleMenu();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ pauseOpen: true, phase: 'stopped' }));
+      app.openSettings(); app.toggleMenu();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ settingsOpen: false, pauseOpen: true, phase: 'stopped' }));
+      app.toggleMenu();
+      expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(4);
+      app.toggleHudPanel('map'); app.toggleMenu();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, pauseOpen: false, phase: 'running' }));
+    } finally {
+      app.dispose();
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+      if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
     }
   });
 

@@ -1,0 +1,13 @@
+{
+  "url": "http://127.0.0.1:5999",
+  "viewport": [
+    1280,
+    800
+  ],
+  "singleViewport": [
+    800,
+    1000
+  ],
+  "errors": [],
+  "notes": "Actual exported GLBs, local Three.js, Chromium SwiftShader. No server or runtime multiplayer acceptance."
+}

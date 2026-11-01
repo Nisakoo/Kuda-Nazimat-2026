@@ -1,0 +1,79 @@
+[
+  {
+    "id": "inventory",
+    "left": "specs/images/inventar.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-world-baseline/inventory-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-inventory-reference-current.png",
+    "width": 3256,
+    "height": 970,
+    "leftWidth": 1622,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "id": "map",
+    "left": "specs/images/map.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-world-final-baseline/map-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-map-reference-current.png",
+    "width": 3256,
+    "height": 970,
+    "leftWidth": 1622,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "id": "dictionary",
+    "left": "specs/images/dictionary.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-world-baseline/dictionary-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-dictionary-reference-current.png",
+    "width": 3256,
+    "height": 970,
+    "leftWidth": 1622,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "id": "chat",
+    "left": "specs/images/chat.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-world-followup/chat-1622x970.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-chat-reference-current.png",
+    "width": 3256,
+    "height": 970,
+    "leftWidth": 1622,
+    "rightWidth": 1622,
+    "gap": 12
+  },
+  {
+    "id": "R06",
+    "left": "specs/images/inventar.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-world-baseline/inventory-second-I-1280x800.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-R06-reference-current.png",
+    "width": 3186,
+    "height": 970,
+    "leftWidth": 1622,
+    "rightWidth": 1552,
+    "gap": 12
+  },
+  {
+    "id": "R07-dictionary",
+    "left": "specs/images/dictionary.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-world-followup/dictionary-390x844.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-R07-dictionary-reference-current.png",
+    "width": 2082,
+    "height": 970,
+    "leftWidth": 1622,
+    "rightWidth": 448,
+    "gap": 12
+  },
+  {
+    "id": "R07-map",
+    "left": "specs/images/map.png",
+    "right": "tasks/evidence/ui-independent-review/fresh-world-followup/map-390x844.png",
+    "out": "tasks/evidence/ui-independent-review/baseline-R07-map-reference-current.png",
+    "width": 2082,
+    "height": 970,
+    "leftWidth": 1622,
+    "rightWidth": 448,
+    "gap": 12
+  }
+]

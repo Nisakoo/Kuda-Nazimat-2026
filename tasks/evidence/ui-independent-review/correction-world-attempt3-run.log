@@ -1,0 +1,38 @@
+START password-login-enroll-real-two-person-task
+FAIL password-login-enroll-real-two-person-task ExpectError: expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+Call Log:
+- Timeout 5000ms exceeded while waiting on the predicate
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBe (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:16:1955
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:16:1 {
+  matcherResult: {
+    pass: false,
+    message: 'expect(received).toBe(expected) // Object.is equality\n' +
+      '\n' +
+      'Expected: true\n' +
+      'Received: false\n' +
+      '\n' +
+      'Call Log:\n' +
+      '- Timeout 5000ms exceeded while waiting on the predicate',
+    name: 'toBe'
+  }
+}
+CAPTURE failure-password-login-enroll-real-two-person-task
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.waitForResponse: Timeout 5000ms exceeded while waiting for event "response"
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world.mjs:32:322 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.22.2

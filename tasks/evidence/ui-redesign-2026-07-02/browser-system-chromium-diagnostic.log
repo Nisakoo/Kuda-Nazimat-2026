@@ -1,0 +1,92 @@
+Error: Failed to launch: Error: spawn /bin/sh ENOENT
+
+
+real	0m2.689s
+user	0m2.654s
+sys	0m0.519s
+
+--- Retry with original preview working directory ---
+Error: Failed to launch: Error: spawn /bin/sh ENOENT
+
+
+real	0m2.854s
+user	0m2.834s
+sys	0m0.523s
+
+--- Retry with Playwright server debug ---
+2026-11-01T00:13:32.597Z pw:webserver HTTP GET: http://127.0.0.1:4173/
+2026-11-01T00:13:32.617Z pw:webserver Error while checking if http://127.0.0.1:4173/ is available: connect ECONNREFUSED 127.0.0.1:4173
+2026-11-01T00:13:32.618Z pw:webserver Starting WebServer process npm run preview -- --host 127.0.0.1 --port 4173 --strictPort...
+2026-11-01T00:13:32.629Z pw:webserver Terminating the WebServer
+2026-11-01T00:13:32.629Z pw:webserver Terminated the WebServer
+Error: Failed to launch: Error: spawn /bin/sh ENOENT
+2026-11-01T00:13:32.693Z pw:webserver Terminating the WebServer
+2026-11-01T00:13:32.693Z pw:webserver Terminated the WebServer
+
+
+real	0m2.466s
+user	0m2.244s
+sys	0m0.403s
+
+--- Retry with single preview configuration ---
+
+Running 1 test using 1 worker
+
+  ✘  1 e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen (0ms)
+
+
+  1) e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+
+    Error: Cannot find module '/data/worktrees/ui-hud-669eb5/client/test-results/system-browser-config.ts' imported from /data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/common/index.js
+        at eval (<anonymous>:1:1)
+
+  1 failed
+    e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+
+real	0m6.931s
+user	0m4.184s
+sys	0m0.743s
+
+--- Retry with isolated Playwright output directory ---
+
+Running 1 test using 1 worker
+
+  ✘  1 e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen (33.4s)
+
+
+  1) e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByLabel('Положение игрока')
+    Expected: "X 0.0 · Z 3.6 · Y 0.0"
+    Received: ""
+
+
+      114 |   await resume(page);
+      115 |   await page.clock.runFor(300);
+    > 116 |   await expect(coords).toHaveText(hiddenPosition!);
+          |                        ^
+      117 |   await page.keyboard.up('w');
+      118 |   await page.keyboard.press('Escape');
+      119 |   await page.getByRole('button', { name: 'Перезапустить сцену', exact: true }).click();
+        at /data/worktrees/ui-hud-669eb5/client/e2e/demo.spec.ts:116:24
+
+    Error Context: test-results/system-browser-output/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/system-browser-output/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/system-browser-output/demo-pauses-clears-held-ke-7b37d-turns-to-the-welcome-screen/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/demo.spec.ts:76:1 › pauses, clears held keys on blur, restarts and returns to the welcome screen 
+
+real	0m40.741s
+user	0m8.949s
+sys	0m1.926s

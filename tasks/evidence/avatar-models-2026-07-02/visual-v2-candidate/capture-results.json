@@ -1,0 +1,347 @@
+{
+  "status": "complete",
+  "startedAt": "2026-11-01T02:45:51.422Z",
+  "candidates": {
+    "lukas": {
+      "sha256": "e1a337342f2187f30d96a5f51ed6f1097812ea4fdd77b7c24c7354f53460ca12",
+      "bytes": 785028
+    },
+    "nic": {
+      "sha256": "add2fb9663e1836e566ccfba2a23483393a9bd0a27a9a595cdcf5cb6f6f7e530",
+      "bytes": 785032
+    },
+    "dan": {
+      "sha256": "5195a37723ab9fc25227e1e1188670904b4df32ebe05ee9c4f5fd0a388a2627a",
+      "bytes": 785040
+    },
+    "ksu": {
+      "sha256": "4a2303ac401352c968946a841505ce9288c12afd66801d591fe6f2f4ce611dab",
+      "bytes": 684300
+    }
+  },
+  "images": [
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/lukas-preview-front-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/lukas-preview-side-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/lukas-preview-back-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-front-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-side-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/lukas-neutral-back-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/lukas-market-front-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/lukas-market-side-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/lukas-market-back-idle.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/lukas-preview-front-walk.png"
+    },
+    {
+      "id": "lukas",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/lukas-preview-side-walk.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/nic-preview-front-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/nic-preview-side-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/nic-preview-back-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/nic-neutral-front-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/nic-neutral-side-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/nic-neutral-back-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/nic-market-front-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/nic-market-side-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/nic-market-back-idle.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/nic-preview-front-walk.png"
+    },
+    {
+      "id": "nic",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/nic-preview-side-walk.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/dan-preview-front-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/dan-preview-side-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/dan-preview-back-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/dan-neutral-front-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/dan-neutral-side-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/dan-neutral-back-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/dan-market-front-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/dan-market-side-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/dan-market-back-idle.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/dan-preview-front-walk.png"
+    },
+    {
+      "id": "dan",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/dan-preview-side-walk.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/ksu-preview-front-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/ksu-preview-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/ksu-preview-back-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-front-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "neutral",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/ksu-neutral-back-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "market",
+      "view": "front",
+      "pose": "idle",
+      "file": "captures/ksu-market-front-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "market",
+      "view": "side",
+      "pose": "idle",
+      "file": "captures/ksu-market-side-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "market",
+      "view": "back",
+      "pose": "idle",
+      "file": "captures/ksu-market-back-idle.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "front",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/ksu-preview-front-walk.png"
+    },
+    {
+      "id": "ksu",
+      "lighting": "preview",
+      "view": "side",
+      "pose": "walk",
+      "seconds": 0.225,
+      "file": "captures/ksu-preview-side-walk.png"
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    "Private candidate GLBs only.",
+    "SwiftShader evidence is not hardware acceptance.",
+    "No tool attachment is rendered."
+  ],
+  "finishedAt": "2026-11-01T02:46:10.995Z"
+}

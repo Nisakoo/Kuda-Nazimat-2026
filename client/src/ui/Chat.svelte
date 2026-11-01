@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import { modal } from './modal';
-  const { messages, error, canSend, send, close }: { messages: readonly { readonly id: string; readonly name: string; readonly text: string }[]; error: string | null; canSend: boolean; send: (text: string) => boolean; close: () => void } = $props();
+  const { messages, error, canSend, send, close, navigation }: { messages: readonly { readonly id: string; readonly name: string; readonly text: string }[]; error: string | null; canSend: boolean; send: (text: string) => boolean; close: () => void; navigation?: Snippet } = $props();
   let text = $state('');
   let input: HTMLInputElement;
   let history: HTMLDivElement;
@@ -18,5 +18,10 @@
     <label class="sr-only" for="chat-input">Сообщение игрокам</label>
     <div class="input-row"><input id="chat-input" bind:this={input} bind:value={text} maxlength="500" autocomplete="off" placeholder="Напишите сообщение…" /><button type="submit" disabled={!canSend || !text.trim()}>Отправить</button></div>
   </form>
-  <p class="small subtle">Esc — закрыть. Движение продолжится после нажатия «Продолжить».</p>
+
+  {#if navigation}<div class="chat-navigation">{@render navigation()}</div>{/if}
 </dialog>
+
+<style>
+  .chat-navigation { flex: none; }
+</style>

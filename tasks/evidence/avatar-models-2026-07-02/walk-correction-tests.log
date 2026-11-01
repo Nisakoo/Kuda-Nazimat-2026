@@ -1,0 +1,17 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5/client[39m
+
+ [32m✓[39m src/render/three/AvatarModels.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 17486[2mms[22m[39m
+     [33m[2m✓[22m[39m has one common hierarchy, forward axis, real surface dimensions and foot origin [33m 1320[2mms[22m[39m
+     [33m[2m✓[22m[39m has distinct sculpted hair, frames and Ksu clothing, not only different colours [33m 745[2mms[22m[39m
+     [33m[2m✓[22m[39m uses identical looped clips without root motion or unnormalised rotations [33m 1630[2mms[22m[39m
+     [33m[2m✓[22m[39m holds actual exported stance soles and contact Z within 0.1 mm between dense keys [33m 2584[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the shared trouser surfaces inside the closed tunic throughout the gait [33m 9184[2mms[22m[39m
+     [33m[2m✓[22m[39m rebuilds the checked-in GLBs byte for byte [33m 1208[2mms[22m[39m
+ [32m✓[39m src/render/three/AvatarWalkPace.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 535[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m20 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 23:15:51
+[2m   Duration [22m 20.62s[2m (transform 618ms, setup 0ms, import 1.20s, tests 18.02s, environment 1ms)[22m
+

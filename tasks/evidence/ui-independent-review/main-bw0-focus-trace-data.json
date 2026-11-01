@@ -1,0 +1,157 @@
+{
+  "at": "2026-11-01T03:01:57.875Z",
+  "bundle": [
+    "http://127.0.0.1:4387/assets/index-BW0Z57Ad.js"
+  ],
+  "scope": "Read-only focus event observation on actual server UI; no event or application-state substitution",
+  "events": [
+    {
+      "type": "focusin",
+      "at": 279583.7000000179,
+      "target": "BUTTON:Повторить подключение",
+      "active": "BUTTON:",
+      "lock": false,
+      "dialogs": [
+        "pause-title"
+      ]
+    },
+    {
+      "type": "focusout",
+      "at": 290519,
+      "target": "BUTTON:Повторить подключение",
+      "active": "BODY:",
+      "lock": false,
+      "dialogs": [
+        "pause-title"
+      ]
+    },
+    {
+      "type": "focusin",
+      "at": 290519.5,
+      "target": "BUTTON:Продолжить",
+      "active": "BUTTON:",
+      "lock": false,
+      "dialogs": [
+        "pause-title"
+      ]
+    },
+    {
+      "type": "focusout",
+      "at": 290543.8000000119,
+      "target": "BUTTON:Продолжить",
+      "active": "BODY:",
+      "lock": false,
+      "dialogs": [
+        "pause-title"
+      ]
+    },
+    {
+      "type": "pointerlockchange",
+      "at": 290568.09999999404,
+      "target": "document",
+      "active": "BODY:",
+      "lock": true,
+      "dialogs": []
+    },
+    {
+      "type": "focusin",
+      "at": 303731.59999999404,
+      "target": "DIV:Инвентарь✕ Тестовый переводчик и NPC. Со",
+      "active": "DIV:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "pointerlockchange",
+      "at": 303755.7000000179,
+      "target": "document",
+      "active": "DIV:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusout",
+      "at": 305104.2000000179,
+      "target": "DIV:Инвентарь✕ Тестовый переводчик и NPC. Со",
+      "active": "BODY:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusin",
+      "at": 438214.5,
+      "target": "BUTTON:Кувшин",
+      "active": "BUTTON:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusout",
+      "at": 449468.40000000596,
+      "target": "BUTTON:Кувшин",
+      "active": "BODY:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusin",
+      "at": 449468.8000000119,
+      "target": "BUTTON:Взять в руки",
+      "active": "BUTTON:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusout",
+      "at": 449510.90000000596,
+      "target": "BUTTON:Взять в руки",
+      "active": "BODY:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusin",
+      "at": 501893,
+      "target": "BUTTON:Карта",
+      "active": "BUTTON:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusout",
+      "at": 501934.8000000119,
+      "target": "BUTTON:Карта",
+      "active": "BODY:",
+      "lock": false,
+      "dialogs": [
+        "babel-title"
+      ]
+    },
+    {
+      "type": "focusin",
+      "at": 501983.5,
+      "target": "BUTTON:Закрыть",
+      "active": "BUTTON:Закрыть",
+      "lock": false,
+      "dialogs": [
+        "map-title"
+      ]
+    }
+  ]
+}

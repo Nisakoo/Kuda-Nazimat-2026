@@ -1,0 +1,113 @@
+npm --prefix client test
+
+> educational-world-client@0.1.0 pretest
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 18697328 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 20277145 bytes.
+
+> educational-world-client@0.1.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5/client[39m
+
+ [31m❯[39m src/multiplayer/BabylonClient.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 151[2mms[22m[39m
+[31m   [31m×[31m does not overwrite an action result with an older polling response[39m[32m 128[2mms[22m[39m
+[31m   [31m×[31m retries the identical action and request ID after an ambiguous network failure[39m[32m 6[2mms[22m[39m
+   [32m✓[39m aborts on disposal and rejects invalid or unauthorized responses before updating the UI[32m 4[2mms[22m[39m
+ [32m✓[39m src/render/three/AvatarModels.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 5109[2mms[22m[39m
+     [33m[2m✓[22m[39m has one common hierarchy, forward axis, real surface dimensions and foot origin [33m 944[2mms[22m[39m
+     [33m[2m✓[22m[39m has distinct sculpted hair, frames and Ksu clothing, not only different colours [33m 573[2mms[22m[39m
+     [33m[2m✓[22m[39m uses identical looped clips without root motion or unnormalised rotations [33m 1020[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps stance soles within 3 cm of the ground across the full common gait [33m 689[2mms[22m[39m
+     [33m[2m✓[22m[39m rebuilds the checked-in GLBs byte for byte [33m 1388[2mms[22m[39m
+ [32m✓[39m src/render/three/CameraRaycast.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 585[2mms[22m[39m
+   [33m[2m✓[22m[39m matches exact mesh intersections for transformed indexed and nonindexed walls, roofs and material sides [33m 529[2mms[22m[39m
+ [32m✓[39m src/render/three/EntityVisuals.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+Error: getaddrinfo EAI_AGAIN school.local
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:123:26) {
+  errno: -3001,
+  code: 'EAI_AGAIN',
+  syscall: 'getaddrinfo',
+  hostname: 'school.local'
+}
+Error: getaddrinfo EAI_AGAIN school.local
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:123:26) {
+  errno: -3001,
+  code: 'EAI_AGAIN',
+  syscall: 'getaddrinfo',
+  hostname: 'school.local'
+}
+ [32m✓[39m src/app/GameApp.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 394[2mms[22m[39m
+ [32m✓[39m src/multiplayer/GuestAuth.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 116[2mms[22m[39m
+ [32m✓[39m src/session/OnlineSession.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+ [32m✓[39m src/map/AssetManager.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+ [32m✓[39m src/input/InputController.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 133[2mms[22m[39m
+ [32m✓[39m src/app/GameLoop.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 133[2mms[22m[39m
+ [32m✓[39m src/session/LocalSession.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 137[2mms[22m[39m
+ [32m✓[39m src/map/ChunkManager.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32m✓[39m src/render/three/GltfLibrary.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m src/session/MarketSession.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 87[2mms[22m[39m
+ [32m✓[39m src/core/GameWorld.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m src/shared/protocol/validate.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m src/shared/AsyncLeaseCache.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m src/multiplayer/SocketIOAdapter.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m src/core/EntityManager.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m src/app/config.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m src/render/three/CameraObstruction.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m src/app/connectionPreference.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/render/three/CharacterMotion.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/map/WorldBudget.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m src/app/FrameMetrics.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 10[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/multiplayer/BabylonClient.test.ts[2m > [22mdoes not overwrite an action result with an older polling response
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/multiplayer/BabylonClient.test.ts:[2m24:55[22m[39m
+    [90m 22|[39m   }))[33m;[39m
+    [90m 23|[39m   [35mconst[39m f [33m=[39m [34mfixture[39m()[33m,[39m pending [33m=[39m f[33m.[39mclient[33m.[39m[34mstart[39m()[33m;[39m
+    [90m 24|[39m   [34mexpect[39m([35mawait[39m f[33m.[39mclient[33m.[39m[34msend[39m({ type[33m:[39m [32m'intro-seen'[39m }))[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   |[39m                                                       [31m^[39m
+    [90m 25|[39m   [34mfinish[39m([34mresponse[39m(poll))[33m;[39m [35mawait[39m pending[33m;[39m
+    [90m 26|[39m   [34mexpect[39m(f[33m.[39mview[33m.[39mstate[33m?.[39mintroSeen)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/multiplayer/BabylonClient.test.ts[2m > [22mretries the identical action and request ID after an ambiguous network failure
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/multiplayer/BabylonClient.test.ts:[2m37:71[22m[39m
+    [90m 35|[39m   [35mconst[39m f [33m=[39m [34mfixture[39m()[33m;[39m
+    [90m 36|[39m   expect(await f.client.send({ type: 'buy', item: 'dates', targetId: '…
+    [90m 37|[39m   expect(f.view.canRetry).toBe(true); expect(await f.client.repeat()).…
+    [90m   |[39m                                                                       [31m^[39m
+    [90m 38|[39m   expect(packets[1]).toEqual(packets[0]); expect(f.view.canRetry).toBe…
+    [90m 39|[39m })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m24 passed[39m[22m[90m (25)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m197 passed[39m[22m[90m (199)[39m
+[2m   Start at [22m 22:24:14
+[2m   Duration [22m 27.70s[2m (transform 3.15s, setup 0ms, import 5.77s, tests 7.65s, environment 3.06s)[22m
+
+make: *** [Makefile:25: client-test] Error 1

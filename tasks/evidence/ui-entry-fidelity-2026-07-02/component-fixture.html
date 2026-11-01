@@ -1,0 +1,11 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entry components — isolated visual fixture</title></head><body><main class="entry-screen"><div class="viewport"></div><header><a class="brand" href="/entry-component-preview"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><path d="M3 35h38M9 23h26M16 12h13" fill="none" stroke="currentColor" stroke-width="2"/></svg> Вавилон</a></header><div id="fixture"></div></main><script type="module">
+import {mount,unmount} from '/node_modules/.vite/deps/svelte.js?v=f172a8d2';
+import Login from '/src/ui/Login.svelte';import EntrySetup from '/src/ui/EntrySetup.svelte';
+import '/src/ui/global.css';import '/src/ui/game-ui.css';
+const target=document.querySelector('#fixture');let instance;
+window.calls=[];
+const game={logout:()=>show('login'),retryBabylon:async()=>{},babylonAction:async(action)=>{window.calls.push(action);}};
+const view={state:{languages:['ru','en','es'],availableParty:null},busy:false,error:null,canRetry:false};
+async function show(screen,error=null){if(instance)await unmount(instance);instance=mount(screen==='mode'?EntrySetup:Login,{target,props:screen==='mode'?{game,view}:{pending:false,error,initialName:'Мира',configure:()=>window.calls.push(['configure']),login:async(name)=>{window.calls.push(['guest',name]);show('mode')},loginPassword:async(name,password)=>{window.calls.push(['login',name,password]);},register:async(name,password)=>{window.calls.push(['register',name,password]);}}});}
+window.previewShow=show;await show(new URLSearchParams(location.search).get('screen')||'login');
+</script></body></html>

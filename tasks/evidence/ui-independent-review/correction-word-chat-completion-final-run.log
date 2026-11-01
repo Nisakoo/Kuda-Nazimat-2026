@@ -1,0 +1,10 @@
+CAPTURE hud-overlap-390x844
+CAPTURE chat-es-new-old-preserved-1622x970
+page.waitForResponse: Timeout 90000ms exceeded while waiting for event "response"
+    at response (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-word-chat-completion-final.mjs:1:3301)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-word-chat-completion-final.mjs:2:3623 {
+  log: [],
+  name: 'TimeoutError'
+}
+CAPTURE failure
+WORD/CHAT COMPLETION CLOSED

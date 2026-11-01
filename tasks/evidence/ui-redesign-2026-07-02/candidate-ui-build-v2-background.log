@@ -1,0 +1,60 @@
+Sun Nov  1 03:09:58 UTC 2026
+Loading svelte-check in workspace: /data/worktrees/ui-hud-669eb5/client
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/data/worktrees/ui-hud-669eb5/client[39m
+
+[90mstdout[2m | src/render/three/ThreeAvatarPreviewFraming.test.ts[2m > [22m[2mavatar preview camera framing[2m > [22m[2mfits every GLB and the full pedestal with margin at eight yaw angles and throughout sampled idle
+[22m[39mpreview projected maximum absolute NDC { x: [33m0.84381959377191[39m, y: [33m0.975928581010232[39m, z: [33m0.7115716577450093[39m } {
+  y: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m7[39m,
+    coordinate: [33m-0.975928581010232[39m,
+    aspect: [33m0.72[39m
+  },
+  z: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m7[39m,
+    coordinate: [33m-0.7115716577450093[39m,
+    aspect: [33m0.5[39m
+  },
+  x: {
+    context: [32m'pedestal'[39m,
+    mesh: [32m''[39m,
+    vertex: [33m8[39m,
+    coordinate: [33m0.84381959377191[39m,
+    aspect: [33m0.5[39m
+  }
+}
+
+ [32m✓[39m src/render/three/ThreeAvatarPreviewFraming.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 9976[2mms[22m[39m
+     [33m[2m✓[22m[39m fits every GLB and the full pedestal with margin at eight yaw angles and throughout sampled idle [33m 9969[2mms[22m[39m
+ [32m✓[39m src/ui/modal.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 422[2mms[22m[39m
+ [32m✓[39m src/app/GameApp.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 364[2mms[22m[39m
+ [32m✓[39m src/render/three/ThreeAvatarPreview.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 109[2mms[22m[39m
+ [32m✓[39m src/ui/inventoryShortcut.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[32m55 passed[39m[22m[90m (55)[39m
+[2m   Start at [22m 03:10:53
+[2m   Duration [22m 19.08s[2m (transform 1.69s, setup 0ms, import 2.57s, tests 10.92s, environment 3.19s)[22m
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 226 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.49 kB │ gzip:   0.32 kB
+dist/assets/index-qM6L3C1v.css   42.83 kB │ gzip:  10.29 kB
+dist/assets/index-Cuu8VCm4.js   994.45 kB │ gzip: 272.94 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.15s

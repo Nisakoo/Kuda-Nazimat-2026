@@ -1,0 +1,103 @@
+START chat-seed-draft-no-submit-data-loss
+CAPTURE chat-seed-draft-after-idle-1622x970
+PASS chat-seed-draft-no-submit-data-loss
+START normal-windows-1622
+CAPTURE chat-1622x970
+CAPTURE chat-controls-1622x970
+CAPTURE dictionary-1622x970
+CAPTURE dictionary-controls-1622x970
+PASS normal-windows-1622
+START normal-windows-1280
+CAPTURE chat-1280x800
+CAPTURE chat-controls-1280x800
+CAPTURE dictionary-1280x800
+CAPTURE dictionary-controls-1280x800
+PASS normal-windows-1280
+START normal-windows-390
+CAPTURE chat-390x844
+locator.scrollIntoViewIfNeeded: Timeout 45000ms exceeded.
+Call log:
+  - waiting for getByLabel('Сообщение группе')
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:2:3002
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:1:3197)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:2:2822 {
+  log: [ "  - waiting for getByLabel('Сообщение группе')" ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-normal-windows-390
+START normal-windows-640
+ExpectError: expect(locator).toBeEnabled() failed
+
+Locator: getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })
+Expected: enabled
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeEnabled" getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true }) with timeout 45000ms
+  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })
+  - Target page, context or browser has been closed
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeEnabled (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at panel (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:1:1938)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:2:2913
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:1:3197)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:2:2822 {
+  matcherResult: {
+    message: 'expect(locator).toBeEnabled() failed\n' +
+      '\n' +
+      "Locator: getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })\n" +
+      'Expected: enabled\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeEnabled" getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true }) with timeout 45000ms\n` +
+      "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })\n" +
+      '  - Target page, context or browser has been closed\n',
+    pass: false,
+    actual: undefined,
+    name: 'toBeEnabled',
+    expected: 'enabled',
+    log: [
+      `  - Expect "toBeEnabled" getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true }) with timeout 45000ms`,
+      "  - waiting for getByRole('navigation', { name: 'Игровые окна' }).getByRole('button', { name: 'Чат', exact: true })",
+      '  - Target page, context or browser has been closed'
+    ],
+    timeout: undefined,
+    ariaSnapshot: '- main:\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - button "Настройки"\n' +
+      '  - region "Войти в город":\n' +
+      '    - paragraph: Вавилон\n' +
+      '    - heading "Войти в город" [level=1]\n' +
+      '    - tablist "Способ входа":\n' +
+      '      - tab "Вход" [selected]\n' +
+      '      - tab "Регистрация"\n' +
+      '    - tabpanel "Вход":\n' +
+      '      - text: Имя игрока\n' +
+      '      - textbox "Имя игрока":\n' +
+      '        - /placeholder: Ваше имя\n' +
+      '        - text: indafter-mvxaqa5w\n' +
+      '      - text: Пароль\n' +
+      '      - textbox "Пароль"\n' +
+      '      - button "Показать пароль"\n' +
+      '      - alert: shutdown\n' +
+      '      - button "Начать путешествие →" [disabled]\n' +
+      '    - button "Настроить подключение"\n' +
+      '  - complementary "Демонстрационный вход":\n' +
+      '    - button "Демонстрационный вход по имени"\n' +
+      '    - paragraph: Без пароля и регистрации. Любой участник может использовать это имя.'
+  }
+}
+START actual-delete-reviewer-created-jug
+page.setViewportSize: Target page, context or browser has been closed
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:2:3572
+    at step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:1:3203)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-seed-draft-audit.mjs:2:3512 {
+  log: []
+}
+SEED DRAFT AUDIT CLOSED

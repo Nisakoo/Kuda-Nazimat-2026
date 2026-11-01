@@ -1,0 +1,6 @@
+2026-11-01 08:37:52 UTC
+Existing process PID 69123: node src/app/main.ts; not started/restarted/stopped by this task.
+GET http://localhost:8080/ -> 200
+GET http://localhost:8080/api/health -> 200
+Access-Control-Allow-Origin: *
+{"status":"ok","protocol":3,"npc":"ready"}

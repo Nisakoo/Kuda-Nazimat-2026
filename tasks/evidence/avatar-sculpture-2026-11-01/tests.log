@@ -1,0 +1,23 @@
+npm --prefix client test
+
+> educational-world-client@0.1.0 pretest
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 21928618 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 23508435 bytes.
+
+> educational-world-client@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /Users/nisakoo/Documents/competition-2026/client
+
+
+ Test Files  39 passed (39)
+      Tests  324 passed (324)
+   Start at  12:48:52
+   Duration  4.82s (transform 376ms, setup 0ms, import 910ms, tests 5.95s, environment 624ms)
+

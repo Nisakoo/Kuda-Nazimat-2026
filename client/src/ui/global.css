@@ -142,15 +142,13 @@ button.question { font-weight: 500; background: #fffefa; border: 1px solid #cfdd
 .word-link:hover, .word-link:focus-visible { background: #ddede3; color: #214d49; }
 .babel-task { max-width: 28rem; white-space: normal; }
 .stamina { position: fixed; z-index: 3; left: 50%; bottom: 64px; transform: translateX(-50%); display: grid; justify-items: center; gap: 4px; pointer-events: none; color: #fff; font-size: 11px; line-height: 1.2; }
-.stamina-label, .stamina-recovery { padding: 3px 7px; border-radius: 8px; background: #182c32; white-space: nowrap; }
-.stamina-ring { position: relative; width: 56px; height: 56px; border-radius: 50%; background: #182c32; }
+.stamina-ring { position: relative; width: 56px; height: 56px; border-radius: 50%; background: none; }
 .stamina-ring svg { display: block; overflow: visible; }
 .stamina-track, .stamina-arc { fill: none; stroke-width: 6px; }
 .stamina-track { stroke: #344852; }
 .stamina-arc { stroke: #8df0d9; transition: stroke-dashoffset 80ms linear; }
 .stamina.low .stamina-arc { stroke: #ffc567; }
 .stamina.empty .stamina-arc, .stamina.blocked .stamina-arc { transition: none; }
-.stamina-number { position: absolute; inset: 0; display: grid; place-content: center; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .world-actions { margin-bottom: 112px; }
 @media (max-width: 700px), (max-height: 420px) {
   .hints { display: none; }

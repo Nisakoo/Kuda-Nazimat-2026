@@ -1,0 +1,12 @@
+TASK-048 check incident (recorded from tool output; excerpt, not a complete captured transcript)
+
+Command: npm --prefix client exec -- vitest run src/ui/modal.test.ts && npm --prefix client run check
+Focused modal test: 3 passed.
+The check script unexpectedly executed node scripts/generate-demo-world.mjs before svelte-check. This was contrary to the no-generation instruction. Generator output: Prepared 1024 chunks; world 21668106 bytes; market world 23247923 bytes.
+The check then failed: svelte-check reported 7 errors and 0 warnings in App.svelte. The initial errors concerned the App variable `state` and the `$state` rune; subsequent errors were type inference consequences. The full check did not reach tsc or check:core.
+After the correction, direct commands only: cd client && ./node_modules/.bin/svelte-check --tsconfig ./tsconfig.json && ./node_modules/.bin/tsc --noEmit
+Result: svelte-check 0 errors and 0 warnings; tsc exited 0. These direct checks preceded the later CSS-only R05 fix.
+
+Позднее после добавления preview framing test независимый запуск implementer сообщил2 TS errors: positions может быть undefined в ThreeAvatarPreviewFraming.test.ts:23–24. Полный raw transcript не сохранён; это запись сообщения agent, не полный compiler log. Добавлена явная fail-fast проверка отсутствующего position attribute, без non-null assertion и без ослабления geometry checks. Повторный прямой запуск сохраняется в client-direct-corrections-after-framing.log; до его окончания новый pass не заявляется.
+The independent production baseline served the old static dist. git status showed no tracked changes under client/public after the generator. This does not establish that no ignored or untracked generated files were touched.
+No build or GPU test was run. The full client acceptance pipeline and visual verification remain required after all fixes.

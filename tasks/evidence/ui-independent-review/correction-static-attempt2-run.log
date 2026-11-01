@@ -1,0 +1,16 @@
+1622 970 undefined TimeoutError: locator.selectOption: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByLabel('Число игроков', { exact: true })
+ 8 captures []
+1280 800 undefined TimeoutError: locator.selectOption: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByLabel('Число игроков', { exact: true })
+ 8 captures []
+390 844 undefined TimeoutError: locator.selectOption: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByLabel('Число игроков', { exact: true })
+ 8 captures []
+640 480 undefined TimeoutError: locator.selectOption: Timeout 5000ms exceeded.
+Call log:
+  - waiting for getByLabel('Число игроков', { exact: true })
+ 8 captures []

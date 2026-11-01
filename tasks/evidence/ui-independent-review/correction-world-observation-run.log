@@ -1,0 +1,403 @@
+START password-login-enroll-real-two-person-task
+ACTUAL WORLD CAPTURED; initial gates remain separately recorded
+PASS password-login-enroll-real-two-person-task
+START R06-initial-I-immediate-and-delayed-natural-ACK
+CAPTURE R06-natural-equip-1280x800
+R06 NATURAL INITIAL/DELAYED/EQUIP/SECOND-I PASS
+PASS R06-initial-I-immediate-and-delayed-natural-ACK
+START real-authenticated-protocol-peer
+PASS real-authenticated-protocol-peer
+START R06-pending-ACK-focus-recovery-controlled-transport
+PASS R06-pending-ACK-focus-recovery-controlled-transport
+START R06-user-focus-before-ACK-is-preserved
+PASS R06-user-focus-before-ACK-is-preserved
+START R06-new-map-modal-before-ACK-is-preserved
+PASS R06-new-map-modal-before-ACK-is-preserved
+START R06-Settings-before-ACK-is-preserved
+PASS R06-Settings-before-ACK-is-preserved
+START dictionary-create-note-example-learn-edit-search-delete
+CAPTURE dictionary-empty-1280x800
+CAPTURE dictionary-learned-1280x800
+PASS dictionary-create-note-example-learn-edit-search-delete
+START real-peer-chat-translation-add-word-own-delivery-stone
+CAPTURE chat-populated-1280x800
+CAPTURE chat-stone-1280x800
+PASS real-peer-chat-translation-add-word-own-delivery-stone
+START map-real-authority-zoom-center-and-live-peer-movement
+CAPTURE map-live-peer-1280x800
+PASS map-real-authority-zoom-center-and-live-peer-movement
+START all-windows-1622x970
+CAPTURE inventory-1622x970
+CAPTURE map-1622x970
+CAPTURE dictionary-1622x970
+CAPTURE chat-1622x970
+FAIL all-windows-1622x970 ExpectError: expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+Call Log:
+- Timeout 5000ms exceeded while waiting on the predicate
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBe (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:8:481)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:891
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:70 {
+  matcherResult: {
+    pass: false,
+    message: 'expect(received).toBe(expected) // Object.is equality\n' +
+      '\n' +
+      'Expected: true\n' +
+      'Received: false\n' +
+      '\n' +
+      'Call Log:\n' +
+      '- Timeout 5000ms exceeded while waiting on the predicate',
+    name: 'toBe'
+  }
+}
+CAPTURE failure-all-windows-1622x970
+START all-windows-1280x800
+CAPTURE inventory-1280x800
+CAPTURE map-1280x800
+CAPTURE dictionary-1280x800
+CAPTURE chat-1280x800
+GATE FAIL explicit resume enabled
+FAIL all-windows-1280x800 ExpectError: expect(locator).toBeEnabled() failed
+
+Locator: getByRole('button', { name: 'Продолжить', exact: true })
+Expected: enabled
+Timeout: 90000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms
+  - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeEnabled (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at ready (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:7:313)
+    at async resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:8:330)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:891
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:70 {
+  matcherResult: {
+    message: 'expect(locator).toBeEnabled() failed\n' +
+      '\n' +
+      "Locator: getByRole('button', { name: 'Продолжить', exact: true })\n" +
+      'Expected: enabled\n' +
+      'Timeout: 90000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms\n` +
+      "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeEnabled',
+    expected: 'enabled',
+    log: [
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms`,
+      "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })"
+    ],
+    timeout: 90000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - button "Изучаю English"\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - button "Меню Esc"\n' +
+      '  - complementary:\n' +
+      '    - button "The Shepherd’s Goats· 0 / 4"\n' +
+      '  - dialog "Пауза":\n' +
+      '    - paragraph: Можно не торопиться\n' +
+      '    - heading "Пауза" [level=2]\n' +
+      '    - paragraph: Прогулка продолжится с этого места.\n' +
+      '    - alert: Не удалось захватить мышь. Разрешите захват в браузере и нажмите «Повторить захват» или вернитесь в меню.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Повторить захват"\n' +
+      '    - button "Общение"\n' +
+      '    - button "Перезапустить сцену"\n' +
+      '    - button "На главный экран"\n' +
+      '    - checkbox "Символы над башней" [checked]\n' +
+      '    - text: Символы над башней\n' +
+      '    - button "Задание"\n' +
+      '    - button "Сумка"\n' +
+      '    - button "Камень"\n' +
+      '    - button "Словарь"\n' +
+      '    - button "Языки"\n' +
+      '    - button "О мире и управлении"\n' +
+      '    - checkbox "Показывать координаты"\n' +
+      '    - text: Показывать координаты\n' +
+      '    - button "Настройки"\n' +
+      '    - text: Радиус загрузки\n' +
+      '    - combobox "Радиус загрузки":\n' +
+      '      - option "Текущая область"\n' +
+      '      - option "Ближайшие области"\n' +
+      '      - option "Расширенный обзор" [selected]\n' +
+      '    - paragraph: Мышь свободна. Нажмите «Продолжить», чтобы вернуть управление. WASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n' +
+      '    - navigation "Игровые окна":\n' +
+      '      - button "Инвентарь"\n' +
+      '      - button "Карта"\n' +
+      '      - button "Словарь"\n' +
+      '      - button "Чат"\n' +
+      '  - group "Текущая область": Пастбище у рынка\n' +
+      '  - status: Просмотр приостановлен'
+  }
+}
+CAPTURE failure-all-windows-1280x800
+START all-windows-390x844
+CAPTURE inventory-390x844
+CAPTURE map-390x844
+CAPTURE dictionary-390x844
+CAPTURE chat-390x844
+GATE FAIL explicit resume enabled
+FAIL all-windows-390x844 ExpectError: expect(locator).toBeEnabled() failed
+
+Locator: getByRole('button', { name: 'Продолжить', exact: true })
+Expected: enabled
+Timeout: 90000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms
+  - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeEnabled (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at ready (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:7:313)
+    at async resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:8:330)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:891
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:70 {
+  matcherResult: {
+    message: 'expect(locator).toBeEnabled() failed\n' +
+      '\n' +
+      "Locator: getByRole('button', { name: 'Продолжить', exact: true })\n" +
+      'Expected: enabled\n' +
+      'Timeout: 90000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms\n` +
+      "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeEnabled',
+    expected: 'enabled',
+    log: [
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms`,
+      "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })"
+    ],
+    timeout: 90000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - button "Изучаю English"\n' +
+      '  - button "Настройки"\n' +
+      '  - complementary:\n' +
+      '    - button "The Shepherd’s Goats· 0 / 4"\n' +
+      '  - dialog "Пауза":\n' +
+      '    - paragraph: Можно не торопиться\n' +
+      '    - heading "Пауза" [level=2]\n' +
+      '    - paragraph: Прогулка продолжится с этого места.\n' +
+      '    - alert: Не удалось захватить мышь. Разрешите захват в браузере и нажмите «Повторить захват» или вернитесь в меню.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Повторить захват"\n' +
+      '    - button "Общение"\n' +
+      '    - button "Перезапустить сцену"\n' +
+      '    - button "На главный экран"\n' +
+      '    - checkbox "Символы над башней" [checked]\n' +
+      '    - text: Символы над башней\n' +
+      '    - button "Задание"\n' +
+      '    - button "Сумка"\n' +
+      '    - button "Камень"\n' +
+      '    - button "Словарь"\n' +
+      '    - button "Языки"\n' +
+      '    - button "О мире и управлении"\n' +
+      '    - checkbox "Показывать координаты"\n' +
+      '    - text: Показывать координаты\n' +
+      '    - button "Настройки"\n' +
+      '    - text: Радиус загрузки\n' +
+      '    - combobox "Радиус загрузки":\n' +
+      '      - option "Текущая область"\n' +
+      '      - option "Ближайшие области"\n' +
+      '      - option "Расширенный обзор" [selected]\n' +
+      '    - paragraph: Мышь свободна. Нажмите «Продолжить», чтобы вернуть управление. WASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n' +
+      '    - navigation "Игровые окна":\n' +
+      '      - button "Инвентарь"\n' +
+      '      - button "Карта"\n' +
+      '      - button "Словарь"\n' +
+      '      - button "Чат"\n' +
+      '  - group "Текущая область": Пастбище у рынка\n' +
+      '  - status: Просмотр приостановлен'
+  }
+}
+CAPTURE failure-all-windows-390x844
+START all-windows-640x480
+CAPTURE inventory-640x480
+CAPTURE inventory-controls-640x480
+CAPTURE map-640x480
+CAPTURE map-controls-640x480
+CAPTURE dictionary-640x480
+FAIL all-windows-640x480 locator.scrollIntoViewIfNeeded: Timeout 45000ms exceeded.
+Call log:
+  - waiting for getByLabel('Моя заметка', { exact: true })
+
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:802
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:28:70 {
+  log: [ "  - waiting for getByLabel('Моя заметка', { exact: true })" ],
+  name: 'TimeoutError'
+}
+CAPTURE failure-all-windows-640x480
+START languages-real-ACK-new-message-old-message-preservation
+REVIEWER ORPHAN page.waitForResponse: Timeout 5000ms exceeded while waiting for event "response"
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:29:358
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:29:1 {
+  log: [],
+  name: 'TimeoutError'
+}
+(node:180712) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 14)
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL languages-real-ACK-new-message-old-message-preservation page.waitForResponse: Timeout 5000ms exceeded while waiting for event "response"
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:29:358
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:29:1 {
+  log: [],
+  name: 'TimeoutError'
+}
+CAPTURE failure-languages-real-ACK-new-message-old-message-preservation
+START live-appearance-Dan-server-and-peer
+GATE FAIL appearance chooser ready
+GATE FAIL explicit resume enabled
+FAIL live-appearance-Dan-server-and-peer ExpectError: expect(locator).toBeEnabled() failed
+
+Locator: getByRole('button', { name: 'Продолжить', exact: true })
+Expected: enabled
+Timeout: 90000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms
+  - waiting for getByRole('button', { name: 'Продолжить', exact: true })
+
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBeEnabled (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at ready (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:7:313)
+    at async resume (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:8:330)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:30:925
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:30:1 {
+  matcherResult: {
+    message: 'expect(locator).toBeEnabled() failed\n' +
+      '\n' +
+      "Locator: getByRole('button', { name: 'Продолжить', exact: true })\n" +
+      'Expected: enabled\n' +
+      'Timeout: 90000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms\n` +
+      "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeEnabled',
+    expected: 'enabled',
+    log: [
+      `  - Expect "toBeEnabled" getByRole('button', { name: 'Продолжить', exact: true }) with timeout 90000ms`,
+      "  - waiting for getByRole('button', { name: 'Продолжить', exact: true })"
+    ],
+    timeout: 90000,
+    ariaSnapshot: '- main:\n' +
+      '  - img "Трёхмерная сцена"\n' +
+      '  - link "Вавилон — главная":\n' +
+      '    - /url: ./\n' +
+      '    - text: Вавилон\n' +
+      '  - button "Изучаю Español"\n' +
+      '  - status "Состояние связи": Подключён\n' +
+      '  - button "Настройки"\n' +
+      '  - button "Меню Esc"\n' +
+      '  - complementary:\n' +
+      '    - button "Las cabras del pastor· 0 / 4"\n' +
+      '  - dialog "Пауза":\n' +
+      '    - paragraph: Можно не торопиться\n' +
+      '    - heading "Пауза" [level=2]\n' +
+      '    - paragraph: Прогулка продолжится с этого места.\n' +
+      '    - alert: Не удалось захватить мышь. Разрешите захват в браузере и нажмите «Повторить захват» или вернитесь в меню.\n' +
+      '    - button "Повторить подключение"\n' +
+      '    - button "Выйти из сессии"\n' +
+      '    - button "Повторить захват"\n' +
+      '    - button "Общение"\n' +
+      '    - button "Перезапустить сцену"\n' +
+      '    - button "На главный экран"\n' +
+      '    - checkbox "Символы над башней" [checked]\n' +
+      '    - text: Символы над башней\n' +
+      '    - button "Задание"\n' +
+      '    - button "Сумка"\n' +
+      '    - button "Камень"\n' +
+      '    - button "Словарь"\n' +
+      '    - button "Языки"\n' +
+      '    - button "О мире и управлении"\n' +
+      '    - checkbox "Показывать координаты"\n' +
+      '    - text: Показывать координаты\n' +
+      '    - button "Настройки"\n' +
+      '    - text: Радиус загрузки\n' +
+      '    - combobox "Радиус загрузки":\n' +
+      '      - option "Текущая область"\n' +
+      '      - option "Ближайшие области"\n' +
+      '      - option "Расширенный обзор" [selected]\n' +
+      '    - paragraph: Мышь свободна. Нажмите «Продолжить», чтобы вернуть управление. WASD — идти · Space — прыжок · Shift — спринт · E — поговорить\n' +
+      '    - navigation "Игровые окна":\n' +
+      '      - button "Инвентарь"\n' +
+      '      - button "Карта"\n' +
+      '      - button "Словарь"\n' +
+      '      - button "Чат"\n' +
+      '  - group "Текущая область": Пастбище у рынка\n' +
+      '  - status: Просмотр приостановлен'
+  }
+}
+CAPTURE failure-live-appearance-Dan-server-and-peer
+START map-excludes-real-outsider-sequential-peer-socket
+CAPTURE map-real-outsider-excluded-1280x800
+PASS map-excludes-real-outsider-sequential-peer-socket
+START password-relogin-persistence
+FAIL password-relogin-persistence ExpectError: expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+
+Call Log:
+- Timeout 5000ms exceeded while waiting on the predicate
+    at captureRawStack (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toBe (/data/worktrees/ui-hud-669eb5/client/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at /data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:32:1205
+    at async step (/data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:6:200)
+    at async file:///data/worktrees/ui-hud-669eb5/tasks/evidence/ui-independent-review/correction-world-observation.mjs:32:1 {
+  matcherResult: {
+    pass: false,
+    message: 'expect(received).toBe(expected) // Object.is equality\n' +
+      '\n' +
+      'Expected: true\n' +
+      'Received: false\n' +
+      '\n' +
+      'Call Log:\n' +
+      '- Timeout 5000ms exceeded while waiting on the predicate',
+    name: 'toBe'
+  }
+}
+CAPTURE failure-password-relogin-persistence
+CORRECTION WORLD CLOSED; GPU AVAILABLE AFTER EXPLICIT REVIEWER RELEASE

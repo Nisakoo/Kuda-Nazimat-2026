@@ -15,3 +15,5 @@ server/config.json
 
 # Vitest cache when server tests use repository root.
 /node_modules/
+
+client/coverage/

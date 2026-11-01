@@ -28,6 +28,7 @@ export interface Entity {
   readonly character?: Character;
   readonly animationState?: AnimationState;
   readonly motion?: MotionStatus;
+  readonly equipment?: { readonly tool: import('../equipment/types.ts').ToolId };
 }
 
 export interface WorldSnapshot {

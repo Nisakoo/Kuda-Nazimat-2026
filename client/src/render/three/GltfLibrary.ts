@@ -5,10 +5,13 @@ import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import type { AssetManager } from '../../map/AssetManager';
 import { abortError, AsyncLeaseCache } from '../../shared/AsyncLeaseCache';
 import type { Lease } from '../../shared/AsyncLeaseCache';
+import { AVATAR_WALK_MAX_PACE, avatarWalkPacing } from './AvatarWalkPace';
 
 interface Template { readonly scene: Object3D; readonly animations: AnimationClip[]; readonly sources: readonly Lease<ArrayBuffer>[] }
 export interface ModelInstance {
   readonly root: Object3D;
+  /** Present only for validated avatar metadata; converts observed m/s to clip pace. */
+  readonly walkPace?: (speed: number) => number;
   animate(name: string, delta: number, pace?: number): void;
   dispose(): void;
 }
@@ -85,12 +88,14 @@ export class GltfLibrary {
     const root = clone(lease.value.scene);
     root.traverse(object => { if ('isMesh' in object) { object.castShadow = true; object.receiveShadow = true; } });
     const mixer = new AnimationMixer(root);
+    const avatarWalk = avatarWalkPacing(root, lease.value.animations.find(clip => clip.name === 'walk')?.duration);
     let animation = '';
     const actions = new Map<string, { action: AnimationAction; weight: number; from: number }>();
     let transition = 0;
     let disposed = false;
     const instance: ModelInstance = {
       root,
+      ...(avatarWalk ? { walkPace: (speed: number) => avatarWalk.pace(speed) } : {}),
       animate: (name, delta, pace = 1) => {
         if (disposed) return;
         const dt = Math.min(Math.max(delta, 0), 0.1);
@@ -115,7 +120,10 @@ export class GltfLibrary {
           const target = key === animation ? 1 : 0;
           state.weight = state.from + (target - state.from) * (transition / .14);
           state.action.setEffectiveWeight(state.weight);
-          state.action.setEffectiveTimeScale(key === 'walk' ? Math.max(.2, Math.min(2, pace)) : 1);
+          const walkPace = avatarWalk
+            ? Number.isFinite(pace) ? Math.max(0, Math.min(AVATAR_WALK_MAX_PACE, pace)) : 0
+            : Math.max(.2, Math.min(2, pace));
+          state.action.setEffectiveTimeScale(key === 'walk' ? walkPace : 1);
           if (state.weight === 0 && target === 0) state.action.stop();
         }
         mixer.update(dt);

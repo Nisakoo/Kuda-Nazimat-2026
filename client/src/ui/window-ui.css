@@ -1,0 +1,72 @@
+/* Shared spacing for existing windows. Content, actions and scroll regions stay distinct. */
+dialog.panel, dialog.dialog-panel, .game-screen dialog.panel, .game-screen dialog.dialog-panel {
+  color: var(--ui-ink); background-color: var(--ui-paper); border: 1px solid #d6c6aa;
+  border-radius: 12px; box-shadow: 0 12px 36px #44341f28;
+  max-width: calc(100vw - 32px); max-height: calc(100svh - 32px);
+}
+dialog.settings-panel { width: 520px; }
+dialog.pause-panel { width: 400px; }
+dialog .panel-top { align-items: start; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--ui-line); margin: 0 0 20px; }
+dialog .panel-top h2 { line-height: 1.25; padding-top: 6px; }
+dialog .panel-top > .icon-button { width: 44px; height: 44px; min-width: 44px; padding: 0; display: grid; place-items: center; border-radius: 8px; }
+dialog button { line-height: 1.35; overflow-wrap: anywhere; }
+dialog button:not(.resident-word):not(.word-link) { min-height: 44px; }
+dialog button > svg { flex-shrink: 0; vertical-align: middle; }
+dialog input, dialog select, dialog textarea { min-width: 0; max-width: 100%; }
+dialog input:not([type=checkbox]):not([type=radio]), dialog select { min-height: 44px; }
+dialog .settings-form { gap: 16px; }
+dialog .advanced-settings { border: 1px solid var(--ui-line); border-radius: 8px; padding: 0 14px 12px; margin: 0; }
+dialog .advanced-settings:not([open]) { padding-bottom: 0; }
+dialog .debug-toggle { display: flex; align-items: center; gap: 10px; }
+dialog .menu-buttons { gap: 10px; margin: 20px 0 10px; }
+.window-actions, dialog .babel-actions { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+.window-actions > button, dialog .babel-actions > button { flex: 1 1 140px; min-width: 0; margin: 0; }
+dialog.babel-panel { padding: 0; overflow: hidden; }
+dialog.babel-panel .babel-content { padding: 24px; overflow-x: hidden; }
+dialog.babel-panel .babel-footer { flex: none; display: flex; justify-content: flex-end; padding: 14px 24px; border-top: 1px solid var(--ui-line); }
+dialog.babel-panel .babel-footer > button { min-width: 144px; }
+dialog.babel-panel .babel-word-toolbar { align-items: end; gap: 12px; margin-bottom: 16px; }
+dialog.babel-panel .babel-word-toolbar label { margin: 0; }
+dialog.babel-panel .babel-word-toolbar button { margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; }
+dialog.babel-panel .babel-word-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+dialog.babel-panel .babel-word-tabs button { padding: 10px; }
+dialog.babel-panel .babel-word-layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 20px; padding-top: 20px; }
+dialog.babel-panel .babel-word-detail { padding-left: 20px; }
+dialog.babel-panel .babel-word-list button { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; padding: 12px 8px; }
+dialog.babel-panel .babel-compose { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 10px; }
+dialog.babel-panel .babel-compose label { margin: 0; }
+dialog.babel-panel .babel-compose button { white-space: normal; }
+dialog.babel-panel .babel-compose textarea { height: 48px; min-height: 48px; }
+dialog.babel-panel .resident-compose { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 10px; }
+dialog.babel-panel .resident-compose textarea { height: 48px; }
+dialog.map-dialog .map-controls { gap: 10px; padding-top: 8px; }
+dialog.map-dialog .map-controls button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.avatar-tablet .avatar-bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.avatar-tablet .avatar-bottom button { width: 100%; min-width: 0; }
+.capture-recovery { position: fixed; z-index: 10; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 14px; text-align: center; }
+.capture-recovery p { max-width: 420px; margin: 0 0 12px; font-size: 14px; line-height: 1.5; }
+.capture-recovery > button { margin: 4px; }
+.game-screen .stamina {
+  position: fixed; left: 50%; right: auto; bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); display: block; padding: 0; border: 0; background: none; box-shadow: none;
+  pointer-events: none;
+}
+.game-screen .stamina-ring { background: none; }
+.game-screen .stamina-track { stroke: #315e59; stroke-opacity: .35; }
+.game-screen .stamina-arc { stroke: #286c63; stroke-linecap: round; }
+.game-screen .stamina.low .stamina-arc { stroke: #9c6b35; }
+@media (max-width: 600px) {
+  dialog.panel, dialog.dialog-panel, .game-screen dialog.panel, .game-screen dialog.dialog-panel { max-width: calc(100vw - 20px); max-height: calc(100svh - 20px); }
+  dialog.babel-panel .babel-content { padding: 16px; }
+  dialog.babel-panel .babel-footer { padding: 12px 16px; }
+  dialog.babel-panel .babel-word-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  dialog.babel-panel .babel-word-detail { padding: 16px 0 0; }
+  dialog.babel-panel .babel-compose { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  dialog.babel-panel .babel-compose label { grid-column: 1 / -1; grid-row: 1; }
+  dialog.babel-panel .resident-compose { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .game-screen .stamina-arc { transition: none; } }
+
+.hand-status { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left)); max-width: min(240px, calc(50vw - 58px)); padding: 8px 14px; text-align: center; pointer-events: none; font-size: 13px; }
+
+.debug > output { display: block; }

@@ -37,7 +37,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   const broadcastEvery = config.tickHz / config.broadcastHz;
   const game = new GameService(world, deps.players, deps.clock, deps.scheduler, {
     maxPlayers: config.maxPlayers, disconnectGraceMs: config.disconnectGraceMs, broadcastEvery, initialSpawn: deps.babylon?.spawn.bind(deps.babylon), didSpawn: deps.babylon?.entered.bind(deps.babylon),
-  }, log, metrics, deps.worldLife);
+  }, log, deps.avatars, deps.equipment, metrics, deps.worldLife);
   const tickHistogram = metrics.histogram('game_tick_duration_ms', 'Длительность шага симуляции', FAST_MS_BUCKETS);
   const broadcastHistogram = metrics.histogram('game_broadcast_interval_ms', 'Интервал между рассылками AOI', MS_BUCKETS);
   let stats: { tickP95Ms: number; broadcastP95Ms: number; players: number } | null = null;
@@ -85,8 +85,12 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   };
 
   return {
+    canAdmit: accountId => game.canAdmit(accountId),
+    setAvatar: (playerId, avatarId) => game.setAvatar(playerId, avatarId),
+    setEquipment: (playerId, tool) => game.setEquipment(playerId, tool),
     canAct: (accountId, sessionKey) => game.canAct(accountId, sessionKey),
     location: accountId => game.locate(accountId),
+    playerLocation: playerId => game.playerLocation(playerId),
     maps: [...loaded.maps.values()].map((map) => ({ mapId: map.id, worldBytes: map.manifest.worldBytes, chunks: map.manifest.chunks.length })),
     worldFile(path: string, accountId: string): WorldFileAccess {
       const file = loaded.files.get(path);

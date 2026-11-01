@@ -1,0 +1,229 @@
+{
+  "fixture": "Isolated component layout and callback checks. Not backend acceptance.",
+  "result": [
+    {
+      "screen": "login",
+      "viewport": [
+        1622,
+        970
+      ],
+      "panel": {
+        "x": 521,
+        "y": 121.984375,
+        "width": 580,
+        "height": 782.015625,
+        "top": 121.984375,
+        "right": 1101,
+        "bottom": 904,
+        "left": 521
+      },
+      "scroll": [
+        970,
+        970
+      ],
+      "pageOverflow": false
+    },
+    {
+      "screen": "login",
+      "viewport": [
+        1280,
+        800
+      ],
+      "panel": {
+        "x": 350,
+        "y": 90,
+        "width": 580,
+        "height": 774.8125,
+        "top": 90,
+        "right": 930,
+        "bottom": 864.8125,
+        "left": 350
+      },
+      "scroll": [
+        899,
+        800
+      ],
+      "pageOverflow": false
+    },
+    {
+      "screen": "login",
+      "viewport": [
+        390,
+        844
+      ],
+      "panel": {
+        "x": 12,
+        "y": 80,
+        "width": 366,
+        "height": 733.09375,
+        "top": 80,
+        "right": 378,
+        "bottom": 813.09375,
+        "left": 12
+      },
+      "scroll": [
+        903,
+        844
+      ],
+      "pageOverflow": false
+    },
+    {
+      "screen": "login",
+      "viewport": [
+        640,
+        480
+      ],
+      "panel": {
+        "x": 65,
+        "y": 75,
+        "width": 510,
+        "height": 646.703125,
+        "top": 75,
+        "right": 575,
+        "bottom": 721.703125,
+        "left": 65
+      },
+      "scroll": [
+        752,
+        480
+      ],
+      "pageOverflow": false
+    },
+    {
+      "shortConnectionVisible": true
+    },
+    {
+      "screen": "mode",
+      "viewport": [
+        1622,
+        970
+      ],
+      "panel": {
+        "x": 486,
+        "y": 171.890625,
+        "width": 650,
+        "height": 688.203125,
+        "top": 171.890625,
+        "right": 1136,
+        "bottom": 860.09375,
+        "left": 486
+      },
+      "scroll": [
+        970,
+        970
+      ],
+      "pageOverflow": false
+    },
+    {
+      "screen": "mode",
+      "viewport": [
+        1280,
+        800
+      ],
+      "panel": {
+        "x": 315,
+        "y": 100,
+        "width": 650,
+        "height": 682.96875,
+        "top": 100,
+        "right": 965,
+        "bottom": 782.96875,
+        "left": 315
+      },
+      "scroll": [
+        821,
+        800
+      ],
+      "pageOverflow": false
+    },
+    {
+      "screen": "mode",
+      "viewport": [
+        390,
+        844
+      ],
+      "panel": {
+        "x": 12,
+        "y": 138.390625,
+        "width": 366,
+        "height": 579.203125,
+        "top": 138.390625,
+        "right": 378,
+        "bottom": 717.59375,
+        "left": 12
+      },
+      "scroll": [
+        844,
+        844
+      ],
+      "pageOverflow": false
+    },
+    {
+      "screen": "mode",
+      "viewport": [
+        640,
+        480
+      ],
+      "panel": {
+        "x": 50,
+        "y": 84,
+        "width": 540,
+        "height": 550.3125,
+        "top": 84,
+        "right": 590,
+        "bottom": 634.3125,
+        "left": 50
+      },
+      "scroll": [
+        664,
+        480
+      ],
+      "pageOverflow": false
+    },
+    {
+      "focusAfterNext": "SELECT"
+    },
+    {
+      "focusAfterEscape": {
+        "tag": "INPUT",
+        "checked": true
+      }
+    },
+    {
+      "eyeType": "text"
+    },
+    {
+      "passwordAfterTab": ""
+    },
+    {
+      "passwordAfterSubmit": ""
+    },
+    {
+      "passwordAfterLoginSubmit": "",
+      "calls": [
+        [
+          "guest",
+          "Мира",
+          null
+        ],
+        [
+          "register",
+          "Мира",
+          "[redacted]"
+        ],
+        [
+          "login",
+          "Мира",
+          "[redacted]"
+        ]
+      ]
+    },
+    {
+      "tabArrowFocus": {
+        "id": "register-tab",
+        "selected": "true"
+      }
+    }
+  ],
+  "errors": []
+}
