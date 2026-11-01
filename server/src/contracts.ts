@@ -157,6 +157,8 @@ export interface WorldContentPort {
   maps(): readonly { readonly mapId: string; readonly chunks: number; readonly npcs: number }[];
   /** Surface height when (x, z) lies inside the map's chunks, otherwise null. */
   surface(mapId: string, x: number, z: number): number | null;
+  /** ADMIN-SRV-013: walkable spot on the map (shared walkability and ceilings). */
+  walkable(mapId: string, x: number, z: number): boolean;
   /** Replaces the NPCs of the world; the next broadcast upserts or removes their entities. */
   setNpcs(npcs: readonly NpcDefinition[]): void;
   scene(mapId: string): SceneView | null;

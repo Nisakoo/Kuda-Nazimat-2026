@@ -3,7 +3,7 @@ import type { Clock } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
 import { MetricsRegistry, type Metrics } from '../common/metrics.ts';
 import type { SessionCheck, SessionVerifier } from '../contracts.ts';
-import { NameTakenError, type AccountStore, type RevokeReason, type SessionStore } from './ports.ts';
+import { NameTakenError, type AccountStore, type RevokeReason, type SessionScope, type SessionStore } from './ports.ts';
 import { HashQueueFullError, PasswordHasher, checkPassword, temporaryPassword } from './password.ts';
 import { LoginLockout, WindowLimiter } from './limits.ts';
 
@@ -32,18 +32,26 @@ export const REVOKE_MESSAGES: Readonly<Record<RevokeReason, string>> = {
   'password-reset': 'Администратор выдал новый пароль. Войдите снова.',
   operator: 'Администратор завершил сессию.',
   limit: 'Слишком много входов в этот аккаунт: старая сессия завершена.',
+  'role-revoked': 'Роль администратора снята.',
 };
 
+/** AUTH-018: what an admin session proves; `verify` never accepts it. */
+export type AdminCheck = { readonly ok: true; readonly identity: { accountId: string; playerId: string; displayName: string }; readonly sessionId: string; readonly expiresAt: number } | { readonly ok: false };
+
+/** ADMIN-SRV-009: who performed an administrator action; absent for the console. */
+export interface AuditActor { readonly ip: string | null; readonly accountId?: string | null; readonly name?: string | null }
 export interface ServerSession { readonly token: string; readonly expiresAt: number }
 export interface AuthDeps {
   readonly accounts: AccountStore; readonly sessions: SessionStore; readonly clock: Clock; readonly ttlMs: number;
   readonly maxSessions?: number;
+  /** AUTH-018 admin session lifetime; 8 h by default. */
+  readonly adminTtlMs?: number;
   readonly canAdmit?: (accountId: string | null) => boolean;
   /** AUTH-001: guest and dev login; false in production. */
   readonly passwordless?: boolean;
   readonly hasher?: PasswordHasher; readonly logger?: Logger; readonly metrics?: Metrics;
   /** ADMIN-SRV-009: journal of operator actions; never receives the temporary password. */
-  readonly audit?: (entry: { readonly action: 'reset-password' | 'revoke' | 'unlock'; readonly accountId: string | null; readonly name: string; readonly result: Record<string, number | boolean> }) => void;
+  readonly audit?: (entry: { readonly action: 'reset-password' | 'revoke' | 'unlock' | 'create-admin' | 'grant-admin' | 'revoke-admin'; readonly accountId: string | null; readonly name: string; readonly result: Record<string, number | boolean>; readonly by?: AuditActor }) => void;
 }
 export type AuthService = ReturnType<typeof createAuthService>;
 
@@ -93,16 +101,17 @@ export function createAuthService(deps: AuthDeps) {
     catch (error) { if (error instanceof HashQueueFullError) throw new AuthError('UNAVAILABLE', 'Сервер занят. Попробуйте войти через несколько секунд.'); throw error; }
   };
   const admit = (accountId: string | null): void => { if (deps.canAdmit && !deps.canAdmit(accountId)) throw new AuthError('FULL', 'Сервер заполнен: в мире уже 4 игрока.'); };
-  const issue = (identity: { accountId: string; playerId: string; displayName: string }, ip: string, method: string): ServerSession => {
-    admit(identity.accountId);
+  const issue = (identity: { accountId: string; playerId: string; displayName: string }, ip: string, method: string, scope: SessionScope = 'game'): ServerSession => {
+    // An administrator signs in even when the four seats are taken: the admin session never enters the world.
+    if (scope === 'game') admit(identity.accountId);
     const now = clock.now();
     const token = randomBytes(32).toString('base64url');
     const sessionId = randomBytes(9).toString('base64url');
-    const expiresAt = now + ttlMs;
-    sessions.create({ tokenHash: hashToken(token), accountId: identity.accountId, createdAt: now, expiresAt, id: sessionId, ip });
-    notify(sessions.enforceLimit(identity.accountId, maxSessions, now), 'limit', { accountId: identity.accountId });
+    const expiresAt = now + (scope === 'admin' ? deps.adminTtlMs ?? 8 * 3_600_000 : ttlMs);
+    sessions.create({ tokenHash: hashToken(token), accountId: identity.accountId, createdAt: now, expiresAt, id: sessionId, ip, scope });
+    notify(sessions.enforceLimit(identity.accountId, maxSessions, now, scope), 'limit', { accountId: identity.accountId });
     attempts.inc({ method, outcome: 'ok' });
-    log?.info(`auth.${method}`, 'Вход выполнен', { accountId: identity.accountId, playerId: identity.playerId, name: identity.displayName, ip, sessionId });
+    log?.info(`auth.${method}`, 'Вход выполнен', { accountId: identity.accountId, playerId: identity.playerId, name: identity.displayName, ip, sessionId, scope });
     return { token, expiresAt };
   };
   const requirePasswordless = (method: string): void => {
@@ -161,7 +170,7 @@ export function createAuthService(deps: AuthDeps) {
       return issue(record.identity, ip, 'login');
     },
     /** Own password with the current (or temporary) one; ends every other session of the account. */
-    async changePassword(rawName: unknown, rawPassword: unknown, rawNew: unknown, ip = 'unknown'): Promise<ServerSession> {
+    async changePassword(rawName: unknown, rawPassword: unknown, rawNew: unknown, ip = 'unknown', scope: SessionScope = 'game'): Promise<ServerSession> {
       limitIp(ip, 'password');
       const name = nameOf(rawName); const key = name.toLowerCase();
       if (typeof rawPassword !== 'string' || !rawPassword) throw new AuthError('INVALID', 'Введите текущий пароль.');
@@ -170,12 +179,13 @@ export function createAuthService(deps: AuthDeps) {
       const record = accounts.find(key);
       const result = await hashing(() => hasher.verify(rawPassword, record?.passwordHash ?? null));
       if (!record || !result.ok) return failed(key, ip, 'password', record ? 'credentials' : 'unknown', true);
+      if (scope === 'admin' && record.role !== 'admin') return failed(key, ip, 'password', 'not_admin', false);
       if (record.mustChangePassword && (record.tempPasswordExpiresAt ?? 0) <= clock.now()) return failed(key, ip, 'password', 'temp_expired', false);
       lockout.succeed(key);
       accounts.setPassword(record.identity.accountId, await hashing(() => hasher.hash(next)), { mustChange: false, tempExpiresAt: null }, clock.now());
       log?.info('auth.password.changed', 'Пароль изменён', { accountId: record.identity.accountId, ip });
       notify(sessions.revoke({ accountId: record.identity.accountId }, 'password-changed', clock.now()), 'password-changed', { accountId: record.identity.accountId });
-      return issue(record.identity, ip, 'login');
+      return issue(record.identity, ip, scope === 'admin' ? 'admin.login' : 'login', scope);
     },
     /** AUTH-009: idempotent; never reveals whether the token was valid. */
     logout(token: string): void {
@@ -192,13 +202,47 @@ export function createAuthService(deps: AuthDeps) {
     async verify(token: string): Promise<SessionCheck> {
       if (!TOKEN.test(token)) return { ok: false };
       const session = sessions.find(hashToken(token));
-      if (!session || session.revokedAt !== null || session.expiresAt <= clock.now()) return { ok: false };
+      if (!session || session.revokedAt !== null || session.expiresAt <= clock.now() || session.scope !== 'game') return { ok: false };
       return { ok: true, identity: session.identity, expiresAt: session.expiresAt, sessionId: session.sessionId };
+    },
+    /** AUTH-018: admin scope and a current admin role; checked on every admin request. */
+    async verifyAdmin(token: string): Promise<AdminCheck> {
+      if (!TOKEN.test(token)) return { ok: false };
+      const session = sessions.find(hashToken(token));
+      if (!session || session.revokedAt !== null || session.expiresAt <= clock.now() || session.scope !== 'admin' || session.role !== 'admin') return { ok: false };
+      return { ok: true, identity: session.identity, expiresAt: session.expiresAt, sessionId: session.sessionId };
+    },
+    /** AUTH-019: a non-admin gets the same answer as a wrong password; the per-name lock is shared with the game login. */
+    async adminLogin(rawName: unknown, rawPassword: unknown, ip = 'unknown'): Promise<ServerSession> {
+      limitIp(ip, 'admin-login');
+      const name = nameOf(rawName); const key = name.toLowerCase();
+      if (typeof rawPassword !== 'string' || !rawPassword) throw new AuthError('INVALID', 'Введите пароль.');
+      locked(key, 'admin-login');
+      const record = accounts.find(key);
+      const result = await hashing(() => hasher.verify(rawPassword.normalize('NFC'), record?.passwordHash ?? null));
+      if (!record || !result.ok) return failed(key, ip, 'admin-login', record ? 'credentials' : 'unknown', true);
+      if (record.role !== 'admin') return failed(key, ip, 'admin-login', 'not_admin', false);
+      if (record.mustChangePassword) {
+        if ((record.tempPasswordExpiresAt ?? 0) <= clock.now()) return failed(key, ip, 'admin-login', 'temp_expired', false);
+        throw new AuthError('PASSWORD_CHANGE_REQUIRED', 'Это временный пароль. Придумайте свой.');
+      }
+      lockout.succeed(key);
+      return issue(record.identity, ip, 'admin.login', 'admin');
+    },
+    /** AUTH-020: development/test only — admin session of account `admin` without a password. */
+    async adminDev(ip = 'unknown'): Promise<ServerSession> {
+      requirePasswordless('admin-dev');
+      limitIp(ip, 'admin-dev');
+      const existing = accounts.find('admin');
+      if (existing?.passwordHash) throw new AuthError('PASSWORD_REQUIRED', 'У аккаунта admin есть пароль. Войдите с паролем.');
+      const identity = existing?.identity ?? accounts.findOrCreate('admin', 'admin', clock.now());
+      if (existing?.role !== 'admin') accounts.setRole(identity.accountId, 'admin');
+      return issue(identity, ip, 'admin.dev', 'admin');
     },
 
     /** AUTH-010 operator actions; the caller has already checked loopback and CSRF. */
     operator: {
-      async resetPassword(rawName: unknown): Promise<{ name: string; temporaryPassword: string; expiresAt: number }> {
+      async resetPassword(rawName: unknown, by?: AuditActor): Promise<{ name: string; temporaryPassword: string; expiresAt: number }> {
         const record = accounts.find(nameOf(rawName).toLowerCase());
         if (!record) throw new AuthError('INVALID', 'Аккаунт не найден.');
         const password = temporaryPassword(); const now = clock.now();
@@ -206,24 +250,24 @@ export function createAuthService(deps: AuthDeps) {
         lockout.unlock(record.identity.displayName.toLowerCase());
         log?.info('auth.operator.action', 'Администратор выдал временный пароль', { action: 'reset-password', name: record.identity.displayName, accountId: record.identity.accountId });
         const revoked = sessions.revoke({ accountId: record.identity.accountId }, 'password-reset', now);
-        deps.audit?.({ action: 'reset-password', accountId: record.identity.accountId, name: record.identity.displayName, result: { revoked: revoked.length } });
+        deps.audit?.({ action: 'reset-password', accountId: record.identity.accountId, name: record.identity.displayName, result: { revoked: revoked.length }, ...(by ? { by } : {}) });
         notify(revoked, 'password-reset', { accountId: record.identity.accountId });
         return { name: record.identity.displayName, temporaryPassword: password, expiresAt: now + TEMP_PASSWORD_MS };
       },
-      revoke(rawName: unknown): number {
+      revoke(rawName: unknown, by?: AuditActor): number {
         const record = accounts.find(nameOf(rawName).toLowerCase());
         if (!record) throw new AuthError('INVALID', 'Аккаунт не найден.');
         const hashes = sessions.revoke({ accountId: record.identity.accountId }, 'operator', clock.now());
         log?.info('auth.operator.action', 'Администратор завершил сессии', { action: 'revoke', name: record.identity.displayName, accountId: record.identity.accountId, count: hashes.length });
-        deps.audit?.({ action: 'revoke', accountId: record.identity.accountId, name: record.identity.displayName, result: { revoked: hashes.length } });
+        deps.audit?.({ action: 'revoke', accountId: record.identity.accountId, name: record.identity.displayName, result: { revoked: hashes.length }, ...(by ? { by } : {}) });
         notify(hashes, 'operator', { accountId: record.identity.accountId });
         return hashes.length;
       },
-      unlock(rawName: unknown): boolean {
+      unlock(rawName: unknown, by?: AuditActor): boolean {
         const name = nameOf(rawName);
         const unlocked = lockout.unlock(name.toLowerCase());
         log?.info('auth.operator.action', 'Администратор снял блокировку входа', { action: 'unlock', name, unlocked });
-        deps.audit?.({ action: 'unlock', accountId: accounts.find(name.toLowerCase())?.identity.accountId ?? null, name, result: { unlocked } });
+        deps.audit?.({ action: 'unlock', accountId: accounts.find(name.toLowerCase())?.identity.accountId ?? null, name, result: { unlocked }, ...(by ? { by } : {}) });
         return unlocked;
       },
       /** ADMIN-SRV-010: when the name may try to log in again, null when not locked. */
@@ -231,6 +275,38 @@ export function createAuthService(deps: AuthDeps) {
       list: () => accounts.list(clock.now()).map(account => ({
         ...account, loginBlockedSeconds: lockout.retryAfter(account.name.toLowerCase()),
       })),
+      /** AUTH-020: new admin account with a one-time temporary password. */
+      async createAdmin(rawName: unknown, by?: AuditActor): Promise<{ name: string; temporaryPassword: string; expiresAt: number }> {
+        const name = nameOf(rawName); const now = clock.now();
+        const password = temporaryPassword();
+        const hash = await hashing(() => hasher.hash(password));
+        let identity;
+        try { identity = accounts.create(name, name.toLowerCase(), hash, now); }
+        catch (error) { if (error instanceof NameTakenError) throw new AuthError('NAME_TAKEN', 'Это имя уже занято: используйте grant-admin.'); throw error; }
+        accounts.setRole(identity.accountId, 'admin');
+        accounts.setPassword(identity.accountId, hash, { mustChange: true, tempExpiresAt: now + TEMP_PASSWORD_MS }, now);
+        log?.info('auth.operator.action', 'Создан администратор', { action: 'create-admin', name, accountId: identity.accountId });
+        deps.audit?.({ action: 'create-admin', accountId: identity.accountId, name, result: {}, ...(by ? { by } : {}) });
+        return { name, temporaryPassword: password, expiresAt: now + TEMP_PASSWORD_MS };
+      },
+      grantAdmin(rawName: unknown, by?: AuditActor): void {
+        const record = accounts.find(nameOf(rawName).toLowerCase());
+        if (!record) throw new AuthError('INVALID', 'Аккаунт не найден.');
+        if (!record.passwordHash) throw new AuthError('INVALID', 'У аккаунта нет пароля: администратором может быть только аккаунт с паролем.');
+        accounts.setRole(record.identity.accountId, 'admin');
+        log?.info('auth.operator.action', 'Выдана роль администратора', { action: 'grant-admin', name: record.identity.displayName, accountId: record.identity.accountId });
+        deps.audit?.({ action: 'grant-admin', accountId: record.identity.accountId, name: record.identity.displayName, result: {}, ...(by ? { by } : {}) });
+      },
+      revokeAdmin(rawName: unknown, by?: AuditActor): number {
+        const record = accounts.find(nameOf(rawName).toLowerCase());
+        if (!record) throw new AuthError('INVALID', 'Аккаунт не найден.');
+        accounts.setRole(record.identity.accountId, 'player');
+        const hashes = sessions.revoke({ accountId: record.identity.accountId, scope: 'admin' }, 'role-revoked', clock.now());
+        log?.info('auth.operator.action', 'Снята роль администратора', { action: 'revoke-admin', name: record.identity.displayName, accountId: record.identity.accountId, count: hashes.length });
+        notify(hashes, 'role-revoked', { accountId: record.identity.accountId });
+        deps.audit?.({ action: 'revoke-admin', accountId: record.identity.accountId, name: record.identity.displayName, result: { revoked: hashes.length }, ...(by ? { by } : {}) });
+        return hashes.length;
+      },
     },
   };
   return service satisfies SessionVerifier;

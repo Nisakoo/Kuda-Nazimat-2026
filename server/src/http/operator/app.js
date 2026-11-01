@@ -3,6 +3,11 @@
 // Every API value is rendered with textContent; charts are plain SVG built here.
 (() => {
   const $ = id => document.getElementById(id);
+  const adminMode = location.pathname.replace(/\/$/, '') === '/admin';
+  let adminToken = null;
+  let sessionEpoch = 0;
+  let needsPasswordChange = false;
+  const requests = new Set();
   const SVG = 'http://www.w3.org/2000/svg';
   const sections = {
     overview: ['Обзор', 'Состояние мира и подключённых игроков'],
@@ -92,13 +97,57 @@
     $('toast').hidden = false;
   }
   async function request(path, options = {}) {
-    const response = await fetch(path, { cache: 'no-store', signal: AbortSignal.timeout(8000), ...options });
-    const body = await response.json().catch(() => null);
-    if (!response.ok) { const error = new Error(body?.error?.message || 'Сервер ответил ошибкой (' + response.status + ').'); error.status = response.status; throw error; }
-    if (body === null) throw new Error('Сервер вернул некорректный ответ.');
-    return body;
+    const { asText = false, ...fetchOptions } = options;
+    if (adminMode && path.startsWith('/api/operator/')) {
+      if (!adminToken) throw new Error('Войдите как администратор.');
+      path = path.replace('/api/operator/', '/api/admin/');
+    }
+    const epoch = sessionEpoch;
+    const controller = new AbortController(); requests.add(controller);
+    const headers = new Headers(fetchOptions.headers);
+    if (adminMode && adminToken && path.startsWith('/api/admin/')) headers.set('Authorization', 'Bearer ' + adminToken);
+    try {
+      const response = await fetch(path, { cache: 'no-store', ...fetchOptions, headers, signal: AbortSignal.any([controller.signal, AbortSignal.timeout(8000)]) });
+      const text = await response.text();
+      if (epoch !== sessionEpoch) throw new DOMException('Сессия изменена', 'AbortError');
+      let body = null;
+      try { body = text ? JSON.parse(text) : {}; } catch { /* CSV is returned as text below. */ }
+      if (!response.ok) {
+        if (adminMode && adminToken && response.status === 401) endSession();
+        const error = new Error(body?.error?.message || 'Сервер ответил ошибкой (' + response.status + ').');
+        error.status = response.status; error.code = body?.error?.code; error.current = body?.current; throw error;
+      }
+      if (asText) return text;
+      if (body === null) throw new Error('Сервер вернул некорректный ответ.');
+      return body;
+    } finally { requests.delete(controller); }
   }
   const change = (path, method, data) => request(path, { method, headers: { 'Content-Type': 'application/json', 'X-Operator': '1' }, body: JSON.stringify(data ?? {}) });
+  function endSession() {
+    adminToken = null; ++sessionEpoch;
+    for (const controller of requests) controller.abort();
+    clearPassword();
+    // A fresh document clears every private table/form and discards late callbacks.
+    location.replace('/admin');
+  }
+  async function signIn(dev = false) {
+    const button = $('admin-submit');
+    button.disabled = true; $('admin-dev').disabled = true; $('admin-login-error').textContent = '';
+    try {
+      const input = dev ? {} : { name: $('admin-name').value, password: $('admin-password').value, ...(needsPasswordChange ? { newPassword: $('admin-new-password').value } : {}) };
+      const result = await change('/api/admin/' + (dev ? 'dev' : needsPasswordChange ? 'password' : 'login'), 'POST', input);
+      adminToken = result.token; ++sessionEpoch;
+      $('admin-password').value = ''; $('admin-new-password').value = '';
+      $('admin-login').hidden = true; document.body.classList.remove('admin-signed-out'); $('admin-logout').hidden = false;
+      navigate(); await refresh(true);
+    } catch (error) {
+      if (error.code === 'PASSWORD_CHANGE_REQUIRED') {
+        needsPasswordChange = true; $('admin-new-password-row').hidden = false; $('admin-new-password').required = true;
+        button.textContent = 'Сменить пароль и войти'; $('admin-new-password').focus();
+      }
+      $('admin-login-error').textContent = error.message;
+    } finally { button.disabled = false; $('admin-dev').disabled = false; }
+  }
 
   // ---------- Charts: SVG, no libraries. Values: number | null (gap) | "inf" (above the scale).
   function chart(id, series, options = {}) {
@@ -205,6 +254,7 @@
     if ($('password-dialog').open) $('password-dialog').close();
   }
   function navigate() {
+    if (adminMode && !adminToken) return;
     const key = location.hash.slice(1);
     currentSection = Object.hasOwn(sections, key) ? key : 'overview';
     clearPassword();
@@ -325,11 +375,12 @@
     $('updated').textContent = 'Обновлено в ' + time(lastUpdate);
   }
   async function refreshHistory(force) {
-    if (!force && Date.now() - historyAt < 10_000) return;
+    if (!force && Date.now() - historyAt < 5_000) return;
     try { history = await request('/api/operator/history'); historyAt = Date.now(); renderCharts(); }
     catch { /* the status banner already reports a lost connection */ }
   }
   async function refresh(force = false) {
+    if (adminMode && !adminToken) return;
     if (refreshing) return;
     refreshing = true;
     $('refresh').disabled = true;
@@ -406,8 +457,9 @@
     for (const field of ALL_FIELDS) setField(field, editable.has(field) && (create || !npc.deleted));
     const flags = [];
     if (npc.deleted) flags.push(['Персонаж удалён и скрыт из мира. Восстановите его, чтобы изменить.', 'danger']);
-    if (npc.embedded) flags.push(['Фигура нарисована в модели карты: переместить или сменить облик нельзя; при выключении фигура останется, исчезнут разговор и подпись.', 'info']);
-    if (npc.quest) flags.push(['Персонаж участвует в задании рынка: без него задание нельзя пройти.', 'warn']);
+    if (npc.embedded) flags.push(['Фигура нарисована в модели карты: перемещение, смена облика, выключение и удаление запрещены.', 'info']);
+    if (npc.quest) flags.push(['Персонаж нужен заданию BABEL: выключение и удаление запрещены.', 'warn']);
+    if (!create) flags.push(['Revision ' + npc.revision + (npc.updatedAt ? ' · изменён ' + dateTime(npc.updatedAt) : ''), 'info']);
     if (create) flags.push(['Персонаж появится в мире сразу после создания. Облик — из моделей, которые уже есть в игре.', 'info']);
     if (!create && npc.overridden?.length) flags.push(['Изменено в панели: ' + npc.overridden.map(f => fieldNames[f] || f).join(', ') + '.', 'info']);
     $('npc-flags').replaceChildren(...flags.map(([text, kind]) => node('p', text, 'flag ' + kind)));
@@ -425,9 +477,10 @@
     form.elements.enabled.checked = create ? true : !!npc.enabled;
     $('npc-reset').hidden = create || npc.origin !== 'content' || !npc.overridden?.length;
     $('npc-delete').hidden = create || !!npc.deleted;
+    $('npc-delete').disabled = !!npc.embedded || !!npc.quest;
     $('npc-restore').hidden = create || !npc.deleted;
     $('npc-save').hidden = !create && !!npc.deleted;
-    $('npc-history').replaceChildren(...(changes || []).map(e => row([dateTime(e.at), actionNames[e.action] || e.action, e.actor === 'seed' ? 'Система (начальная загрузка)' : e.actor === 'system' ? 'Система' : 'Администратор'])));
+    $('npc-history').replaceChildren(...(changes || []).map(e => row([dateTime(e.at), actionNames[e.action] || e.action, e.actorName || (e.actor === 'seed' ? 'Система (начальная загрузка)' : e.actor === 'system' ? 'Система' : 'Администратор')])));
     if (!changes?.length) $('npc-history').append(emptyRow(create ? 'Появятся после создания' : 'Изменений нет', 3));
     if (npcData) renderNpcRows();
   }
@@ -454,17 +507,21 @@
     const create = !!npcSelected.create;
     const patch = formPatch();
     if (!create && !Object.keys(patch).length) { $('npc-form-error').textContent = 'Изменений нет.'; return; }
-    if (npcSelected.quest && patch.enabled === false && !confirm('Персонаж участвует в задании рынка: без него задание нельзя пройти. Выключить?')) return;
+    const details = Object.keys(patch).map(key => (fieldNames[key] || key) + ': ' + (typeof patch[key] === 'object' ? JSON.stringify(patch[key]) : String(patch[key]))).join('\n');
+    if (!confirm((create ? 'Создать персонажа?' : 'Сохранить изменения?') + '\n' + details)) return;
     acting = true; $('npc-save').disabled = true; $('npc-form-error').textContent = '';
     try {
       let npc;
       if (create) {
         npc = (await change('/api/operator/npcs', 'POST', patch)).npc;
-        if (!form.elements.enabled.checked) npc = (await change('/api/operator/npcs/' + encodeURIComponent(npc.id), 'PATCH', { enabled: false })).npc;
-      } else npc = (await change('/api/operator/npcs/' + encodeURIComponent(npcSelected.id), 'PATCH', patch)).npc;
+        if (!form.elements.enabled.checked) npc = (await change('/api/operator/npcs/' + encodeURIComponent(npc.id), 'PATCH', { revision: npc.revision, enabled: false })).npc;
+      } else npc = (await change('/api/operator/npcs/' + encodeURIComponent(npcSelected.id), 'PATCH', { revision: npcSelected.revision, ...patch })).npc;
       notify(create ? 'Персонаж «' + npc.name + '» создан.' : 'Изменения сохранены и уже действуют в игре.');
       await loadNpcs(); await openNpc(npc.id);
-    } catch (error) { $('npc-form-error').textContent = error.message; }
+    } catch (error) {
+      if (error.status === 409 && error.current) { showEditor(error.current, []); $('npc-form-error').textContent = error.message + ' Показаны актуальные значения. Проверьте их перед новой правкой.'; }
+      else $('npc-form-error').textContent = error.message;
+    }
     finally { acting = false; $('npc-save').disabled = false; }
   }
   async function npcAction(kind) {
@@ -476,14 +533,15 @@
       reset: 'Сбросить «' + n.name + '» к исходным значениям из файла? Изменения панели будут удалены.',
     }[kind];
     if (!confirm(question)) return;
+    if (kind === 'delete' && prompt('Для удаления введите идентификатор персонажа: ' + n.id) !== n.id) return;
     acting = true;
     try {
       const path = '/api/operator/npcs/' + encodeURIComponent(n.id);
-      const { npc } = kind === 'delete' ? await request(path, { method: 'DELETE', headers: { 'X-Operator': '1' } }) : await change(path + '/' + kind, 'POST', {});
+      const { npc } = await change(path + (kind === 'delete' ? '' : '/' + kind), kind === 'delete' ? 'DELETE' : 'POST', { revision: n.revision });
       notify(kind === 'delete' ? 'Персонаж удалён из мира.' : kind === 'restore' ? 'Персонаж восстановлен.' : 'Персонаж сброшен к исходным значениям.');
       await loadNpcs();
       if (npc.deleted && !$('npc-deleted').checked) closeEditor(); else await openNpc(npc.id);
-    } catch (error) { notify('Не удалось выполнить действие: ' + error.message, true); }
+    } catch (error) { if (error.status === 409 && error.current) showEditor(error.current, []); notify('Не удалось выполнить действие: ' + error.message, true); }
     finally { acting = false; }
   }
   function renderWorld() {
@@ -549,7 +607,7 @@
       $('journal-rows').replaceChildren(...result.entries.map((e, index) => {
         const action = node('td'); action.append(node('span', actionNames[e.action] || e.action, 'pill ' + e.action.split('.')[0]));
         const target = e.targetType === 'npc' ? e.targetId : e.targetType === 'world' ? 'мир · ' + e.targetId : 'аккаунт';
-        const tr = row([dateTime(e.at), target, action, e.actor === 'admin' ? 'администратор' : e.actor, e.ip || '—', describe(e)]);
+        const tr = row([dateTime(e.at), target, action, e.actorName || (e.actor === 'admin' ? 'администратор' : e.actor), e.ip || '—', describe(e)]);
         tr.tabIndex = 0;
         tr.addEventListener('click', () => showJournalEntry(index));
         tr.addEventListener('keydown', event => { if (event.key === 'Enter') showJournalEntry(index); });
@@ -573,7 +631,7 @@
     const e = journalEntries[index]; if (!e) return;
     $('journal-details').hidden = false;
     const npcName = e.targetType === 'npc' ? (e.after?.name ?? e.before?.name ?? '') : '';
-    list('journal-detail-meta', [['Действие', actionNames[e.action] || e.action], ['Цель', e.targetType + ' · ' + e.targetId + (npcName ? ' (' + npcName + ')' : '')], ['Автор', e.actor === 'admin' ? 'администратор' : e.actor], ['Время', new Date(e.at).toLocaleString('ru')]]);
+    list('journal-detail-meta', [['Действие', actionNames[e.action] || e.action], ['Цель', e.targetType + ' · ' + e.targetId + (npcName ? ' (' + npcName + ')' : '')], ['Автор', e.actorName || (e.actor === 'admin' ? 'администратор' : e.actor)], ['Время', new Date(e.at).toLocaleString('ru')]]);
     $('journal-before').textContent = e.before ? JSON.stringify(e.before, null, 2) : '—';
     $('journal-after').textContent = e.after ? JSON.stringify(e.after, null, 2) : '—';
   }
@@ -670,6 +728,17 @@
   }
 
   // ---------- Wiring
+  $('admin-login-form').addEventListener('submit', event => { event.preventDefault(); void signIn(); });
+  $('admin-dev').addEventListener('click', () => void signIn(true));
+  $('admin-logout').addEventListener('click', () => { void request('/api/admin/logout', { method: 'POST' }).finally(endSession); });
+  $('journal-csv').addEventListener('click', event => {
+    event.preventDefault();
+    void request('/api/operator/journal.csv?' + journalParams(false), { asText: true }).then(text => {
+      const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+      const link = node('a'); link.href = url; link.download = 'journal.csv'; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }).catch(error => notify('Не удалось выгрузить журнал: ' + error.message, true));
+  });
   $('refresh').addEventListener('click', () => {
     void refresh(true);
     if (currentSection === 'accounts' && selectedAccount) void openAccount(selectedAccount.name);
@@ -712,6 +781,10 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) clearPassword(); });
   window.addEventListener('pagehide', clearPassword);
   window.addEventListener('hashchange', navigate);
+  if (adminMode) {
+    $('admin-login').hidden = false; document.body.classList.add('admin-signed-out');
+    void request('/api/auth/mode').then(mode => { $('admin-dev').hidden = !mode.dev; }).catch(() => {});
+  }
   navigate();
   void refresh(true);
   setInterval(() => void refresh(), 2000);

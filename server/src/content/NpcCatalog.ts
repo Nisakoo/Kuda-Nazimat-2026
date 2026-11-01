@@ -33,15 +33,23 @@ export interface NpcRecord {
 export interface NpcContext {
   /** Surface height inside the map's chunks, otherwise null. */
   surface(mapId: string, x: number, z: number): number | null;
+  /** ADMIN-SRV-013: the spot is walkable on that map (shared walkability and ceilings). */
+  walkable(mapId: string, x: number, z: number): boolean;
+  /** ADMIN-SRV-013: another live NPC, not `exceptId`, stands closer than {@link MIN_NPC_GAP}. */
+  crowded(mapId: string, exceptId: string, x: number, z: number): boolean;
   readonly appearances: ReadonlySet<string>;
 }
 export class ContentError extends Error {
-  readonly code: 'INVALID' | 'NOT_FOUND' | 'CONFLICT';
-  constructor(code: ContentError['code'], message: string) { super(message); this.code = code; }
+  readonly code: 'INVALID' | 'NOT_FOUND' | 'CONFLICT' | 'FORBIDDEN';
+  /** ADMIN-SRV-014: on a revision conflict, the current state of the NPC. */
+  readonly current: unknown;
+  constructor(code: ContentError['code'], message: string, current?: unknown) { super(message); this.code = code; this.current = current; }
 }
 
 export const MAX_NPCS = 64;
 export const DEFAULT_RADIUS = 2.5;
+/** ADMIN-SRV-013: minimal distance between two NPCs, as between players (REALTIME-010). */
+export const MIN_NPC_GAP = 1.2;
 const TEXT = { name: NPC_LIMITS.name, topic: NPC_LIMITS.topic, persona: NPC_LIMITS.persona, greeting: NPC_LIMITS.greeting } as const;
 const TEXT_FIELDS = ['name', 'topic', 'persona', 'greeting'] as const;
 const EMBEDDED_FIELDS = [...TEXT_FIELDS, 'interactionRadius'] as const;
@@ -96,10 +104,15 @@ export function liveNpcs(records: readonly NpcRecord[]): NpcDefinition[] {
   return records.filter((record) => record.enabled && !record.deleted).map((record) => record.npc);
 }
 
-function placement(input: Record<string, unknown>, mapId: string, current: Vector3 | null, context: NpcContext): Vector3 {
+function checkSpot(context: NpcContext, mapId: string, selfId: string, x: number, z: number): void {
+  if (!context.walkable(mapId, x, z)) invalid('Точка непроходима: выберите другое место.');
+  if (context.crowded(mapId, selfId, x, z)) invalid('Слишком близко к другому персонажу.');
+}
+function placement(input: Record<string, unknown>, mapId: string, current: Vector3 | null, context: NpcContext, selfId: string): Vector3 {
   const raw = input.position;
   if (raw === undefined) {
     if (!current || context.surface(mapId, current.x, current.z) === null) invalid('Позиция: укажите место на этой карте.');
+    checkSpot(context, mapId, selfId, current!.x, current!.z);
     return current!;
   }
   if (!raw || typeof raw !== 'object' || Array.isArray(raw) || Object.keys(raw).some((key) => !['x', 'y', 'z'].includes(key))) return invalid('Позиция: ожидается {x, z} и необязательный y.');
@@ -108,6 +121,7 @@ function placement(input: Record<string, unknown>, mapId: string, current: Vecto
   const z = finite('position', p.z, -NPC_LIMITS.maxCoordinate, NPC_LIMITS.maxCoordinate);
   const surface = context.surface(mapId, x, z);
   if (surface === null) invalid('Позиция вне чанков карты.');
+  checkSpot(context, mapId, selfId, x, z);
   const y = p.y === undefined ? surface! : finite('position', p.y, -NPC_LIMITS.maxCoordinate, NPC_LIMITS.maxCoordinate);
   return { x, y, z };
 }
@@ -130,7 +144,7 @@ export function validatePatch(record: NpcRecord, patch: Record<string, unknown>,
   if ('rotationY' in patch) fields.rotationY = finite('rotationY', patch.rotationY, -NPC_LIMITS.maxCoordinate, NPC_LIMITS.maxCoordinate);
   if ('assetId' in patch) { if (typeof patch.assetId !== 'string' || !context.appearances.has(patch.assetId)) invalid('Облик: выберите облик из списка.'); fields.assetId = patch.assetId as string; }
   if ('mapId' in patch) fields.mapId = mapOf(patch.mapId, maps);
-  if ('mapId' in patch || 'position' in patch) fields.position = placement(patch, fields.mapId ?? record.npc.mapId, 'position' in patch ? null : record.npc.position, context);
+  if ('mapId' in patch || 'position' in patch) fields.position = placement(patch, fields.mapId ?? record.npc.mapId, 'position' in patch ? null : record.npc.position, context, record.id);
   let enabled: boolean | undefined;
   if ('enabled' in patch) { if (typeof patch.enabled !== 'boolean') invalid('Включён: true или false.'); enabled = patch.enabled as boolean; }
   return { fields, ...(enabled === undefined ? {} : { enabled }) };
@@ -148,7 +162,7 @@ export function validateCreate(input: Record<string, unknown>, taken: ReadonlySe
   if (typeof input.assetId !== 'string' || !context.appearances.has(input.assetId)) invalid('Облик: выберите облик из списка.');
   return {
     id: id as string, mapId, name: text('name', input.name), topic: text('topic', input.topic), persona: text('persona', input.persona), greeting: text('greeting', input.greeting),
-    position: placement(input, mapId, null, context),
+    position: placement(input, mapId, null, context, id as string),
     rotationY: input.rotationY === undefined ? 0 : finite('rotationY', input.rotationY, -NPC_LIMITS.maxCoordinate, NPC_LIMITS.maxCoordinate),
     interactionRadius: input.interactionRadius === undefined ? DEFAULT_RADIUS : finite('interactionRadius', input.interactionRadius, 0, NPC_LIMITS.maxRadius),
     assetId: input.assetId as string,

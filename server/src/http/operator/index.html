@@ -7,6 +7,12 @@
 <style>/* OPERATOR_STYLE */</style>
 </head>
 <body>
+<section id="admin-login" hidden aria-labelledby="admin-login-title">
+  <div class="panel"><h1 id="admin-login-title">Вход администратора</h1><p>Войдите административным аккаунтом этого сервера.</p>
+    <form id="admin-login-form"><label>Имя<input id="admin-name" name="username" autocomplete="username" maxlength="32" required></label><label>Пароль<input id="admin-password" name="password" type="password" autocomplete="current-password" required></label><label id="admin-new-password-row" hidden>Новый пароль<input id="admin-new-password" name="newPassword" type="password" autocomplete="new-password" minlength="6" maxlength="128"></label><p id="admin-login-error" role="alert"></p><button id="admin-submit" class="primary" type="submit">Войти</button><button id="admin-dev" type="button" hidden>Тестовый вход администратора</button></form>
+    <p class="muted">Создать администратора в терминале сервера:</p><code>npm.cmd --prefix server run auth -- create-admin Admin --env production</code>
+  </div>
+</section>
 <a class="skip" href="#main">К содержимому</a>
 <aside id="sidebar">
   <div class="brand"><span class="diamond" aria-hidden="true">◆</span><div><strong>Вавилон</strong><small>Администратор</small></div></div>
@@ -25,6 +31,7 @@
   <header class="topbar">
     <button class="icon-button" id="toggle-sidebar" aria-label="Свернуть боковую панель" aria-controls="sidebar" aria-expanded="true">☰</button>
     <div class="breadcrumb">Панель администратора <span>/</span> <strong id="breadcrumb">Обзор</strong></div>
+    <button id="admin-logout" class="secondary" hidden>Выйти</button>
     <label class="global-search"><span class="sr-only">Поиск раздела</span><input id="section-search" type="search" placeholder="Поиск раздела…" autocomplete="off"></label>
     <span id="connection" class="badge neutral" role="status">Подключение…</span>
   </header>

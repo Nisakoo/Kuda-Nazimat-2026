@@ -1,5 +1,5 @@
 ---
-id: TASK-085
+id: TASK-094
 type: implementation-task
 status: todo
 spec: ../specs/server-admin-content.md
@@ -7,7 +7,7 @@ requirements: [ADMIN-SRV-003, ADMIN-SRV-005, ADMIN-SRV-007]
 related:
   - spec: ../specs/protocol.md
     requirements: [PROTO-008]
-depends_on: [TASK-084]
+depends_on: [TASK-093]
 scheduling_note: передача от серверной команды 2026-11-01; протокол не меняется — клиенту нужно подтвердить, что текущее поведение сохраняется, и закрепить его тестами; объём определяет клиентская команда по SDD
 ---
 

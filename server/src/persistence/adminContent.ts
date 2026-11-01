@@ -11,16 +11,16 @@ const parsed = (value: unknown): Record<string, unknown> | null => value === nul
 export function sqliteAdminContent(db: DatabaseSync): AdminContentStore {
   // SQLite lower() folds ASCII only; journal search must ignore case in Cyrillic too.
   db.function('unicode_lower', { deterministic: true }, (value) => typeof value === 'string' ? value.toLowerCase() : value);
-  const insert = db.prepare('INSERT INTO admin_journal (at, actor, ip, target_type, target_id, action, before, after) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+  const insert = db.prepare('INSERT INTO admin_journal (at, actor, ip, target_type, target_id, action, before, after, actor_account_id, actor_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
   const write = (e: JournalInput): void => {
-    insert.run(e.at, e.actor, e.ip, e.targetType, e.targetId, e.action, e.before === null ? null : JSON.stringify(e.before), e.after === null ? null : JSON.stringify(e.after));
+    insert.run(e.at, e.actor, e.ip, e.targetType, e.targetId, e.action, e.before === null ? null : JSON.stringify(e.before), e.after === null ? null : JSON.stringify(e.after), e.actorAccountId ?? null, e.actorName ?? null);
     db.prepare('DELETE FROM admin_journal WHERE id <= (SELECT id FROM admin_journal ORDER BY id DESC LIMIT 1 OFFSET ?)').run(MAX_JOURNAL);
   };
   const summary = (row: Record<string, unknown>): AccountSummary => ({
-    accountId: String(row.id), name: String(row.name), createdAt: Number(row.created_at), hasPassword: Number(row.has_password) === 1,
+    accountId: String(row.id), name: String(row.name), role: row.role === 'admin' ? 'admin' : 'player', createdAt: Number(row.created_at), hasPassword: Number(row.has_password) === 1,
     mustChangePassword: Number(row.must) === 1, activeSessions: Number(row.active), lastLoginAt: optional(row.last_login),
   });
-  const ACCOUNT = `SELECT a.id, a.name, a.created_at, a.password_hash IS NOT NULL AS has_password, a.must_change_password AS must,
+  const ACCOUNT = `SELECT a.id, a.name, a.role, a.created_at, a.password_hash IS NOT NULL AS has_password, a.must_change_password AS must,
     (SELECT count(*) FROM sessions s WHERE s.account_id = a.id AND s.revoked_at IS NULL AND s.expires_at > ?) AS active,
     (SELECT max(created_at) FROM sessions s WHERE s.account_id = a.id) AS last_login FROM accounts a`;
   return {
@@ -36,10 +36,14 @@ export function sqliteAdminContent(db: DatabaseSync): AdminContentStore {
           ON CONFLICT(npc_id) DO UPDATE SET origin = excluded.origin, fields = excluded.fields, enabled = excluded.enabled, deleted_at = excluded.deleted_at, updated_at = excluded.updated_at`)
           .run(npcId, override.origin, JSON.stringify(override.fields), override.enabled ? 1 : 0, override.deletedAt, override.updatedAt);
         else db.prepare('DELETE FROM npc_overrides WHERE npc_id = ?').run(npcId);
+        db.prepare('INSERT INTO npc_revisions (npc_id, revision) VALUES (?, 1) ON CONFLICT(npc_id) DO UPDATE SET revision = revision + 1').run(npcId);
         write(entry);
       });
     },
     append(entry) { transaction(db, () => write(entry)); },
+    revisions() {
+      return new Map(db.prepare('SELECT npc_id, revision FROM npc_revisions').all().map((row) => [String(row.npc_id), Number(row.revision)] as [string, number]));
+    },
     seed(entries) {
       return transaction(db, () => {
         const seen = db.prepare("SELECT 1 FROM admin_journal WHERE target_type = 'npc' AND target_id = ? AND action = 'npc.seed'");
@@ -63,6 +67,7 @@ export function sqliteAdminContent(db: DatabaseSync): AdminContentStore {
         total,
         entries: rows.map((row): JournalEntry => ({
           id: Number(row.id), at: Number(row.at), actor: String(row.actor) as JournalEntry['actor'], ip: row.ip === null ? null : String(row.ip),
+          actorAccountId: row.actor_account_id === null || row.actor_account_id === undefined ? null : String(row.actor_account_id), actorName: row.actor_name === null || row.actor_name === undefined ? null : String(row.actor_name),
           targetType: String(row.target_type) as JournalEntry['targetType'], targetId: String(row.target_id), action: String(row.action), before: parsed(row.before), after: parsed(row.after),
         })),
       };

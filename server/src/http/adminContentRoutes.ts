@@ -2,10 +2,10 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Logger } from '../common/logger.ts';
 import { ContentError } from '../content/NpcCatalog.ts';
 import type { ContentAdmin } from '../content/ContentAdmin.ts';
-import type { JournalEntry, JournalFilter, JournalTarget } from '../content/ports.ts';
+import type { JournalEntry, JournalFilter, JournalTarget, Who } from '../content/ports.ts';
 import { BodyError, body, clientIp, error, json, type RequestContext } from './util.ts';
 
-const STATUS = { INVALID: 400, NOT_FOUND: 404, CONFLICT: 409 } as const;
+const STATUS = { INVALID: 400, NOT_FOUND: 404, CONFLICT: 409, FORBIDDEN: 403 } as const;
 const BODY_LIMIT = 8192;
 const CSV_ROWS = 10_000;
 const TARGETS: readonly JournalTarget[] = ['npc', 'world', 'account'];
@@ -39,7 +39,7 @@ function cell(value: unknown): string {
 }
 function csv(entries: readonly JournalEntry[]): string {
   const header = ['id', 'время', 'автор', 'ip', 'цель', 'идентификатор', 'действие', 'было', 'стало'];
-  const rows = entries.map((e) => [e.id, new Date(e.at).toISOString(), e.actor, e.ip, e.targetType, e.targetId, e.action, e.before, e.after].map(cell).join(','));
+  const rows = entries.map((e) => [e.id, new Date(e.at).toISOString(), e.actorName ?? e.actorName ?? e.actor, e.ip, e.targetType, e.targetId, e.action, e.before, e.after].map(cell).join(','));
   return `\uFEFF${[header.join(','), ...rows].join('\r\n')}\r\n`;
 }
 
@@ -47,7 +47,7 @@ function csv(entries: readonly JournalEntry[]): string {
  * ADMIN-SRV-012: NPC, world, journal and account routes of the operator screen. The caller has already
  * checked loopback; `trusted` is the AUTH-010 CSRF guard for changes. False when the path is not ours.
  */
-export async function handleAdminContent(req: IncomingMessage, res: ServerResponse, path: string, admin: ContentAdmin, trusted: () => boolean, logger: Logger, context: RequestContext): Promise<boolean> {
+export async function handleAdminContent(req: IncomingMessage, res: ServerResponse, path: string, admin: ContentAdmin, trusted: () => boolean, logger: Logger, context: RequestContext, actor?: Who): Promise<boolean> {
   const method = req.method ?? 'GET';
   const params = new URL(req.url ?? '/', 'http://localhost').searchParams;
   const npc = NPC.exec(path); const scene = SCENE.exec(path);
@@ -67,16 +67,21 @@ export async function handleAdminContent(req: IncomingMessage, res: ServerRespon
     return value as Record<string, unknown>;
   };
   const empty = async (): Promise<void> => { if (req.headers['content-type'] && Object.keys(await input()).length) throw new ContentError('INVALID', 'Тело должно быть пустым объектом.'); else req.resume(); };
-  const ip = clientIp(req);
+  const who: Who = actor ?? { ip: clientIp(req) };
+  const revisionOf = async (): Promise<unknown> => {
+    const b = await input();
+    if (Object.keys(b).some((key) => key !== 'revision')) throw new ContentError('INVALID', 'Ожидается только {revision}.');
+    return b.revision;
+  };
   try {
     if (path === '/api/operator/npcs' && method === 'GET') { json(res, 200, admin.list({ ...(params.get('map') ? { map: params.get('map')! } : {}), ...(params.get('q') ? { q: params.get('q')! } : {}), deleted: params.get('deleted') === '1' })); return true; }
-    if (path === '/api/operator/npcs' && method === 'POST') { json(res, 201, { npc: admin.create(await input(), ip) }); return true; }
+    if (path === '/api/operator/npcs' && method === 'POST') { json(res, 201, { npc: admin.create(await input(), who) }); return true; }
     if (npc && !npc[2] && method === 'GET') { json(res, 200, admin.get(npc[1]!)); return true; }
-    if (npc && !npc[2] && method === 'PATCH') { json(res, 200, { npc: admin.update(npc[1]!, await input(), ip) }); return true; }
-    if (npc && !npc[2] && method === 'DELETE') { req.resume(); json(res, 200, { npc: admin.remove(npc[1]!, ip) }); return true; }
-    if (npc?.[2] && method === 'POST') { await empty(); json(res, 200, { npc: npc[2] === 'restore' ? admin.restore(npc[1]!, ip) : admin.reset(npc[1]!, ip) }); return true; }
+    if (npc && !npc[2] && method === 'PATCH') { const { revision, ...patch } = await input(); json(res, 200, { npc: admin.update(npc[1]!, patch, revision, who) }); return true; }
+    if (npc && !npc[2] && method === 'DELETE') { const revision = await revisionOf(); json(res, 200, { npc: admin.remove(npc[1]!, revision, who) }); return true; }
+    if (npc?.[2] && method === 'POST') { const revision = await revisionOf(); json(res, 200, { npc: npc[2] === 'restore' ? admin.restore(npc[1]!, revision, who) : admin.reset(npc[1]!, revision, who) }); return true; }
     if (path === '/api/operator/world' && method === 'GET') { json(res, 200, admin.world()); return true; }
-    if (scene && method === 'POST') { await empty(); json(res, 200, admin.resetScene(scene[1]!, ip)); return true; }
+    if (scene && method === 'POST') { await empty(); json(res, 200, admin.resetScene(scene[1]!, who)); return true; }
     if (path === '/api/operator/journal' && method === 'GET') {
       const filter = journalFilter(params, false);
       json(res, 200, { ...admin.journal(filter), page: filter.offset / filter.limit + 1, pageSize: filter.limit }); return true;
@@ -90,7 +95,7 @@ export async function handleAdminContent(req: IncomingMessage, res: ServerRespon
     if (path === '/api/operator/account' && method === 'GET') { json(res, 200, { account: admin.account(params.get('name') ?? '') }); return true; }
     req.resume(); res.writeHead(404); res.end(); return true;
   } catch (cause) {
-    if (cause instanceof ContentError) { error(res, STATUS[cause.code], cause.code, cause.message); return true; }
+    if (cause instanceof ContentError) { json(res, STATUS[cause.code], { error: { code: cause.code, message: cause.message }, ...(cause.current ? { current: cause.current } : {}) }); return true; }
     logger.error('db.transaction.failed', 'Изменение администратора не сохранено', { route: context.route, error: cause });
     error(res, 503, 'UNAVAILABLE', 'Не удалось сохранить изменение. Повторите позже.'); return true;
   }

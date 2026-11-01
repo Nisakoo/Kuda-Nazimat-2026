@@ -29,7 +29,7 @@ import { makeWorld, npc } from './a-helpers.ts';
 const cleanups: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
 
-const NPCS = [npc('guide', 1, 6), npc('tutor', 3, 6, { assetId: 'history-guide', name: 'Учитель' })];
+const NPCS = [npc('guide', 1, 6), npc('tutor', 3, 6, { assetId: 'history-guide', name: 'Учитель', interactionRadius: 5 })];
 
 async function withScene(world: Awaited<ReturnType<typeof makeWorld>>): Promise<void> {
   const fixture = JSON.parse(await readFile(new URL('../../shared/world-life/fixtures.json', import.meta.url), 'utf8')) as { valid: boolean; packet: { type: string; definition?: WorldLifeDefinition } }[];
@@ -56,6 +56,10 @@ async function start(options: { scene?: boolean; delayMs?: number } = {}) {
   cleanups.push(async () => { await app.stop(); await rm(root, { force: true, recursive: true }); });
   const origin = () => { const a = app.server.address(); if (!a || typeof a === 'string') throw new Error('No address'); return `http://127.0.0.1:${a.port}`; };
   const op = async (method: string, path: string, value?: unknown, headers?: Record<string, string>) => {
+    if (['PATCH', 'DELETE', 'POST'].includes(method) && /^\/api\/operator\/npcs\/[^/?]+(?:\/(?:restore|reset))?$/.test(path)) {
+      const current = await (await fetch(origin() + path.replace(/\/(?:restore|reset)$/, ''))).json() as any;
+      value = { revision: current.npc?.revision, ...(value as Record<string, unknown> ?? {}) };
+    }
     const response = await fetch(`${origin()}${path}`, { method, headers: headers ?? { Origin: origin(), 'X-Operator': '1', ...(value === undefined ? {} : { 'Content-Type': 'application/json' }) }, ...(value === undefined ? {} : { body: JSON.stringify(value) }) });
     const text = await response.text();
     return { status: response.status, body: (text && response.headers.get('content-type')?.startsWith('application/json') ? JSON.parse(text) : text) as any };
@@ -78,6 +82,22 @@ async function start(options: { scene?: boolean; delayMs?: number } = {}) {
 }
 
 const entityIn = (p: ServerMessage, id: string) => p.type === 'delta' ? p.upsert.find((e) => e.id === id) : undefined;
+
+it('ADMIN-SRV-014: stale edits conflict; reset and journal retention never reuse revisions', async () => {
+  const { op, restart, config } = await start();
+  const first = (await op('GET', '/api/operator/npcs/guide')).body.npc;
+  const changed = await op('PATCH', '/api/operator/npcs/guide', { revision: first.revision, topic: 'Новая тема' });
+  expect(changed.status).toBe(200);
+  const stale = await op('PATCH', '/api/operator/npcs/guide', { revision: first.revision, topic: 'Потерянная правка' });
+  expect(stale.status).toBe(409); expect(stale.body.current.topic).toBe('Новая тема');
+  const reset = (await op('POST', '/api/operator/npcs/guide/reset', {})).body.npc;
+  expect(reset.revision).toBeGreaterThan(changed.body.npc.revision);
+  await restart(() => { const db = new DatabaseSync(config.dbPath); db.exec('DELETE FROM admin_journal'); db.close(); });
+  expect((await op('GET', '/api/operator/npcs/guide')).body.npc.revision).toBe(reset.revision);
+  expect((await op('PATCH', '/api/operator/npcs/guide', { revision: first.revision, topic: 'Старая' })).status).toBe(409);
+  expect((await op('PATCH', '/api/operator/npcs/guide', { enabled: false })).status).toBe(403);
+  expect((await op('DELETE', '/api/operator/npcs/guide')).status).toBe(403);
+});
 
 it('ADMIN-SRV S1, S2, S7: live edits reach players and the model, persist, reset and are journaled once', async () => {
   const { op, player, restart } = await start();
@@ -122,26 +142,26 @@ it('ADMIN-SRV S1, S2, S7: live edits reach players and the model, persist, reset
 it('ADMIN-SRV S3, S4, S9: withdrawn NPC cancels the question, disappears and returns; created NPC is live; access is guarded', async () => {
   const { op, player, origin } = await start({ delayMs: 1500 });
   const a = await player('Бэла');
-  await a.wait((p) => (p.type === 'joined' && p.snapshot.entities.some((e) => e.id === 'guide')));
-  const question = a.command('npc-question', { targetId: 'guide', text: 'Привет' });
+  await a.wait((p) => (p.type === 'joined' && p.snapshot.entities.some((e) => e.id === 'tutor')));
+  const question = a.command('npc-question', { targetId: 'tutor', text: 'Привет' });
   await new Promise((resolve) => setTimeout(resolve, 100));
-  expect((await op('PATCH', '/api/operator/npcs/guide', { enabled: false })).body.npc).toMatchObject({ enabled: false });
+  expect((await op('PATCH', '/api/operator/npcs/tutor', { enabled: false })).body.npc).toMatchObject({ enabled: false });
   const failure = await a.wait((p) => p.type === 'error' && p.requestId === question);
   expect(failure).toMatchObject({ code: 'UNAVAILABLE', message: 'Собеседник сейчас недоступен.' });
   expect(a.packets.some((p) => p.type === 'npc-answer')).toBe(false);
-  await a.wait((p) => p.type === 'delta' && p.remove.includes('guide'));
-  const interact = a.command('interact', { targetId: 'guide' });
+  await a.wait((p) => p.type === 'delta' && p.remove.includes('tutor'));
+  const interact = a.command('interact', { targetId: 'tutor' });
   expect(await a.wait((p) => p.type === 'error' && p.requestId === interact)).toMatchObject({ code: 'FORBIDDEN' });
-  await op('PATCH', '/api/operator/npcs/guide', { enabled: true });
-  await a.wait((p) => entityIn(p, 'guide') !== undefined);
+  await op('PATCH', '/api/operator/npcs/tutor', { enabled: true });
+  await a.wait((p) => entityIn(p, 'tutor') !== undefined);
 
   // Delete and restore, journal actions in order.
-  expect((await op('DELETE', '/api/operator/npcs/guide')).body.npc).toMatchObject({ deleted: true, editable: [] });
-  expect((await op('PATCH', '/api/operator/npcs/guide', { name: 'Новый' })).status).toBe(409);
-  expect((await op('GET', '/api/operator/npcs')).body.npcs.map((n: any) => n.id)).toEqual(['tutor']);
+  expect((await op('DELETE', '/api/operator/npcs/tutor')).body.npc).toMatchObject({ deleted: true, editable: [] });
+  expect((await op('PATCH', '/api/operator/npcs/tutor', { name: 'Новый' })).status).toBe(409);
+  expect((await op('GET', '/api/operator/npcs')).body.npcs.map((n: any) => n.id)).toEqual(['guide']);
   expect((await op('GET', '/api/operator/npcs?deleted=1')).body.npcs.map((n: any) => n.id)).toEqual(['guide', 'tutor']);
-  expect((await op('POST', '/api/operator/npcs/guide/restore', {})).body.npc).toMatchObject({ deleted: false, enabled: true });
-  const actions = (await op('GET', '/api/operator/journal?target=npc&id=guide&order=asc')).body.entries.map((e: any) => e.action);
+  expect((await op('POST', '/api/operator/npcs/tutor/restore', {})).body.npc).toMatchObject({ deleted: false, enabled: true });
+  const actions = (await op('GET', '/api/operator/journal?target=npc&id=tutor&order=asc')).body.entries.map((e: any) => e.action);
   expect(actions).toEqual(['npc.seed', 'npc.disable', 'npc.enable', 'npc.delete', 'npc.restore']);
 
   // S4: created NPC with a player appearance.
@@ -155,10 +175,10 @@ it('ADMIN-SRV S3, S4, S9: withdrawn NPC cancels the question, disappears and ret
   expect((await op('POST', '/api/operator/npcs/baker/reset', {})).status).toBe(409);
 
   // S9: CSRF guard and loopback-only routes.
-  const forged = await op('PATCH', '/api/operator/npcs/guide', { name: 'Взлом' }, { 'Content-Type': 'application/json', Origin: 'http://evil.example' });
+  const forged = await op('PATCH', '/api/operator/npcs/tutor', { name: 'Взлом' }, { 'Content-Type': 'application/json', Origin: 'http://evil.example' });
   expect(forged.status).toBe(403);
-  expect((await op('PATCH', '/api/operator/npcs/guide', { name: 'Взлом' }, { 'Content-Type': 'application/json', Origin: origin() })).status).toBe(403);
-  expect((await op('GET', '/api/operator/npcs/guide')).body.npc.name).toBe('NPC guide');
+  expect((await op('PATCH', '/api/operator/npcs/tutor', { name: 'Взлом' }, { 'Content-Type': 'application/json', Origin: origin() })).status).toBe(403);
+  expect((await op('GET', '/api/operator/npcs/tutor')).body.npc.name).toBe('Учитель');
   const lan = (await import('node:os')).networkInterfaces();
   const address = Object.values(lan).flat().find((i) => i && i.family === 'IPv4' && !i.internal)?.address;
   if (address) {
@@ -235,7 +255,7 @@ it('ADMIN-SRV-008: a pot whose home is occupied by a player stays; the rest go h
 
 it('NpcCatalog: file layer keeps only differences, orphans are reported, created NPCs need a full record', () => {
   const base = [npc('a', 0, 0), npc('b', 1, 1, { assetId: 'm' })] as never[];
-  const context: NpcContext = { surface: (mapId, x) => mapId === 'test' && x < 100 ? 0 : null, appearances: new Set(['m']) };
+  const context: NpcContext = { surface: (mapId, x) => mapId === 'test' && x < 100 ? 0 : null, walkable: () => true, crowded: () => false, appearances: new Set(['m']) };
   const { records, orphaned } = buildRecords(base, [
     { npcId: 'a', origin: 'content', fields: { topic: 'Новая' }, enabled: false, deletedAt: null, updatedAt: 1 },
     { npcId: 'gone', origin: 'content', fields: {}, enabled: true, deletedAt: null, updatedAt: 1 },

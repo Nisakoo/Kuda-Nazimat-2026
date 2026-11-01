@@ -10,7 +10,8 @@ import { handleOperatorMetrics } from './operatorMetricsRoutes.ts';
 import { OPERATOR_PAGE } from './operatorPage.ts';
 import type { ContentAdmin } from '../content/ContentAdmin.ts';
 import { handleAdminContent } from './adminContentRoutes.ts';
-import { BodyError, body, error, fields, json, type RequestContext } from './util.ts';
+import type { Who } from '../content/ports.ts';
+import { BodyError, body, clientIp, error, fields, json, type RequestContext } from './util.ts';
 
 export interface OperatorDeps {
   readonly auth: AuthService; readonly game: GameRuntime; readonly metrics: MetricsRegistry; readonly logger: Logger;
@@ -28,6 +29,9 @@ export interface OperatorDeps {
 
 const startedAt = Date.now();
 
+/** Who may use the operator routes: the computer itself (OFFLINE-010) or a verified administrator session (ADMIN-ACCESS). */
+export type OperatorAccess = { readonly kind: 'loopback' } | { readonly kind: 'admin'; readonly who: Who };
+
 /** AUTH-010 CSRF guard: same loopback origin as the server and the custom header a cross-site form cannot set. */
 export function trustedAction(req: IncomingMessage): boolean {
   const port = req.socket.localPort;
@@ -36,12 +40,16 @@ export function trustedAction(req: IncomingMessage): boolean {
 }
 
 /** OBS-008/010/014, OFFLINE-010, AUTH-010; `/operator` and `/api/operator/*`, loopback only. False when not ours. */
-export async function handleOperator(req: IncomingMessage, res: ServerResponse, path: string, deps: OperatorDeps, context: RequestContext): Promise<boolean> {
+export async function handleOperator(req: IncomingMessage, res: ServerResponse, path: string, deps: OperatorDeps, context: RequestContext, access: OperatorAccess = { kind: 'loopback' }): Promise<boolean> {
   if (path !== '/operator' && !path.startsWith('/api/operator/')) return false;
   context.route = path.startsWith('/api/operator/actions/') ? '/api/operator/actions' : path;
-  if (!isLoopback(req.socket.remoteAddress)) { req.resume(); res.writeHead(404); res.end(); return true; }
-  if (deps.content && await handleAdminContent(req, res, path, deps.content, () => trustedAction(req), deps.logger, context)) return true;
-  if (req.method === 'GET' && path === '/operator') {
+  const admin = access.kind === 'admin';
+  if (!admin && !isLoopback(req.socket.remoteAddress)) { req.resume(); res.writeHead(404); res.end(); return true; }
+  // A bearer session is not sent by the browser by itself, so only the loopback screen needs the CSRF guard.
+  const allowed = (): boolean => admin || trustedAction(req);
+  const who: Who = access.kind === 'admin' ? access.who : { ip: clientIp(req) };
+  if (deps.content && await handleAdminContent(req, res, path, deps.content, allowed, deps.logger, context, who)) return true;
+  if (req.method === 'GET' && path === '/operator' && !admin) {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" });
     res.end(OPERATOR_PAGE); return true;
   }
@@ -65,16 +73,16 @@ export async function handleOperator(req: IncomingMessage, res: ServerResponse, 
   if (handleOperatorMetrics(req, res, path, deps)) return true;
   if (req.method === 'GET' && path === '/api/operator/accounts') { json(res, 200, { accounts: deps.auth.operator.list() }); return true; }
   if (req.method === 'POST' && path.startsWith('/api/operator/actions/')) {
-    if (!trustedAction(req)) { req.resume(); deps.logger.warn('auth.operator.rejected', 'Действие администратора без правильного Origin или X-Operator', { origin: req.headers.origin ?? null }); error(res, 403, 'FORBIDDEN', 'Действие доступно только со страницы администратора.'); return true; }
+    if (!allowed()) { req.resume(); deps.logger.warn('auth.operator.rejected', 'Действие администратора без правильного Origin или X-Operator', { origin: req.headers.origin ?? null }); error(res, 403, 'FORBIDDEN', 'Действие доступно только со страницы администратора.'); return true; }
     const action = path.slice('/api/operator/actions/'.length);
     let input: Record<string, unknown> | null;
     try { input = fields(await body(req), action === 'dump' ? [] : ['name']); }
     catch (cause) { if (!(cause instanceof BodyError)) throw cause; input = null; }
     if (!input) { error(res, 400, 'INVALID', 'Некорректный запрос.'); return true; }
     try {
-      if (action === 'reset-password') json(res, 200, await deps.auth.operator.resetPassword(input.name));
-      else if (action === 'revoke') json(res, 200, { revoked: deps.auth.operator.revoke(input.name) });
-      else if (action === 'unlock') json(res, 200, { unlocked: deps.auth.operator.unlock(input.name) });
+      if (action === 'reset-password') json(res, 200, await deps.auth.operator.resetPassword(input.name, who));
+      else if (action === 'revoke') json(res, 200, { revoked: deps.auth.operator.revoke(input.name, who) });
+      else if (action === 'unlock') json(res, 200, { unlocked: deps.auth.operator.unlock(input.name, who) });
       else if (action === 'dump') {
         const file = deps.dump('operator');
         deps.logger.info('obs.incident.dumped', 'Администратор сохранил отчёт', { file });

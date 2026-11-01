@@ -158,3 +158,10 @@ td.level { font-weight: 500; }
 @media (max-width: 1150px) { #sidebar { width: 185px; } .workspace { margin-left: 185px; } main { padding: 20px; } .topbar { gap: 12px; padding: 12px 20px; } .global-search input { width: 150px; } .cards { gap: 10px; } .card { padding: 14px; } .card strong { font-size: 22px; } .breadcrumb { font-size: 12px; } .account-profile { flex-wrap: wrap; } }
 @media (max-width: 1250px) { .npc-layout:has(.npc-editor:not([hidden])) { grid-template-columns: 1fr; } }
 @media (max-width: 850px) { .cards.three-cards { grid-template-columns: 1fr; } .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .columns, .columns.three { grid-template-columns: 1fr; gap: 0; } .global-search { display: none; } .topbar .badge { margin-left: auto; } .panel-heading { flex-wrap: wrap; } }
+[hidden] { display: none !important; }
+body.admin-signed-out > :not(#admin-login):not(noscript) { display: none !important; }
+#admin-login { max-width: 520px; margin: 10vh auto; padding: 16px; }
+#admin-login label { display: grid; gap: 6px; margin-bottom: 14px; }
+#admin-login input { width: 100%; box-sizing: border-box; }
+#admin-login code { display: block; overflow-wrap: anywhere; }
+#admin-login-error { color: #a3271f; }

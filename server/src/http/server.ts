@@ -15,6 +15,7 @@ import { parseBabylonRequest } from '../../../shared/babylon/validate.ts';
 import { BabylonError, type BabylonService } from '../babylon/BabylonService.ts';
 import { handleAuth } from './authRoutes.ts';
 import { handleOperator, type OperatorDeps } from './operatorRoutes.ts';
+import { handleAdminAccess } from './adminAccess.ts';
 import { telemetryHandler } from './telemetry.ts';
 import type { PerfReport } from '../obs/clientPerf.ts';
 import { bearer, body, clientIp, error, json, type RequestContext } from './util.ts';
@@ -22,7 +23,7 @@ import { bearer, body, clientIp, error, json, type RequestContext } from './util
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 const BABEL_STATUS = { INVALID: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, CONFLICT: 409, NOT_READY: 409, RATE_LIMIT: 429, UNAVAILABLE: 503 } as const;
 /** Routes logged at debug: high-volume polling and static files (OBS-012). */
-const QUIET = new Set(['/world/*', 'static', '/api/operator/status', '/api/operator/history', '/api/babylon:state']);
+const QUIET = new Set(['/world/*', 'static', '/api/operator/status', '/api/operator/history', '/api/admin/status', '/api/admin/history', '/api/babylon:state']);
 
 export interface HttpDeps {
   avatars?: AvatarStore; equipment?: EquipmentStore;
@@ -56,6 +57,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   const limited = metrics.counter('http_rate_limited_total', 'HTTP-запросы, отклонённые лимитом сессии');
   const babylonLimit = sessionLimiter(deps.clock, 10, 20);
   const worldLimit = sessionLimiter(deps.clock, 50, 300);
+  const adminBuckets = new Map<string, TokenBucket>();
   const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger, metrics, ...(deps.clientPerf ? { perf: deps.clientPerf } : {}) });
   const operator: OperatorDeps = {
     auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
@@ -183,6 +185,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
       json(res, 200, selection); return;
     }
     if (await handleAuth(req, res, path, deps.auth, log, context)) return;
+    if (await handleAdminAccess(req, res, path, { ...operator, clock: deps.clock }, context, adminBuckets)) return;
     if (await handleOperator(req, res, path, operator, context)) return;
     if (req.method === 'POST' && path === '/api/babylon' && deps.babylon) { context.route = '/api/babylon'; await babel(req, res, deps.babylon, context); return; }
     if (req.method === 'POST' && path === '/api/telemetry/client') { await telemetry(req, res, context); return; }

@@ -92,6 +92,7 @@ try {
   await expect(page.locator('#npc-editor')).toBeVisible();
   await page.locator('#npc-form [name="topic"]').fill('Новая тема');
   await page.locator('#npc-form [name="persona"]').fill('Спокойный проводник, говорит коротко.');
+  page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page.locator('#toast')).toContainText('Изменения сохранены');
   await expect(page.locator('#npc-rows')).toContainText('Новая тема');
@@ -106,9 +107,10 @@ try {
   await page.locator('#npc-form [name="greeting"]').fill('Здравствуй');
   await page.locator('#npc-form [name="x"]').fill('2');
   await page.locator('#npc-form [name="z"]').fill('2');
+  page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page.locator('#npc-rows')).toContainText('helper');
-  page.once('dialog', dialog => dialog.accept());
+  page.once('dialog', dialog => { page.once('dialog', prompt => prompt.accept('helper')); return dialog.accept(); });
   await page.getByRole('button', { name: 'Удалить персонажа' }).click();
   await expect(page.locator('#npc-rows')).not.toContainText('helper');
   await page.locator('#npc-deleted').check();

@@ -112,6 +112,10 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
         const map = loaded.maps.get(mapId);
         return map && Number.isFinite(x) && Number.isFinite(z) && map.footprintChunkIds(x, z) ? map.heightAt(x, z) : null;
       },
+      walkable(mapId, x, z) {
+        const map = loaded.maps.get(mapId);
+        return !!map && Number.isFinite(x) && Number.isFinite(z) && map.isSafeSupport(x, z);
+      },
       setNpcs: (npcs) => world.setNpcs(npcs),
       scene: (mapId) => game.sceneView(mapId),
       resetScene: (mapId) => game.resetScene(mapId),

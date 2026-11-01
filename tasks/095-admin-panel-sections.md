@@ -1,5 +1,5 @@
 ---
-id: TASK-090
+id: TASK-095
 type: implementation-task
 status: in-progress
 spec: ../specs/admin-panel-ui.md
