@@ -90,25 +90,29 @@ function boundedRequest(request: NpcAnswerRequest): NpcAnswerRequest | undefined
 }
 
 interface ProcessRow { pid: number; parent: number; group: number; rss: number; zombie: boolean }
-function processTable(): Promise<ProcessRow[]> {
+function processTable(run: typeof execFile = execFile): Promise<ProcessRow[]> {
   return new Promise((resolve, reject) => {
-    execFile('/bin/ps', ['-axo', 'pid=,ppid=,pgid=,rss=,stat='], { timeout: 500, maxBuffer: 1024 * 1024, encoding: 'utf8', env: { ...process.env, LC_ALL: 'C' } }, (error, stdout) => {
-      if (error) { reject(new Error('memory_unavailable')); return; }
+    run('/bin/ps', ['-axo', 'pid=,ppid=,pgid=,rss=,stat='], { timeout: 500, maxBuffer: 1024 * 1024, encoding: 'utf8', env: { ...process.env, LC_ALL: 'C' } }, (error, stdout) => {
+      if (error) {
+        const reason = error.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER' ? 'memory_sample_ps_limit'
+          : error.killed ? 'memory_sample_ps_timeout' : 'memory_sample_ps_failed';
+        reject(new Error(reason)); return;
+      }
       const rows: ProcessRow[] = [];
       for (const line of stdout.trim().split('\n')) {
         const match = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\S+)\s*$/.exec(line);
-        if (!match) { reject(new Error('memory_unavailable')); return; }
+        if (!match) { reject(new Error('memory_sample_parse')); return; }
         const row = { pid: Number(match[1]), parent: Number(match[2]), group: Number(match[3]), rss: Number(match[4]) * 1024, zombie: match[5]!.startsWith('Z') };
-        if (![row.pid, row.parent, row.group, row.rss].every(Number.isSafeInteger)) { reject(new Error('memory_unavailable')); return; }
+        if (![row.pid, row.parent, row.group, row.rss].every(Number.isSafeInteger)) { reject(new Error('memory_sample_parse')); return; }
         rows.push(row);
       }
       resolve(rows);
     });
   });
 }
-async function memoryBytes(group: number): Promise<number> {
-  const rows = await processTable();
-  if (!rows.some((row) => row.pid === process.pid)) throw new Error('memory_unavailable');
+async function memoryBytes(group: number, run: typeof execFile = execFile): Promise<number> {
+  const rows = await processTable(run);
+  if (!rows.some((row) => row.pid === process.pid)) throw new Error('memory_sample_missing');
   // Conservatively count all of Node and its descendants, plus reparented owned group members.
   const included = new Set([process.pid]);
   for (let changed = true; changed;) {
@@ -121,6 +125,9 @@ async function groupAlive(group: number): Promise<boolean> {
   // Zombies have no model memory or computation. The direct Python child must also emit exit.
   return (await processTable()).some((row) => row.group === group && !row.zombie);
 }
+
+/** Internal command-callback seam. Operator configuration cannot replace the OS command. */
+export const memoryBytesForTest = memoryBytes;
 
 /** Internal fixture seam. Never read these values from operator configuration. */
 interface Runtime {
@@ -234,13 +241,17 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     try {
       const bytes = await Promise.race([
         runtime.memoryBytes(s.group!),
-        new Promise<never>((_resolve, reject) => { timer = scheduler.setTimeout(() => reject(new Error('memory_unavailable')), 600); }),
+        new Promise<never>((_resolve, reject) => { timer = scheduler.setTimeout(() => reject(new Error('memory_sample_deadline')), 600); }),
       ]);
       if (s.phase === 'stopping') return;
-      if (!Number.isSafeInteger(bytes) || bytes <= 0) { fail(s, 'memory_unavailable'); return; }
+      if (!Number.isSafeInteger(bytes) || bytes <= 0) { fail(s, 'memory_sample_invalid'); return; }
       if (bytes >= SOFT_RSS) { fail(s, 'resource_limit'); return; }
       s.measured = true; ready(s);
-    } catch { fail(s, 'memory_unavailable'); }
+    } catch (error) {
+      const reason = error instanceof Error && isNpcFailureCode(error.message) && error.message.startsWith('memory_sample_')
+        ? error.message : 'memory_unavailable';
+      fail(s, reason);
+    }
     finally { if (timer) scheduler.clearTimeout(timer); }
     if (s.phase !== 'stopping') s.watchdog = scheduler.setTimeout(() => { void watch(s); }, 250);
   }

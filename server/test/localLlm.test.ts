@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
-import { localLlm, localLlmForTest, mlx, ollama, type LocalLlmResponder } from '../src/npc/adapters/localLlm.ts';
+import { localLlm, localLlmForTest, memoryBytesForTest, mlx, ollama, type LocalLlmResponder } from '../src/npc/adapters/localLlm.ts';
 import { systemClock, systemScheduler } from '../src/common/time.ts';
 import { answerRequest, responderContract } from './responderContract.ts';
 
@@ -81,12 +81,22 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
   }
 });
 `);
+  let ownedGroup: number | undefined;
   const responder = localLlmForTest(backend, { ...options(backend), ...overrides }, fixtureDeps, {
     workerPath, workerPrefix: [], platform: 'darwin', arch: 'arm64', ...runtime,
+    memoryBytes(group) {
+      // The OS can stop a startup worker before its JS writes the fixture log.
+      // Observe its actual owned PID at the existing measurement boundary.
+      ownedGroup = group;
+      return (runtime.memoryBytes ?? memoryBytesForTest)(group);
+    },
   });
   fixtures.push({ responder, dir });
   const events = (): Event[] => readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line) as Event);
-  const pid = () => events().find((event) => event.type === 'spawn')!.pid!;
+  const pid = () => {
+    if (ownedGroup === undefined) throw new Error('Fixture worker has not spawned');
+    return ownedGroup;
+  };
   return { responder, events, pid };
 }
 afterEach(async () => {
@@ -268,11 +278,47 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
     expect(alive(pid())).toBe(false);
   });
   it('fails closed on startup memory excess, invalid measurements or measurement errors', async () => {
-    for (const memoryBytes of [async () => 3_500_000_000, async () => 0, async () => NaN, async () => { throw new Error('secret ps diagnostic'); }]) {
+    for (const { memoryBytes, reason } of [
+      { memoryBytes: async () => 3_500_000_000, reason: 'resource_limit' },
+      { memoryBytes: async () => 0, reason: 'memory_sample_invalid' },
+      { memoryBytes: async () => NaN, reason: 'memory_sample_invalid' },
+      { memoryBytes: async () => { throw new Error('secret ps diagnostic'); }, reason: 'memory_unavailable' },
+    ]) {
       const { responder, pid } = fixture('ollama', 'normal', { memoryBytes });
-      await expect(responder.start()).rejects.toThrow(/^(resource_limit|memory_unavailable)$/);
+      await expect(responder.start()).rejects.toThrow(new RegExp(`^${reason}$`));
+      expect(responder.lastFailure()).toBe(reason);
       expect(responder.status()).toBe('unavailable'); await responder.stop(); expect(alive(pid())).toBe(false);
     }
+  });
+  it.each([
+    'memory_sample_ps_timeout', 'memory_sample_ps_failed', 'memory_sample_ps_limit',
+    'memory_sample_parse', 'memory_sample_missing', 'memory_sample_invalid', 'memory_sample_deadline',
+  ])('preserves the fixed memory diagnostic %s and still fails closed', async (reason) => {
+    const { responder, pid } = fixture('ollama', 'normal', { memoryBytes: async () => { throw new Error(reason); } });
+    await expect(responder.start()).rejects.toThrow(new RegExp(`^${reason}$`));
+    expect(responder.lastFailure()).toBe(reason); expect(responder.status()).toBe('unavailable');
+    await responder.stop(); expect(alive(pid())).toBe(false);
+  });
+  it.each(['model_unavailable', 'memory_sample_unknown'])('does not mistake an unrelated or unknown exception %s for a memory diagnostic', async (message) => {
+    const { responder } = fixture('ollama', 'normal', { memoryBytes: async () => { throw new Error(message); } });
+    await expect(responder.start()).rejects.toThrow(/^memory_unavailable$/);
+    expect(responder.lastFailure()).toBe('memory_unavailable'); await responder.stop();
+  });
+  it.each(['private rejection /Users/private/path', 'memory_sample_ps_timeout'])('does not expose or promote a non-Error rejection (%s)', async (rejection) => {
+    const { responder } = fixture('ollama', 'normal', { memoryBytes: () => Promise.reject(rejection) });
+    await expect(responder.start()).rejects.toThrow(/^memory_unavailable$/);
+    expect(responder.lastFailure()).toBe('memory_unavailable'); await responder.stop();
+  });
+  it('reports a memory-sampling failure during a live answer without accepting a late result', async () => {
+    let failMeasurement = false;
+    const { responder, pid } = fixture('ollama', 'normal', { memoryBytes: async () => {
+      if (failMeasurement) throw new Error('memory_sample_ps_timeout'); return 100;
+    } });
+    await responder.start();
+    const pending = expect(responder.answer({ ...answerRequest(), question: 'stall' }, new AbortController().signal)).rejects.toThrow(/^memory_sample_ps_timeout$/);
+    failMeasurement = true;
+    await pending; expect(responder.status()).toBe('unavailable'); expect(responder.lastFailure()).toBe('memory_sample_ps_timeout');
+    await responder.stop(); expect(alive(pid())).toBe(false);
   });
   it('watches idle and active runtime memory and permits only explicit recovery after cleanup', async () => {
     for (const active of [false, true]) {
@@ -289,7 +335,7 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
   });
   it('bounds hung startup memory sampling and refuses ready before the initial sample', async () => {
     const { responder, pid } = fixture('ollama', 'normal', { memoryBytes: () => new Promise(() => {}) });
-    const pending = responder.start(); const rejected = expect(pending).rejects.toThrow('memory_unavailable');
+    const pending = responder.start(); const rejected = expect(pending).rejects.toThrow('memory_sample_deadline');
     await wait(100); expect(responder.status()).toBe('unavailable');
     await rejected; await responder.stop(); expect(alive(pid())).toBe(false);
   });

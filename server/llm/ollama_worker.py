@@ -1,9 +1,11 @@
 """Owned Ollama worker. Loopback alone is not an OS isolation boundary."""
+from contextlib import contextmanager, nullcontext
 import hashlib
 import importlib.metadata
 import json
 import os
 import re
+import signal
 from pathlib import Path
 import socket
 import subprocess
@@ -205,11 +207,45 @@ def owned_listener(pid, port):
     return False
 
 
+class _StopRequested(BaseException):
+    """Internal control flow; request/HTTP Exception handlers must not catch it."""
+
+
+class _Termination:
+    def __init__(self):
+        self.pending = False
+        self.deferred = 0
+        self.cleaning = False
+
+    def handle(self, signum, frame):
+        self.pending = True
+        self.check()
+
+    def check(self):
+        if self.pending and not self.deferred and not self.cleaning:
+            # Set this before raising: later SIGTERM must not interrupt unwinding
+            # or cleanup, including the wait that anchors supervisor escalation.
+            self.cleaning = True
+            raise _StopRequested()
+
+    @contextmanager
+    def spawning(self):
+        # Popen can create a process before returning its ownership handle. Do
+        # not unwind that constructor until the caller has assigned self.child.
+        self.deferred += 1
+        try:
+            yield
+        finally:
+            self.deferred -= 1
+            self.check()
+
+
 class OllamaWorker:
     def __init__(self, options):
         self.options = options
         self.stage = None
         self.child = None
+        self.termination = None
         self.runtime = None
         self.tokenizer = None
         self.model_digest = None
@@ -270,8 +306,9 @@ class OllamaWorker:
                    OMP_NUM_THREADS=str(o['threads']))
         # The supervisor owns the process group. The daemon must inherit it.
         self.stage = 'ollama_spawn'
-        self.child = subprocess.Popen([o['executable'], 'serve'], env=env, stdin=subprocess.DEVNULL,
-                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        with self.termination.spawning() if self.termination is not None else nullcontext():
+            self.child = subprocess.Popen([o['executable'], 'serve'], env=env, stdin=subprocess.DEVNULL,
+                                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.stage = 'ollama_listener'
         deadline = time.monotonic() + o['startupTimeoutMs'] / 1000
         while time.monotonic() < deadline:
@@ -414,40 +451,56 @@ class OllamaWorker:
 
 def main():
     worker = None
+    termination = _Termination()
+    previous_handler = signal.getsignal(signal.SIGTERM)
     try:
-        first = read_message()
-        if first is None:
-            return
-        if first.get('op') != 'start' or not isinstance(first.get('options'), dict):
-            raise WorkerError('invalid_message', 'Expected start message')
-        worker = OllamaWorker(first['options'])
-        worker.start()
-        worker.stage = None
-        emit({'type': 'ready'})
-        while True:
-            msg = read_message()
-            if msg is None or msg.get('op') == 'stop':
-                break
-            if msg.get('op') != 'answer' or not isinstance(msg.get('request'), dict):
-                raise WorkerError('invalid_message', 'Expected answer message')
-            emit({'type': 'answer', 'text': worker.answer(msg['request'])})
-    except WorkerError as exc:
-        result = {'type': 'error', 'code': exc.code, 'message': str(exc)[:200]}
-        diagnostic = getattr(exc, 'diagnostic', None) or (worker.stage if worker is not None else None)
-        if diagnostic:
-            result['diagnostic'] = diagnostic
-        emit(result)
-    except Exception:
-        result = {'type': 'error', 'code': 'model_unavailable', 'message': 'Local worker failed'}
-        if worker is not None and worker.stage:
-            result['diagnostic'] = worker.stage
-        emit(result)
+        signal.signal(signal.SIGTERM, termination.handle)
+        try:
+            first = read_message()
+            if first is None:
+                termination.cleaning = True
+                return
+            if first.get('op') != 'start' or not isinstance(first.get('options'), dict):
+                raise WorkerError('invalid_message', 'Expected start message')
+            worker = OllamaWorker(first['options'])
+            worker.termination = termination
+            worker.start()
+            worker.stage = None
+            emit({'type': 'ready'})
+            while True:
+                msg = read_message()
+                if msg is None or msg.get('op') == 'stop':
+                    break
+                if msg.get('op') != 'answer' or not isinstance(msg.get('request'), dict):
+                    raise WorkerError('invalid_message', 'Expected answer message')
+                emit({'type': 'answer', 'text': worker.answer(msg['request'])})
+        except WorkerError as exc:
+            result = {'type': 'error', 'code': exc.code, 'message': str(exc)[:200]}
+            diagnostic = getattr(exc, 'diagnostic', None) or (worker.stage if worker is not None else None)
+            if diagnostic:
+                result['diagnostic'] = diagnostic
+            emit(result)
+        except Exception:
+            result = {'type': 'error', 'code': 'model_unavailable', 'message': 'Local worker failed'}
+            if worker is not None and worker.stage:
+                result['diagnostic'] = worker.stage
+            emit(result)
+        # Suppress TERM before leaving the protected scope on normal stop/EOF
+        # or error, not only after entering finally. Cancellation sets this in
+        # the handler before unwinding, including during error reporting.
+        termination.cleaning = True
+    except _StopRequested:
+        pass
     finally:
-        if worker is not None:
-            try:
-                worker.stop()
-            except Exception:
-                print('Local worker cleanup failed', file=sys.stderr)
+        termination.cleaning = True
+        try:
+            if worker is not None:
+                try:
+                    worker.stop()
+                except Exception:
+                    print('Local worker cleanup failed', file=sys.stderr)
+        finally:
+            signal.signal(signal.SIGTERM, previous_handler)
 
 
 if __name__ == '__main__':

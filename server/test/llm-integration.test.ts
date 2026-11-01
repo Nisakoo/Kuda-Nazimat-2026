@@ -28,6 +28,7 @@ describe('configured game LLM integration without real models', () => {
   });
   it.each([
     ['ollama_memory_insufficient', 'ollama_memory_insufficient'],
+    ['memory_sample_ps_timeout', 'memory_sample_ps_timeout'],
     ['ollama_token_count_mismatch', 'ollama_token_count_mismatch'],
     ['secret prompt /Users/private/path', 'unavailable'],
   ])('logs only a fixed startup diagnostic (%s) and leaves health unavailable', async (failure, expected) => {
@@ -65,6 +66,7 @@ describe('configured game LLM integration without real models', () => {
   it.each([
     ['ollama_token_count_mismatch', 'ollama_token_count_mismatch'],
     ['resource_limit', 'resource_limit'],
+    ['memory_sample_deadline', 'memory_sample_deadline'],
     ['secret body /Users/private/path', 'unavailable'],
   ])('logs a safe runtime failure once per outage, including after recovery (%s)', async (failure, expected) => {
     vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'unavailable';

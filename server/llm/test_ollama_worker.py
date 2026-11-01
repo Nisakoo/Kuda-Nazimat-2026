@@ -3,8 +3,12 @@ import io
 import json
 import os
 from pathlib import Path
+import signal
+import subprocess
 import sys
+import textwrap
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -527,6 +531,78 @@ class WorkerTests(unittest.TestCase):
             self.assertEqual(emit.call_args_list[0].args[0], {'type': 'ready'})
             self.assertNotIn('diagnostic', emit.call_args_list[1].args[0])
 
+    def test_main_restores_handler_on_eof_stop_error_and_cancel(self):
+        original = signal.getsignal(signal.SIGTERM)
+        sentinel = lambda signum, frame: None
+        try:
+            signal.signal(signal.SIGTERM, sentinel)
+            for mode in ('eof', 'stop', 'error', 'startup_cancel', 'answer_cancel', 'error_report_cancel'):
+                instance = mock.Mock(stage='ollama_warmup')
+                emitted = []
+                messages = [None] if mode == 'eof' else [{'op': 'start', 'options': {}}, {'op': 'stop'}]
+                if mode in ('error', 'error_report_cancel'):
+                    instance.start.side_effect = RuntimeError('SECRET')
+                if mode == 'startup_cancel':
+                    instance.start.side_effect = lambda: signal.raise_signal(signal.SIGTERM)
+                if mode == 'answer_cancel':
+                    messages[1] = {'op': 'answer', 'request': {}}
+                    instance.answer.side_effect = lambda request: signal.raise_signal(signal.SIGTERM)
+                # Repeated TERM during stop must never interrupt cleanup.
+                instance.stop.side_effect = lambda: (signal.raise_signal(signal.SIGTERM), signal.raise_signal(signal.SIGTERM))
+                def emit(message):
+                    if mode == 'error_report_cancel':
+                        signal.raise_signal(signal.SIGTERM)
+                    emitted.append(message)
+
+                with self.subTest(mode=mode), mock.patch.object(worker, 'OllamaWorker', return_value=instance), \
+                     mock.patch.object(worker, 'read_message', side_effect=messages), \
+                     mock.patch.object(worker, 'emit', side_effect=emit):
+                    worker.main()
+                    self.assertIs(signal.getsignal(signal.SIGTERM), sentinel)
+                    if mode in ('startup_cancel', 'error_report_cancel'):
+                        self.assertEqual(emitted, [])
+                    elif mode == 'answer_cancel':
+                        self.assertEqual(emitted, [{'type': 'ready'}])
+                    if mode != 'eof':
+                        instance.stop.assert_called_once()
+        finally:
+            signal.signal(signal.SIGTERM, original)
+
+    def test_termination_defers_until_spawn_ownership_and_ignores_repeats(self):
+        termination = worker._Termination()
+        child = None
+        with self.assertRaises(worker._StopRequested):
+            with termination.spawning():
+                termination.handle(signal.SIGTERM, None)
+                termination.handle(signal.SIGTERM, None)
+                child = object()
+        self.assertIsNotNone(child)
+        termination.handle(signal.SIGTERM, None)
+        self.assertFalse(issubclass(worker._StopRequested, Exception))
+
+    def test_stop_reaps_cooperative_or_stubborn_direct_child(self):
+        for stubborn in (False, True):
+            with self.subTest(stubborn=stubborn):
+                child = mock.Mock()
+                child.poll.return_value = None
+                if stubborn:
+                    child.wait.side_effect = [subprocess.TimeoutExpired('owned', 2), 0]
+                self.w.child = child
+                self.w.stop()
+                child.terminate.assert_called_once()
+                self.assertEqual(child.wait.call_count, 2 if stubborn else 1)
+                self.assertEqual(child.kill.call_count, int(stubborn))
+                self.w.stop()
+                self.assertEqual(child.kill.call_count, int(stubborn))
+
+    def test_stop_does_not_signal_an_already_reaped_child(self):
+        child = mock.Mock()
+        child.poll.return_value = 0
+        self.w.child = child
+        self.w.stop()
+        child.terminate.assert_not_called()
+        child.kill.assert_not_called()
+
     def test_stop_owned_child_and_runtime(self):
         self.w.child = mock.Mock(); self.w.child.poll.return_value = None
         child = self.w.child
@@ -615,6 +691,269 @@ class WorkerTests(unittest.TestCase):
              mock.patch.object(worker, 'port_free', return_value=False), mock.patch.object(worker.subprocess, 'Popen') as popen:
             with self.assertRaises(common.WorkerError): worker.OllamaWorker(opts).start()
             popen.assert_not_called()
+
+
+# These fixtures run only Python and loopback HTTP. No Ollama, packages or
+# model files are used. Each leader owns a new session; the fixture supervisor
+# signals its group only while that leader is alive, as the Node guard requires.
+_CHILD_FIXTURE = r'''
+import json, os, signal, sys, threading, time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
+root = Path(sys.argv[1])
+stubborn = sys.argv[2] == 'stubborn'
+# Fixture safety if a regression exits the leader before cleanup. Do not send
+# a stale PID/group signal from the supervisor; the child exits itself instead.
+parent = os.getppid()
+def parent_watch():
+    while os.getppid() == parent:
+        time.sleep(.05)
+    os._exit(90)
+threading.Thread(target=parent_watch, daemon=True).start()
+def terminate(signum, frame):
+    (root / 'child_term').write_text('yes')
+    if not stubborn:
+        raise SystemExit(0)
+signal.signal(signal.SIGTERM, terminate)
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, *args): pass
+    def do_GET(self):
+        body = ({'version': 'fixture'} if self.path == '/api/version' else
+                {'models': [{'name': 'qwen3.5:2b-q4_K_M', 'digest': 'a' * 64}]})
+        data = json.dumps(body).encode()
+        self.send_response(200)
+        self.send_header('Content-Length', str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+    def do_POST(self):
+        self.rfile.read(int(self.headers['Content-Length']))
+        self.send_response(200)
+        self.send_header('Content-Length', '65536')
+        self.end_headers()
+        self.wfile.flush()
+        (root / 'blocked').write_text('yes')
+        time.sleep(60)
+server = HTTPServer(('127.0.0.1', 0), Handler)
+(root / 'port').write_text(str(server.server_port))
+(root / 'child_pid').write_text(str(os.getpid()))
+server.serve_forever()
+'''
+
+_LEADER_FIXTURE = r'''
+import json, os, signal, subprocess, sys, time
+from pathlib import Path
+from unittest import mock
+import ollama_worker as worker
+from test_ollama_worker import Tokenizer, request
+root = Path(sys.argv[1])
+mode = sys.argv[2]
+real_popen = subprocess.Popen
+real_start = worker.OllamaWorker.start
+real_stop = worker.OllamaWorker.stop
+real_emit = worker.emit
+instance = None
+
+def spawn(*args, **kwargs):
+    child = real_popen([sys.executable, '-B', str(root / 'child.py'), str(root),
+                        'stubborn' if mode == 'stubborn' else 'cooperative'], **kwargs)
+    # Do not lose the handle even if the fixture preparation fails.
+    try:
+        deadline = time.monotonic() + 4
+        while not (root / 'port').exists():
+            if time.monotonic() > deadline: raise RuntimeError('fixture child timeout')
+            time.sleep(.005)
+        instance.port = int((root / 'port').read_text())
+        if mode == 'spawn':
+            assert instance.child is None
+            (root / 'spawn_pending').write_text('yes')
+            while not instance.termination.pending:
+                time.sleep(.005)
+            # A TERM arrived while Popen had not returned. Ownership must still
+            # be assigned before the pending cancellation unwinds start().
+            (root / 'spawn_deferred').write_text('yes')
+        return child
+    except BaseException:
+        child.terminate()
+        child.wait(timeout=2)
+        raise
+
+def start(self):
+    global instance
+    instance = self
+    fake = mock.Mock()
+    fake.AutoTokenizer.from_pretrained.return_value = Tokenizer()
+    with mock.patch.object(worker, 'verify_manifest'), \
+         mock.patch.object(worker, 'verify_ollama_model', return_value='a' * 64), \
+         mock.patch.object(worker.importlib.metadata, 'version', side_effect=['4.57.6', '3.1.6']), \
+         mock.patch.dict(sys.modules, {'transformers': fake}), \
+         mock.patch.object(worker, 'port_free', return_value=True), \
+         mock.patch.object(worker.subprocess, 'Popen', side_effect=spawn):
+        if mode == 'startup':
+            real_start(self)  # The actual warmup HTTP read blocks.
+        else:
+            with mock.patch.object(self, 'generate', return_value=''):
+                real_start(self)
+
+def stop(self):
+    child = self.child
+    (root / 'cleanup').write_text(str(os.getpid()))
+    # Deterministic repeated-signal test; the supervisor releases this barrier.
+    while not (root / 'release_cleanup').exists():
+        time.sleep(.005)
+    real_stop(self)
+    if child is not None:
+        assert child.returncode is not None
+        try:
+            os.waitpid(child.pid, os.WNOHANG)
+        except ChildProcessError:
+            (root / 'reaped').write_text('yes')
+        else:
+            raise AssertionError('direct child was not reaped')
+    (root / 'cleaned').write_text('yes')
+
+def emit(message):
+    real_emit(message)
+    if message['type'] == 'ready':
+        (root / 'ready').write_text('yes')
+worker.OllamaWorker.start = start
+worker.OllamaWorker.stop = stop
+worker.emit = emit
+worker.main()
+'''
+
+
+def _supervise_signal_fixture(mode, directory):
+    """Isolated test supervisor, never signals an exited leader's stale PGID."""
+    root = Path(directory)
+    env = dict(os.environ, PYTHONPATH=str(Path(__file__).resolve().parent), PYTHONDONTWRITEBYTECODE='1')
+    leader = subprocess.Popen([sys.executable, '-B', str(root / 'leader.py'), str(root), mode],
+                              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              text=True, env=env, start_new_session=True)
+
+    def wait_file(name):
+        deadline = time.monotonic() + 4
+        while not (root / name).exists():
+            if leader.poll() is not None or time.monotonic() > deadline:
+                raise AssertionError('fixture did not reach ' + name)
+            time.sleep(.005)
+
+    def send(message):
+        leader.stdin.write(json.dumps(message) + '\n')
+        leader.stdin.flush()
+
+    try:
+        send({'op': 'start', 'options': {
+            'python': sys.executable, 'executable': '/fixture', 'modelsDir': str(root),
+            'tokenizerDir': '/fixture', 'tokenizerManifest': '/fixture',
+            'model': worker.MODEL, 'modelDigest': 'a' * 64, 'runnerVersion': 'fixture',
+            'startupTimeoutMs': 4000, 'threads': 1}})
+        if mode == 'spawn':
+            wait_file('spawn_pending')
+        elif mode == 'startup':
+            wait_file('blocked')
+        else:
+            wait_file('ready')
+            if mode == 'eof':
+                leader.stdin.close()
+                leader.stdin = None
+            elif mode == 'stop':
+                send({'op': 'stop'})
+            else:
+                send({'op': 'answer', 'request': request()})
+                wait_file('blocked')
+        started = time.monotonic()
+        if mode not in ('stop', 'eof'):
+            leader.send_signal(signal.SIGTERM)
+        wait_file('cleanup')
+        assert leader.poll() is None, 'leader exited before cleanup'
+        if mode == 'spawn':
+            wait_file('spawn_deferred')
+        # Repeated TERM during cleanup must not skip the direct-child wait.
+        for _ in range(3):
+            leader.send_signal(signal.SIGTERM)
+            time.sleep(.01)
+            assert leader.poll() is None, 'TERM interrupted cleanup'
+        (root / 'release_cleanup').write_text('yes')
+        if mode == 'stubborn':
+            wait_file('child_term')
+            remaining = .5 - (time.monotonic() - started)
+            if remaining > 0:
+                time.sleep(remaining)
+            assert leader.poll() is None, 'leader did not anchor 500ms escalation'
+            os.killpg(leader.pid, signal.SIGKILL)
+        out, err = leader.communicate(timeout=4)
+        result = {'returncode': leader.returncode, 'output': out, 'stderr': err,
+                  'reaped': (root / 'reaped').exists(), 'cleaned': (root / 'cleaned').exists(),
+                  'elapsed': time.monotonic() - started}
+        # On Linux this isolated supervisor is a subreaper. Reap the adopted
+        # fixture child after group KILL; no PID signal is sent after leader exit.
+        if mode == 'stubborn' and sys.platform.startswith('linux'):
+            pid, status = os.waitpid(int((root / 'child_pid').read_text()), 0)
+            result['group_child_killed'] = os.WIFSIGNALED(status) and os.WTERMSIG(status) == signal.SIGKILL
+        return result
+    finally:
+        if leader.poll() is None:
+            os.killpg(leader.pid, signal.SIGKILL)
+        leader.communicate(timeout=4)
+
+
+@unittest.skipUnless(os.name == 'posix', 'POSIX signal/group fixture')
+class SignalProcessTests(unittest.TestCase):
+    def run_fixture(self, mode):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'child.py').write_text(textwrap.dedent(_CHILD_FIXTURE))
+            (root / 'leader.py').write_text(textwrap.dedent(_LEADER_FIXTURE))
+            script = '''
+import ctypes, json, sys
+from test_ollama_worker import _supervise_signal_fixture
+if sys.platform.startswith('linux'):
+    if ctypes.CDLL(None, use_errno=True).prctl(36, 1, 0, 0, 0) != 0:
+        raise RuntimeError('fixture subreaper unavailable')
+print(json.dumps(_supervise_signal_fixture(sys.argv[1], sys.argv[2])))
+'''
+            result = subprocess.run([sys.executable, '-B', '-c', script, mode, temp],
+                                    env=dict(os.environ, PYTHONPATH=str(Path(__file__).resolve().parent)),
+                                    capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            return json.loads(result.stdout)
+
+    def test_sigterm_interrupts_startup_and_answer_http_and_reaps(self):
+        for mode in ('startup', 'answer'):
+            with self.subTest(mode=mode):
+                result = self.run_fixture(mode)
+                self.assertEqual(result['returncode'], 0, result)
+                self.assertTrue(result['reaped'], result)
+                self.assertTrue(result['cleaned'], result)
+                self.assertEqual(result['stderr'], '')
+                messages = [json.loads(line) for line in result['output'].splitlines()]
+                self.assertEqual(messages, [] if mode == 'startup' else [{'type': 'ready'}])
+
+    def test_sigterm_during_popen_assigns_then_reaps_child(self):
+        result = self.run_fixture('spawn')
+        self.assertEqual(result['returncode'], 0, result)
+        self.assertTrue(result['reaped'], result)
+        self.assertEqual(result['output'], '')
+        self.assertEqual(result['stderr'], '')
+
+    def test_stubborn_child_keeps_leader_alive_for_500ms_group_kill(self):
+        result = self.run_fixture('stubborn')
+        self.assertEqual(result['returncode'], -signal.SIGKILL, result)
+        self.assertGreaterEqual(result['elapsed'], .5)
+        self.assertFalse(result['cleaned'], result)
+        if sys.platform.startswith('linux'):
+            self.assertTrue(result['group_child_killed'], result)
+        self.assertEqual(result['output'], '{"type":"ready"}\n')
+        self.assertEqual(result['stderr'], '')
+
+    def test_normal_eof_and_ipc_stop_reap_cooperative_child(self):
+        for mode in ('eof', 'stop'):
+            with self.subTest(mode=mode):
+                result = self.run_fixture(mode)
+                self.assertEqual(result['returncode'], 0, result)
+                self.assertTrue(result['reaped'], result)
+                self.assertTrue(result['cleaned'], result)
+                self.assertEqual(result['stderr'], '')
 
 
 if __name__ == '__main__': unittest.main()
