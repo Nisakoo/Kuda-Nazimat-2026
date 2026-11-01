@@ -14,7 +14,7 @@ import { parseEquipmentState } from '../../../shared/equipment/validate.ts';
 import { parseBabylonRequest } from '../../../shared/babylon/validate.ts';
 import { BabylonError, type BabylonService } from '../babylon/BabylonService.ts';
 import { handleAuth } from './authRoutes.ts';
-import { handleAdmin } from './adminRoutes.ts';
+import { adminHandler, type AdminDeps } from './adminRoutes.ts';
 import { handleOperator, type OperatorDeps } from './operatorRoutes.ts';
 import { telemetryHandler } from './telemetry.ts';
 import type { ClientPerfStore } from '../obs/clientPerf.ts';
@@ -31,6 +31,8 @@ export interface HttpDeps {
   readonly metrics?: MetricsRegistry;
   /** OBS-014 store for accepted perf reports. */
   readonly clientPerf?: ClientPerfStore;
+  /** ADMIN: NPC catalogue and status snapshot; absent in tests that do not need the panel. */
+  readonly admin?: Pick<AdminDeps, 'catalog' | 'status'>;
   npcReady(): boolean;
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
@@ -57,6 +59,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   const limited = metrics.counter('http_rate_limited_total', 'HTTP-запросы, отклонённые лимитом сессии');
   const babylonLimit = sessionLimiter(deps.clock, 10, 20);
   const worldLimit = sessionLimiter(deps.clock, 50, 300);
+  const admin = adminHandler({ auth: deps.auth, logger: deps.logger, clock: deps.clock, metrics, catalog: deps.admin?.catalog ?? (() => undefined), status: deps.admin?.status ?? (() => ({})) });
   const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger, metrics, ...(deps.clientPerf ? { perf: deps.clientPerf } : {}) });
   const operator: OperatorDeps = {
     auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
@@ -175,7 +178,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
       json(res, 200, selection); return;
     }
     if (await handleAuth(req, res, path, deps.auth, log, context)) return;
-    if (await handleAdmin(req, res, path, deps.auth, log, context)) return;
+    if (await admin(req, res, path, context)) return;
     if (await handleOperator(req, res, path, operator, context)) return;
     if (req.method === 'POST' && path === '/api/babylon' && deps.babylon) { context.route = '/api/babylon'; await babel(req, res, deps.babylon, context); return; }
     if (req.method === 'POST' && path === '/api/telemetry/client') { await telemetry(req, res, context); return; }

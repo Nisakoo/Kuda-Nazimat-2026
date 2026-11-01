@@ -10,6 +10,8 @@ export interface Observability {
   readonly logger: Logger;
   readonly metrics: MetricsRegistry;
   readonly recorder: FlightRecorder;
+  /** ADMIN-005: error and fatal events of the last 5 and 60 minutes by event. */
+  errors(): { readonly event: string; readonly last5m: number; readonly last60m: number }[];
   /** Last-minute process health for the operator screen (OBS-010). */
   process(): { eventLoopP99Ms: number; rssBytes: number };
   /** Extra state for incident dumps, registered by the composition root once modules exist. */
@@ -29,7 +31,9 @@ export function createObservability(logs: LogsConfig, options: { runId?: string;
   const events = metrics.counter('log_events_total', 'События warn, error и fatal по модулю');
   const invariants = metrics.counter('invariant_violations_total', 'Нарушения инвариантов по имени');
   // OBS-013: counts come from the records themselves, so every module is covered without extra calls.
+  const errorTimes: { at: number; event: string }[] = [];
   const counting: LogSink = (record) => {
+    if (record.level === 'error' || record.level === 'fatal') { errorTimes.push({ at: now(), event: record.event }); if (errorTimes.length > 5000) errorTimes.shift(); }
     if (record.level === 'warn' || record.level === 'error' || record.level === 'fatal') events.inc({ level: record.level, module: record.module });
     if (record.event === 'invariant.violated') invariants.inc({ invariant: String(record.invariant ?? 'unknown') });
   };
@@ -61,6 +65,15 @@ export function createObservability(logs: LogsConfig, options: { runId?: string;
   return {
     runId, logger, metrics, recorder,
     process: () => last,
+    errors() {
+      const at = now(); const result = new Map<string, { event: string; last5m: number; last60m: number }>();
+      for (const entry of errorTimes) {
+        if (at - entry.at > 3_600_000) continue;
+        const row = result.get(entry.event) ?? { event: entry.event, last5m: 0, last60m: 0 }; row.last60m++; if (at - entry.at <= 300_000) row.last5m++;
+        result.set(entry.event, row);
+      }
+      return [...result.values()].sort((a, b) => b.last60m - a.last60m);
+    },
     setSnapshot(next) { snapshot = next; },
     close() { clearInterval(monitor); delay.disable(); file?.close(); },
   };

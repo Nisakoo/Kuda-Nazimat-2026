@@ -40,7 +40,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   }, log, deps.avatars, deps.equipment, metrics, deps.worldLife);
   const tickHistogram = metrics.histogram('game_tick_duration_ms', 'Длительность шага симуляции', FAST_MS_BUCKETS);
   const broadcastHistogram = metrics.histogram('game_broadcast_interval_ms', 'Интервал между рассылками AOI', MS_BUCKETS);
-  let stats: { tickP95Ms: number; broadcastP95Ms: number; players: number } | null = null;
+  let stats: { tickP50Ms: number; tickP95Ms: number; tickMaxMs: number; broadcastP95Ms: number; broadcastMaxMs: number; players: number } | null = null;
 
   const timers: TimerHandle[] = [];
   let gateway: { close(): Promise<void> } | null = null;
@@ -73,7 +73,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
       if (next <= now) next = now + stepMs; // drop missed steps beyond the catch-up limit
       if (now - statsAt >= STATS_EVERY_MS && durations.length) {
         const ticks = [...durations].sort((a, b) => a - b); const sent = [...intervals].sort((a, b) => a - b);
-        stats = { tickP95Ms: quantile(ticks, 0.95), broadcastP95Ms: quantile(sent, 0.95), players: game.activePlayers };
+        stats = { tickP50Ms: quantile(ticks, 0.5), tickP95Ms: quantile(ticks, 0.95), tickMaxMs: quantile(ticks, 1), broadcastP95Ms: quantile(sent, 0.95), broadcastMaxMs: quantile(sent, 1), players: game.activePlayers };
         log.info('game.tick.stats', 'Длительность шага и интервал рассылки, мс', { p50: quantile(ticks, 0.5), p95: stats.tickP95Ms, max: quantile(ticks, 1), broadcastP95: stats.broadcastP95Ms, broadcastMax: quantile(sent, 1), players: stats.players });
         durations = []; intervals = []; statsAt = now;
       }

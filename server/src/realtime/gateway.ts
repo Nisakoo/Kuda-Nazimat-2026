@@ -107,7 +107,7 @@ class Connection implements Channel {
   private readonly identity: PlayerIdentity;
   private readonly expiresAt: number;
   /** Device address for operational logs (OFFLINE-016). */
-  private readonly ip: string;
+  readonly ip: string;
   private readonly usedRequestIds = new Set<string>();
   private readonly inputBucket: TokenBucket;
   private readonly chatBucket: TokenBucket;

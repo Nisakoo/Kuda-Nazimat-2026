@@ -28,6 +28,7 @@ export interface AppObservability {
   readonly metrics: MetricsRegistry;
   readonly recorder?: { warnings(): readonly LogRecord[]; dump(reason: string): string | null };
   readonly process?: () => { eventLoopP99Ms: number };
+  readonly errors?: () => readonly { event: string; last5m: number; last60m: number }[];
   readonly setSnapshot?: (snapshot: () => unknown) => void;
 }
 
@@ -122,6 +123,9 @@ export async function startApplication(config: Config, createGame: CreateGame, l
       requests: metrics.value('npc_requests_total'),
       dbErrors: metrics.value('db_errors_total'),
       logDropped: metrics.value('log_dropped_total'),
+      completed: metrics.value('npc_requests_total', { outcome: 'completed' }),
+      busy: metrics.value('npc_requests_total', { outcome: 'player-busy' }) + metrics.value('npc_requests_total', { outcome: 'server-busy' }),
+      http5xx: (((metrics.snapshot().http_requests_total ?? []) as { labels: Record<string, string>; value: number }[]).filter((s) => s.labels.status?.startsWith('5')).reduce((sum, s) => sum + s.value, 0)),
     });
     sample();
     const sampler = setInterval(sample, 30_000); sampler.unref();
@@ -136,7 +140,31 @@ export async function startApplication(config: Config, createGame: CreateGame, l
         dbErrors5m: counters.delta('dbErrors'), logDropped5m: counters.delta('logDropped'), diskFreeBytes, players: runtime.presence(),
       });
     };
+    // ADMIN-004–006: one snapshot for the panel, built from what is already collected (OBS-013/014).
+    const about = startFields(config);
+    const p95 = (name: string): number | null => {
+      const series = (metrics.snapshot()[name] ?? []) as { count: number; p95: number | null }[];
+      const values = series.filter((s) => s.count > 0 && s.p95 !== null).map((s) => s.p95 as number);
+      return values.length ? Math.max(...values) : null;
+    };
+    const adminStatus = () => {
+      const stats = runtime.stats(); const players = runtime.presence(); const errors = obs.errors?.() ?? [];
+      return {
+        env: config.env, version: about.version, commit: about.commit ?? null, uptimeSeconds: Math.floor(process.uptime()),
+        health: health(), seats: { used: players.length, max: config.maxPlayers }, npcReady: npcService.ready(), languageReady,
+        server: {
+          tick: stats && { p50: stats.tickP50Ms, p95: stats.tickP95Ms, max: stats.tickMaxMs },
+          broadcast: stats && { p95: stats.broadcastP95Ms, max: stats.broadcastMaxMs },
+          npc: { ...npcService.state(), requests5m: counters.delta('requests'), completed5m: counters.delta('completed'), timeouts5m: counters.delta('timeouts'), busy5m: counters.delta('busy'), firstPartialP95: p95('npc_first_partial_ms'), generationP95: p95('npc_generation_ms') },
+          memory: { rss: process.memoryUsage().rss, heapUsed: process.memoryUsage().heapUsed, eventLoopP99: obs.process?.().eventLoopP99Ms ?? null },
+          errors: { last5m: errors.reduce((n, e) => n + e.last5m, 0), last60m: errors.reduce((n, e) => n + e.last60m, 0), byEvent: errors, http5xx5m: counters.delta('http5xx'), db5m: counters.delta('dbErrors'), logDropped5m: counters.delta('logDropped') },
+          diskFreeBytes: metrics.value('disk_free_bytes') || null, dbBytes: metrics.value('db_size_bytes') || null,
+        },
+        players, warnings: (obs.recorder?.warnings() ?? []).map((r) => ({ ts: r.ts, level: r.level, event: r.event, msg: r.msg })).reverse(),
+      };
+    };
     http = createHttpServer(config, {
+      admin: { catalog: () => catalog, status: adminStatus },
       auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, clientPerf, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
       operator: { languageReady: () => languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
     });

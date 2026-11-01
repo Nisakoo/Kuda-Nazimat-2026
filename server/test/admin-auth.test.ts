@@ -39,5 +39,5 @@ it('AUTH-018/019 over HTTP: admin login and dev autologin, game channel refuses 
   expect(await post('/api/admin/login', { name: 'Никто', password: 'неверно12' })).toMatchObject({ status: 401, body: { error: { code: 'CREDENTIALS' } } });
   expect((await post('/api/admin/login', { name: 'x' })).status).toBe(400);
   expect((await fetch(`${origin}/api/admin/logout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } })).status).toBe(204);
-  expect((await fetch(`${origin}/api/admin/unknown`)).status).toBe(404);
+  expect((await fetch(`${origin}/api/admin/unknown`)).status).toBe(401); // ADMIN-003: no admin session first
 });

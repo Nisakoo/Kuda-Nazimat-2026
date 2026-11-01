@@ -94,7 +94,7 @@ describe('metrics and health (OBS-007, 010)', () => {
     expect(evaluateHealth({ ...base, tickP95Ms: 25 }).level).toBe('red');
     expect(evaluateHealth({ ...base, dbErrors5m: 1 }).level).toBe('red');
     expect(evaluateHealth({ ...base, diskFreeBytes: 100 * 1024 ** 2 }).level).toBe('red');
-    const unstable = evaluateHealth({ ...base, players: [{ name: 'Аня', mapId: 'test', connected: true, releaseInMs: null, rttMs: 20, reconnects: 3, seatedSeconds: 60, perf: null }] });
+    const unstable = evaluateHealth({ ...base, players: [{ name: 'Аня', mapId: 'test', connected: true, releaseInMs: null, rttMs: 20, reconnects: 3, seatedSeconds: 60, perf: null, ip: null }] });
     expect(unstable.reasons.map((r) => r.text)).toEqual([expect.stringContaining('Нестабильная связь у игрока Аня')]);
     const window = new CounterWindow(300_000);
     window.sample(0, { t: 0 }); window.sample(200_000, { t: 5 }); window.sample(400_000, { t: 9 });

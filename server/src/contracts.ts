@@ -69,6 +69,8 @@ export interface PlayerPresence {
   /** OBS-010: median Engine.IO heartbeat RTT of the last minute, reconnects in 10 min, seconds since the seat was taken. */
   readonly rttMs: number | null; readonly reconnects: number; readonly seatedSeconds: number;
   /** OBS-014: last client performance report younger than 30 s, null otherwise. */
+  /** ADMIN-006: device address of the controlling connection. */
+  readonly ip: string | null;
   readonly perf: { readonly fps: number | null; readonly frameMs: number | null; readonly drawCalls: number | null; readonly ageMs: number } | null;
 }
 
@@ -129,7 +131,7 @@ export interface GameRuntime {
   /** Seats, connections and queue counters for incident dumps (OBS-004); no names or texts. */
   state(): Record<string, unknown>;
   /** Last minute p95 of the step and broadcast interval (OBS-010); null before the first minute. */
-  stats(): { readonly tickP95Ms: number; readonly broadcastP95Ms: number; readonly players: number } | null;
+  stats(): { readonly tickP50Ms: number; readonly tickP95Ms: number; readonly tickMaxMs: number; readonly broadcastP95Ms: number; readonly broadcastMaxMs: number; readonly players: number } | null;
   /** SERVER-005: closes connections and saves positions. */
   stop(reason: string): Promise<void>;
 }

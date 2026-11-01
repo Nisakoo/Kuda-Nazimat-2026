@@ -297,7 +297,7 @@ export class GameService {
       name: seat.identity.displayName, mapId: this.world.locate(seat.identity.playerId)?.mapId ?? null,
       connected: seat.channel !== null, releaseInMs: seat.releaseAt === null ? null : Math.max(0, seat.releaseAt - now),
       rttMs: seat.channel?.rttMs?.() ?? null, reconnects: Math.max(0, seat.attaches.filter((time) => now - time < 600_000).length - 1),
-      seatedSeconds: Math.floor((now - seat.seatedAt) / 1000), perf: this.settings.clientPerf?.(seat.identity.playerId) ?? null,
+      seatedSeconds: Math.floor((now - seat.seatedAt) / 1000), perf: this.settings.clientPerf?.(seat.identity.playerId) ?? null, ip: seat.channel?.ip ?? null,
     }));
   }
 

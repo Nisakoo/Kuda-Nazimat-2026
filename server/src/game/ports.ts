@@ -7,6 +7,8 @@ import type { WorldLifeServerMessage } from '../../../shared/world-life/types.ts
 export interface Channel {
   readonly id: string;
   readonly sessionKey?: string;
+  /** Device address for the admin panel (ADMIN-006). */
+  readonly ip?: string;
   send(message: ServerMessage): void;
   sendLife?(message: WorldLifeServerMessage, volatile?: boolean): void;
   /** OBS-010: median heartbeat RTT of the last minute, null before the first sample. */
