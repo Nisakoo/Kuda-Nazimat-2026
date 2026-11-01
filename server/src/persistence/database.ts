@@ -51,13 +51,13 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now, obs
     },
     find(nameKey) {
       const row = timed('accounts.find', () => db.prepare(`SELECT a.id AS accountId, p.id AS playerId, a.name AS displayName, a.password_hash AS hash, a.must_change_password AS must,
-        a.temp_password_expires_at AS tempExpires, (SELECT max(created_at) FROM sessions s WHERE s.account_id = a.id) AS lastLogin
+        a.temp_password_expires_at AS tempExpires, a.role AS role, (SELECT max(created_at) FROM sessions s WHERE s.account_id = a.id) AS lastLogin
         FROM accounts a JOIN players p ON p.account_id = a.id WHERE name_key = ?`).get(nameKey));
       if (!row) return null;
       return {
         identity: { accountId: String(row.accountId), playerId: String(row.playerId), displayName: String(row.displayName) },
         passwordHash: row.hash === null ? null : String(row.hash), mustChangePassword: Number(row.must) === 1,
-        tempPasswordExpiresAt: optional(row.tempExpires), lastLoginAt: optional(row.lastLogin),
+        tempPasswordExpiresAt: optional(row.tempExpires), lastLoginAt: optional(row.lastLogin), role: row.role === 'admin' ? 'admin' : 'player',
       };
     },
     create(name, nameKey, passwordHash, time) {
@@ -70,11 +70,12 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now, obs
       timed('accounts.setPassword', () => db.prepare('UPDATE accounts SET password_hash = ?, password_set_at = ?, must_change_password = ?, temp_password_expires_at = ? WHERE id = ?')
         .run(passwordHash, time, options.mustChange ? 1 : 0, options.tempExpiresAt, accountId));
     },
+    setRole(accountId, role) { timed('accounts.setRole', () => db.prepare('UPDATE accounts SET role = ? WHERE id = ?').run(role, accountId)); },
     list(time) {
-      return timed('accounts.list', () => db.prepare(`SELECT a.name AS name, a.password_hash IS NOT NULL AS hasPassword, a.must_change_password AS must,
+      return timed('accounts.list', () => db.prepare(`SELECT a.name AS name, a.role AS role, a.password_hash IS NOT NULL AS hasPassword, a.must_change_password AS must,
         (SELECT count(*) FROM sessions s WHERE s.account_id = a.id AND s.revoked_at IS NULL AND s.expires_at > ?) AS active,
         (SELECT max(created_at) FROM sessions s WHERE s.account_id = a.id) AS lastLogin FROM accounts a ORDER BY a.name_key`).all(time))
-        .map((row) => ({ name: String(row.name), hasPassword: Number(row.hasPassword) === 1, mustChangePassword: Number(row.must) === 1, activeSessions: Number(row.active), lastLoginAt: optional(row.lastLogin) }));
+        .map((row) => ({ name: String(row.name), role: row.role === 'admin' ? 'admin' as const : 'player' as const, hasPassword: Number(row.hasPassword) === 1, mustChangePassword: Number(row.must) === 1, activeSessions: Number(row.active), lastLoginAt: optional(row.lastLogin) }));
     },
   };
   const revokeAll = (hashes: string[], reason: string, time: number): string[] => {
@@ -84,27 +85,29 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now, obs
   };
   const sessions: SessionStore = {
     isActive(sessionId, playerId, time) {
-      return !!timed('sessions.isActive', () => db.prepare('SELECT 1 FROM sessions s JOIN players p ON p.account_id = s.account_id WHERE s.id = ? AND p.id = ? AND s.revoked_at IS NULL AND s.expires_at > ?').get(sessionId, playerId, time));
+      return !!timed('sessions.isActive', () => db.prepare("SELECT 1 FROM sessions s JOIN players p ON p.account_id = s.account_id WHERE s.id = ? AND p.id = ? AND s.scope = 'game' AND s.revoked_at IS NULL AND s.expires_at > ?").get(sessionId, playerId, time));
     },
     create(s) {
-      timed('sessions.create', () => db.prepare('INSERT INTO sessions (token_hash, account_id, created_at, expires_at, id, created_ip) VALUES (?, ?, ?, ?, ?, ?)')
-        .run(s.tokenHash, s.accountId, s.createdAt, s.expiresAt, s.id ?? randomId('s'), s.ip ?? null));
+      timed('sessions.create', () => db.prepare('INSERT INTO sessions (token_hash, account_id, created_at, expires_at, id, created_ip, scope) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        .run(s.tokenHash, s.accountId, s.createdAt, s.expiresAt, s.id ?? randomId('s'), s.ip ?? null, s.scope ?? 'game'));
     },
     find(hash) {
-      const row = timed('sessions.find', () => db.prepare('SELECT a.id AS accountId, p.id AS playerId, a.name AS displayName, s.expires_at AS expiresAt, s.id AS sessionId, s.revoked_at AS revokedAt FROM sessions s JOIN accounts a ON a.id = s.account_id JOIN players p ON p.account_id = a.id WHERE token_hash = ?').get(hash));
-      return row ? { identity: { accountId: String(row.accountId), playerId: String(row.playerId), displayName: String(row.displayName) }, expiresAt: Number(row.expiresAt), sessionId: String(row.sessionId), revokedAt: optional(row.revokedAt) } : null;
+      const row = timed('sessions.find', () => db.prepare('SELECT a.id AS accountId, p.id AS playerId, a.name AS displayName, s.expires_at AS expiresAt, s.id AS sessionId, s.revoked_at AS revokedAt, s.scope AS scope, a.role AS role FROM sessions s JOIN accounts a ON a.id = s.account_id JOIN players p ON p.account_id = a.id WHERE token_hash = ?').get(hash));
+      return row ? { identity: { accountId: String(row.accountId), playerId: String(row.playerId), displayName: String(row.displayName) }, expiresAt: Number(row.expiresAt), sessionId: String(row.sessionId), revokedAt: optional(row.revokedAt), scope: row.scope === 'admin' ? 'admin' : 'game', role: row.role === 'admin' ? 'admin' : 'player' } : null;
     },
     revoke(target, reason, time) {
       return timed('sessions.revoke', () => transaction(db, () => {
         const rows = 'tokenHash' in target
           ? db.prepare('SELECT token_hash AS hash FROM sessions WHERE revoked_at IS NULL AND token_hash = ?').all(target.tokenHash)
-          : db.prepare('SELECT token_hash AS hash FROM sessions WHERE revoked_at IS NULL AND account_id = ? AND expires_at > ?').all(target.accountId, time);
+          : target.scope
+            ? db.prepare('SELECT token_hash AS hash FROM sessions WHERE revoked_at IS NULL AND account_id = ? AND expires_at > ? AND scope = ?').all(target.accountId, time, target.scope)
+            : db.prepare('SELECT token_hash AS hash FROM sessions WHERE revoked_at IS NULL AND account_id = ? AND expires_at > ?').all(target.accountId, time);
         return revokeAll(rows.map((row) => String(row.hash)), reason, time);
       }));
     },
-    enforceLimit(accountId, max, time) {
-      return timed('sessions.enforceLimit', () => transaction(db, () => revokeAll(db.prepare('SELECT token_hash AS hash FROM sessions WHERE account_id = ? AND revoked_at IS NULL AND expires_at > ? ORDER BY created_at DESC, rowid DESC LIMIT -1 OFFSET ?')
-        .all(accountId, time, max).map((row) => String(row.hash)), 'limit', time)));
+    enforceLimit(accountId, max, time, scope = 'game') {
+      return timed('sessions.enforceLimit', () => transaction(db, () => revokeAll(db.prepare('SELECT token_hash AS hash FROM sessions WHERE account_id = ? AND revoked_at IS NULL AND expires_at > ? AND scope = ? ORDER BY created_at DESC, rowid DESC LIMIT -1 OFFSET ?')
+        .all(accountId, time, scope, max).map((row) => String(row.hash)), 'limit', time)));
     },
     prune(before) { timed('sessions.prune', () => db.prepare('DELETE FROM sessions WHERE expires_at < ? OR revoked_at < ?').run(before, before)); },
   };

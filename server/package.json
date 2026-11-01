@@ -16,6 +16,8 @@
     "backup": "node src/cli/backup.ts",
     "lan:check": "node src/cli/lanCheck.ts",
     "auth": "node src/cli/auth.ts",
+    "tls": "node src/cli/tls.ts",
+    "report": "node src/cli/report.ts",
     "check:platform": "tsc -p tsconfig.platform.json && tsc -p ../shared/tsconfig.json && depcruise src --config .dependency-cruiser.cjs"
   },
   "dependencies": {

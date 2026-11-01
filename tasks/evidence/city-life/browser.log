@@ -1,0 +1,29 @@
+
+Running 2 tests using 1 worker
+
+(node:2951) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/2] e2e/city.spec.ts:108:1 › whole-city overview fits narrow and wide screens without horizontal cropping
+[2/2] e2e/city.spec.ts:138:1 › living city: carry artifacts, scatter birds, feeding camels, walking mule and detailed map
+e2e/city.spec.ts:138:1 › living city: carry artifacts, scatter birds, feeding camels, walking mule and detailed map
+WALK tablet segments 2
+
+WALK place-tablet segments 2
+
+WALK birds segments 2
+
+WALK birds-return segments 2
+
+WALK camels segments 6
+
+SHOT 1 camel-feeding
+
+WALK mule segments 3
+
+SHOT 2 mule-circuit
+
+SHOT 3 detailed-map
+
+  2 passed (57.4s)

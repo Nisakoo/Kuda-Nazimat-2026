@@ -472,7 +472,7 @@ describe('application lifecycle', () => {
     const messages = vi.spyOn(WorldAudio.prototype, 'message').mockImplementation(() => {});
     let state: BabylonState = {
       v: 2, playerId: 'p1', backend: 'test', languages: ['ru', 'en'], profile: { native: 'ru', learning: 'en' }, introSeen: true,
-      party: null, availableParty: null, partyPositions: [], taskTitle: '', taskTarget: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
+      party: null, availableParties: [], availablePartiesTruncated: false, availableParty: null, partyPositions: [], taskTitle: '', taskTarget: null, task: '', goatGuide: null, inventory: { dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 },
       fed: [], stones: [], words: [], messages: [], replies: [{ id: 'old', npcId: 'fruit-seller', question: 'Old question', text: 'Old answer', language: 'en' }],
     };
     vi.stubGlobal('fetch', vi.fn(async (_url: unknown, options: RequestInit) => {

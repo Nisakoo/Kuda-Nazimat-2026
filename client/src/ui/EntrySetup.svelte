@@ -18,19 +18,34 @@
   $effect(() => { if (gameState?.profile && !initialized) { native = gameState.profile.native; learning = gameState.profile.learning; initialized = true; } });
   const dirty = $derived(!gameState?.profile || native !== gameState.profile.native || learning !== gameState.profile.learning);
   const ready = $derived(!!gameState?.profile && !dirty && !snapshot.avatarRequired && !view.busy);
-  const creationBlocked = $derived(Boolean(!gameState?.party && gameState?.availableParty));
+  let size = $state<PartySize>(2);
+  let mode = $state<'solo' | 'friends'>('solo');
+  const availableParties = $derived(gameState?.availableParties ?? []);
+  let selectedPartyId = $state('');
+  const selectedParty = $derived(availableParties.find(party => party.id === selectedPartyId));
   let replacement = $state<{ partyId: string; size: PartySize } | null>(null);
   function create() {
-    if (!ready || creationBlocked || replacement) return;
+    if (!ready || replacement) return;
     const selectedSize = mode === 'solo' ? 1 : size;
     if (gameState?.party) replacement = { partyId: gameState.party.id, size: selectedSize };
     else void game.createEntryGame(selectedSize);
   }
   function cancelReplacement() { if (!view.busy) replacement = null; }
-  let size = $state<PartySize>(2);
-  let mode = $state<'solo' | 'friends'>('solo');
+  function confirmReplacement() {
+    if (ready && replacement) void game.createEntryGame(replacement.size, replacement.partyId);
+  }
   let ip = $state(''), port = $state('8080'), addressError = $state<string | null>(null);
   $effect(() => { const url = new URL(game.config.serverUrl); ip = url.hostname === 'localhost' ? '127.0.0.1' : url.hostname.replace(/^\[|\]$/g, ''); port = url.port || (url.protocol === 'https:' ? '443' : '80'); });
+  const sameServer = $derived.by(() => {
+    try {
+      const address = serverAddress(ip, port, new URL(game.config.serverUrl).protocol);
+      const current = new URL(game.config.serverUrl);
+      if (current.hostname === 'localhost') current.hostname = '127.0.0.1';
+      return current.origin === address;
+    } catch { return false; }
+  });
+  const needsSelection = $derived(sameServer && !gameState?.party &&
+    ((availableParties.length > 1 || gameState?.availablePartiesTruncated) && !selectedParty || !!selectedPartyId && !selectedParty));
   let connecting = $state(false);
   let connectionAttempt = 0;
   async function connect() {
@@ -43,11 +58,12 @@
       if (current.hostname === 'localhost') current.hostname = '127.0.0.1';
       const equivalent = current.origin === address;
       if (equivalent && !ready) throw new Error('Вернитесь в профиль: подтвердите персонажа и сохраните изменения языков.');
-      await game.connectEntryGame(equivalent ? game.config.serverUrl : address);
+      if (equivalent && needsSelection) throw new Error('Выберите группу для подключения.');
+      await game.connectEntryGame(equivalent ? game.config.serverUrl : address, equivalent && !gameState?.party && selectedParty ? selectedParty.id : undefined);
     } catch (error) { if (attempt === connectionAttempt && stage === 'connect') addressError = (error as Error).message; }
     finally { if (attempt === connectionAttempt) connecting = false; }
   }
-  function clearAddressAttempt() { connectionAttempt++; connecting = false; addressError = null; }
+  function clearAddressAttempt() { connectionAttempt++; connecting = false; addressError = null; selectedPartyId = ''; }
   function back() { if (replacement) { cancelReplacement(); return; } if (!view.busy && stage !== 'profile') { clearAddressAttempt(); game.setEntryStage('profile'); } }
   function settings() { clearAddressAttempt(); game.openSettings(); }
 </script>
@@ -66,7 +82,7 @@
           {#if mode === 'friends'}<label class="entry-size">Число игроков <select aria-label="Число игроков" bind:value={size} disabled={view.busy}><option value={2}>2</option><option value={3}>3</option><option value={4}>4</option></select></label>{/if}
           {@render savedGame()}
           {@render errors()}
-          <div class="entry-sign-actions"><button class="entry-back" disabled={view.busy} onclick={back}>← Назад</button><button class="entry-primary" disabled={!ready || creationBlocked} onclick={create}>Далее →</button></div>
+          <div class="entry-sign-actions"><button class="entry-back" disabled={view.busy} onclick={back}>← Назад</button><button class="entry-primary" disabled={!ready} onclick={create}>Далее →</button></div>
         </div>
       {:else}
         <section class="hub-tablet">
@@ -76,10 +92,22 @@
               <p>Укажите IP-адрес и порт, которые показаны на компьютере ведущего.</p>
               <label>IP-адрес <input aria-label="IP-адрес" bind:value={ip} required disabled={view.busy} placeholder="192.168.1.10" /></label>
               <label>Порт <input aria-label="Порт" bind:value={port} inputmode="numeric" required disabled={view.busy}/></label>
+              {#if sameServer && gameState?.party}
+                <p class="hub-saved">Будет продолжена ваша сохранённая игра. Прогресс и участники сохранятся.</p>
+              {:else if sameServer && availableParties.length}
+                <fieldset class="hub-party-list" disabled={view.busy || connecting}>
+                  <legend>{availableParties.length > 1 ? 'Выберите игру' : 'Доступная игра'}</legend>
+                  {#each availableParties as party (party.id)}
+                    <label><input type="radio" name="waiting-party" value={party.id} checked={selectedPartyId === party.id || !selectedPartyId && availableParties.length === 1} onchange={() => { selectedPartyId = party.id; addressError = null; }}/><span><strong>{party.hostName}</strong><small>{party.count} из {party.size} игроков</small></span></label>
+                  {/each}
+                </fieldset>
+                {#if gameState?.availablePartiesTruncated}<p class="entry-note">Показаны последние 64 ожидающие группы.</p>{/if}
+                {#if needsSelection}<p class="entry-note" role="status">{selectedPartyId ? 'Выбранная игра больше не ждёт участников. Выберите другую группу.' : 'Выберите группу для подключения.'}</p>{/if}
+              {/if}
               {#if snapshot.avatarRequired || !gameState?.profile}<p>Для игры на этом сервере подтвердите персонажа и сохраните языки в профиле.</p>{/if}
               {#if addressError}<p role="alert" class="entry-error">{addressError}</p>{/if}
               {@render errors()}
-              <div class="entry-sign-actions"><button type="button" class="entry-back" onclick={back}>← Назад</button><button class="entry-primary" disabled={view.busy || connecting}>{connecting ? 'Подключаемся…' : 'Подключиться'}</button></div>
+              <div class="entry-sign-actions"><button type="button" class="entry-back" onclick={back}>← Назад</button><button class="entry-primary" disabled={view.busy || connecting || needsSelection}>{connecting ? 'Подключаемся…' : 'Подключиться'}</button></div>
             </form>
           {:else}
             <div class="hub-profile"><div><img class="hub-portrait" src={`/assets/ui/avatars/${snapshot.avatar?.state?.avatarId ?? 'lukas'}-portrait.png`} alt="Ваш персонаж"/><h3>{snapshot.authName || 'Игрок'}</h3><p>{snapshot.avatarRequired ? 'Выберите персонажа' : 'Персонаж готов к путешествию'}</p><button class="secondary" disabled={view.busy} onclick={() => game.openAvatar()}>Выбрать персонажа</button></div>
@@ -109,12 +137,19 @@
     {@render errors()}
     <div class="replace-game-actions">
       <button class="secondary" disabled={view.busy} onclick={cancelReplacement}>Отмена</button>
-      <button disabled={!ready} onclick={() => { if (replacement) void game.createEntryGame(replacement.size, replacement.partyId); }}>{view.busy ? 'Создаём игру…' : 'Удалить и создать новую'}</button>
+      <button disabled={!ready} onclick={confirmReplacement}>{view.busy ? 'Создаём игру…' : 'Удалить и создать новую'}</button>
     </div>
   </dialog>
 {/if}
 
 <style>
+  .hub-party-list { display: grid; gap: 8px; min-width: 0; margin: 8px 0; padding: 12px; border: 1px solid #cdb18a; }
+  .hub-party-list legend { font-weight: 650; padding: 0 6px; }
+  .hub-party-list label { display: flex; gap: 12px; align-items: center; text-align: left; padding: 10px; background: #fbf1df; border-radius: 5px; cursor: pointer; }
+  .hub-party-list input { width: 20px; min-height: 20px; height: 20px; padding: 0; flex: 0 0 20px; accent-color: #087671; }
+  .hub-party-list span { min-width: 0; overflow-wrap: anywhere; }
+  .hub-party-list strong, .hub-party-list small { display: block; }
+  .hub-party-list small { margin-top: 4px; }
   .replace-game { width: min(540px, calc(100vw - 32px)); max-height: calc(100svh - 32px); overflow: auto; padding: 24px; color: #073c48; background: #fbf1df; border: 1px solid #d6c6aa; border-radius: 12px; }
   .replace-game h2 { font-size: 24px; margin: 0 0 16px; }
   .replace-game p { line-height: 1.5; }
@@ -147,11 +182,11 @@
       {#if stage === 'mode'}<p>Можно продолжить игру или создать новую после подтверждения удаления текущего прогресса.</p>{/if}
       <button type="button" disabled={!ready} onclick={() => void game.connectEntryGame(game.config.serverUrl)}>Продолжить игру</button>
     </section>
-  {:else if stage === 'mode' && gameState?.availableParty}
-    <section class="hub-saved-game" aria-label="Доступная игра">
-      <h3>На сервере уже ждёт группа</h3>
-      <p>{gameState.availableParty.count} из {gameState.availableParty.size} игроков. Можно присоединиться к этой игре.</p>
-      <button type="button" disabled={!ready} onclick={() => void game.connectEntryGame(game.config.serverUrl)}>Присоединиться к игре</button>
+  {:else if stage === 'mode' && availableParties.length}
+    <section class="hub-saved-game" aria-label="Доступные игры">
+      <h3>Можно присоединиться к игрокам</h3>
+      <p>{availableParties.length === 1 ? `${availableParties[0]!.hostName} · ${availableParties[0]!.count} из ${availableParties[0]!.size} игроков` : 'На сервере ждут несколько групп.'} Или создайте отдельную игру в любом режиме.</p>
+      <button type="button" disabled={!ready} onclick={() => game.setEntryStage('connect')}>Выбрать игру для подключения</button>
     </section>
   {/if}
 {/snippet}

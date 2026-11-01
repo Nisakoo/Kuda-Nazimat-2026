@@ -10,6 +10,7 @@ import { parseConfig } from '../src/app/config.ts';
 import { silentLogger } from '../src/common/logger.ts';
 import type { CreateGame, GameDeps } from '../src/contracts.ts';
 import { openDatabase, sqliteStores } from '../src/persistence/database.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 const roots: string[] = [];
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
@@ -28,14 +29,14 @@ it('assembles exclusively through the frozen contract, restarts with memory and 
     return { maps: [{ mapId: 'demo', chunks: 1, worldBytes: 1000 }], worldFile: () => ({ ok: false }), attach() {}, activePlayers: () => 1, presence: () => [], closeSessions() {}, state: () => ({}), stats: () => null,
       async stop() { if (savedId) deps.players.save([{ id: savedId, mapId: 'demo', position: { x: 2, y: 0, z: 3 }, rotationY: 1 }]); } };
   };
-  const app = await startApplication(config, createGame, silentLogger);
+  const app = await startTrusted(startApplication, config, createGame, silentLogger);
   const address = app.server.address(); if (!address || typeof address === 'string') throw new Error('No address');
-  const session = await (await fetch(`http://127.0.0.1:${address.port}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Аня' }) })).json() as { token: string };
+  const session = await (await fetch(`https://127.0.0.1:${address.port}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Аня' }) })).json() as { token: string };
   const verified = await deps.sessions.verify(session.token); if (!verified.ok) throw new Error('No session'); savedId = verified.identity.playerId;
   const question = { sessionId: verified.sessionId!, authorize: () => deps.sessions.isActive!(verified.sessionId!, verified.identity.playerId), connectionId: 'c1', requestId: 'r1', player: verified.identity, npc: { id: 'n', name: 'Пастух', topic: 'Козы', persona: 'Заботливый пастух', greeting: 'Здравствуй' }, question: 'Что ест козлёнок?' };
   const first = await deps.npc.ask(question); expect(first.ok).toBe(true);
   const started = Date.now(); await app.stop(); await app.stop(); expect(Date.now() - started).toBeLessThan(10000);
-  const secondApp = await startApplication(config, createGame, silentLogger);
+  const secondApp = await startTrusted(startApplication, config, createGame, silentLogger);
   try {
     expect((await deps.sessions.verify(session.token)).ok).toBe(true);
     expect(deps.players.load(savedId)?.position).toEqual({ x: 2, y: 0, z: 3 });

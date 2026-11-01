@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync, symlinkSyn
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import { request } from 'node:http';
+import { request } from 'node:https';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { openDatabase, sqliteStores } from '../src/persistence/database.ts';
@@ -15,6 +15,7 @@ import { systemClock, systemScheduler } from '../src/common/time.ts';
 import { memoryLogger, silentLogger } from '../src/common/logger.ts';
 import { memoryStores } from './memory.ts';
 import type { GameRuntime } from '../src/contracts.ts';
+import { testCertificate } from './tls-helpers.ts';
 
 const directories: string[] = []; const databases: DatabaseSync[] = [];
 function directory() { const path = mkdtempSync(join(tmpdir(), 'platform-')); directories.push(path); return path; }
@@ -98,10 +99,10 @@ it('serves public UI/config, strict guest login, protected world and allowlisted
   const root = directory(); mkdirSync(join(root, 'maps')); writeFileSync(join(root, 'index.html'), 'UI'); writeFileSync(join(root, 'config.json'), 'secret'); writeFileSync(join(root, 'maps/private.json'), 'world'); linkIfPermitted(join(root, 'maps/private.json'), join(root, 'alias'));
   const stores = memoryStores(); const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: { now: () => 100 }, ttlMs: 1000 });
   const logger = memoryLogger(); const logs = logger.records;
-  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, presence: () => [{ name: 'Аня', mapId: 'market', connected: false, releaseInMs: 4000, rttMs: null, reconnects: 0, seatedSeconds: 1 }], closeSessions() {}, state: () => ({}), stats: () => null, async stop() {}, worldFile(path) { return path === 'near' ? { ok: true, file: { absolutePath: join(root, 'maps/private.json'), bytes: 5, contentType: 'application/json' } } : { ok: false }; } };
+  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, presence: () => [{ playerId: 'p-anya', name: 'Аня', mapId: 'market', connected: false, releaseInMs: 4000, rttMs: null, reconnects: 0, seatedSeconds: 1 }], closeSessions() {}, state: () => ({}), stats: () => null, async stop() {}, worldFile(path) { return path === 'near' ? { ok: true, file: { absolutePath: join(root, 'maps/private.json'), bytes: 5, contentType: 'application/json' } } : { ok: false }; } };
   const config = parseConfig({ clientDir: root, corsOrigins: ['http://localhost:5173'], logWorldAccess: true }, join(root, 'config.json'), 'test');
-  const { server } = createHttpServer(config, { auth, game, npcReady: () => true, logger, clock: { now: () => 100 } });
-  server.listen(0, '127.0.0.1'); await once(server, 'listening'); const address = server.address(); const url = `http://127.0.0.1:${typeof address === 'object' && address ? address.port : 0}`;
+  const { server } = createHttpServer(config, { auth, game, npcReady: () => true, logger, clock: { now: () => 100 }, certificate: await testCertificate() });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening'); const address = server.address(); const url = `https://127.0.0.1:${typeof address === 'object' && address ? address.port : 0}`;
   try {
     expect(await (await fetch(url)).text()).toBe('UI');
     expect(await (await fetch(`${url}/config.json`)).json()).toEqual({ session: 'online', serverUrl: null, mapId: 'market', chunkRadius: null, debug: false });

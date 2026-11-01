@@ -14,6 +14,8 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
   const logger = deps.logger.child('npc');
   const firstPartial = (deps.metrics ?? new MetricsRegistry()).histogram('npc_first_partial_ms', 'Время от приёма вопроса до первого временного текста', MS_BUCKETS);
   const queue = createGenerationQueue({ ...deps, onIdle: scheduleRecovery }, config);
+  /** ADMIN-SRV-005: unfinished game-channel questions per NPC, so a withdrawn NPC can cancel them. */
+  const inflight = new Map<string, Set<{ connectionId: string; requestId: string }>>();
   let available = false, stopped = false;
   let starting: Promise<void> | undefined;
   let recoveryTimer: TimerHandle | undefined;
@@ -92,6 +94,9 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
       return Promise.resolve({ ok: false, reason: 'unavailable' });
     }
     const accepted = clock.now();
+    const job = { connectionId: q.connectionId, requestId: q.requestId };
+    const jobs = inflight.get(q.npc.id) ?? new Set(); jobs.add(job); inflight.set(q.npc.id, jobs);
+    const done = () => { jobs.delete(job); if (!jobs.size && inflight.get(q.npc.id) === jobs) inflight.delete(q.npc.id); };
     return queue.generate(q.player.playerId, q.connectionId, async (signal, _deadline, budget) => {
       let finished = false;
       try {
@@ -135,7 +140,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
         logTiming('timeout');
         if (responder.status) logger.error('npc.answer.deadline', 'Истёк deadline ответа NPC', { code: 'timeout' });
       },
-    });
+    }).finally(done);
   };
   return {
     async start() { stopped = false; recoveryAttempted = false; queue.start(); await startResponder(); },
@@ -146,6 +151,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
     generate: queue.generate,
     cancel: queue.cancel,
     cancelConnection: queue.cancelConnection,
+    cancelNpc(npcId: string) { for (const job of [...inflight.get(npcId) ?? []]) queue.cancel(job.connectionId, job.requestId); },
     state: queue.state,
     async stop() {
       stopped = true; available = false;

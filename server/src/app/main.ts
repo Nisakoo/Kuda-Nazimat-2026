@@ -6,6 +6,7 @@ import { connectionBlock, connectionInfo, lanAddresses } from '../common/network
 import { shutdownOnSignals } from './shutdown.ts';
 import { startApplication } from './application.ts';
 import { loadLaunchConfig } from './launch.ts';
+import { daysLeft, EXPIRY_WARNING_DAYS } from '../tls/store.ts';
 
 const profileErrors: Record<string, string> = {
   llm_profiles_invalid: 'Некорректный profiles.json: проверьте схему, пары backend/model и полный набор options',
@@ -50,8 +51,15 @@ try {
   const app = await startApplication(config, createGame, obs.logger, undefined, obs);
   const address = app.server.address();
   const port = address && typeof address !== 'string' ? address.port : config.port;
-  process.stdout.write(`${connectionBlock(connectionInfo(config.host, port, lanAddresses()))}\n`);
-  shutdownOnSignals({ stop: async () => { try { await app.stop(); } finally { obs.close(); } } }, obs.logger);
+  const info = connectionInfo(config.host, port, lanAddresses());
+  const { certificate } = app;
+  const warnings = [...info.warnings, ...(certificate.created ? ['Создан новый сертификат: каждое устройство должно один раз его установить (страница /setup).'] : []),
+    ...(certificate.uncovered.length ? [`Сертификат не покрывает адреса ${certificate.uncovered.join(', ')}: по ним игроки увидят ошибку. Выпустите новый: npm --prefix server run tls -- renew --yes`] : []),
+    ...(daysLeft(certificate.info, new Date()) < EXPIRY_WARNING_DAYS ? ['Сертификат скоро истечёт: npm --prefix server run tls -- renew --yes'] : [])];
+  process.stdout.write(`${connectionBlock({ ...info, warnings }, { fingerprint: certificate.info.fingerprint, notAfter: certificate.info.notAfter })}\n`);
+  shutdownOnSignals({ stop: async () => {
+    try { await app.stop(); process.stdout.write(`\nИтог запуска (OBS-017):\n${app.report()}`); } finally { obs.close(); }
+  } }, obs.logger);
 } catch (error) {
   obs.logger.fatal('app.start.failed', error instanceof Error ? error.message : 'Ошибка запуска', { error });
   obs.close();

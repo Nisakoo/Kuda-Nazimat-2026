@@ -11,6 +11,7 @@ import { parseConfig } from '../src/app/config.ts';
 import { silentLogger } from '../src/common/logger.ts';
 import type { GameRuntime } from '../src/contracts.ts';
 import type { BabylonAction, BabylonFailure, BabylonResult } from '../../shared/babylon/types.ts';
+import { testCertificate } from './tls-helpers.ts';
 
 it.each(['captured socket', 'range', 'role'] as const)('actual HTTP rechecks %s after BabylonService resolves and before NPC delivery', async loss => {
   const db = openDatabase(':memory:'), stores = sqliteStores(db), clock = { now: Date.now };
@@ -28,12 +29,12 @@ it.each(['captured socket', 'range', 'role'] as const)('actual HTTP rechecks %s 
     now: Date.now, monotonicNow: () => performance.now(), id: () => `id${++ids}`, location: () => location,
   });
   const config = parseConfig({}, '/tmp/babylon-delivery/config.json', 'test');
-  const { server } = createHttpServer(config, { auth, game, babylon, clock, logger: silentLogger, npcReady: () => true });
+  const { server } = createHttpServer(config, { auth, game, babylon, clock, logger: silentLogger, npcReady: () => true, certificate: await testCertificate() });
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
   const address = server.address(); if (!address || typeof address === 'string') throw new Error('Missing HTTP listener');
   let requests = 0;
   const post = async (token: string, action: BabylonAction, requestId = `request${++requests}`) => {
-    const response = await fetch(`http://127.0.0.1:${address.port}/api/babylon`, {
+    const response = await fetch(`https://127.0.0.1:${address.port}/api/babylon`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ v: 2, requestId, action }),
     });
     return { status: response.status, body: await response.json() as BabylonResult | BabylonFailure };

@@ -2,7 +2,7 @@ import type { Vector3 } from '../world/types.ts';
 
 export const WORLD_LIFE_VERSION = 1 as const;
 export const WORLD_LIFE_EVENT = 'world-life' as const;
-export const WORLD_LIFE_LIMITS = { packetBytes: 65536, templates: 64, instances: 128, routePoints: 16, pots: 4, apples: 5, cats: 3, pickupDistance: 2, placeDistance: 0.9, potRadius: 0.3, appleRadius: 0.15 } as const;
+export const WORLD_LIFE_LIMITS = { packetBytes: 65536, templates: 64, instances: 128, routePoints: 16, pots: 16, apples: 24, birds: 24, cats: 3, pickupDistance: 2, placeDistance: 0.9, potRadius: 0.3, appleRadius: 0.15 } as const;
 export type ObjectBehavior = 'static' | 'animated' | 'pushable' | 'pickup';
 export interface ObjectTemplate {
   readonly id: string;
@@ -29,6 +29,9 @@ export interface CatDefinition {
   readonly pauseMs: number;
 }
 export interface SceneSchedule { readonly periodMs: number; readonly durationMs: number; readonly offsetMs: number }
+export interface PackAnimalDefinition { readonly instanceId: string; readonly kind: 'camel' | 'mule'; readonly behavior: 'feed' | 'walk'; readonly route: readonly Vector3[]; readonly cycleMs: number }
+export interface PerchedBird { readonly id: string; readonly position: Vector3; readonly rotationY: number }
+export interface BirdState { readonly id: string; readonly startedMs: number | null; readonly landingMs: number | null; readonly yaw: number; readonly resumedFrom?: Vector3 }
 export interface WorldLifeDefinition {
   readonly v: 1;
   readonly mapId: string;
@@ -36,6 +39,8 @@ export interface WorldLifeDefinition {
   readonly templates: readonly ObjectTemplate[];
   readonly instances: readonly ObjectInstance[];
   readonly cats: readonly CatDefinition[];
+  readonly perches?: readonly PerchedBird[];
+  readonly packAnimals?: readonly PackAnimalDefinition[];
   readonly flock: { readonly assetId: string; readonly count: number; readonly route: readonly Vector3[]; readonly schedule: SceneSchedule };
   readonly wind: { readonly strength: number; readonly gustStrength: number; readonly schedule: SceneSchedule };
 }
@@ -65,6 +70,7 @@ export interface SceneStateMessage {
   readonly epochMs: number;
   readonly definition: WorldLifeDefinition;
   readonly pots: readonly PotState[];
+  readonly birds?: readonly BirdState[];
   readonly apples: readonly AppleState[];
 }
 export type WorldLifeServerMessage = SceneStateMessage | HandResultMessage;

@@ -1,5 +1,5 @@
 import type { Vector3 } from '../world/types.ts';
-import type { CatDefinition, SceneSchedule } from './types.ts';
+import type { CatDefinition, SceneSchedule, PackAnimalDefinition } from './types.ts';
 
 /** A deterministic loop in server scene time. Callers estimate current serverTimeMs from the latest sample. */
 export function schedulePhase(elapsedMs: number, schedule: SceneSchedule): { active: boolean; phase: number } {
@@ -19,4 +19,14 @@ export function catPosition(cat: CatDefinition, elapsedMs: number): Vector3 {
   if (cat.behavior !== 'walk') return { ...cat.route[0]! };
   const local = ((elapsedMs % cat.cycleMs) + cat.cycleMs) % cat.cycleMs;
   return routePosition(cat.route, Math.max(0, local - cat.pauseMs) / (cat.cycleMs - cat.pauseMs), true);
+}
+
+export function packAnimalPosition(animal: PackAnimalDefinition, elapsedMs: number): Vector3 {
+  if(animal.behavior==='feed')return {...animal.route[0]!};
+  const phase=((elapsedMs%animal.cycleMs)+animal.cycleMs)%animal.cycleMs/animal.cycleMs;
+  const scaled=phase*animal.route.length,index=Math.floor(scaled),t=scaled-index;
+  const at=(offset:number)=>animal.route[(index+offset+animal.route.length)%animal.route.length]!;
+  const a=at(-1),b=at(0),c=at(1),d=at(2);
+  const coordinate=(key:'x'|'y'|'z')=>.5*((2*b[key])+(-a[key]+c[key])*t+(2*a[key]-5*b[key]+4*c[key]-d[key])*t*t+(-a[key]+3*b[key]-3*c[key]+d[key])*t*t*t);
+  return {x:coordinate('x'),y:coordinate('y'),z:coordinate('z')};
 }

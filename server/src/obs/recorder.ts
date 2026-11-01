@@ -9,6 +9,9 @@ export interface RecorderOptions {
   readonly snapshot?: () => unknown;
 }
 
+/** Key `info` events shown among the admin's last events (OBS-010). */
+const KEY_EVENTS = new Set(['app.ready', 'game.seat.attach', 'game.seat.release', 'npc.responder.ready', 'language.ready', 'auth.operator.action', 'obs.incident.dumped']);
+
 /**
  * OBS-004 flight recorder: the last N records of every level stay in memory and are written to
  * `incident-*.jsonl` on the first error, on an invariant violation and on request.
@@ -29,12 +32,12 @@ export class FlightRecorder {
     this.sink = (record) => this.record(record);
   }
 
-  /** Last 20 warnings and errors for the operator screen (OBS-010). */
+  /** Last 20 events for the admin screen (OBS-010): warnings, errors and key `info` events. */
   warnings(): readonly LogRecord[] { return this.recent; }
 
   private record(record: LogRecord): void {
     this.ring[this.next] = record; this.next = (this.next + 1) % this.options.capacity;
-    if (levelRank(record.level) >= levelRank('warn')) { this.recent.push(record); if (this.recent.length > 20) this.recent.shift(); }
+    if (levelRank(record.level) >= levelRank('warn') || (record.level === 'info' && KEY_EVENTS.has(record.event))) { this.recent.push(record); if (this.recent.length > 20) this.recent.shift(); }
     if (levelRank(record.level) >= levelRank('error') && record.event !== 'obs.incident.dumped') this.dump(record.event, false);
   }
 

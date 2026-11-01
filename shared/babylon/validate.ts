@@ -1,4 +1,5 @@
 import type { BabylonAction, BabylonRequest, Language, PartySize, Stone, ItemId } from './types.ts';
+import { MAX_AVAILABLE_PARTIES } from './types.ts';
 const idPattern = /^[A-Za-z0-9_.:-]{1,128}$/;
 export function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Ожидается объект');
@@ -33,7 +34,8 @@ export function parseBabylonRequest(value: unknown): BabylonRequest {
   const requestId = id(packet.requestId), a = record(packet.action);
   let action: BabylonAction;
   switch (a.type) {
-    case 'state': case 'intro-seen': case 'join': keys(a, ['type']); action = { type: a.type }; break;
+    case 'state': case 'intro-seen': keys(a, ['type']); action = { type: a.type }; break;
+    case 'join': keys(a, ['type', 'partyId']); action = { type: 'join', ...(a.partyId === undefined ? {} : { partyId: id(a.partyId) }) }; break;
     case 'city-start': keys(a, ['type', 'questId']); action = { type: 'city-start', questId: id(a.questId) }; break;
     case 'city-step':
       keys(a, ['type', 'questId', 'step', 'choice', 'targetId']);
@@ -90,6 +92,20 @@ export function parseBabylonResult(value: unknown): import('./types.ts').Babylon
     positionIds.add(playerId);
   }
   if (state.availableParty !== null) { const p = record(state.availableParty); number(p.size, 4); number(p.count, 4); }
+  const availableIds = new Set<string>();
+  const available = array(state.availableParties, MAX_AVAILABLE_PARTIES);
+  bool(state.availablePartiesTruncated);
+  if (state.availablePartiesTruncated && available.length !== MAX_AVAILABLE_PARTIES) throw new Error('Неверный предел списка групп');
+  for (const raw of available) {
+    const p = record(raw); keys(p, ['id', 'hostName', 'size', 'count']);
+    const partyId = id(p.id); text(p.hostName, 32); number(p.size, 4); number(p.count, 3);
+    if (availableIds.has(partyId) || (p.size as number) < 2 || (p.count as number) < 1 || (p.count as number) >= (p.size as number)) throw new Error('Неверная ожидающая группа');
+    availableIds.add(partyId);
+  }
+  if (available.length === 1) {
+    const only = record(available[0]), legacy = record(state.availableParty);
+    if (legacy.size !== only.size || legacy.count !== only.count) throw new Error('Несогласованная ожидающая группа');
+  } else if (state.availableParty !== null) throw new Error('Неоднозначная ожидающая группа');
   text(state.task, 2000, true); text(state.taskTitle, 200, true); if (state.goatGuide !== null) text(state.goatGuide, 2000);
   if (state.taskTarget !== null) { const target = record(state.taskTarget); keys(target, ['x', 'z']); for (const coordinate of [target.x, target.z]) if (typeof coordinate !== 'number' || !Number.isFinite(coordinate) || Math.abs(coordinate) > 1000000) throw new Error('Неверная цель'); }
   const inventory = record(state.inventory); keys(inventory, ['dates', 'red-fruit', 'yellow-fruit', 'water', 'fabric']);

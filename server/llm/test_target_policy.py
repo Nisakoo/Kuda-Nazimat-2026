@@ -2,7 +2,7 @@
 import json
 import types
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import local_common as common
 import mlx_worker
@@ -105,8 +105,73 @@ class TargetTests(unittest.TestCase):
             for text in ('Hello 🙂', 'x' * 801, '\ud800', 'NPC: Я продаю свежие фрукты на рынке.'):
                 runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text=text, finish_reason='stop')])
                 with self.assertRaises(common.WorkerError): runtime.answer(request(locale))
-            runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text='', finish_reason=None)] * 129)
+            runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text='', finish_reason=None)] * 257)
             with self.assertRaises(common.WorkerError): runtime.answer(request(locale))
+
+    def test_mlx_target_budget_and_unchanged_translation_and_ru(self):
+        runtime = object.__new__(mlx_worker.Runtime)
+        ids = [7] * 1792
+        runtime.tokenizer = types.SimpleNamespace(encode=Mock(return_value=ids))
+        runtime.model = object(); runtime.sampler = None; runtime.processors = []
+        runtime.generate = Mock(return_value='Ответ')
+        with patch.object(mlx_worker, 'compile_prompt', return_value='exact prompt'), patch.object(mlx_worker, 'compile_translation', return_value='exact prompt'):
+            for locale in ('en', 'es'):
+                for count, reason, accepted in [(129, 'stop', True), (256, 'stop', True),
+                                                 (256, 'length', False), (256, None, False),
+                                                 (256, 'other', False), (257, 'stop', False)]:
+                    with self.subTest(locale=locale, count=count, reason=reason):
+                        frames = [types.SimpleNamespace(text='x', finish_reason=None) for _ in range(count)]
+                        frames[-1].finish_reason = reason
+                        runtime.stream_generate = Mock(return_value=iter(frames))
+                        if accepted:
+                            self.assertEqual(runtime.answer(request(locale)), 'x' * count)
+                        else:
+                            with self.assertRaises(common.WorkerError): runtime.answer(request(locale))
+                        self.assertEqual(runtime.stream_generate.call_args.kwargs['max_tokens'], 256)
+                        self.assertIs(runtime.stream_generate.call_args.args[2], ids)
+                runtime.tokenizer.encode.return_value = [7] * 1793
+                runtime.stream_generate.reset_mock()
+                with self.assertRaises(common.WorkerError) as error: runtime.answer(request(locale))
+                self.assertEqual(error.exception.code, 'input_too_long')
+                runtime.stream_generate.assert_not_called()
+                runtime.tokenizer.encode.return_value = ids
+            self.assertEqual(runtime.answer(request('ru')), 'Ответ')
+            self.assertEqual(runtime.generate.call_args.kwargs['max_tokens'], 128)
+            for count in (128, 129):
+                frames = [types.SimpleNamespace(text='x', finish_reason=None) for _ in range(count)]
+                frames[-1].finish_reason = 'stop'
+                runtime.stream_generate = Mock(return_value=iter(frames))
+                if count == 128:
+                    self.assertEqual(runtime.translate({}), 'x' * 128)
+                else:
+                    with self.assertRaises(common.WorkerError): runtime.translate({})
+                self.assertEqual(runtime.stream_generate.call_args.kwargs['max_tokens'], 128)
+            runtime.tokenizer.encode.assert_called_with('exact prompt', add_special_tokens=False)
+
+    def test_ollama_target_budget_and_unchanged_translation_and_ru(self):
+        runtime = object.__new__(ollama_worker.OllamaWorker)
+        runtime.options = {'model': ollama_worker.MODEL, 'threads': 1}
+        runtime.tokenizer = types.SimpleNamespace(encode=Mock(return_value=[7] * 1792))
+        frame = {'response': 'Hello.', 'done': True, 'done_reason': 'stop',
+                 'prompt_eval_count': 1792, 'eval_count': 1}
+        with patch.object(ollama_worker, 'compile_prompt', return_value='exact prompt'), patch.object(ollama_worker, 'compile_translation', return_value='exact prompt'), patch.object(ollama_worker, 'emit'):
+            for locale in ('en', 'es', 'ru'):
+                runtime.http = Mock(return_value=(json.dumps(frame) + '\n').encode())
+                self.assertEqual(runtime.answer(request(locale)), 'Hello.')
+                payload = runtime.http.call_args.args[1]
+                self.assertEqual(payload['options']['num_predict'], 128 if locale == 'ru' else 256)
+                self.assertEqual(payload['options']['num_ctx'], 2048)
+                self.assertEqual(payload['prompt'], 'exact prompt')
+            runtime.http.reset_mock()
+            self.assertEqual(runtime.translate({}), 'Hello.')
+            self.assertEqual(runtime.http.call_args.args[1]['options']['num_predict'], 128)
+            runtime.tokenizer.encode.assert_called_with('exact prompt', add_special_tokens=False)
+            for locale in ('en', 'es'):
+                runtime.tokenizer.encode.return_value = [7] * 1793
+                runtime.http.reset_mock()
+                with self.assertRaises(common.WorkerError) as error: runtime.answer(request(locale))
+                self.assertEqual(error.exception.code, 'input_too_long')
+                runtime.http.assert_not_called()
 
     def test_mlx_ipc_labels_checked_target_only(self):
         runtime = types.SimpleNamespace(answer=lambda req: 'Hello.')
@@ -123,12 +188,12 @@ class TargetTests(unittest.TestCase):
         runtime = object.__new__(ollama_worker.OllamaWorker)
         runtime.options = {'model': ollama_worker.MODEL, 'threads': 1}
         for reason in ('length', None, 'other', 'stop'):
-            frame = {'response': 'Hello.', 'done': True, 'prompt_eval_count': 2}
+            frame = {'response': 'Hello.', 'done': True, 'prompt_eval_count': 2, 'eval_count': 256}
             if reason is not None: frame['done_reason'] = reason
             runtime.http = lambda *a, **kw: (json.dumps(frame) + '\n').encode()
-            if reason == 'stop': self.assertEqual(runtime.generate('x', 128, expected_tokens=2, target=True), 'Hello.')
+            if reason == 'stop': self.assertEqual(runtime.generate('x', 256, expected_tokens=2, target=True), 'Hello.')
             else:
-                with self.assertRaises(common.WorkerError): runtime.generate('x', 128, expected_tokens=2, target=True)
+                with self.assertRaises(common.WorkerError): runtime.generate('x', 256, expected_tokens=2, target=True)
 
 
 if __name__ == '__main__': unittest.main()

@@ -35,7 +35,7 @@ related:
   - готовую сборку клиента из `clientDir` по `/`, публично;
   - `GET /config.json` — публичную конфигурацию клиента `{session: "online", serverUrl: null, mapId: <defaultMap>, chunkRadius: null, debug: <clientDebug>}`, сформированную из конфигурации сервера; файл `config.json` из сборки клиента не отдаётся;
   - `/api/*` — [AUTH](server-auth.md), `GET /api/health`, HTTP BABEL (PROTO-009) и публичный `GET /api/game-config` (только effective `npcTimeoutMs`, no-store, обычный CORS, без model options/путей/pins/секретов);
-  - `GET /operator` и `GET /api/operator/status` — экран ведущего, только с loopback ([OFFLINE](offline-multiplayer.md) OFFLINE-010);
+  - `GET /operator` и `GET /api/operator/status` — экран администратора, только с loopback ([OFFLINE](offline-multiplayer.md) OFFLINE-010);
   - `/world/*` — данные мира только с проверками [SERVER-WORLD](server-world.md).
 
   Из `clientDir` не отдаются пути `maps/` и `assets/models/`: данные мира не должны быть публичными в обход `/world/`. Статические ответы ограничены `clientDir`, без directory listing и выхода за корень; неизвестный путь — 404. Браузерный клиент не требует установки ПО.
@@ -100,7 +100,7 @@ related:
 
 ## Ограничения и вне scope
 
-- Без микросервисов, облачной БД, внешнего ИИ, TLS и обратного прокси. HTTP в LAN — принятый риск офлайн-демо.
+- Без микросервисов, облачной БД, внешнего ИИ и обратного прокси. TLS завершается в самом сервере по [TLS](server-tls.md); HTTP-режима нет.
 - Выбор/квалификация LLM-backend — [LLM](server-llm-runtime.md). В MVP включена только заглушка NpcResponder.
 - Серверный runtime не импортирует код `client/`; UI входа принадлежит клиентскому фасаду GameApp (NET-007).
 

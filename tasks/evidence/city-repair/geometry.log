@@ -1,0 +1,21 @@
+✔ boat geometry has finite positions and usable unit normals (8.528584ms)
+✔ tapered water footprint contains body-height geometry without blocking its empty bounding rectangle (5.381916ms)
+✔ both hull sides, ends, keel and both sail sides remain visible with front-face culling (11.225917ms)
+✔ round objects keep a close perimeter and leave their old square corners empty (1.292916ms)
+✔ a reachable overhead beam preserves ground passage and excludes low decoration (1.600208ms)
+✔ generated fountain GLB blocks the bowl, not its empty square corners (2.872916ms)
+✔ generated mill GLB preserves thin canopy posts and an empty covered corner (0.787666ms)
+✔ generated guest GLB retains hanging cloth height without a floor-wide wall (7.675333ms)
+✔ thin support survives even when it misses every cell centre (2.729958ms)
+✔ aligned obstacle does not invent an extra strip beside its boundary (1.231458ms)
+✔ rotated contour blocks its surface while its bounding-box corners remain clear (0.497417ms)
+✔ concave contours retain their open courtyard (0.270167ms)
+✔ chunk edges clip crossing shapes without wrapping into another row (0.8305ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 521.342584

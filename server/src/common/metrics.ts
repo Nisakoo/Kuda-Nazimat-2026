@@ -14,16 +14,15 @@ export interface Metrics {
 
 export const MS_BUCKETS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 30000] as const;
 export const FAST_MS_BUCKETS = [0.25, 0.5, 1, 2, 5, 10, 20, 50, 100] as const;
+/** Bounds contain the OBS thresholds (broadcast 120 ms, RTT 150 ms), so a threshold check never depends on rounding. */
+export const BROADCAST_MS_BUCKETS = [50, 80, 100, 110, 120, 150, 200, 300, 500, 1000, 2000] as const;
+export const RTT_MS_BUCKETS = [5, 10, 20, 50, 100, 150, 200, 300, 500, 1000, 2000, 5000] as const;
+export const FPS_BUCKETS = [5, 10, 15, 20, 25, 30, 45, 60, 90, 120, 240, 1000] as const;
 
 interface Series { labels: Labels; value: number; counts?: number[]; sum?: number }
 interface Family { name: string; help: string; type: 'counter' | 'gauge' | 'histogram'; buckets?: readonly number[]; series: Map<string, Series>; collect?: () => number | readonly { labels: Labels; value: number }[] }
 
 const key = (labels: Labels): string => Object.keys(labels).sort().map((k) => `${k}=${labels[k]}`).join(',');
-const escape = (value: string): string => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
-const render = (labels: Labels, extra: Labels = {}): string => {
-  const all = { ...labels, ...extra }; const keys = Object.keys(all);
-  return keys.length ? `{${keys.map((k) => `${k}="${escape(all[k]!)}"`).join(',')}}` : '';
-};
 
 export class MetricsRegistry implements Metrics {
   private readonly families = new Map<string, Family>();
@@ -68,21 +67,6 @@ export class MetricsRegistry implements Metrics {
     return [...family.series.values()];
   }
 
-  /** Prometheus text exposition format 0.0.4 (OBS-008). */
-  prometheus(): string {
-    const lines: string[] = [];
-    for (const family of this.families.values()) {
-      lines.push(`# HELP ${family.name} ${family.help}`, `# TYPE ${family.name} ${family.type}`);
-      for (const series of this.collected(family)) {
-        if (family.type !== 'histogram') { lines.push(`${family.name}${render(series.labels)} ${series.value}`); continue; }
-        let cumulative = 0;
-        family.buckets!.forEach((bound, i) => { cumulative += series.counts![i]!; lines.push(`${family.name}_bucket${render(series.labels, { le: String(bound) })} ${cumulative}`); });
-        lines.push(`${family.name}_bucket${render(series.labels, { le: '+Inf' })} ${series.value}`, `${family.name}_sum${render(series.labels)} ${series.sum}`, `${family.name}_count${render(series.labels)} ${series.value}`);
-      }
-    }
-    return `${lines.join('\n')}\n`;
-  }
-
   /** JSON snapshot for the operator screen and incident dumps; histograms report count, sum and p50/p95. */
   snapshot(): Record<string, unknown> {
     const result: Record<string, unknown> = {};
@@ -99,10 +83,31 @@ export class MetricsRegistry implements Metrics {
     const family = this.families.get(name); if (!family) return 0;
     return this.collected(family).filter((s) => Object.entries(filter).every(([k, v]) => s.labels[k] === v)).reduce((sum, s) => sum + s.value, 0);
   }
+
+  has(name: string): boolean { return this.families.has(name); }
+
+  /** Total of a counter or gauge over label sets accepted by `match` (e.g. HTTP statuses ≥ 500). */
+  total(name: string, match: (labels: Labels) => boolean): number {
+    const family = this.families.get(name); if (!family) return 0;
+    return this.collected(family).filter((s) => match(s.labels)).reduce((sum, s) => sum + s.value, 0);
+  }
+
+  /** Bucket counts of a histogram summed over label sets matching `filter`; the last element counts values above every bound. */
+  histogramCounts(name: string, filter: Labels = {}): { readonly buckets: readonly number[]; readonly counts: number[] } | null {
+    const family = this.families.get(name); if (!family || family.type !== 'histogram') return null;
+    const counts = new Array<number>(family.buckets!.length + 1).fill(0);
+    for (const series of family.series.values()) {
+      if (!Object.entries(filter).every(([k, v]) => series.labels[k] === v)) continue;
+      let inBuckets = 0;
+      series.counts!.forEach((count, i) => { counts[i]! += count; inBuckets += count; });
+      counts[counts.length - 1]! += series.value - inBuckets;
+    }
+    return { buckets: family.buckets!, counts };
+  }
 }
 
 /** Upper bucket bound containing the quantile; null without observations. */
-function quantile(buckets: readonly number[], counts: readonly number[], total: number, q: number): number | null {
+export function quantile(buckets: readonly number[], counts: readonly number[], total: number, q: number): number | null {
   if (!total) return null;
   let seen = 0;
   for (let i = 0; i < buckets.length; i++) { seen += counts[i]!; if (seen >= q * total) return buckets[i]!; }

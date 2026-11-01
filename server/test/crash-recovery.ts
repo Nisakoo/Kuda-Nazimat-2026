@@ -19,7 +19,7 @@ const address = probe.address(); assert(address && typeof address !== 'string');
 const port = address.port; await new Promise<void>((resolve) => probe.close(() => resolve()));
 await writeFile(join(root, 'index.html'), 'UI');
 await writeFile(configPath, JSON.stringify({ ...world, host: '127.0.0.1', port, clientDir: root, dbPath, defaultMap: 'test' }));
-const origin = `http://127.0.0.1:${port}`; const sockets: Socket[] = []; let child: ChildProcess | undefined;
+const origin = `https://127.0.0.1:${port}`; const sockets: Socket[] = []; let child: ChildProcess | undefined;
 const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 async function until(predicate: () => boolean, ms = 12000) { const end = Date.now() + ms; while (!predicate()) { assert(Date.now() < end, 'deadline'); await delay(25); } }
 async function start() {

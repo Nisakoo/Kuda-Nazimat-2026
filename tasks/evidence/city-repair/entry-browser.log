@@ -1,0 +1,10 @@
+
+Running 2 tests using 1 worker
+
+(node:22656) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/2] e2e/hub.spec.ts:277:1 › waiting groups do not block creating solo or multiplayer games
+[2/2] e2e/hub.spec.ts:296:1 › waiting groups require an explicit choice and preserve the saved game
+  2 passed (11.2s)

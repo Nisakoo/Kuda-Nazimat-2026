@@ -11,6 +11,7 @@ import { parseServerMessage } from '../../shared/protocol/validate.ts';
 import { parseWorldLifeServerMessage } from '../../shared/world-life/validate.ts';
 import type { WorldLifeServerMessage, SceneStateMessage, HandResultMessage, WorldLifeDefinition } from '../../shared/world-life/types.ts';
 import { makeWorld } from './a-helpers.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 const cleanups:(()=>Promise<void>)[]=[];
 afterEach(async()=>{for(const cleanup of cleanups.splice(0).reverse())await cleanup();});
@@ -32,8 +33,8 @@ it('real HTTP auth, 4 BABEL roles, world-life sockets, pickup race, lost reply, 
   for(let i=0;i<10;i++){const total=resources+Buffer.byteLength(JSON.stringify(manifest));if(total===manifest.worldBytes)break;manifest.worldBytes=total;}
   await writeFile(manifestPath,JSON.stringify(manifest));await writeFile(join(root,'index.html'),'<main>test</main>');
   const config={...parseConfig({...world,clientDir:root,dbPath:join(root,'game.sqlite'),defaultMap:'test',host:'127.0.0.1',staticChunkRadius:0,saveIntervalMs:50,disconnectGraceMs:80,npc:{options:{delayMs:0}}},join(root,'config.json')),port:0};
-  let app=await startApplication(config,createGame,silentLogger);cleanups.push(async()=>{await app.stop();});
-  const origin=()=>{const a=app.server.address();if(!a||typeof a==='string')throw new Error('No address');return `http://127.0.0.1:${a.port}`;};
+  let app=await startTrusted(startApplication, config,createGame,silentLogger);cleanups.push(async()=>{await app.stop();});
+  const origin=()=>{const a=app.server.address();if(!a||typeof a==='string')throw new Error('No address');return `https://127.0.0.1:${a.port}`;};
   const guest=async(name:string)=>await(await fetch(`${origin()}/api/auth/guest`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})})).json() as {token:string};
   const auth=await Promise.all(['Role1','Role2','Role3','Role4'].map(guest));
   for(const [index,a] of auth.entries()){
@@ -84,7 +85,7 @@ it('real HTTP auth, 4 BABEL roles, world-life sockets, pickup race, lost reply, 
   const saved=db.prepare('SELECT * FROM world_apples ORDER BY id').all();await app.stop();
   // Resume outside the original scene's chunk window, without releasing the held apple.
   db.prepare('UPDATE players SET x=60,y=0,z=60 WHERE id=?').run(String(people[2]!.id));
-  app=await startApplication(config,createGame,silentLogger);
+  app=await startTrusted(startApplication, config,createGame,silentLogger);
   const restored=await connect(auth[2]!.token);restored.send('lost','pickup','apple-3');expect(await restored.result('lost')).toMatchObject({ok:true});expect(db.prepare('SELECT * FROM world_apples ORDER BY id').all()).toEqual(saved);expect(inventory()).toEqual(inventoryBefore);
   expect(restored.life.find(p=>p.type==='scene-state')).toMatchObject({apples:expect.arrayContaining([{id:'apple-3',mapId:'test',state:'held',holderId:people[2]!.id}])});
   expect((restored.life.find(p=>p.type==='scene-state') as SceneStateMessage).sceneId).not.toBe(scene.sceneId);

@@ -14,6 +14,7 @@ import { parseBabylonResult } from '../../shared/babylon/validate.ts';
 import type { ServerMessage } from '../../shared/protocol/types.ts';
 import { testLanguagePort } from '../src/babylon/TestLanguagePort.ts';
 import type { LanguagePort } from '../src/babylon/ports.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 async function authPost(origin: string, route: string, value?: unknown, token?: string) {
   return fetch(`${origin}/api/auth/${route}`, {
@@ -42,9 +43,9 @@ it('password registration restores pending state after restart, gates join, save
   await pending.wait(p => p.type === 'error' && p.requestId === denied && p.code === 'FORBIDDEN');
   expect(pending.packets.some(p => p.type === 'joined')).toBe(false);
   await app.stop();
-  const restarted = await startApplication(config, createGame, silentLogger); defer(() => restarted.stop());
+  const restarted = await startTrusted(startApplication, config, createGame, silentLogger); defer(() => restarted.stop());
   const address = restarted.server.address(); if (!address || typeof address === 'string') throw new Error('No restarted server');
-  const nextOrigin = `http://127.0.0.1:${address.port}`;
+  const nextOrigin = `https://127.0.0.1:${address.port}`;
   expect(await (await fetch(`${nextOrigin}/api/auth/state`, { headers })).json()).toEqual({ requiresAvatar: true });
   const save = await fetch(`${nextOrigin}/api/avatar`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ avatarId: 'dan' }) });
   expect(save.status).toBe(200);

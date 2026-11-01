@@ -3,6 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { GameConfig } from '../contracts.ts';
 import { NPC_TIMING, validNpcTimeoutMs } from '../../../shared/protocol/npcTiming.ts';
+import { isIP } from 'node:net';
 import { LEVELS, type LogsConfig } from '../common/logger.ts';
 
 /** SERVER-009: the environment selects a preset; files and arguments override it. */
@@ -17,7 +18,9 @@ export interface Config extends GameConfig {
   /** passwordless enables `guest` and `dev` login (AUTH-001, AUTH-016); never in production. */
   auth: { maxSessions: number; passwordless: boolean };
   logs: LogsConfig;
-  monitoring: { token: string | null; pingIntervalMs: number; validateOutgoing: boolean };
+  /** TLS-016: HTTPS is always on; only the certificate directory and extra names are configurable. */
+  tls: { dir: string; extraNames: string[] };
+  monitoring: { pingIntervalMs: number; validateOutgoing: boolean };
   language: { adapter: string; options: Record<string, unknown> };
   npc: { adapter: string; maxConcurrent: number; maxUnfinished: number; timeoutMs: number; streamTimeoutMs: number; options: Record<string, unknown> };
 }
@@ -31,17 +34,20 @@ const defaults: Input = {
   disconnectGraceMs: 10000, saveIntervalMs: 10000, corsOrigins: [], logWorldAccess: false, clientDebug: false,
   auth: { maxSessions: 5, passwordless: false },
   logs: { consoleLevel: 'info', fileLevel: 'debug', dir: 'data/logs', maxFileMb: 20, maxTotalMb: 200, retentionDays: 14 },
-  monitoring: { token: null, pingIntervalMs: 5000, validateOutgoing: false },
+  tls: { dir: 'data/tls', extraNames: [] },
+  monitoring: { pingIntervalMs: 5000, validateOutgoing: false },
   language: { adapter: 'test', options: {} },
   npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: NPC_TIMING.defaultMs, streamTimeoutMs: NPC_TIMING.defaultMs, options: {} },
 };
-const NESTED = ['auth', 'logs', 'monitoring', 'language', 'npc'] as const;
+const NESTED = ['auth', 'logs', 'tls', 'monitoring', 'language', 'npc'] as const;
 type Preset = { [K in keyof Input]?: K extends (typeof NESTED)[number] ? Partial<Input[K]> : Input[K] };
 const PRESETS: Record<Environment, Preset> = {
-  development: { dbPath: 'data/dev.sqlite', corsOrigins: ['http://localhost:5173'], clientDebug: true, auth: { passwordless: true }, logs: { consoleLevel: 'debug' }, monitoring: { validateOutgoing: true } },
+  development: { dbPath: 'data/dev.sqlite', corsOrigins: ['https://localhost:5173'], clientDebug: true, auth: { passwordless: true }, logs: { consoleLevel: 'debug' }, monitoring: { validateOutgoing: true } },
   production: {},
   test: { dbPath: 'data/test.sqlite', auth: { passwordless: true }, logs: { consoleLevel: 'warn', fileLevel: 'off' } },
 };
+
+const DNS_NAME = /^(?=.{1,253}$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*$/i;
 
 export function record(value: unknown, key: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Неверный объект: ${key}`);
@@ -75,7 +81,7 @@ export function parseConfig(raw: unknown, path: string, env: Environment = 'deve
   if (!Array.isArray(config.corsOrigins) || config.corsOrigins.some((origin) => {
     try { const url = new URL(origin); return typeof origin !== 'string' || !['http:', 'https:'].includes(url.protocol) || url.origin !== origin; } catch { return true; }
   })) throw new Error('Неверный corsOrigins');
-  const { auth, logs, monitoring, language, npc } = config;
+  const { auth, logs, tls, monitoring, language, npc } = config;
   integer(auth.maxSessions, 'auth.maxSessions', 1, 100);
   if (typeof auth.passwordless !== 'boolean') throw new Error('Неверный auth.passwordless');
   if (env === 'production' && auth.passwordless) throw new Error('auth.passwordless запрещён в production: вход без пароля только для development и test');
@@ -83,7 +89,10 @@ export function parseConfig(raw: unknown, path: string, env: Environment = 'deve
   if (typeof logs.dir !== 'string' || !logs.dir.trim()) throw new Error('Неверный logs.dir');
   integer(logs.maxFileMb, 'logs.maxFileMb', 1, 1024); integer(logs.maxTotalMb, 'logs.maxTotalMb', 1, 100000); integer(logs.retentionDays, 'logs.retentionDays', 1, 3650);
   if (logs.maxFileMb > logs.maxTotalMb) throw new Error('logs.maxFileMb > logs.maxTotalMb');
-  if (monitoring.token !== null && (typeof monitoring.token !== 'string' || monitoring.token.length < 32 || /\s/.test(monitoring.token))) throw new Error('monitoring.token: null или строка от 32 символов без пробелов');
+  if (typeof tls.dir !== 'string' || !tls.dir.trim()) throw new Error('Неверный tls.dir');
+  if (!Array.isArray(tls.extraNames) || tls.extraNames.length > 8 || tls.extraNames.some((name) => typeof name !== 'string' || !(isIP(name) || DNS_NAME.test(name)))) {
+    throw new Error('tls.extraNames: до 8 DNS-имён или IP-адресов');
+  }
   integer(monitoring.pingIntervalMs, 'monitoring.pingIntervalMs', 1000, 60000);
   if (typeof monitoring.validateOutgoing !== 'boolean') throw new Error('Неверный monitoring.validateOutgoing');
   if (typeof language.adapter !== 'string' || !language.adapter) throw new Error('Неверный language.adapter');
@@ -100,7 +109,7 @@ export function parseConfig(raw: unknown, path: string, env: Environment = 'deve
   const base = dirname(path);
   return {
     ...config, clientDir: resolve(base, config.clientDir), worldDir: resolve(base, config.worldDir), contentDir: resolve(base, config.contentDir), dbPath: resolve(base, config.dbPath),
-    logs: { ...logs, dir: resolve(base, logs.dir) },
+    logs: { ...logs, dir: resolve(base, logs.dir) }, tls: { ...tls, dir: resolve(base, tls.dir) },
   };
 }
 

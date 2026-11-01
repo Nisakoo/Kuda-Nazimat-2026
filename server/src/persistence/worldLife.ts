@@ -10,15 +10,16 @@ export function sqliteWorldLife(db: DatabaseSync, now: () => number = Date.now):
     ? { id: row.id, mapId: row.map_id, state: 'world', position: { x: row.x, y: row.y, z: row.z } }
     : { id: row.id, mapId: row.map_id, state: 'held', holderId: row.holder_id }));
   return {
-    initialize(definitions) {
+    initialize(definitions, restore) {
       return transaction(db, () => {
-        const expected = new Set<string>();
+        const expected = new Set<string>(), added = new Set<string>();
         for (const definition of definitions) {
           const apples = definition.instances.filter(i => definition.templates.find(t => t.id === i.templateId)?.behavior === 'pickup');
           for (const apple of apples) {
             if (expected.has(apple.id)) throw new Error(`Duplicate durable apple id: ${apple.id}`);
             expected.add(apple.id);
             const existing = db.prepare('SELECT map_id FROM world_apples WHERE id = ?').get(apple.id);
+            if (!existing) added.add(apple.id);
             if (existing && existing.map_id !== definition.mapId) throw new Error(`Apple home map changed: ${apple.id}`);
             db.prepare('INSERT OR IGNORE INTO world_apples (id,map_id,state,x,y,z) VALUES (?,?,\'world\',?,?,?)').run(apple.id, definition.mapId, apple.position.x, apple.position.y, apple.position.z);
           }
@@ -27,7 +28,23 @@ export function sqliteWorldLife(db: DatabaseSync, now: () => number = Date.now):
         }
         const saved = read();
         if (saved.length !== expected.size || saved.some(a => !expected.has(a.id))) throw new Error('Durable apple catalogue removed or changed');
-        return saved;
+        if(!restore)return saved;
+        // Preserve existing positions first; new authored items yield when they overlap an old save.
+        const repaired=restore([...saved].sort((a,b)=>Number(added.has(a.id))-Number(added.has(b.id))));
+        if(repaired.length!==saved.length||new Set(repaired.map(a=>a.id)).size!==saved.length)throw new Error('Invalid scene restoration');
+        for(const item of repaired){
+          const before=saved.find(a=>a.id===item.id);if(!before||before.mapId!==item.mapId||before.state!==item.state||before.state==='held'&&(item.state!=='held'||item.holderId!==before.holderId))throw new Error('Restoration changed item ownership');
+          parseAppleState(item);
+          if(item.state==='world')db.prepare('UPDATE world_apples SET x=?,y=?,z=? WHERE id=? AND state=\'world\'').run(item.position.x,item.position.y,item.position.z,item.id);
+        }
+        return repaired;
+      });
+    },
+    resetApples(mapId, apples) {
+      return transaction(db, () => {
+        const update = db.prepare('UPDATE world_apples SET state = \'world\', x = ?, y = ?, z = ?, holder_id = NULL WHERE id = ? AND map_id = ?');
+        for (const apple of apples) if (update.run(apple.position.x, apple.position.y, apple.position.z, apple.id, mapId).changes !== 1) throw new Error('Unknown durable apple');
+        return read();
       });
     },
     execute(playerId, mapId, request, decide) {

@@ -97,6 +97,17 @@ describe('authoritative world-life visuals',()=>{
     h.life.animate(0,.016,['0_0']);h.life.animate(.1,.016,[]);const late=model();resolve(late);await settle();
     expect(late.dispose).toHaveBeenCalledOnce();expect(h.life.ids).toHaveLength(0);h.dispose();
   });
+  it('renders a perched bird, synchronized flight and folded wings, releasing its model on unload',async()=>{
+    const h=setup(),initial=state();const perch={id:'bird-rest',position:{x:1,y:0,z:2},rotationY:.3};
+    const resting={id:perch.id,startedMs:null,landingMs:null,yaw:.3};
+    h.life.setState({...initial,definition:{...initial.definition,perches:[perch]},birds:[resting]},0);
+    h.life.animate(0,.016,['0_0']);await settle();h.life.animate(.1,.016,['0_0']);
+    const bird=h.scene.getObjectByName('life:bird-rest')!;expect(bird.position.y).toBeCloseTo(.13);
+    expect(bird.getObjectByName('bird-wing-left')!.rotation.y).toBeCloseTo(-1.05);
+    h.life.setState({...initial,revision:1,serverTimeMs:2000,definition:{...initial.definition,perches:[perch]},birds:[{...resting,startedMs:1000}]},1);
+    h.life.animate(2.2,.016,['0_0']);expect(bird.position.y).toBeGreaterThan(2);
+    h.life.animate(2.3,.016,[]);expect(h.scene.getObjectByName('life:bird-rest')).toBeUndefined();h.dispose();
+  });
   it('uses the existing centred market grid at negative and positive boundaries',()=>{
     expect(lifeChunk({x:-16,y:0,z:-16})).toBe('0_0');expect(lifeChunk({x:16,y:0,z:-16.01})).toBe('1_-1');
   });

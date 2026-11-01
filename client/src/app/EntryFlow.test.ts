@@ -18,7 +18,7 @@ function savedState(): BabylonState {
       { id: 'entry-player', name: 'Returning', role: 2 },
       { id: 'third-peer', name: 'Third', role: 3 },
     ], started: true, completed: false, seconds: 42 },
-    availableParty: null, partyPositions: [{ id: 'task-peer', name: 'Peer', x: -5, z: -26 }],
+    availableParties: [], availablePartiesTruncated: false, availableParty: null, partyPositions: [{ id: 'task-peer', name: 'Peer', x: -5, z: -26 }],
     task: 'Continue the saved task', taskTitle: 'Saved task', taskTarget: { x: 0, z: -34 }, goatGuide: null,
     inventory: { ...EMPTY_INVENTORY, dates: 2, water: 1 }, fed: ['white-goat'],
     stones: [], words: [], messages: [], replies: [],
@@ -168,5 +168,40 @@ describe('market entry confirmation', () => {
     expect(f.snapshot.entryStage).toBe('loading');
     expect(f.network).toHaveBeenCalledOnce();
     expect(f.transport.connect).toHaveBeenCalledExactlyOnceWith({ kind: 'server', session });
+  });
+});
+
+
+describe('independent waiting groups', () => {
+  const waiting = [
+    { id: 'host-a-party', hostName: 'Host A', size: 2 as const, count: 1 },
+    { id: 'host-b-party', hostName: 'Host B', size: 4 as const, count: 1 },
+  ];
+  it.each([1, 3] as const)('allows a new game of size %i while other groups wait', async size => {
+    const initial = { ...newState(), profile: { native: 'ru' as const, learning: 'en' as const }, availableParties: waiting };
+    const f = fixture(initial); await ready(f);
+    expect(await f.app.createEntryGame(size)).toBe(true);
+    expect(f.commands()[0]?.action).toEqual({ type: 'create', size });
+    expect(f.snapshot.babylon?.state?.availableParties).toEqual(waiting);
+  });
+  it('requires an explicit group and retains that group on retry', async () => {
+    const initial = { ...newState(), profile: { native: 'ru' as const, learning: 'en' as const }, availableParties: waiting };
+    const f = fixture(initial); await ready(f);
+    await expect(f.app.connectEntryGame('http://entry.unit')).rejects.toThrow('Выберите группу');
+    expect(f.commands()).toHaveLength(0);
+    f.reply(() => new Response(JSON.stringify({ v: 2, error: { code: 'UNAVAILABLE', message: 'Retry selected group' } }), { status: 503 }));
+    expect(await f.app.connectEntryGame('http://entry.unit', 'host-b-party')).toBe(false);
+    const first = f.commands()[0]!;
+    expect(first.action).toEqual({ type: 'join', partyId: 'host-b-party' });
+    f.reply(packet => f.success(packet, { ...initial, party: { ...savedState().party!, id: 'host-b-party' } }));
+    expect(await f.app.retryEntryAction()).toBe(true);
+    expect(f.commands()[1]).toEqual(first);
+  });
+  it('continues its own saved party without selecting another waiting group', async () => {
+    const initial = { ...savedState(), availableParties: waiting };
+    const f = fixture(initial); await ready(f);
+    expect(await f.app.connectEntryGame('http://entry.unit')).toBe(true);
+    expect(f.commands()[0]?.action).toEqual({ type: 'join' });
+    expect(f.snapshot.babylon?.state?.party?.id).toBe('saved-party');
   });
 });

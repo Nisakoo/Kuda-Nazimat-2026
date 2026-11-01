@@ -112,24 +112,25 @@ class Runtime:
 
     def answer(self, request):
         return self._answer_prompt(compile_prompt(request, self.tokenizer),
-                                   normalize_target_text if request.get('locale') in ('en', 'es') else None)
+                                   normalize_target_text if request.get('locale') in ('en', 'es') else None,
+                                   max_tokens=256 if request.get('locale') in ('en', 'es') else 128)
 
     def translate(self, request):
         return self._answer_prompt(compile_translation(request, self.tokenizer), normalize_translation)
 
-    def _answer_prompt(self, prompt, strict_normalize):
+    def _answer_prompt(self, prompt, strict_normalize, max_tokens=128):
         ids = self.tokenizer.encode(prompt, add_special_tokens=False)
-        if not isinstance(ids, list) or len(ids) > 1792 or len(ids) + 128 > 2048:
+        if not isinstance(ids, list) or len(ids) > 1792 or len(ids) + max_tokens > 2048:
             raise WorkerError('input_too_long', 'Input token limit exceeded')
         with open(os.devnull, 'w') as sink, contextlib.redirect_stdout(sink):
             if strict_normalize is not None:
                 parts = []
                 size = 0
                 reason = None
-                for count, item in enumerate(self.stream_generate(self.model, self.tokenizer, ids, max_tokens=128,
+                for count, item in enumerate(self.stream_generate(self.model, self.tokenizer, ids, max_tokens=max_tokens,
                                                                   sampler=self.sampler, logits_processors=self.processors), 1):
                     chunk = getattr(item, 'text', None)
-                    if count > 128 or not isinstance(chunk, str) or reason is not None:
+                    if count > max_tokens or not isinstance(chunk, str) or reason is not None:
                         raise WorkerError('invalid_response', 'Invalid model response')
                     try:
                         size += len(chunk.encode('utf-8'))

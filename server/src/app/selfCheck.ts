@@ -1,4 +1,4 @@
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -6,6 +6,8 @@ import type { Config } from './config.ts';
 import { firewallHint, lanAddresses, type LanAddress } from '../common/network.ts';
 import { loadMigrations } from '../persistence/migrate.ts';
 import { loadWorld } from '../world/loader.ts';
+import { describeCertificate, uncoveredNames } from '../tls/certificate.ts';
+import { certificateNames, certificatePaths, daysLeft, EXPIRY_WARNING_DAYS } from '../tls/store.ts';
 
 /** One diagnostic line; `ok: false` means the server cannot start as configured. */
 export interface Check { readonly name: string; readonly ok: boolean; readonly detail: string }
@@ -43,6 +45,21 @@ function interfacesCheck(addresses: readonly LanAddress[]): Check {
   return { name: 'Сеть', ok: true, detail: usable.length ? listed : `${listed || 'нет интерфейсов'} — доступен только режим одного компьютера` };
 }
 
+/** TLS-015: read-only look at the certificate; a missing one is fine, the first start creates it. */
+export function certificateCheck(config: Config, addresses: readonly LanAddress[], now = new Date()): Check {
+  const { certPath, keyPath } = certificatePaths(config.tls);
+  if (!existsSync(certPath) && !existsSync(keyPath)) return { name: 'Сертификат', ok: true, detail: `${config.tls.dir}: будет создан при первом запуске (npm --prefix server run tls -- init)` };
+  try {
+    const info = describeCertificate(readFileSync(certPath, 'utf8'), readFileSync(keyPath, 'utf8'));
+    const left = daysLeft(info, now);
+    const missing = uncoveredNames(info, certificateNames(config.tls, addresses));
+    const problems = [left < 0 ? `истёк ${info.notAfter.toISOString().slice(0, 10)}` : left < EXPIRY_WARNING_DAYS ? `истекает через ${left} дн.` : '', missing.length ? `не покрывает адреса: ${missing.join(', ')}` : ''].filter(Boolean);
+    const mode = process.platform !== 'win32' && (statSync(keyPath).mode & 0o077) !== 0 ? `ключ доступен другим пользователям: chmod 600 "${keyPath}"` : '';
+    if (mode) problems.push(mode);
+    return { name: 'Сертификат', ok: left >= 0 && !mode, detail: `SHA-256 ${info.fingerprint}, до ${info.notAfter.toISOString().slice(0, 10)}${problems.length ? ` — ${problems.join('; ')}; выпустить заново: npm --prefix server run tls -- renew --yes` : ''}` };
+  } catch { return { name: 'Сертификат', ok: false, detail: `${config.tls.dir}: сертификат или ключ повреждены — npm --prefix server run tls -- renew --yes` }; }
+}
+
 /** OFFLINE-008: everything a start needs, without starting the game. */
 export async function lanCheck(config: Config, options: { addresses?: readonly LanAddress[]; platform?: NodeJS.Platform; node?: string } = {}): Promise<Check[]> {
   const checks: Check[] = [nodeCheck(options.node), interfacesCheck(options.addresses ?? lanAddresses()), await portCheck(config.host, config.port)];
@@ -53,6 +70,7 @@ export async function lanCheck(config: Config, options: { addresses?: readonly L
     checks.push({ name: 'Мир', ok: true, detail: [...world.maps.keys()].join(', ') });
   } catch (error) { checks.push({ name: 'Мир', ok: false, detail: `${error instanceof Error ? error.message : 'ошибка'} — выполните make prepare` }); }
   checks.push(databaseCheck(config.dbPath));
+  checks.push(certificateCheck(config, options.addresses ?? lanAddresses()));
   checks.push({ name: 'Брандмауэр', ok: true, detail: firewallHint(options.platform).replace('<порт>', String(config.port)) });
   return checks;
 }

@@ -13,6 +13,7 @@ import { parseConfig } from '../src/app/config.ts';
 import { createGame } from '../src/game/index.ts';
 import { silentLogger } from '../src/common/logger.ts';
 import type { CreateGame } from '../src/contracts.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 const directory = await mkdtemp(join(tmpdir(),'world-life-startup-'));
 const config = { ...parseConfig({ host:'127.0.0.1',clientDir:resolve('client/dist'),worldDir:resolve('client/public'),contentDir:resolve('server/content'),dbPath:join(directory,'game.sqlite'),defaultMap:'market' },join(directory,'config.json')),port:0 };
@@ -65,7 +66,7 @@ const measuredGame:CreateGame=async(settings,deps)=>{
 };
 let app:Awaited<ReturnType<typeof startApplication>>|undefined;
 try {
-  app=await startApplication(config,measuredGame,silentLogger);
+  app=await startTrusted(startApplication, config,measuredGame,silentLogger);
   mark('ready');loop.disable();
   console.log(JSON.stringify({startupDiagnostic:{startupMs:performance.now()-startedAt,environment,after:{loadAverage:loadavg(),freeBytes:freemem(),rssBytes:process.memoryUsage().rss},stages,fileReads:Object.fromEntries(reads),json:{calls:jsonCalls,wallMs:jsonMs},eventLoopDelay:{maxMs:loop.max/1e6,meanMs:loop.mean/1e6},targetHardware:'unverified: shared Linux container'}}));
 } catch(error) {

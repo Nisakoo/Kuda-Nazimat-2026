@@ -20,6 +20,13 @@ describe('generated market assets',()=>{
       expect(collisions.some(([minX,minZ,maxX,maxZ])=>x!>=minX!&&x!<=maxX!&&z!>=minZ!&&z!<=maxZ!)).toBe(false);
     }
   });
+  it('blocks ground vessels and cart shafts but leaves rounded corners and shaft gap open',()=>{
+    const collisions=json('market').nodes.find(node=>node.name==='market')!.extras!.collisions!;
+    const blocked=(x:number,z:number)=>collisions.some(([x0,z0,x1,z1])=>x>=x0!&&x<=x1!&&z>=z0!&&z<=z1!);
+    for(const [x,z] of [[-6.8,3.6],[-3.15,3.5],[-6.7,4.9],[4.25,-6.2],[5.35,-6.2]])expect(blocked(x!,z!)).toBe(true);
+    expect(blocked(-6.7+.6,4.9+.6)).toBe(false);
+    expect(blocked(4.8,-6.2)).toBe(false);
+  });
   it('does not leave baked visual vessels at any of the 4 movable positions',async()=>{
     const market=await scene('market');
     for(const [x,z] of [[5.2,4.6],[5.9,5.3],[6.6,4.6],[-3.7,7]]){
@@ -37,8 +44,8 @@ describe('generated market assets',()=>{
     const life=parseWorldLifeDefinition(manifest.worldLife,manifest.models,'market');
     expect(life.cats).toHaveLength(3);expect(life.flock.count).toBe(5);
     const behavior=(id:string)=>life.templates.find(template=>template.id===id)!.behavior;
-    expect(life.instances.filter(instance=>behavior(instance.templateId)==='pushable')).toHaveLength(4);
-    expect(life.instances.filter(instance=>behavior(instance.templateId)==='pickup')).toHaveLength(5);
+    expect(life.instances.filter(instance=>behavior(instance.templateId)==='pushable')).toHaveLength(8);
+    expect(life.instances.filter(instance=>behavior(instance.templateId)==='pickup')).toHaveLength(17);
   });
   it('makes the full SCENE/BUILDING catalogue available through independent manifest models and declared budgets',()=>{
     const manifest=JSON.parse(readFileSync(new URL('../../../public/maps/market/manifest.json',import.meta.url),'utf8')) as {models:Record<string,string>;assets:Record<string,{bytes:number;memory:number}>};
