@@ -11,7 +11,7 @@ related:
     requirements: [ADMIN-SRV-009, ADMIN-SRV-012–014]
   - spec: ../specs/admin-panel-ui.md
     requirements: [ADMIN-001, ADMIN-007, ADMIN-019–028]
-depends_on: [TASK-080, TASK-100, TASK-095]
+depends_on: [TASK-080, TASK-100, TASK-102]
 ---
 
 # Завершение admin-server и перенос решений прерванной admin-panel
