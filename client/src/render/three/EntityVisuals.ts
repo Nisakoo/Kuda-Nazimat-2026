@@ -125,7 +125,8 @@ export class EntityVisuals {
         { carrying: this.held.has(id), action: visual.handAction, progress: visual.handTime/.65 });
       visual.handTime = Math.min(.65,visual.handTime+dt);
       if (visual.handTime >= .65) visual.handAction = null;
-      const name = visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
+      const name = visual.motion && !visual.motion.grounded ? 'jump'
+        : visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
       // Avatar stride metadata includes source normalization; legacy models keep speed/3.
       const pace = name === 'walk'
         ? visual.model?.walkPace?.(speed) ?? Math.max(.2, visual.speed / 3)

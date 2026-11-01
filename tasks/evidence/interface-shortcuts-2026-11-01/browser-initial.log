@@ -1,0 +1,238 @@
+
+Running 21 tests using 1 worker
+
+(node:72423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/babylon.spec.ts:56:1 › two real players enroll, translate, share stones and restore a private dictionary after restart (11.5s)
+  ✓   2 e2e/babylon.spec.ts:111:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task (48.7s)
+  ✓   3 e2e/babylon.spec.ts:154:1 › real server authorizes the default 25-chunk window at the market and tower (22.4s)
+  ✓   4 e2e/hub.spec.ts:54:1 › hub saves preferences, selects modes, loads automatically and preserves the saved game (9.5s)
+  ✓   5 e2e/hub.spec.ts:117:1 › manual IP validates input, reports unreachable server, cancels late navigation and reauthenticates on another server (6.1s)
+  ✓   6 e2e/hub.spec.ts:166:1 › delayed world stays frozen; cancel ignores late resources and retry enters without creating twice (3.8s)
+  ✓   7 e2e/hub.spec.ts:198:1 › resource failure retries and Escape during loading requires an explicit capture gesture (4.3s)
+  ✓   8 e2e/hub.spec.ts:214:1 › reduced motion and a browser capture rejection leave a recoverable ready world (2.4s)
+  ✓   9 e2e/hub.spec.ts:229:1 › entry errors persist across polling and retry never submits a changed destination (6.7s)
+  ✓  10 e2e/hub.spec.ts:268:1 › an existing waiting party offers a direct join before a rejected create (2.6s)
+  ✘  11 e2e/hub.spec.ts:284:1 › physical shortcuts free the cursor, switch panels and leave typing untouched without HUD key captions (5.7s)
+(node:73055) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 e2e/server-auth.spec.ts:61:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token (3.2s)
+  ✓  13 e2e/server-auth.spec.ts:81:1 › real players exchange chat and NPC memory survives a server restart (10.7s)
+  ✘  14 e2e/server-auth.spec.ts:101:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits (30.4s)
+(node:73361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  15 e2e/server-auth.spec.ts:120:1 › a world 401 and client session expiry return to login without automatically posting again (2.9s)
+  ✘  16 e2e/server-auth.spec.ts:131:1 › switching to the server market enrolls BABEL and opens the authoritative inventory (33.2s)
+(node:73539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 e2e/ui-hud.spec.ts:49:1 › confirmed appearance enters the real world, changes live and keeps the held jug (10.2s)
+  ✓  18 e2e/ui-hud.spec.ts:54:1 › real guest entry preserves only the connection address and returns from mode with Escape (3.0s)
+  ✘  19 e2e/ui-hud.spec.ts:99:1 › real registration resumes mandatory appearance and uses password authentication (11.2s)
+(node:73670) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  20 e2e/ui-hud.spec.ts:104:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (11.6s)
+  ✓  21 e2e/ui-hud.spec.ts:185:1 › connection errors allow retry and disappear after entry polling recovers (2.0s)
+
+
+  1) e2e/hub.spec.ts:284:1 › physical shortcuts free the cursor, switch panels and leave typing untouched without HUD key captions 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/Users/nisakoo/Documents/competition-2026/client/e2e/helpers.ts:5:86)
+        at play (/Users/nisakoo/Documents/competition-2026/client/e2e/hub.spec.ts:52:9)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/hub.spec.ts:285:43
+
+    Error Context: test-results/hub/hub-physical-shortcuts-fre-0a339-ed-without-HUD-key-captions/error-context.md
+
+    Error Context: test-results/hub/hub-physical-shortcuts-fre-0a339-ed-without-HUD-key-captions/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/hub-physical-shortcuts-fre-0a339-ed-without-HUD-key-captions/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/hub-physical-shortcuts-fre-0a339-ed-without-HUD-key-captions/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/server-auth.spec.ts:101:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Browser logs:
+
+    <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --enable-unsafe-swiftshader --user-data-dir=/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/playwright_chromiumdev_profile-4ydRiV --remote-debugging-pipe --no-startup-window
+    <launched> pid=73061
+    [pid=73061][err] Trying to load the allocator multiple times. This is *not* supported.
+    [pid=73061][err] [73065:12703705:1101/120610.470270:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120610.470697:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120610.473785:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120610.473893:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120610.475146:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120610.475240:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120610.477750:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120610.481911:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120610.482146:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120610.482237:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120611.943141:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120611.943224:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120613.563329:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120613.563431:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120613.567349:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120613.567442:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120613.567681:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120613.567751:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120613.567936:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120613.568021:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120613.568193:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120613.568271:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120614.625964:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120614.626055:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120616.003161:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120616.003246:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120616.093660:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120616.093783:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120616.537593:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120616.537684:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120616.619001:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120616.619096:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120617.031355:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120617.031487:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120623.561679:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120623.561770:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73061:12703703:1101/120624.091132:ERROR:base/process/process_mac.cc:45] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+    [pid=73061][err] [73061:12703703:1101/120624.091150:ERROR:base/process/process_mac.cc:90] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+    [pid=73061][err] [73065:12703705:1101/120624.294575:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120624.294719:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120624.297322:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120624.297419:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120624.298837:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120624.298934:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120624.299121:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120624.299185:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703705:1101/120624.299376:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061][err] [73065:12703801:1101/120624.299455:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=73061] <gracefully close start>
+    Call log:
+      - waiting for getByLabel('Адрес сервера')
+        - locator resolved to <input type="url" required="" aria-label="Адрес сервера"/>
+        - fill("http://127.0.0.1:1")
+      - attempting fill action
+        2 × waiting for element to be visible, enabled and editable
+          - element is not visible
+        - retrying fill action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and editable
+          - element is not visible
+        - retrying fill action
+          - waiting 100ms
+        58 × waiting for element to be visible, enabled and editable
+           - element is not visible
+         - retrying fill action
+           - waiting 500ms
+        - waiting for element to be visible, enabled and editable
+
+
+      113 |   await expect(page.locator('.entry-form')).toHaveAttribute('aria-busy', 'true');
+      114 |   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
+    > 115 |   await page.getByLabel('Адрес сервера').fill('http://127.0.0.1:1'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
+          |                                          ^
+      116 |   await expect(page.getByLabel('Имя игрока')).toBeVisible(); await expect(page.getByRole('button', { name: 'Начать путешествие →', exact: true })).toBeDisabled();
+      117 |   await expect(page.locator('canvas')).toHaveCount(0);
+      118 | });
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/server-auth.spec.ts:115:42
+
+    Error Context: test-results/hub/server-auth-login-errors-r-af918--and-small-screen-form-fits/error-context.md
+
+    Error Context: test-results/hub/server-auth-login-errors-r-af918--and-small-screen-form-fits/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/server-auth-login-errors-r-af918--and-small-screen-form-fits/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/server-auth-login-errors-r-af918--and-small-screen-form-fits/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) e2e/server-auth.spec.ts:131:1 › switching to the server market enrolls BABEL and opens the authoritative inventory 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Сумка', exact: true })
+
+
+      134 |   await page.getByText('Дополнительно', { exact: true }).click();
+      135 |   await page.getByLabel('Карта', { exact: true }).fill('market'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
+    > 136 |   await createFromHub(page); await page.keyboard.press('Escape');
+          |                                                                  ^
+      137 |   await page.getByRole('button', { name: 'Сумка', exact: true }).click();
+      138 |   const inventory = page.getByRole('dialog', { name: 'Инвентарь', exact: true });
+      139 |   await expect(inventory.getByRole('region', { name: 'Инструменты', exact: true })).toBeVisible();
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/server-auth.spec.ts:136:66
+
+    Error Context: test-results/hub/server-auth-switching-to-t-18bff-the-authoritative-inventory/error-context.md
+
+    Error Context: test-results/hub/server-auth-switching-to-t-18bff-the-authoritative-inventory/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/server-auth-switching-to-t-18bff-the-authoritative-inventory/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/server-auth-switching-to-t-18bff-the-authoritative-inventory/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) e2e/ui-hud.spec.ts:99:1 › real registration resumes mandatory appearance and uses password authentication 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 403
+
+       at auth-avatar-scenario.ts:203
+
+      201 |       page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }).click(),
+      202 |     ]);
+    > 203 |     expect(guest.status()).toBe(401);
+          |                            ^
+      204 |     await expect(page.getByRole('alert')).toHaveText('Неверное имя или пароль');
+      205 |     await expect(avatar).toBeHidden();
+      206 |     await expect(mode).toBeHidden();
+        at authAvatarScenario (/Users/nisakoo/Documents/competition-2026/client/e2e/auth-avatar-scenario.ts:203:28)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/ui-hud.spec.ts:101:3
+
+    Error Context: test-results/hub/ui-hud-real-registration-r-8412e-ses-password-authentication/error-context.md
+
+    Error Context: test-results/hub/ui-hud-real-registration-r-8412e-ses-password-authentication/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/ui-hud-real-registration-r-8412e-ses-password-authentication/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/ui-hud-real-registration-r-8412e-ses-password-authentication/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    e2e/hub.spec.ts:284:1 › physical shortcuts free the cursor, switch panels and leave typing untouched without HUD key captions 
+    e2e/server-auth.spec.ts:101:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits 
+    e2e/server-auth.spec.ts:131:1 › switching to the server market enrolls BABEL and opens the authoritative inventory 
+    e2e/ui-hud.spec.ts:99:1 › real registration resumes mandatory appearance and uses password authentication 
+  17 passed (4.6m)

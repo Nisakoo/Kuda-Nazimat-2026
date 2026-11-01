@@ -12,19 +12,24 @@
   "models": [
     {
       "id": "lukas",
+      "proportions": {
+        "height": 1.95,
+        "width": 1.04,
+        "depth": 0.56
+      },
       "path": "/assets/models/avatars/lukas.glb",
-      "bytes": 883556,
-      "triangles": 6814,
+      "bytes": 804180,
+      "triangles": 6058,
       "drawCalls": 17,
       "bounds": {
         "min": [
-          -0.48,
-          3.1299644265292415e-9,
+          -0.52,
+          3.3907948393530063e-9,
           -0.2847992913476692
         ],
         "max": [
-          0.48,
-          1.8000000031299646,
+          0.52,
+          1.9500000033907947,
           0.27520070865233087
         ]
       },
@@ -36,24 +41,33 @@
         {
           "name": "walk",
           "duration": 0.9
+        },
+        {
+          "name": "jump",
+          "duration": 4
         }
       ],
       "portrait": "/assets/models/avatars/lukas-portrait.png"
     },
     {
       "id": "nic",
+      "proportions": {
+        "height": 1.8,
+        "width": 0.82,
+        "depth": 0.56
+      },
       "path": "/assets/models/avatars/nic.glb",
-      "bytes": 883560,
-      "triangles": 6814,
+      "bytes": 804180,
+      "triangles": 6058,
       "drawCalls": 17,
       "bounds": {
         "min": [
-          -0.48,
+          -0.41,
           3.25939322753932e-9,
           -0.2847992913476692
         ],
         "max": [
-          0.48,
+          0.41,
           1.8000000032593932,
           0.27520070865233087
         ]
@@ -66,24 +80,33 @@
         {
           "name": "walk",
           "duration": 0.9
+        },
+        {
+          "name": "jump",
+          "duration": 4
         }
       ],
       "portrait": "/assets/models/avatars/nic-portrait.png"
     },
     {
       "id": "dan",
+      "proportions": {
+        "height": 1.8,
+        "width": 0.82,
+        "depth": 0.56
+      },
       "path": "/assets/models/avatars/dan.glb",
-      "bytes": 883568,
-      "triangles": 6814,
+      "bytes": 804172,
+      "triangles": 6058,
       "drawCalls": 17,
       "bounds": {
         "min": [
-          -0.48,
+          -0.41,
           3.16858927984498e-9,
           -0.2847992913476692
         ],
         "max": [
-          0.48,
+          0.41,
           1.8000000031685892,
           0.27520070865233087
         ]
@@ -96,24 +119,33 @@
         {
           "name": "walk",
           "duration": 0.9
+        },
+        {
+          "name": "jump",
+          "duration": 4
         }
       ],
       "portrait": "/assets/models/avatars/dan-portrait.png"
     },
     {
       "id": "ksu",
+      "proportions": {
+        "height": 1.8,
+        "width": 0.82,
+        "depth": 0.56
+      },
       "path": "/assets/models/avatars/ksu.glb",
-      "bytes": 720372,
-      "triangles": 5382,
+      "bytes": 818364,
+      "triangles": 6182,
       "drawCalls": 17,
       "bounds": {
         "min": [
-          -0.48,
+          -0.41,
           3.25939322753932e-9,
           -0.2853848587930961
         ],
         "max": [
-          0.48,
+          0.41,
           1.8000000032593932,
           0.27461514120690395
         ]
@@ -126,6 +158,10 @@
         {
           "name": "walk",
           "duration": 0.9
+        },
+        {
+          "name": "jump",
+          "duration": 4
         }
       ],
       "portrait": "/assets/models/avatars/ksu-portrait.png"

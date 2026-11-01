@@ -28,7 +28,7 @@ export class PasswordHasher {
   async verify(password: string, stored: string | null): Promise<{ ok: boolean; needsRehash: boolean }> {
     const parsed = stored ? parse(stored) : null;
     if (!parsed) { await this.verify(password, await (this.dummy ??= this.hash('dummy-password'))); return { ok: false, needsRehash: false }; }
-    const key = await this.derive(password, parsed.salt, parsed);
+    const key = await this.derive(stored?.startsWith('scrypt-legacy$') ? password : password.normalize('NFC'), parsed.salt, parsed);
     const ok = key.length === parsed.key.length && timingSafeEqual(key, parsed.key);
     return { ok, needsRehash: ok && (parsed.N < SCRYPT.N || parsed.r < SCRYPT.r || parsed.p < SCRYPT.p) };
   }
@@ -54,7 +54,7 @@ export class PasswordHasher {
 
 function parse(stored: string): { N: number; r: number; p: number; salt: Buffer; key: Buffer } | null {
   const parts = stored.split('$');
-  if (parts.length !== 6 || parts[0] !== 'scrypt') return null;
+  if (parts.length !== 6 || !['scrypt', 'scrypt-legacy'].includes(parts[0]!)) return null;
   const [N, r, p] = parts.slice(1, 4).map(Number);
   if (![N, r, p].every((value) => Number.isSafeInteger(value) && value! > 0)) return null;
   return { N: N!, r: r!, p: p!, salt: Buffer.from(parts[4]!, 'base64url'), key: Buffer.from(parts[5]!, 'base64url') };

@@ -30,6 +30,8 @@ export interface BabylonState {
 }
 export type BabylonAction =
   | { type: 'state' }
+  | { type: 'create'; size: PartySize; replacePartyId?: string }
+  | { type: 'join' }
   | { type: 'enroll'; size: PartySize; native: Language; learning: Language }
   | { type: 'languages'; native: Language; learning: Language }
   | { type: 'intro-seen' }

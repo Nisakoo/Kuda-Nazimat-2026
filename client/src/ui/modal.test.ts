@@ -199,3 +199,12 @@ it('does not recover after the dialog is destroyed', async () => {
   await new Promise<void>(resolve => setTimeout(resolve, 0));
   expect(spy).not.toHaveBeenCalled();
 });
+
+
+it('restores focus after a disable/enable ACK batch before the next frame', async () => {
+  vi.spyOn(document, 'hasFocus').mockReturnValue(true);
+  const { node, button } = dialog(); const action = modal(node);
+  button.disabled = true; button.blur(); button.disabled = false;
+  await vi.waitFor(() => expect(document.activeElement).toBe(button));
+  action.destroy();
+});

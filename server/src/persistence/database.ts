@@ -7,7 +7,7 @@ import { randomId } from '../common/ids.ts';
 import { NameTakenError, type AccountStore, type SessionStore } from '../auth/ports.ts';
 import type { DialogueStore } from '../npc/ports.ts';
 import type { AvatarStore, EquipmentStore, PlayerIdentity, PlayerStore } from '../contracts.ts';
-import { applyMigrations, loadMigrations } from './migrate.ts';
+import { applyApplicationMigrations } from './migrate.ts';
 
 export function transaction<T>(db: DatabaseSync, action: () => T): T {
   db.exec('BEGIN IMMEDIATE');
@@ -19,23 +19,9 @@ export function openDatabase(path: string, now = Date.now()): DatabaseSync {
   const db = new DatabaseSync(path);
   try {
     db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 1000');
-    const migrations = loadMigrations();
-    transaction(db, () => {
-      // Before merging main, the world-life branch used version 3 for apples.
-      // Preserve its data while assigning main's auth schema to 3 and world-life to 4.
-      const table = (name: string) => db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?").get(name);
-      if (table('schema_migrations') && table('world_apples') && table('world_hand_receipts')
-        && !db.prepare('PRAGMA table_info(accounts)').all().some(column => column.name === 'password_hash')) {
-        const versions = db.prepare('SELECT version FROM schema_migrations ORDER BY version').all();
-        if (versions.length !== 3 || versions.some((row, index) => row.version !== index + 1)) throw new Error('Неизвестная версия legacy world-life БД');
-        db.exec(migrations[2]!.sql);
-        db.prepare('UPDATE schema_migrations SET version = 4 WHERE version = 3').run();
-        db.prepare('INSERT INTO schema_migrations(version, applied_at) VALUES (3, ?)').run(now);
-      }
-      applyMigrations(db, migrations, now);
-    });
+    transaction(db, () => applyApplicationMigrations(db, now));
     return db;
-  } catch (error) { db.close(); throw new Error(`Не удалось открыть БД ${path}`, { cause: error }); }
+  } catch (error) { db.close(); throw new Error(`Не удалось открыть БД ${path}: ${error instanceof Error ? error.message : String(error)}`, { cause: error }); }
 }
 /** Called after each store operation: timing and failures for OBS (db.slow, db.transaction.failed). */
 export type DatabaseObserver = (operation: string, durationMs: number, error?: unknown) => void;
@@ -57,6 +43,9 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now, obs
     return { accountId, playerId, displayName: name };
   };
   const accounts: AccountStore = {
+    requiresAvatar(accountId) {
+      return !!db.prepare('SELECT 1 FROM accounts a JOIN players p ON p.account_id = a.id WHERE a.id = ? AND a.password_hash IS NOT NULL AND p.avatar_id IS NULL').get(accountId);
+    },
     findOrCreate(name, nameKey, time) {
       return timed('accounts.findOrCreate', () => transaction(db, () => (findAccount.get(nameKey) as unknown as PlayerIdentity | undefined) ?? insertAccount(name, nameKey, null, time)));
     },

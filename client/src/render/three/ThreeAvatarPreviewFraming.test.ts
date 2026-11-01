@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { AnimationMixer, Box3, CylinderGeometry, Group, Mesh, MeshBasicMaterial, OrthographicCamera, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { configureAvatarCamera } from './ThreeAvatarPreview';
+import { configureAvatarCamera, placeAvatarPreview } from './ThreeAvatarPreview';
 
 const ids = ['lukas', 'nic', 'dan', 'ksu'] as const;
 const modelsDir = process.env.AVATAR_PREVIEW_MODELS_DIR;
@@ -38,7 +38,8 @@ describe('avatar preview camera framing', () => {
       const model = gltf.scene, group = new Group();
       const bounds = new Box3().setFromObject(model), height = bounds.getSize(new Vector3()).y;
       expect(height).toBeGreaterThan(0);
-      model.scale.multiplyScalar(1.85 / height); model.position.y = -bounds.min.y * (1.85 / height); group.add(model);
+      placeAvatarPreview(model); group.add(model);
+      expect(new Box3().setFromObject(model).getSize(new Vector3()).y).toBeCloseTo((id === 'lukas' ? 1.95 : 1.8) * 1.85 / 1.8, 5);
       const mixer = new AnimationMixer(model), idle = gltf.animations.find(clip => clip.name === 'idle');
       expect(idle).toBeDefined(); mixer.clipAction(idle!).play();
       for (let angle = 0; angle < 8; angle++) {

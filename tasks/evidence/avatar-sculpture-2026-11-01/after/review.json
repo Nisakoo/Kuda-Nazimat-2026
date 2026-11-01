@@ -1,0 +1,29 @@
+{
+  "images": [
+    "lukas-neutral.png",
+    "lukas-market.png",
+    "nic-neutral.png",
+    "nic-market.png",
+    "dan-neutral.png",
+    "dan-market.png",
+    "ksu-neutral.png",
+    "ksu-market.png",
+    "lineup.png",
+    "jump-lineup.png"
+  ],
+  "hashes": {
+    "lukas": "09053cce8607ae6a01a50b413906df2f687d7bf4b44a4833f9808059fd5123bb",
+    "nic": "22a1b4b9b0f6dd125a3350277589c5c5752604c72f4c0b59de67a7d8ecd93cda",
+    "dan": "9c54c822db8aedec682c046069e2c41f27f51bdac8675499d42bed160aa8f3ae",
+    "ksu": "4349447304788aae069fe5701a28c1779bcab861d8f94c9ebc5d8fc8749059ab"
+  },
+  "errors": [],
+  "layout": [
+    "front idle",
+    "three-quarter idle",
+    "side idle",
+    "back idle",
+    "front walk at .225s",
+    "side walk at .225s"
+  ]
+}

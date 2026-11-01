@@ -1,9 +1,9 @@
-/* Original local presentation assets. These are not screenshots of interactive UI. */
+/* Shared presentation for every pre-game screen. */
+:root { --entry-background: #f2c7a1 url('/assets/ui/city-gates.png') center / cover no-repeat; }
 main.entry-screen::before, .entry-city-backdrop {
   content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: #f2c7a1 url('/assets/ui/city-gates.png') center / cover no-repeat;
+  background: var(--entry-background);
 }
-main.entry-screen:has(.entry-setup)::before { background-image: url('/assets/ui/babylon-market-day.png'); }
 .entry-login, .entry-setup { color: #073b42; font-family: 'Trebuchet MS', Arial, sans-serif; font-size: 18px; }
 .entry-login-screen { position: fixed; inset: var(--entry-header) 0 var(--entry-footer); z-index: 5; display: grid; align-items: center; justify-items: center; overflow: auto; overscroll-behavior: contain; padding: 96px 24px 0; }
 .entry-login {
@@ -87,8 +87,8 @@ main.entry-screen:has(.entry-setup)::before { background-image: url('/assets/ui/
 .entry-language-panel p { margin: 0; }
 .entry-language-panel label { display: grid; gap: 8px; }
 .entry-sign > .entry-primary { justify-self: center; width: min(100% - 60px, 460px); min-height: 52px !important; font-size: 19px !important; }
-.entry-back { justify-self: center; margin-top: 4px; padding: 13px 30px; border: 0; border-radius: 0; background: url('/assets/ui/stone-sign.svg') center / 100% 100% no-repeat; color: #073b42; filter: drop-shadow(0 4px 1px #714a2e30); font-size: 23px !important; font-weight: 700 !important; min-width: 210px; min-height: 67px !important; }
-.entry-back:hover { background: #f7ecd8; color: #006569; }
+.entry-back { box-shadow: none; justify-self: center; margin-top: 4px; padding: 13px 30px; border: 0; border-radius: 0; background: url('/assets/ui/stone-sign.svg') center / 100% 100% no-repeat; color: #073b42; filter: drop-shadow(0 4px 1px #714a2e30); font-size: 23px !important; font-weight: 700 !important; min-width: 210px; min-height: 67px !important; }
+.entry-back:hover { background: url('/assets/ui/stone-sign.svg') center / 100% 100% no-repeat; color: #006569; filter: drop-shadow(0 4px 1px #714a2e30) brightness(1.04); }
 @media (max-width: 700px) {
   .entry-login, .entry-setup { font-size: 16px; }
   .entry-login { width: min(100%, 500px); padding: 24px 37px 30px; }
@@ -126,7 +126,7 @@ main.entry-screen:has(.entry-setup)::before { background-image: url('/assets/ui/
   .entry-back { font-size: 20px !important; min-height: 60px !important; }
 }
 @media (max-height: 860px) and (min-width: 481px) {
-  .entry-login-screen { padding: 64px 16px 0; }
+  .entry-login-screen { padding: 24px 16px; }
   .entry-login { width: min(100%, 540px); padding: 19px 45px 25px; font-size: 18px; }
   .entry-login h1 { font-size: 32px; }.entry-ornament { height: 35px; }
   .entry-eyebrow { margin-top: 8px; font-size: 13px; }.entry-divider { margin-block: 12px 15px; }
@@ -151,3 +151,18 @@ main.entry-screen:has(.entry-setup)::before { background-image: url('/assets/ui/
   main.entry-screen:has(.entry-demo-footer) { --entry-footer: calc(128px + env(safe-area-inset-bottom, 0px)); }
   .entry-demo.entry-demo-footer { width: calc(100% - 160px); padding: 4px 8px; }
 }
+
+/* The controls share one silhouette; states never replace the shaped background. */
+.entry-sign-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 4px 24px 0; }
+.entry-sign-actions > button { width: 100%; min-width: 0; min-height: 56px !important; height: 56px; margin: 0; padding: 10px 12px; font-size: 18px !important; }
+.entry-choice:hover::after { background: linear-gradient(120deg, #fff4dd, #e8d7b7); }
+.entry-choice.chosen:hover::after { background: linear-gradient(120deg, #e3efdf, #c8ddca); }
+.entry-sign::before { left: calc(50% - 27px); width: 54px; top: 0; bottom: -12px; background: linear-gradient(90deg, #68452e 0 12%, #9c7148 12% 78%, #805637 78%); }
+@media (max-width: 480px) { .entry-sign-actions { margin-inline: 10px; gap: 10px; } .entry-sign-actions > button { font-size: 15px !important; } }
+
+/* Keep the shared city backdrop and sign silhouette, reduce ornamental clutter. */
+.entry-login .entry-ornament, .entry-login .entry-divider { display: none; }
+.entry-login { background: #fbf1df; border: 1px solid #d6c6aa; border-radius: 14px; filter: none; box-shadow: 0 12px 32px #49331b30; padding: 28px 36px; }
+.entry-login-screen { padding-top: 12px; }
+.hub-tablet { border-width: 1px; border-color: #d6c6aa; border-radius: 14px; box-shadow: 0 12px 32px #49331b30; }
+@media(max-width:700px) { .entry-login { padding: 22px; } }

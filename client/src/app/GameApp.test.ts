@@ -658,13 +658,33 @@ describe('application lifecycle', () => {
       app.toggleHudPanel('words');
       expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, marketPanel: 'words' }));
       app.toggleHudPanel('words');
-      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'stopped' }));
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'running', pauseOpen: false }));
       app.resume(); expect(request).toHaveBeenCalledTimes(2);
     } finally {
       app.dispose();
       if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
       if (exitProperty) Object.defineProperty(document, 'exitPointerLock', exitProperty); else Reflect.deleteProperty(document, 'exitPointerLock');
     }
+  });
+
+  it('keeps visual loading active while chunk HTTP is pending even with an empty renderer queue', async () => {
+    app.dispose();
+    const manifest: WorldManifest = { mapId: 'demo', version: 3, worldBytes: DEMO_WORLD.worldBytes, chunkSize: 32, collisionResolution: 4, spawn: { x: 8, y: 0, z: 8 }, origin: { x: 0, z: 0 }, models: {}, assets: {}, chunks: [{ id: '0', x: 0, z: 0, region: 'test', url: '0', bytes: 1, collisionUrl: 'c', collisionBytes: 16, assets: [] }] };
+    let finish!: (value: Awaited<ReturnType<MapSource['chunk']>>) => void;
+    const source: MapSource = { bootstrap: DEMO_WORLD, budgetEpoch: 0, manifest: async () => manifest, chunk: vi.fn(() => new Promise<Awaited<ReturnType<MapSource['chunk']>>>(resolve => { finish = resolve; })), dispose: vi.fn() };
+    app = new GameApp(parseConfig({}, 'http://school.local'), createRenderer, undefined, () => source);
+    const listener = vi.fn(); app.subscribe(listener); app.start(host);
+    await vi.waitFor(() => expect(source.chunk).toHaveBeenCalled());
+    advance(100);
+    expect(renderer.getDiagnostics().pending).toBe(0);
+    expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ visualLoading: true }));
+    const entry = manifest.chunks[0]!;
+    finish({ entry, visual: { id: entry.id, objects: [] }, collision: new Uint8Array(16), release: vi.fn() });
+    await vi.waitFor(() => expect(renderer.loadChunk).toHaveBeenCalled());
+    await vi.waitFor(() => {
+      advance(performance.now());
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ visualLoading: false }));
+    });
   });
 
   it('waits for queued visuals before capture and still requires explicit start or resume', () => {
@@ -697,7 +717,7 @@ describe('application lifecycle', () => {
     }
   });
 
-  it('opens inventory with I and leaves capture idle until an explicit resume', () => {
+  it('opens tasks with Tab, closes HUD windows into play and preserves only an explicit parent pause', () => {
     const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
     const exitProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
     let locked: Element | null = null;
@@ -709,16 +729,33 @@ describe('application lifecycle', () => {
       app.dispose(); app = new GameApp(parseConfig({ mapId: 'market' }, 'http://school.local'), createRenderer, undefined, null);
       const listener = vi.fn(); app.subscribe(listener); app.start(host); app.closeMarketPanel(); app.enterWorld();
       expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(1);
-      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI' }));
+      const key = (code: string) => window.dispatchEvent(new KeyboardEvent('keydown', { code, cancelable: true }));
+      for (const oldKey of ['KeyI', 'KeyM', 'KeyK', 'KeyJ', 'KeyL', 'KeyO', 'Enter']) key(oldKey);
+      expect(locked).toBe(host);
+      key('Tab');
       expect(locked).toBeNull();
-      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'inventory', phase: 'stopped', capture: 'idle' }));
-      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI' }));
-      expect(locked).toBeNull(); expect(request).toHaveBeenCalledTimes(1);
-      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'inventory', phase: 'stopped', capture: 'idle' }));
-      app.toggleHudPanel('inventory');
-      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'stopped', capture: 'idle' }));
-      expect(locked).toBeNull(); expect(request).toHaveBeenCalledTimes(1);
-      app.resume(); expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(2);
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: 'task', phase: 'stopped', capture: 'idle' }));
+      key('Digit3');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: true, marketPanel: null }));
+      key('Tab');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: true, marketPanel: null }));
+      key('Digit2');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, marketPanel: 'words' }));
+      key('Digit2');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ marketPanel: null, phase: 'running', capture: 'locked', pauseOpen: false }));
+      key('Digit1');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ chatOpen: true }));
+      key('Digit1');
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ chatOpen: false }));
+      expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(3);
+      app.toggleMenu();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ pauseOpen: true, phase: 'stopped' }));
+      app.openSettings(); app.toggleMenu();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ settingsOpen: false, pauseOpen: true, phase: 'stopped' }));
+      app.toggleMenu();
+      expect(locked).toBe(host); expect(request).toHaveBeenCalledTimes(4);
+      app.toggleHudPanel('map'); app.toggleMenu();
+      expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ mapOpen: false, pauseOpen: false, phase: 'running' }));
     } finally {
       app.dispose();
       if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');

@@ -80,10 +80,10 @@ export function createCharacter(assets: SceneAssets, color: string, market: bool
       torso.rotation.x += reach*.42; torso.position.y -= reach*.12;
       head.rotation.x = reach*.2;
       for (const { shoulder, elbow, side } of arms) {
-        shoulder.rotation.x = Math.sin(phase+(side<0?0:Math.PI))*(.42+sprint*.28)*weight - air*(.65-falling*.25) - takeoff*.5;
-        shoulder.rotation.z = side*(.10+Math.sin(elapsed*1.8+seed)*.012*(1-weight)+air*.2);
-        elbow.rotation.x = -.12 - weight*(.20+sprint*.45) - air*.35;
-        if (side > 0 && (hand.carrying || hand.action)) {
+        shoulder.rotation.x = Math.sin(phase+(side<0?0:Math.PI))*(.42+sprint*.28)*weight - air*2.85 - takeoff*.1;
+        shoulder.rotation.z = side*(.10+Math.sin(elapsed*1.8+seed)*.012*(1-weight)+air*.4);
+        elbow.rotation.x = -.12 - weight*(.20+sprint*.45) - air*.08;
+        if (side > 0 && air < .5 && (hand.carrying || hand.action)) {
           shoulder.rotation.x += (-.28+Math.sin(phase)*weight*.06-shoulder.rotation.x)*carryWeight - reach*.5;
           shoulder.rotation.z += (-.12-shoulder.rotation.z)*carryWeight;
           elbow.rotation.x += (-.98-elbow.rotation.x)*carryWeight + reach*.7;

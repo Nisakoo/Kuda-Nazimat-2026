@@ -92,7 +92,7 @@ export function attachGateway(server: HttpServer, deps: GatewayDeps): { close():
     }, (error: unknown) => { log.error('realtime.handshake.failed', 'Проверка сессии упала', { error }); reject('UNAVAILABLE', 'Сервер временно недоступен.', 'verify failed'); });
   });
 
-  nsp.on('connection', (socket) => new Connection(socket, deps, log, metrics).start());
+  nsp.on('connection', socket => { void new Connection(socket, deps, log, metrics).start(); });
 
   return { close: () => new Promise<void>((resolve) => { void io.close(() => resolve()); }) };
 }
@@ -139,7 +139,7 @@ class Connection implements Channel {
     this.controlBucket = new TokenBucket(deps.clock, 5, 10);
   }
 
-  start(): void {
+  async start(): Promise<void> {
     this.log.info('realtime.connect', 'Соединение открыто', { ip: this.ip, sessionId: this.socket.data.sessionId as string | undefined });
     // RTT without client code: time from the server's Engine.IO ping to the client's pong.
     this.socket.conn.on('packetCreate', (packet: { type: string }) => { if (packet.type === 'ping') this.pingAt = performance.now(); });
@@ -149,12 +149,18 @@ class Connection implements Channel {
       this.rtt = [...this.rtt.filter((sample) => now - sample.at < 60_000), { at: now, ms: performance.now() - this.pingAt }];
       this.pingAt = 0;
     });
-    if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
-    this.scheduleExpiry();
-    this.socket.on('game', (raw: unknown) => this.receive(raw));
-    this.socket.on('world-life', (raw: unknown) => this.receiveLife(raw));
-    this.socket.conn.on('drain', () => { this.outboundPackets = 0; this.outboundBytes = 0; });
-    this.socket.on('disconnect', (reason) => this.onDisconnect(reason));
+    this.socket.on('disconnect', reason => this.onDisconnect(reason));
+    try {
+      const check = await this.deps.sessions.verify((this.socket.handshake.auth as { token: string }).token);
+      if (this.closed) return;
+      if (!check.ok) { this.close('Сессия отозвана или истекла.'); return; }
+      if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
+      this.scheduleExpiry();
+      this.socket.on('game', (raw: unknown) => this.receive(raw));
+      this.socket.on('world-life', (raw: unknown) => this.receiveLife(raw));
+      this.socket.conn.on('drain', () => { this.outboundPackets = 0; this.outboundBytes = 0; });
+    } catch { this.fail('UNAVAILABLE', 'Сервер временно недоступен.'); }
+
   }
 
   send(message: ServerMessage): void { if (this.outgoing(message)) this.sendPacket('game', message, false); }

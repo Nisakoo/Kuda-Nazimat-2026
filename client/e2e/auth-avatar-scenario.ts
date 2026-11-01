@@ -13,6 +13,7 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
   let clearedPasswordSubmissions = 0;
   const avatar = page.getByRole('dialog', { name: 'Выберите свой облик', exact: true });
   const mode = page.getByRole('dialog', { name: 'Куда отправимся?', exact: true });
+  const hub = page.getByRole('dialog', { name: 'Личный кабинет', exact: true });
   const passwordInput = page.getByLabel('Пароль', { exact: true });
   const onPageError = (error: Error) => errors.push(error.message);
   const onRequest = (request: import('@playwright/test').Request) => {
@@ -47,6 +48,8 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
     return response;
   }
   async function previewReady(): Promise<void> {
+    await expect(hub).toBeVisible();
+    await page.getByRole('button', { name: 'Выбрать персонажа', exact: true }).click();
     await expect(avatar).toBeVisible();
     await expect(mode).toBeHidden();
     await expect(avatar.locator('.avatar-preview canvas')).toHaveCount(1);
@@ -55,7 +58,7 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
       const image = node as HTMLImageElement;
       return image.complete && image.naturalWidth > 0 && image.naturalHeight > 0;
     })), { timeout: 30000 }).toBe(true);
-    await expect(avatar.getByRole('button', { name: 'Продолжить →', exact: true })).toBeEnabled({ timeout: 30000 });
+    await expect(avatar.getByRole('button', { name: 'Подтвердить →', exact: true })).toBeEnabled({ timeout: 30000 });
   }
   async function withinViewport(): Promise<void> {
     const overflow = await page.evaluate(() => [...document.querySelectorAll('dialog[open], .hud-dock')].flatMap(node => {
@@ -90,8 +93,13 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
     await page.setViewportSize({ width: 1622, height: 970 });
     await page.goto(origin);
     expect((await credentials('register')).ok()).toBe(true);
-    await previewReady(); // First registration must show appearance, not mode selection.
+    await previewReady(); // Registration opens the hub; appearance is chosen there.
     await expect(page.getByRole('dialog')).toHaveCount(1);
+    for (const [index, id] of ['lukas', 'nic', 'dan', 'ksu'].entries()) {
+      await avatar.locator('.avatar-card').nth(index).click();
+      await expect(avatar.getByRole('button', { name: 'Подтвердить →', exact: true })).toBeEnabled();
+      await page.screenshot({ path: join(evidence, `avatar-preview-${id}.png`) });
+    }
     await avatar.locator('.avatar-card').nth(2).click();
     await expect(avatar.getByRole('radio', { name: 'Облик 3', exact: true })).toBeChecked();
 
@@ -114,14 +122,20 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
       await avatar.evaluate(node => { node.scrollTop = 0; });
       await withinViewport();
       if (width >= 1280) {
-        await expect(avatar.getByRole('button', { name: 'Продолжить →', exact: true })).toBeInViewport({ ratio: 1 });
+        const fits = await avatar.locator('.avatar-tablet').evaluate(node => {
+          const tablet = node.getBoundingClientRect();
+          const body = node.parentElement!.getBoundingClientRect();
+          return tablet.top >= body.top && tablet.bottom <= body.bottom;
+        });
+        expect(fits).toBe(true);
+        await expect(avatar.getByRole('button', { name: 'Подтвердить →', exact: true })).toBeInViewport({ ratio: 1 });
         await expect(avatar.getByRole('button', { name: '← Назад', exact: true })).toBeInViewport({ ratio: 1 });
       }
       await page.screenshot({ path: join(evidence, `avatar-${width}.png`) });
       if (width === 390 || height === 480) {
-        await avatar.getByRole('button', { name: 'Продолжить →', exact: true }).scrollIntoViewIfNeeded();
+        await avatar.getByRole('button', { name: 'Подтвердить →', exact: true }).scrollIntoViewIfNeeded();
         await withinViewport();
-        await expect(avatar.getByRole('button', { name: 'Продолжить →', exact: true })).toBeInViewport({ ratio: 1 });
+        await expect(avatar.getByRole('button', { name: 'Подтвердить →', exact: true })).toBeInViewport({ ratio: 1 });
         await expect(avatar.getByRole('button', { name: '← Назад', exact: true })).toBeInViewport({ ratio: 1 });
         await page.screenshot({ path: join(evidence, `avatar-controls-${width}.png`) });
       }
@@ -141,14 +155,14 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
     try {
       const [failedSave] = await Promise.all([
         responseFor('/api/avatar'),
-        avatar.getByRole('button', { name: 'Продолжить →', exact: true }).click(),
+        avatar.getByRole('button', { name: 'Подтвердить →', exact: true }).click(),
       ]);
       expect(failedSave.status()).toBe(503);
       expect(failures).toBe(1);
       await expect(avatar.getByRole('alert')).toHaveText(failureMessage);
       await expect(avatar).toBeVisible();
       await expect(mode).toBeHidden();
-      await expect(avatar.getByRole('button', { name: 'Продолжить →', exact: true })).toBeEnabled();
+      await expect(avatar.getByRole('button', { name: 'Подтвердить →', exact: true })).toBeEnabled();
       const authorization = (await failedSave.request().allHeaders()).authorization;
       if (!authorization) throw new Error('The avatar save did not send an authenticated session.');
       const unchanged = await page.request.get(avatarEndpoint, { headers: { Authorization: authorization }, maxRedirects: 0 });
@@ -157,24 +171,29 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
       await page.screenshot({ path: join(evidence, 'avatar-save-error-1280.png') });
     } finally { await page.unroute(avatarEndpoint, failSave); }
 
-    await logout(() => page.keyboard.press('Escape'));
+    await page.keyboard.press('Escape');
+    await expect(hub).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Создать игру', exact: true })).toBeDisabled();
+    await logout(() => hub.getByRole('button', { name: 'Выйти', exact: true }).click());
     expect((await credentials('login')).ok()).toBe(true);
     await previewReady(); // Escape must not bypass the mandatory appearance step.
-    await logout(() => avatar.getByRole('button', { name: '← Назад', exact: true }).click());
+    await avatar.getByRole('button', { name: '← Назад', exact: true }).click();
+    await expect(hub).toBeVisible();
+    await logout(() => hub.getByRole('button', { name: 'Выйти', exact: true }).click());
     expect((await credentials('login')).ok()).toBe(true);
     await previewReady(); // The Back button must also preserve the mandatory step.
     await avatar.locator('.avatar-card').nth(2).click();
     await expect(avatar.getByRole('radio', { name: 'Облик 3', exact: true })).toBeChecked();
     const [saved] = await Promise.all([
       responseFor('/api/avatar'),
-      avatar.getByRole('button', { name: 'Продолжить →', exact: true }).click(),
+      avatar.getByRole('button', { name: 'Подтвердить →', exact: true }).click(),
     ]);
     expect(saved.ok()).toBe(true);
     expect(await saved.json()).toEqual({ avatarId: 'dan' });
-    await expect(mode).toBeVisible();
+    await expect(hub).toBeVisible();
     await expect(avatar).toBeHidden();
     await withinViewport();
-    await logout(() => mode.getByRole('button', { name: '← Назад', exact: true }).click());
+    await logout(() => hub.getByRole('button', { name: 'Выйти', exact: true }).click());
 
     expect((await credentials('login', 'wrong-password-44')).status()).toBe(401);
     await expect(page.getByRole('alert')).toHaveText('Неверное имя или пароль.');
@@ -186,8 +205,8 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
       responseFor('/api/auth/guest'),
       page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true }).click(),
     ]);
-    expect(guest.status()).toBe(401);
-    await expect(page.getByRole('alert')).toHaveText('Неверное имя или пароль');
+    expect(guest.status()).toBe(403);
+    await expect(page.getByRole('alert')).toHaveText('У этого имени есть пароль. Войдите с паролем.');
     await expect(avatar).toBeHidden();
     await expect(mode).toBeHidden();
     expect((await credentials('register')).status()).toBe(409);
@@ -197,11 +216,11 @@ export async function authAvatarScenario(page: Page, origin: string, evidence: s
     await expect(mode).toBeHidden();
 
     expect((await credentials('login')).ok()).toBe(true);
-    await expect(mode).toBeVisible(); // A confirmed existing account skips appearance.
+    await expect(hub).toBeVisible(); // A confirmed account returns to the hub.
     await expect(avatar).toBeHidden();
     await expect(page.getByRole('dialog')).toHaveCount(1);
     await withinViewport();
-    await logout(() => mode.getByRole('button', { name: '← Назад', exact: true }).click());
+    await logout(() => hub.getByRole('button', { name: 'Выйти', exact: true }).click());
     expect(attempts).toHaveLength(7);
     expect(attempts.length).toBeLessThanOrEqual(20);
     expect(clearedPasswordSubmissions).toBe(6);

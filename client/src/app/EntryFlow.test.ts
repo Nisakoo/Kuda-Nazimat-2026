@@ -53,8 +53,8 @@ function fixture(initial: BabylonState) {
   };
   let commandReply = (packet: BabylonRequest): Response | Promise<Response> => {
     if (packet.action.type === 'languages') state = { ...state, profile: { native: packet.action.native, learning: packet.action.learning } };
-    else if (packet.action.type === 'enroll') state = {
-      ...state, profile: { native: packet.action.native, learning: packet.action.learning },
+    else if (packet.action.type === 'create') state = {
+      ...state,
       party: { id: 'new-party', size: packet.action.size, count: 1, role: 1, members: [{ id: state.playerId, name: 'New player', role: 1 }], started: packet.action.size === 1, completed: false, seconds: 0 },
       task: 'Wait for the task group', taskTitle: 'New task',
       taskTarget: packet.action.size === 1 ? { x: 0, z: -34 } : null,
@@ -62,6 +62,7 @@ function fixture(initial: BabylonState) {
     return success(packet);
   };
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, options?: RequestInit) => {
+    if (String(input).endsWith('/api/avatar')) return Promise.resolve(new Response(JSON.stringify({ avatarId: 'lukas' })));
     if (String(input).endsWith('/api/auth/logout')) return Promise.resolve(new Response(null, { status: 204 }));
     if (String(input) !== 'http://entry.unit/api/babylon' || options?.method !== 'POST' || typeof options.body !== 'string') throw new Error(`Unexpected entry-flow fetch: ${String(input)}`);
     const packet = JSON.parse(options.body) as BabylonRequest;
@@ -111,8 +112,11 @@ describe('market entry confirmation', () => {
     const initial = savedState(), f = fixture(initial);
     await ready(f);
     // A different requested size must not re-enroll or replace the saved party/mode.
-    expect(await f.app.completeEntrySetup(1, 'ru', 'en')).toBe(true);
-    expect(f.commands()).toHaveLength(1);
+    expect(await f.app.saveEntryLanguages('ru', 'en')).toBe(true);
+    expect(f.network).not.toHaveBeenCalled();
+    expect(await f.app.connectEntryGame('http://entry.unit')).toBe(true);
+    expect(f.commands()).toHaveLength(2);
+    expect(f.commands()[1]?.action).toEqual({ type: 'join' });
     expect(f.commands()[0]?.action).toEqual({ type: 'languages', native: 'ru', learning: 'en' });
     expect(f.commands().some(packet => packet.action.type === 'enroll')).toBe(false);
     expect(f.snapshot.babylon?.state).toMatchObject({
@@ -129,7 +133,7 @@ describe('market entry confirmation', () => {
     const f = fixture(savedState());
     await ready(f);
     f.reply(() => new Response(JSON.stringify({ v: 2, error: { code: 'UNAVAILABLE', message: 'Command not confirmed' } }), { status: 503 }));
-    expect(await f.app.completeEntrySetup(3, 'ru', 'en')).toBe(false);
+    expect(await f.app.connectEntryGame('http://entry.unit')).toBe(false);
     expect(f.snapshot.babylonPanel).toBe('setup');
     expect(f.snapshot.babylon).toMatchObject({ busy: false, canRetry: true, error: 'Command not confirmed' });
     expect(f.network).not.toHaveBeenCalled();
@@ -137,7 +141,7 @@ describe('market entry confirmation', () => {
     let finish!: (response: Response) => void;
     f.reply(() => new Promise<Response>(resolve => { finish = resolve; }));
     // New UI values must not replace the action or requestId of an uncertain receipt.
-    const retry = f.app.completeEntrySetup(1, 'es', 'en', true);
+    const retry = f.app.retryEntryAction();
     expect(f.commands()).toHaveLength(2);
     expect(f.commands()[1]).toEqual(first);
     expect(f.snapshot.babylonPanel).toBe('setup');
@@ -148,15 +152,20 @@ describe('market entry confirmation', () => {
     expect(f.transport.connect).toHaveBeenCalledOnce();
   });
 
-  it('enrolls a new profile with the selected size and starts transport only after confirmation', async () => {
+  it('creates a new game after saving the independent profile with the selected size and starts transport only after confirmation', async () => {
     const f = fixture(newState());
     await ready(f);
     expect(f.snapshot.babylon?.state?.profile).toBeNull();
-    expect(await f.app.completeEntrySetup(4, 'ru', 'es')).toBe(true);
-    expect(f.commands()).toHaveLength(1);
-    expect(f.commands()[0]?.action).toEqual({ type: 'enroll', size: 4, native: 'ru', learning: 'es' });
+    expect(await f.app.createEntryGame(4)).toBe(false);
+    expect(await f.app.saveEntryLanguages('ru', 'es')).toBe(true);
+    expect(f.network).not.toHaveBeenCalled();
+    expect(f.snapshot.babylon?.state?.party).toBeNull();
+    expect(await f.app.createEntryGame(4)).toBe(true);
+    expect(f.commands()).toHaveLength(2);
+    expect(f.commands()[1]?.action).toEqual({ type: 'create', size: 4 });
     expect(f.snapshot.babylon?.state?.party?.size).toBe(4);
-    expect(f.snapshot.babylonPanel).toBe('intro');
+    expect(f.snapshot.babylonPanel).toBeNull();
+    expect(f.snapshot.entryStage).toBe('loading');
     expect(f.network).toHaveBeenCalledOnce();
     expect(f.transport.connect).toHaveBeenCalledExactlyOnceWith({ kind: 'server', session });
   });

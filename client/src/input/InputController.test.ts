@@ -103,15 +103,47 @@ describe('confirmed pointer lock and input intentions', () => {
     input.requestCapture(); input.sample(); expect(actions.jump).toHaveBeenCalledTimes(2);
   });
 
-  it('handles physical I once while captured, but not in text or with modifiers', () => {
-    actions.inventory = vi.fn();
+  it('shows hints for either Alt only in captured gameplay and clears them on release or interruption', () => {
+    actions.controlsHint = vi.fn();
+    const down = (code = 'AltLeft', extra: KeyboardEventInit = {}) => window.dispatchEvent(new KeyboardEvent('keydown', { code, altKey: true, cancelable: true, ...extra }));
+    const up = (code = 'AltLeft') => window.dispatchEvent(new KeyboardEvent('keyup', { code }));
+    down(); expect(actions.controlsHint).not.toHaveBeenCalled();
     input.requestCapture();
-    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', key: 'ш' }));
-    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', repeat: true }));
-    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', ctrlKey: true }));
-    const field = document.createElement('input'); document.body.append(field);
-    field.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyI', bubbles: true }));
-    expect(actions.inventory).toHaveBeenCalledTimes(1);
+    down('AltRight', { ctrlKey: true }); // AltGr belongs to text entry.
+    down('AltLeft', { isComposing: true });
+    expect(actions.controlsHint).not.toHaveBeenCalled();
+    down(); expect(actions.controlsHint).toHaveBeenLastCalledWith(true);
+    down('AltRight'); up(); expect(actions.controlsHint).toHaveBeenLastCalledWith(true);
+    up('AltRight'); expect(actions.controlsHint).toHaveBeenLastCalledWith(false);
+    down(); window.dispatchEvent(new Event('blur'));
+    expect(actions.controlsHint).toHaveBeenLastCalledWith(false);
+    input.requestCapture(); down(); input.stop();
+    expect(actions.controlsHint).toHaveBeenLastCalledWith(false);
+    input.requestCapture(); down(); input.dispose();
+    expect(actions.controlsHint).toHaveBeenLastCalledWith(false);
+    const calls = vi.mocked(actions.controlsHint).mock.calls.length;
+    down(); up(); expect(actions.controlsHint).toHaveBeenCalledTimes(calls);
+  });
+
+  it('dispatches HUD shortcuts while captured or stopped, protecting fields, IME and modified keys', () => {
+    actions.shortcut = vi.fn(() => true);
+    const press = (options: KeyboardEventInit = {}) => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Digit3', cancelable: true, ...options }));
+    input.requestCapture(); press(); input.stop(); press({ code: 'Digit2' });
+    for (const options of [{ repeat: true }, { isComposing: true }, { ctrlKey: true }, { altKey: true }, { metaKey: true }, { shiftKey: true }]) press(options);
+    const field = document.createElement('textarea'); document.body.append(field);
+    field.dispatchEvent(new KeyboardEvent('keydown', { code: 'Digit3', bubbles: true }));
+    expect(actions.shortcut).toHaveBeenCalledTimes(2);
+    expect(actions.shortcut).toHaveBeenNthCalledWith(1, 'Digit3');
+    expect(actions.shortcut).toHaveBeenNthCalledWith(2, 'Digit2');
+    input.dispose(); press(); expect(actions.shortcut).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps Enter on buttons native while unlocked, but forwards it with the mouse captured', () => {
+    actions.shortcut = vi.fn(() => true);
+    const button = document.createElement('button'); document.body.append(button);
+    const enter = () => button.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true, cancelable: true }));
+    enter(); expect(actions.shortcut).not.toHaveBeenCalled();
+    input.requestCapture(); enter(); expect(actions.shortcut).toHaveBeenCalledWith('Enter');
   });
 
   it('uses the physical F edge once, resets on interruption, and preserves MOVE', () => {

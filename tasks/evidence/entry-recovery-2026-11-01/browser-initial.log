@@ -1,0 +1,86 @@
+
+Running 20 tests using 1 worker
+
+(node:69629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 e2e/babylon.spec.ts:51:1 › two real players enroll, translate, share stones and restore a private dictionary after restart (2.1m)
+
+
+  1) e2e/babylon.spec.ts:51:1 › two real players enroll, translate, share stones and restore a private dictionary after restart 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: locator.click: Test timeout of 120000ms exceeded.
+    Browser logs:
+
+    <launching> /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --enable-unsafe-swiftshader --user-data-dir=/var/folders/tv/t2jv64z50c18b7sb9cj7bdxm0000gn/T/playwright_chromiumdev_profile-8jwD3C --remote-debugging-pipe --no-startup-window
+    <launched> pid=69631
+    [pid=69631][err] Trying to load the allocator multiple times. This is *not* supported.
+    [pid=69631][err] [69635:12653880:1101/114459.949563:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114459.950111:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114459.953057:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114459.953163:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114459.989774:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114459.989936:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114459.990616:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114459.990715:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114459.991023:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114459.991119:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114502.129004:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114502.129119:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114502.330677:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114502.330774:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114505.879674:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114505.879941:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114506.329811:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114506.329941:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114507.626781:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114507.626983:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114509.211466:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114509.211684:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653880:1101/114510.880418:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631][err] [69635:12653970:1101/114510.880564:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+    [pid=69631] <gracefully close start>
+    Call log:
+      - waiting for getByRole('button', { name: 'Добавить слово', exact: true })
+        - locator resolved to <button disabled>Добавить слово</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+          - waiting 100ms
+        207 × waiting for element to be visible, enabled and stable
+            - element is not enabled
+          - retrying click action
+            - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+
+
+      62 |   await other.getByRole('button', { name: 'Запомнить dátiles', exact: true }).click();
+      63 |   await expect(other.getByLabel('Перевод', { exact: true })).toHaveValue('финики');
+    > 64 |   await other.getByLabel('Заметка', { exact: true }).fill('Личная запись'); await other.getByRole('button', { name: 'Добавить слово', exact: true }).click(); await expect(other.locator('.word-list')).toContainText('Личная запись'); await close(other);
+         |                                                                                                                                                      ^
+      65 |   await close(page); await menu(page, 'Камень');
+      66 |   const canvas = page.getByLabel('Камень для рисунка'); const box = (await canvas.boundingBox())!;
+      67 |   await page.mouse.move(box.x + 40, box.y + 40); await page.mouse.down(); await page.mouse.move(box.x + 100, box.y + 100, { steps: 5 }); await page.mouse.up();
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/babylon.spec.ts:64:150
+
+    Error Context: test-results/hub/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/error-context.md
+
+    Error Context: test-results/hub/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/babylon-two-real-players-e-9ea87-te-dictionary-after-restart/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/babylon.spec.ts:51:1 › two real players enroll, translate, share stones and restore a private dictionary after restart 
+  19 did not run

@@ -4,7 +4,7 @@
   import { MARKET_MAP_BUILDINGS, MARKET_MAP_PALMS } from '../shared/marketMap.generated';
   import { modal } from './modal';
   import Icon from './Icon.svelte';
-  const { player, peers, goal, market, simulated, close, navigation }: { player: MapPlayer | null; peers: readonly MapPeer[]; goal: { x: number; z: number } | null; market: boolean; simulated: boolean; close: () => void; navigation: Snippet } = $props();
+  const { player, peers, goal, market, simulated, close, navigation }: { player: MapPlayer | null; peers: readonly MapPeer[]; goal: { x: number; z: number } | null; market: boolean; simulated: boolean; close: () => void; navigation?: Snippet } = $props();
   let zoom = $state(1);
   function project(x: number, z: number) { return { x: (x-z)*.8660254, z: (x+z)*.5 }; }
   function facing(yaw: number) { return Math.atan2(.8660254*(Math.sin(yaw)-Math.cos(yaw)), -.5*(Math.sin(yaw)+Math.cos(yaw))) * 180 / Math.PI; }
@@ -103,8 +103,8 @@
     <p class="map-disclaimer">Схема реальных областей · {simulated ? 'Тестовые сетевые данные, не сервер' : player?.authoritative ? 'Позиции с сервера' : 'Локальная демонстрация'}. Показаны только участники вашего задания.</p>
   {:else}<p>Схема доступна для рыночной области. Для этой карты иллюстрация ещё не подготовлена.</p>{/if}
   <div class="map-controls"><p><span class="map-dot"></span> Вы <span class="map-dot partner"></span> Напарник <span class="map-diamond">◆</span> Задание</p><button class="secondary" disabled={!player || !market} onclick={centerPlayer}><Icon name="center" size={20}/> К игроку</button><button class="secondary" aria-label="Уменьшить карту" disabled={zoom <= .5 || !market} onclick={() => zoom = Math.max(.5, zoom - .25)}>−</button><button class="secondary" aria-label="Увеличить карту" disabled={zoom >= 3 || !market} onclick={() => zoom = Math.min(3, zoom + .25)}>+</button></div>
-  <p class="window-hint">Esc — закрыть</p>
-  {@render navigation()}
+
+  {#if navigation}{@render navigation()}{/if}
 </dialog>
 
 <style>

@@ -6,7 +6,7 @@ import { resolve, join } from 'node:path';
 import { createServer } from 'node:net';
 import { once } from 'node:events';
 import { randomUUID } from 'node:crypto';
-import { expectCapture } from './helpers';
+import { expectCapture, createFromHub } from './helpers';
 
 let processHandle: ChildProcess; let directory: string; let origin: string; let configFile: string;
 async function startServer() {
@@ -36,7 +36,7 @@ test.beforeAll(async () => {
   const address = portServer.address(); if (!address || typeof address === 'string') throw new Error('No port');
   const port = address.port; await new Promise<void>((done) => portServer.close(() => done()));
   origin = `http://127.0.0.1:${port}`; configFile = join(directory, 'config.json');
-  await writeFile(configFile, JSON.stringify({ host: '127.0.0.1', port, clientDir: resolve('dist'), worldDir: resolve('public'), contentDir: resolve('../server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'demo', disconnectGraceMs: 100, saveIntervalMs: 100, npc: { options: { delayMs: 30 } } }));
+  await writeFile(configFile, JSON.stringify({ clientDebug: false, logs: { fileLevel: 'off', consoleLevel: 'warn' }, host: '127.0.0.1', port, clientDir: resolve('dist'), worldDir: resolve('public'), contentDir: resolve('../server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'demo', disconnectGraceMs: 100, saveIntervalMs: 100, npc: { options: { delayMs: 30 } } }));
   await startServer();
 });
 test.afterAll(async () => { await stopServer(); if (directory) await rm(directory, { recursive: true, force: true }); });
@@ -51,13 +51,12 @@ async function login(page: Page, name: string) {
   const session = await response.json() as { token: string };
   expect(session.token).toMatch(/^[\w-]{43}$/);
   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
-  await expect(page.getByLabel('Состояние связи')).toHaveText('Подключён');
   return session;
 }
 async function chat(page: Page) {
   await page.bringToFront(); await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true);
-  await page.keyboard.press('Escape');
-  await page.getByRole('dialog', { name: 'Пауза' }).getByRole('button', { name: 'Общение', exact: true }).click();
+  await page.keyboard.press('1');
+
 }
 
 test('real guest login authorizes world, takeover returns the form, logout and reload forget the token', async ({ page, context }) => {
@@ -74,7 +73,9 @@ test('real guest login authorizes world, takeover returns the form, logout and r
   await expect(page.getByRole('alert')).toContainText('Игра открыта в другом окне.'); await expect(page.locator('canvas')).toHaveCount(0);
   await other.getByRole('button', { name: 'Выйти из сессии' }).click(); await expect(other.getByLabel('Имя игрока')).toBeVisible();
   await other.reload(); await expect(other.getByLabel('Имя игрока')).toBeVisible();
-  expect(await other.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0]);
+  expect(await other.evaluate(() => Object.keys(localStorage))).toEqual(['babylon.serverUrl']);
+  expect(await other.evaluate(() => localStorage.getItem('babylon.serverUrl'))).toBe(origin);
+  expect(await other.evaluate(() => sessionStorage.length)).toBe(0);
   await other.close(); expect(errors).toEqual([]);
 });
 
@@ -84,7 +85,7 @@ test('real players exchange chat and NPC memory survives a server restart', asyn
   await chat(page); await page.getByLabel('Сообщение игрокам').fill('Привет <b>мир</b>'); await page.getByRole('button', { name: 'Отправить', exact: true }).click();
   await chat(other); await expect(other.getByRole('dialog', { name: 'Общение' })).toContainText('Привет <b>мир</b>');
   await other.close(); await page.bringToFront(); await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Продолжить', exact: true }).click(); await expectCapture(page, true);
+  await expectCapture(page, true);
   await page.keyboard.down('w'); await page.waitForTimeout(1500); await page.keyboard.up('w');
   await page.keyboard.down('a'); await page.waitForTimeout(1200); await page.keyboard.up('a');
   await page.keyboard.press('e'); await expect(page.getByRole('dialog', { name: 'Лея', exact: true })).toBeVisible();
@@ -112,6 +113,7 @@ test('login errors remain text, pending login is cancelled by settings, and smal
   await expect(page.getByRole('button', { name: 'Демонстрационный вход по имени', exact: true })).toBeDisabled();
   await expect(page.locator('.entry-form')).toHaveAttribute('aria-busy', 'true');
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
+  await page.getByText('Дополнительно', { exact: true }).click();
   await page.getByLabel('Адрес сервера').fill('http://127.0.0.1:1'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
   await expect(page.getByLabel('Имя игрока')).toBeVisible(); await expect(page.getByRole('button', { name: 'Начать путешествие →', exact: true })).toBeDisabled();
   await expect(page.locator('canvas')).toHaveCount(0);
@@ -128,20 +130,13 @@ test('a world 401 and client session expiry return to login without automaticall
   await expect(page.getByLabel('Имя игрока')).toBeVisible(); await expect(page.locator('canvas')).toHaveCount(0); expect(posts).toBe(2);
 });
 
-test('switching to the server market enrolls BABEL and opens the authoritative inventory', async ({ page }) => {
+test('switching to the server market enrolls BABEL and opens tasks without inventory controls', async ({ page }) => {
   const session = await login(page, 'Рынок'); await page.getByRole('button', { name: 'Настройки', exact: true }).click();
+  await page.getByText('Дополнительно', { exact: true }).click();
   await page.getByLabel('Карта', { exact: true }).fill('market'); await page.getByRole('button', { name: 'Применить и открыть карту' }).click();
-  await expect(page.getByRole('dialog', { name: 'Куда отправимся?' })).toBeVisible();
-  await page.getByRole('button', { name: 'Далее: языки →' }).click();
-  await expect(page.getByRole('dialog', { name: 'Ваши языки' })).toBeVisible();
-  await page.getByRole('button', { name: 'Войти в Вавилон →' }).click();
-  await expect(page.getByRole('dialog', { name: 'Добро пожаловать в Вавилон' })).toBeVisible();
-  await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
-  await page.getByRole('button', { name: 'Начать прогулку' }).click(); await expectCapture(page, true); await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Сумка', exact: true }).click();
-  const inventory = page.getByRole('dialog', { name: 'Инвентарь', exact: true });
-  await expect(inventory.getByRole('region', { name: 'Инструменты', exact: true })).toBeVisible();
+  await createFromHub(page); await page.keyboard.press('Tab');
+  await expect(page.getByRole('dialog', { name: 'Козы пастуха', exact: true })).toBeVisible();
+  await expect(page.getByRole('navigation')).toHaveCount(0);
   const authoritative = await page.request.post(`${origin}/api/babylon`, {
     headers: { Authorization: `Bearer ${session.token}` },
     data: { v: 2, requestId: randomUUID(), action: { type: 'state' } },
@@ -149,7 +144,7 @@ test('switching to the server market enrolls BABEL and opens the authoritative i
   expect(authoritative.ok()).toBe(true);
   const result = await authoritative.json() as { state: { inventory: Record<string, number> } };
   expect(result.state.inventory).toEqual({ dates: 0, 'red-fruit': 0, 'yellow-fruit': 0, water: 0, fabric: 0 });
-  await expect(inventory).toContainText('Пока пусто');
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
+  await expectCapture(page, true); await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Выйти из сессии' }).click(); await expect(page.getByLabel('Имя игрока')).toBeVisible();
 });

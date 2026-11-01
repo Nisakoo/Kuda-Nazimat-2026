@@ -18,7 +18,7 @@
     <label class="sr-only" for="chat-input">Сообщение игрокам</label>
     <div class="input-row"><input id="chat-input" bind:this={input} bind:value={text} maxlength="500" autocomplete="off" placeholder="Напишите сообщение…" /><button type="submit" disabled={!canSend || !text.trim()}>Отправить</button></div>
   </form>
-  <p class="small subtle">Esc — закрыть. Движение продолжится после нажатия «Продолжить».</p>
+
   {#if navigation}<div class="chat-navigation">{@render navigation()}</div>{/if}
 </dialog>
 

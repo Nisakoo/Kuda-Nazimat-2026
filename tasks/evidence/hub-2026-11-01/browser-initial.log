@@ -1,0 +1,75 @@
+
+Running 4 tests using 1 worker
+
+(node:67660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/hub.spec.ts:53:1 › hub saves preferences, selects modes, loads automatically and preserves the saved game (6.2s)
+  ✘  2 e2e/hub.spec.ts:89:1 › manual IP validates input, reports unreachable server, cancels late navigation and reauthenticates on another server (6.0s)
+(node:67851) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 e2e/hub.spec.ts:135:1 › delayed world stays frozen; cancel ignores late resources and retry enters without creating twice (951ms)
+(node:67866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 e2e/hub.spec.ts:166:1 › resource failure retries and Escape during loading requires an explicit capture gesture (2.6s)
+
+
+  1) e2e/hub.spec.ts:89:1 › manual IP validates input, reports unreachable server, cancels late navigation and reauthenticates on another server 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      114 |   await page.route(`${targetOrigin}/config.json`, async route => { intercepted = true; await delayed; await route.continue().catch(() => {}); }, { times: 1 });
+      115 |   await page.getByRole('button', { name: 'Подключиться', exact: true }).click();
+    > 116 |   await expect.poll(() => intercepted).toBe(true);
+          |                                        ^
+      117 |   await page.getByRole('button', { name: '← Назад', exact: true }).click(); release();
+      118 |   await expect(page.getByRole('heading', { name: 'Личный кабинет' })).toBeVisible();
+      119 |   expect(new URL(page.url()).origin).toBe(origin);
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/hub.spec.ts:116:40
+
+    Error Context: test-results/hub/hub-manual-IP-validates-in-9dc45-enticates-on-another-server/error-context.md
+
+    Error Context: test-results/hub/hub-manual-IP-validates-in-9dc45-enticates-on-another-server/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/hub-manual-IP-validates-in-9dc45-enticates-on-another-server/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/hub-manual-IP-validates-in-9dc45-enticates-on-another-server/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/hub.spec.ts:135:1 › delayed world stays frozen; cancel ignores late resources and retry enters without creating twice 
+
+    SyntaxError: Unexpected token '/', "/game,["ga"... is not valid JSON
+
+      140 |   page.on('websocket', socket => socket.on('framereceived', ({ payload }) => {
+      141 |     if (typeof payload !== 'string' || !payload.startsWith('42')) return;
+    > 142 |     const message = JSON.parse(payload.slice(2))[1];
+          |                          ^
+      143 |     if (message?.type !== 'snapshot') return;
+      144 |     const player = message.snapshot?.entities?.find((entity: { name?: string; type?: string }) => entity.type === 'player');
+      145 |     if (player?.transform?.position) positions.push(JSON.stringify(player.transform.position));
+        at WebSocket2.<anonymous> (/Users/nisakoo/Documents/competition-2026/client/e2e/hub.spec.ts:142:26)
+
+    Error Context: test-results/hub/hub-delayed-world-stays-fr-caeb1-ters-without-creating-twice/error-context.md
+
+    Error Context: test-results/hub/hub-delayed-world-stays-fr-caeb1-ters-without-creating-twice/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/hub-delayed-world-stays-fr-caeb1-ters-without-creating-twice/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/hub-delayed-world-stays-fr-caeb1-ters-without-creating-twice/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    e2e/hub.spec.ts:89:1 › manual IP validates input, reports unreachable server, cancels late navigation and reauthenticates on another server 
+    e2e/hub.spec.ts:135:1 › delayed world stays frozen; cancel ignores late resources and retry enters without creating twice 
+  2 passed (26.8s)

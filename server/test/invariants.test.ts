@@ -23,6 +23,7 @@ it('S4: a non-finite position is reported and the player returns to safe support
   const world = new World(loaded.maps, loaded.npcs, undefined, { invariant: (name, fields) => reported.push({ name, fields }) });
   world.add({ id: 'p', name: 'P', mapId: 'test', position: SPAWN, rotationY: 0 });
   world.add({ id: 'q', name: 'Q', mapId: 'test', position: { x: -2, y: 0, z: 2 }, rotationY: 0 });
+  world.setIntent('p', 1, { x: 0, z: 0 }, [...loaded.maps.get('test')!.manifest.chunks.map(chunk => chunk.id)], 1000);
   poison.playerAt = { x: SPAWN.x, z: SPAWN.z };
   world.step(0.05, 1000);
   poison.playerAt = null;

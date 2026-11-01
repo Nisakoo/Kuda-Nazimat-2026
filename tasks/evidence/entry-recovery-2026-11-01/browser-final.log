@@ -1,0 +1,27 @@
+
+Running 20 tests using 1 worker
+
+(node:70258) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/babylon.spec.ts:51:1 › two real players enroll, translate, share stones and restore a private dictionary after restart (13.8s)
+  ✓   2 e2e/babylon.spec.ts:106:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task (46.2s)
+  ✓   3 e2e/babylon.spec.ts:127:1 › real server authorizes the default 25-chunk window at the market and tower (22.1s)
+  ✓   4 e2e/hub.spec.ts:54:1 › hub saves preferences, selects modes, loads automatically and preserves the saved game (7.0s)
+  ✓   5 e2e/hub.spec.ts:117:1 › manual IP validates input, reports unreachable server, cancels late navigation and reauthenticates on another server (3.5s)
+  ✓   6 e2e/hub.spec.ts:166:1 › delayed world stays frozen; cancel ignores late resources and retry enters without creating twice (3.2s)
+  ✓   7 e2e/hub.spec.ts:198:1 › resource failure retries and Escape during loading requires an explicit capture gesture (2.6s)
+  ✓   8 e2e/hub.spec.ts:214:1 › reduced motion and a browser capture rejection leave a recoverable ready world (3.2s)
+  ✓   9 e2e/hub.spec.ts:229:1 › entry errors persist across polling and retry never submits a changed destination (7.9s)
+  ✓  10 e2e/hub.spec.ts:268:1 › an existing waiting party offers a direct join before a rejected create (4.1s)
+  ✓  11 e2e/server-auth.spec.ts:62:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token (4.2s)
+  ✓  12 e2e/server-auth.spec.ts:82:1 › real players exchange chat and NPC memory survives a server restart (16.6s)
+  ✓  13 e2e/server-auth.spec.ts:102:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits (1.5s)
+  ✓  14 e2e/server-auth.spec.ts:121:1 › a world 401 and client session expiry return to login without automatically posting again (2.4s)
+  ✓  15 e2e/server-auth.spec.ts:132:1 › switching to the server market enrolls BABEL and opens the authoritative inventory (5.0s)
+  ✓  16 e2e/ui-hud.spec.ts:49:1 › confirmed appearance enters the real world, changes live and keeps the held jug (5.9s)
+  ✓  17 e2e/ui-hud.spec.ts:54:1 › real guest entry preserves only the connection address and returns from mode with Escape (2.0s)
+  ✓  18 e2e/ui-hud.spec.ts:98:1 › real registration resumes mandatory appearance and uses password authentication (7.7s)
+  ✓  19 e2e/ui-hud.spec.ts:103:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (12.6s)
+  ✓  20 e2e/ui-hud.spec.ts:184:1 › connection errors allow retry and disappear after entry polling recovers (1.8s)
+
+  20 passed (3.0m)

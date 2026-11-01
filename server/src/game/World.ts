@@ -28,6 +28,7 @@ interface Player {
   applied: Direction;
   prepared: ReadonlySet<string>;
   lastSequence: number;
+  enteredReady: boolean;
   dirty: boolean;
   motion: MotionState;
   sprint: boolean;
@@ -89,7 +90,7 @@ export class World {
     const position = { ...support, y: map.heightAt(support.x, support.z) };
     const motion = { ...initialMotion(position), ...this.resting.get(player.id) };
     this.resting.delete(player.id);
-    const p = { ...player, avatarId: null, tool: null, position, motion: { ...motion, safePosition: map.isSafeSupport(position.x, position.z) ? position : map.spawn }, sprint: false, jumpId: 0, intent: ZERO, intentAt: 0, applied: ZERO, prepared: new Set<string>(), lastSequence: 0, dirty: false };
+    const p = { ...player, avatarId: null, tool: null, position, motion: { ...motion, safePosition: map.isSafeSupport(position.x, position.z) ? position : map.spawn }, sprint: false, jumpId: 0, intent: ZERO, intentAt: 0, applied: ZERO, prepared: new Set<string>(), lastSequence: 0, enteredReady: false, dirty: false };
     p.motion = recoverMotion(p.motion, this.environment(p));
     p.position = p.motion.position;
     this.players.set(player.id, p);
@@ -132,6 +133,7 @@ export class World {
     p.sprint = sprint;
     p.jumpId = jumpId === 0 ? p.motion.jumpAck : Math.max(p.jumpId, jumpId);
     p.prepared = new Set(preparedChunks.filter((id) => map.hasChunk(id)));
+    if (p.prepared.size && map.canTraverse(p.position, p.position, p.prepared)) p.enteredReady = true;
   }
 
   step(deltaSeconds: number, now: number): void {
@@ -147,6 +149,7 @@ export class World {
   }
 
   private move(p: Player, dt: number, now: number): void {
+    if (!p.enteredReady) return;
     const stale = now - p.intentAt > this.settings.intentTimeoutMs;
     const previous = p.position;
     const previousRecovery = p.motion.recoveryReason;

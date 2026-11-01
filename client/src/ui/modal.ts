@@ -69,7 +69,7 @@ export function modal(node: HTMLDialogElement) {
   document.addEventListener('focusin', onFocus, true);
   document.addEventListener('pointerdown', onInteraction, true);
   document.addEventListener('keydown', onInteraction, true);
-  const observer = new MutationObserver(() => {
+  const observer = new MutationObserver(records => {
     if (!isTop()) return;
     if (pending && fallback && document.activeElement === fallback && usable(node, pending)) {
       const previous = pending;
@@ -77,7 +77,13 @@ export function modal(node: HTMLDialogElement) {
       if (focus(previous)) last = previous;
       return;
     }
-    if (document.activeElement !== document.body || !last || usable(node, last)) return;
+    if (document.activeElement !== document.body || !last) return;
+    // A quick ACK can disable and re-enable the same action before this observer
+    // runs. Chrome has already blurred it; restore it without waiting a frame.
+    if (usable(node, last)) {
+      if (document.hasFocus() && records.some(record => record.target === last && record.attributeName === 'disabled')) focus(last);
+      return;
+    }
     const previous = last;
     for (const candidate of node.querySelectorAll<HTMLElement>(controls)) {
       if (usable(node, candidate) && focus(candidate)) {

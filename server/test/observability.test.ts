@@ -131,6 +131,7 @@ describe('end to end (OBS-006, 008, 010, 011)', () => {
     finally { factory.mockRestore(); }
     const { post, connect, origin, port } = server;
     const registered = (await post('/api/auth/register', { name: 'Аня', password: 'секрет12' })).body as { token: string };
+    await fetch(`${origin}/api/avatar`, { method: 'POST', headers: { Authorization: `Bearer ${registered.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ avatarId: 'ksu' }) });
     for (let i = 0; i < 3; i++) { const c = await connect(registered.token); c.command('join', { mapId: 'test' }); await c.wait((p) => p.type === 'joined'); if (i < 2) c.socket.disconnect(); }
     const live = await connect(registered.token); live.command('join', { mapId: 'test' }); await live.wait((p) => p.type === 'joined');
     const chat = live.command('chat-send', { text: 'тайное слово' }); await live.wait((p) => p.type === 'chat' && p.requestId === chat);

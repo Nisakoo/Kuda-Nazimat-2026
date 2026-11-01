@@ -1,12 +1,11 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import './entry.css';
-  const { pending, error, initialName, login, loginPassword, register, configure }: {
+  const { pending, error, initialName, login, loginPassword, register }: {
     pending: boolean; error: string | null; initialName: string;
     login: (name: string) => Promise<void>;
     loginPassword: (name: string, password: string) => Promise<void>;
     register: (name: string, password: string) => Promise<void>;
-    configure?: () => void;
   } = $props();
   let name = $state('');
   let password = $state('');
@@ -65,7 +64,6 @@
       {#if pending}<p role="status">Ожидаем ответа локального сервера…</p>{/if}
     </form>
     </div>
-    {#if configure}<button class="entry-link" type="button" onclick={configure}>Настроить подключение</button>{/if}
   </section>
 </div>
 <aside class="entry-demo entry-demo-footer" aria-label="Демонстрационный вход">

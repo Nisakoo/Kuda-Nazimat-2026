@@ -48,6 +48,7 @@ beforeEach(() => {
   vi.stubGlobal('cancelAnimationFrame', (id: number) => { frames.delete(id); });
   vi.stubGlobal('ResizeObserver', class { observe(): void {} disconnect(): void {} });
   vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+  vi.spyOn(document, 'hasFocus').mockReturnValue(true);
   pointerLockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
   exitLockProperty = Object.getOwnPropertyDescriptor(document, 'exitPointerLock');
 });
@@ -68,10 +69,11 @@ async function openTaskMap() {
   Object.defineProperty(document, 'exitPointerLock', { configurable: true, value: () => { locked = null; document.dispatchEvent(new Event('pointerlockchange')); } });
   Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: () => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); } });
   vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, options?: RequestInit) => {
+    if (String(input).endsWith('/api/avatar')) return Promise.resolve(new Response(JSON.stringify({ avatarId: 'lukas' })));
     if (String(input).endsWith('/api/auth/logout')) return Promise.resolve(new Response(null, { status: 204 }));
     if (String(input) !== 'http://task-map.unit/api/babylon' || typeof options?.body !== 'string') throw new Error(`Unexpected task-map fetch: ${String(input)}`);
     const packet = JSON.parse(options.body) as BabylonRequest;
-    if (packet.action.type !== 'state' && packet.action.type !== 'languages') throw new Error('Unexpected task-map action');
+    if (packet.action.type !== 'state' && packet.action.type !== 'join') throw new Error('Unexpected task-map action');
     const result = { v: 2 as const, requestId: packet.requestId, state };
     parseBabylonResult(result);
     return Promise.resolve(new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } }));
@@ -97,7 +99,7 @@ async function openTaskMap() {
   app.provideServerSession({ token: 'm'.repeat(43), expiresAt: Date.now() + 60_000 });
   await vi.advanceTimersByTimeAsync(0);
   expect(snapshot.babylonPanel).toBe('setup');
-  expect(await app.completeEntrySetup(3, 'ru', 'en')).toBe(true);
+  expect(await app.connectEntryGame(app.config.serverUrl)).toBe(true);
   await vi.advanceTimersByTimeAsync(100);
   frame(0);
   expect(snapshot.phase).toBe('running');
