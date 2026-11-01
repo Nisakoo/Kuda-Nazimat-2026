@@ -228,7 +228,9 @@ export function createAuthService(deps: AuthDeps) {
       },
       /** ADMIN-SRV-010: when the name may try to log in again, null when not locked. */
       lockedUntil(name: string): number | null { const wait = lockout.retryAfter(name.toLowerCase()); return wait ? clock.now() + wait * 1000 : null; },
-      list: () => accounts.list(clock.now()),
+      list: () => accounts.list(clock.now()).map(account => ({
+        ...account, loginBlockedSeconds: lockout.retryAfter(account.name.toLowerCase()),
+      })),
     },
   };
   return service satisfies SessionVerifier;

@@ -31,7 +31,7 @@ export interface HttpDeps {
   npcReady(): boolean;
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
-  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump' | 'overview'> & Partial<Pick<OperatorDeps, 'content'>>;
+  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump' | 'overview' | 'version'> & Partial<Pick<OperatorDeps, 'content'>>;
   /** OBS-011 perf reports for the admin screen. */
   readonly clientPerf?: (playerId: string, report: PerfReport) => void;
 }
@@ -59,7 +59,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger, metrics, ...(deps.clientPerf ? { perf: deps.clientPerf } : {}) });
   const operator: OperatorDeps = {
     auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
-    npcReady: deps.npcReady,
+    npcReady: deps.npcReady, environment: config.env,
     languageReady: () => true, health: () => ({ level: 'green', reasons: [] }), warnings: () => [], dump: () => null,
     ...deps.operator,
   };
