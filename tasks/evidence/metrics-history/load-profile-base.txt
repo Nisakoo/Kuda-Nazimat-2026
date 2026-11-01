@@ -1,0 +1,8 @@
+server/test/load-profile.ts:48
+  if (!steps.length || answers < 1 || timeouts < 1 || sorted.length < 100 || logs.length) throw new Error(`Profile incomplete: ${JSON.stringify(result)}`);
+                                                                                                ^
+
+Error: Profile incomplete: {"node":"v22.22.2","players":4,"durationMs":61000,"npcDelayMs":5000,"steps":[{"p50":0.233,"p95":1.252,"max":1.72,"broadcastP95":100.954,"broadcastMax":106.069,"players":4}],"broadcast":{"samples":609,"p95Ms":101.10108400000172,"maxMs":105.74508300000161},"deltas":2439,"answers":12,"unavailable":0,"errors":[],"warnings":{"auth.passwordless.enabled":1}}
+    at server/test/load-profile.ts:48:97
+
+Node.js v22.22.2

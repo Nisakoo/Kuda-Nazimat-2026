@@ -36,9 +36,25 @@ npm --prefix server run check
 
 Пароль — от 6 символов, хранится как scrypt. Пять неверных попыток блокируют имя на 15 минут (повторно — на час); выход отзывает сессию сразу, смена пароля — все сессии. Забыл пароль — администратор выдаёт временный на `/operator` или `npm --prefix server run auth -- reset-password <имя> --env production`; игрок входит с ним и задаёт свой. `auth -- list` — аккаунты без хешей, `auth -- revoke <имя>` — завершить сессии.
 
-## Логи и мониторинг (OBS)
+## Логи и метрики (OBS)
 
-Журнал — `data/logs/server-*.jsonl` (JSON на строку: `ts`, `level`, `event`, `msg`, `playerId`, `sessionId`, …), ротация 20 МБ, всего ≤200 МБ и ≤14 дней. При первой ошибке и по кнопке «Сохранить отчёт» на `/operator` бортовой самописец пишет `incident-*.jsonl` с последними 5000 событиями и снимком метрик — это главный источник для плавающих ошибок. Пароли, токены, хеши и тексты игроков в журнал не попадают. Метрики — `GET /metrics` (Prometheus) и `/api/operator/metrics`; Prometheus + Grafana с дашбордом — [ops/monitoring](../ops/monitoring/README.md).
+Журнал — `data/logs/server-*.jsonl` (JSON на строку: `ts`, `level`, `event`, `msg`, `playerId`, `sessionId`, …), ротация 20 МБ, всего ≤200 МБ и ≤14 дней. При первой ошибке и по кнопке «Сохранить отчёт» на `/operator` бортовой самописец пишет `incident-*.jsonl` с последними 5000 событиями, снимком метрик и последними 10 минутами истории — это главный источник для плавающих ошибок. Пароли, токены, хеши и тексты игроков в журнал не попадают.
+
+Внешний Prometheus/Grafana не нужен (OBS-009 снято): сервер сам держит историю метрик — снимок раз в 10 с за последние 4 часа в памяти (OBS-013) — и отдаёт её экрану администратора: `GET /api/operator/status` (плитки и карточки), `GET /api/operator/history` (ряды для графиков), `GET /api/operator/metrics` (текущий JSON-снимок реестра); всё только с loopback. Раз в минуту в журнал пишется событие `metrics.minute` — минутный агрегат истории (игроки, корзины шага/рассылки/RTT/NPC, ошибки, память, показатели по `playerId`). Выгрузка для Excel:
+
+```sh
+jq -r 'select(.event=="metrics.minute") | [.ts, .values.seated, .values.errors, .values.warnings, .values.rssBytes] | @csv' server/data/logs/server-*.jsonl > metrics.csv
+```
+
+Отчёт приёмки (OBS-017, OFFLINE-019) — без запущенного сервера, markdown-таблица «показатель — значение — порог — итог» (p95 шага ≤ 5 мс, p95 рассылки ≤ 120 мс, ошибки сервера 0, p95 ping ≤ 150 мс, FPS ≥ 30, таймауты NPC ≤ 25%, потерянные логи 0); «нет данных» никогда не считается нормой:
+
+```sh
+npm --prefix server run report                       # последний запуск в каталоге логов окружения
+npm --prefix server run report -- --env production --last 2h
+npm --prefix server run report -- --file server/data/logs/server-20261101-ab12cd34.jsonl
+```
+
+При штатной остановке (Ctrl+C) сервер печатает ту же таблицу за текущий запуск. FPS появляется, только если клиент присылает отчёты `perf` (`POST /api/telemetry/client`, OBS-011, передача клиенту — TASK-081).
 
 Запуск из корня ([OFFLINE](../specs/offline-multiplayer.md)):
 
@@ -55,7 +71,19 @@ npm --prefix server run lan:check   # самопроверка без запус
 
 Панель администратора — `https://localhost:8080/operator`, только с самого сервера (с других адресов 404). Разделы «Обзор», «Сервер», «Клиенты» и «Аккаунты» показывают адреса подключения, занятые места отдельно от игроков онлайн, RTT и переподключения, состояние NPC/переводчика, окружение, версию, память, очередь и предупреждения. Статус обновляется раз в 2 с; при сбое остаются последние данные с временем. Кнопка «Обновить» повторяет запросы. Поиск игроков и фильтр карты работают в «Клиентах». В «Аккаунтах» введите полное имя: доступны число сессий, состояние блокировки и подтверждаемые действия AUTH-010; временный пароль показывается в отдельном окне и очищается после закрытия, смены раздела или скрытия вкладки. «Сохранить отчёт» находится в «Сервере».
 
-Это первый этап [TASK-083](../tasks/083-admin-panel-foundation.md): графики, FPS, окна ошибок 5/60 минут, редактор NPC и журнал изменений ещё недоступны. Отсутствующие данные не заменяются нулями. Панель работает без сборки игрового клиента и без внешних ресурсов; исходники — `src/http/operator/`. Данные — `GET /api/operator/status`, `/api/operator/metrics` и `/api/operator/accounts`, только loopback. Снимок статуса дополнен `environment`, `version` и `performance` (p95 шага/рассылки за минуту, RSS/куча в байтах). Миграции применяются до открытия HTTP-порта. Повторный запуск использует ту же БД. Runtime не обращается в интернет; установка npm-пакетов требует сети либо заранее подготовленного кеша. На серверной странице по умолчанию открываются вход и карта market.
+Панель содержит обзор, сервер, клиентов, редактор NPC и сцены, журнал с CSV и аккаунты. Графики используют встроенную историю; FPS появится после клиентского TASK-081. Локальные API — `/api/operator/*`, административные API с отдельным Bearer — `/api/admin/*`. Неполученные показатели показываются как «нет данных».
+
+## Администратор в Windows (PowerShell)
+
+Из корня проекта, Node 24.15+ из ветки 24. Команды должны использовать ту же конфигурацию и окружение, что сервер:
+
+```powershell
+npm.cmd --prefix server run auth -- create-admin Admin --env production
+npm.cmd --prefix server run auth -- list --env production
+npm.cmd --prefix server run start:prod
+```
+
+Терминал покажет временный пароль один раз. После установки сертификата откройте `https://localhost:8080/admin` (или LAN-адрес сервера), войдите и задайте постоянный пароль. Для уже существующего аккаунта с паролем: `npm.cmd --prefix server run auth -- grant-admin "ИмяИгрока" --env production`; снять роль: `revoke-admin`. Окружение development использует другую БД: для него замените `--env production` на `--env development`. `/operator` открывается без входа только на самом компьютере сервера. Административная сессия хранится только в памяти страницы и не занимает игровое место.
 
 ## HTTPS и доверие сертификату
 
@@ -103,7 +131,9 @@ npm --prefix server start -- --config /absolute/path/config.json
 - `GET /config.json` — `{session: "online", serverUrl: null, mapId, chunkRadius: null, debug: false}` из настроек сервера.
 - `GET /api/health` — публичный статус готовности; ready не доказывает качество/скорость реальной модели.
 - `GET /api/game-config` — только `{npcTimeoutMs}` из эффективной конфигурации, no-store/обычный CORS; без model paths/options/pins.
-- `GET /operator`, `GET /api/operator/status` — экран администратора, только с loopback.
+- `GET /operator`, `GET /api/operator/status`, `GET /api/operator/history`, `GET /api/operator/metrics` — экран администратора и его данные, только с loopback.
+- `/api/operator/npcs`, `/api/operator/world`, `/api/operator/journal(.csv)`, `/api/operator/accounts`, `/api/operator/account` — правка, создание и удаление NPC на ходу поверх `content/npcs.json` (правки в SQLite, «сбросить» возвращает файл), сброс живой сцены, журнал изменений с CSV и карточка аккаунта; только loopback, изменения — с `Origin` сервера и `X-Operator: 1`. Контракт — [ADMIN-SRV](../specs/server-admin-content.md). У NPC рынка без `assetId` фигура нарисована в чанке: их можно переименовать, сменить тему, характер и приветствие или выключить, но не переместить.
+- `POST /api/telemetry/client` — отчёты клиента об ошибках (10/мин) и `perf` (`fps`, `visible`, по желанию `frameMs`, `drawCalls`; 12/мин), Bearer-сессия, OBS-011.
 - `POST /api/auth/guest`, JSON `{name}` — совместимость development/test; production требует парольного login. Регистрация/login/logout/password/dev и ограничения описаны в [AUTH](../specs/server-auth.md).
 - `GET /world/*` — только Bearer действующей сессии и решение `GameRuntime.worldFile` набора A; 401 без сессии, 404 без доступа к ресурсу.
 

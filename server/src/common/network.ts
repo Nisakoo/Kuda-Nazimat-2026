@@ -62,7 +62,7 @@ export function connectionBlock(info: Connection, certificate?: CertificateSumma
   const lan = info.lan.length
     ? info.lan.map((entry) => `    ${entry.url.padEnd(30)} ${entry.name}${entry.kind === 'link-local' ? ' (нет сети)' : ''}`)
     : ['    —'];
-  return [line, '  ВАВИЛОН ЗАПУЩЕН', '', `  Этот компьютер:     ${info.local}`, '  Другие устройства:', ...lan, `  Экран ведущего:     ${info.operator}`,
+  return [line, '  ВАВИЛОН ЗАПУЩЕН', '', `  Этот компьютер:     ${info.local}`, '  Другие устройства:', ...lan, `  Оператор:     ${info.operator}`,
     ...(certificate ? ['', '  Первый вход с устройства — один раз доверьте сертификат:', ...info.setup.map((url) => `    ${url}`),
       '  Отпечаток SHA-256 (сверьте на устройстве):', `    ${certificate.fingerprint}`, `  Сертификат действует до ${certificate.notAfter.toISOString().slice(0, 10)}`] : []),
     ...(info.warnings.length ? ['', ...info.warnings.map((warning) => `  ! ${warning}`)] : []), line].join('\n');

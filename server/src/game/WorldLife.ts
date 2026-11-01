@@ -5,6 +5,7 @@ import { handFailure, parseWorldLifeServerMessage } from '../../../shared/world-
 import { isBodyClear } from '../../../shared/movement/simulation.ts';
 import type { GameMap } from '../world/GameMap.ts';
 import type { PlacedPlayer } from './ports.ts';
+import type { SceneView } from '../contracts.ts';
 
 function distance(a: Vector3, b: Vector3): number { return Math.hypot(a.x-b.x, a.y-b.y, a.z-b.z); }
 function overlapsPath(p: Vector3, a: Vector3, b: Vector3, half: number): boolean {
@@ -65,6 +66,44 @@ export class WorldLife {
     }
   }
   catalogue(): readonly WorldLifeDefinition[] { return [...this.definitions.values()]; }
+  /** ADMIN-SRV-008: current and initial places of the map's pots and apples. */
+  view(mapId: string): SceneView | null {
+    const d = this.definitions.get(mapId); if (!d) return null;
+    const home = new Map(d.instances.map(i => [i.id, i.position]));
+    return {
+      revision: this.revision,
+      pots: this.pots.get(mapId)!.map(p => ({ id: p.id, position: { ...p.position }, home: { ...home.get(p.id)! } })),
+      apples: this.apples.filter(a => a.mapId === mapId).map(a => a.state === 'world'
+        ? { id: a.id, state: 'world' as const, position: { ...a.position }, home: { ...home.get(a.id)! } }
+        : { id: a.id, state: 'held' as const, holderId: a.holderId, home: { ...home.get(a.id)! } }),
+    };
+  }
+  /**
+   * ADMIN-SRV-008: pots go home unless a player or a skipped pot occupies the home; returns the apples
+   * whose home stays clear of every pot afterwards. Pots are RAM state, as after a restart.
+   */
+  resetPots(mapId: string, players: readonly PlacedPlayer[]): { reset: number; skipped: string[]; apples: { id: string; position: Vector3 }[]; skippedApples: string[] } | null {
+    const d = this.definitions.get(mapId); if (!d) return null;
+    const pots = this.pots.get(mapId)!; const home = new Map(d.instances.map(i => [i.id, i.position]));
+    const moved = pots.filter(p => distance(p.position, home.get(p.id)!) > 1e-6);
+    const blocked = (target: Vector3, others: readonly { position: Vector3 }[]) => players.some(p => p.mapId === mapId && overlapsPath(p.position, target, target, L.potRadius + 0.25))
+      || others.some(o => overlapsPath(o.position, target, target, 2 * L.potRadius));
+    const skipped = new Set<string>();
+    // A skipped pot stays where it is and may block another pot's home: repeat until stable.
+    for (let changed = true; changed;) {
+      changed = false;
+      for (const pot of moved) if (!skipped.has(pot.id) && blocked(home.get(pot.id)!, pots.filter(o => o !== pot && skipped.has(o.id)))) { skipped.add(pot.id); changed = true; }
+    }
+    let reset = 0;
+    for (const pot of moved) if (!skipped.has(pot.id)) { pot.position = { ...home.get(pot.id)! }; reset++; }
+    if (reset) this.revision++;
+    const apples: { id: string; position: Vector3 }[] = []; const skippedApples: string[] = [];
+    for (const i of this.instances(d, 'pickup')) {
+      if (pots.some(p => overlapsPath(p.position, i.position, i.position, L.potRadius + L.appleRadius))) skippedApples.push(i.id);
+      else apples.push({ id: i.id, position: { ...i.position } });
+    }
+    return { reset, skipped: [...skipped], apples, skippedApples };
+  }
   has(mapId: string): boolean { return this.definitions.has(mapId); }
   private behavior(d: WorldLifeDefinition, i: ObjectInstance) { return d.templates.find(t => t.id === i.templateId)!.behavior; }
   private instances(d: WorldLifeDefinition, behavior: 'pickup' | 'pushable'): ObjectInstance[] { return d.instances.filter(i => this.behavior(d,i) === behavior); }

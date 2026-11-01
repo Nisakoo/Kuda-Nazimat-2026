@@ -18,14 +18,16 @@ import type { ServerCertificate } from '../tls/store.ts';
 import { handleAuth } from './authRoutes.ts';
 import { handleOperator, type OperatorDeps } from './operatorRoutes.ts';
 import { setupPage } from './setupPage.ts';
-import { telemetryHandler } from './telemetry.ts';
 import { createTransport } from './transport.ts';
+import { handleAdminAccess } from './adminAccess.ts';
+import { telemetryHandler } from './telemetry.ts';
+import type { PerfReport } from '../obs/clientPerf.ts';
 import { bearer, body, clientIp, error, json, type RequestContext } from './util.ts';
 
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 const BABEL_STATUS = { INVALID: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, CONFLICT: 409, NOT_READY: 409, RATE_LIMIT: 429, UNAVAILABLE: 503 } as const;
 /** Routes logged at debug: high-volume polling and static files (OBS-012). */
-const QUIET = new Set(['/world/*', 'static', '/api/operator/status', '/metrics', '/api/babylon:state']);
+const QUIET = new Set(['/world/*', 'static', '/api/operator/status', '/api/operator/history', '/api/admin/status', '/api/admin/history', '/api/babylon:state']);
 
 export interface HttpDeps {
   avatars?: AvatarStore; equipment?: EquipmentStore;
@@ -34,7 +36,9 @@ export interface HttpDeps {
   npcReady(): boolean;
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
-  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump' | 'version'>;
+  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump' | 'overview' | 'version'> & Partial<Pick<OperatorDeps, 'content'>>;
+  /** OBS-011 perf reports for the admin screen. */
+  readonly clientPerf?: (playerId: string, report: PerfReport) => void;
   /** TLS-003: the server certificate; every route is served with it (TLS-007). */
   readonly certificate: ServerCertificate;
   /** Current addresses the certificate does not cover, evaluated on demand (TLS-004). */
@@ -76,10 +80,11 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   /** TLS-012: devices that rejected the certificate, newest last, one entry per IP. */
   const untrusted = new Map<string, { ts: number; reason: string }>();
   const certNames = new Set(deps.certificate.info.names);
-  const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger });
+  const adminBuckets = new Map<string, TokenBucket>();
+  const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger, metrics, ...(deps.clientPerf ? { perf: deps.clientPerf } : {}) });
   const operator: OperatorDeps = {
     auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
-    npcReady: deps.npcReady, monitoringToken: config.monitoring.token, environment: config.env,
+    npcReady: deps.npcReady, environment: config.env,
     languageReady: () => true, health: () => ({ level: 'green', reasons: [] }), warnings: () => [], dump: () => null,
     ...deps.operator,
     tls: () => ({
@@ -251,6 +256,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
       json(res, 200, selection); return;
     }
     if (await handleAuth(req, res, path, deps.auth, log, context)) return;
+    if (await handleAdminAccess(req, res, path, { ...operator, clock: deps.clock }, context, adminBuckets)) return;
     if (await handleOperator(req, res, path, operator, context)) return;
     if (req.method === 'POST' && path === '/api/babylon' && deps.babylon) { context.route = '/api/babylon'; await babel(req, res, deps.babylon, context); return; }
     if (req.method === 'POST' && path === '/api/telemetry/client') { await telemetry(req, res, context); return; }

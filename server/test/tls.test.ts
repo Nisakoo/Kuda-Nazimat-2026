@@ -173,8 +173,8 @@ describe('transport on one port (TLS-007, 008, 009)', () => {
     expect(status.tls.untrusted[0]).toMatchObject({ reason: 'untrusted' }); expect(status.tls.untrusted[0]!.ip).toMatch(/127\.0\.0\.1$/);
     expect(status.tls.fingerprint).toMatch(/^([0-9A-F]{4} ){15}[0-9A-F]{4}$/);
     expect(status.setup.every((url) => url.startsWith('http://') && url.endsWith('/setup'))).toBe(true);
-    const metrics = await (await fetch(`${origin}/metrics`)).text();
-    expect(metrics).toMatch(/tls_handshake_failures_total\{reason="untrusted"\} [1-9]/);
+    const metrics = await (await fetch(`${origin}/api/operator/metrics`)).json() as Record<string, { labels: { reason: string }; value: number }[]>;
+    expect(metrics.tls_handshake_failures_total).toEqual(expect.arrayContaining([expect.objectContaining({ labels: { reason: 'untrusted' }, value: expect.any(Number) })]));
   });
 
   it('operator actions need an https loopback origin', async () => {

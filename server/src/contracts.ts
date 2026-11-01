@@ -9,6 +9,7 @@ import type { Logger } from './common/logger.ts';
 import type { Metrics } from './common/metrics.ts';
 import type { Clock, Scheduler } from './common/time.ts';
 import type { WorldLifeStore } from './game/worldLifePorts.ts';
+import type { NpcDefinition } from './world/npcContent.ts';
 
 export interface PlayerIdentity { readonly accountId: string; readonly playerId: string; readonly displayName: string }
 
@@ -63,6 +64,8 @@ export interface NpcQuestions {
   cancel(connectionId: string, requestId: string): void;
   /** Disconnect, takeover, session expiry. */
   cancelConnection(connectionId: string): void;
+  /** ADMIN-SRV-005: aborts every unfinished game-channel question to this NPC. */
+  cancelNpc?(npcId: string): void;
 }
 
 // ── Implemented by part A, consumed by part B ──────────────────────────────
@@ -73,6 +76,8 @@ export type WorldFileAccess = { readonly ok: true; readonly file: WorldFile } | 
 
 /** OFFLINE-010: who holds a seat, for the operator screen; no tokens, texts or positions. */
 export interface PlayerPresence {
+  /** Joins client reports (OBS-011) and history rows to the seat; not shown to players. */
+  readonly playerId: string;
   readonly name: string; readonly mapId: string | null; readonly connected: boolean; readonly releaseInMs: number | null;
   /** OBS-010: median Engine.IO heartbeat RTT of the last minute, reconnects in 10 min, seconds since the seat was taken. */
   readonly rttMs: number | null; readonly reconnects: number; readonly seatedSeconds: number;
@@ -135,6 +140,30 @@ export interface GameRuntime {
   stats(): { readonly tickP95Ms: number; readonly broadcastP95Ms: number; readonly players: number } | null;
   /** SERVER-005: closes connections and saves positions. */
   stop(reason: string): Promise<void>;
+  /** ADMIN-SRV: the live NPC set and the world-life scene, for the administrator. */
+  readonly content?: WorldContentPort;
+}
+
+export interface SceneView {
+  readonly revision: number;
+  readonly pots: readonly { readonly id: string; readonly position: Vector3; readonly home: Vector3 }[];
+  readonly apples: readonly ({ readonly id: string; readonly home: Vector3 } & ({ readonly state: 'world'; readonly position: Vector3 } | { readonly state: 'held'; readonly holderId: string }))[];
+}
+export interface SceneReset { readonly revision: number; readonly reset: { readonly pots: number; readonly apples: number }; readonly skipped: { readonly pots: readonly string[]; readonly apples: readonly string[] } }
+/** ADMIN-SRV-001/005/008: what the content administration needs from the game. */
+export interface WorldContentPort {
+  /** NPCs as loaded from contentDir/npcs.json (SERVER-WORLD-008). */
+  readonly baseNpcs: readonly NpcDefinition[];
+  maps(): readonly { readonly mapId: string; readonly chunks: number; readonly npcs: number }[];
+  /** Surface height when (x, z) lies inside the map's chunks, otherwise null. */
+  surface(mapId: string, x: number, z: number): number | null;
+  /** ADMIN-SRV-013: walkable spot on the map (shared walkability and ceilings). */
+  walkable(mapId: string, x: number, z: number): boolean;
+  /** Replaces the NPCs of the world; the next broadcast upserts or removes their entities. */
+  setNpcs(npcs: readonly NpcDefinition[]): void;
+  scene(mapId: string): SceneView | null;
+  /** Throws when the scene store fails; null when the map has no scene. */
+  resetScene(mapId: string): SceneReset | null;
 }
 /** Exported by part A from src/game/index.ts; loads and validates the world (fails fast). */
 export type CreateGame = (config: GameConfig, deps: GameDeps) => Promise<GameRuntime>;

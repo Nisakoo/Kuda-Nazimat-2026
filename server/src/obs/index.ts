@@ -32,7 +32,9 @@ export function createObservability(logs: LogsConfig, options: { runId?: string;
     console({ ts: new Date(now()).toISOString(), seq: 0, runId, level: 'warn', module: 'obs', event, msg: event === 'log.dropped' ? 'Строки лога отброшены' : 'Не удалось записать лог в файл', ...fields });
   };
   if (logs.fileLevel !== 'off') file = new FileSink({ dir: logs.dir, runId, minLevel: logs.fileLevel, maxFileBytes: logs.maxFileMb << 20, maxTotalBytes: logs.maxTotalMb << 20, retentionMs: logs.retentionDays * 86_400_000, now, report });
-  const logger = createLogger(fanOut(console, recorder.sink, ...(file ? [file.sink] : [])), runId, now);
+  // OBS-013: records per level feed the error and warning counts of the history.
+  const levels = metrics.counter('log_records_total', 'Записи журнала по уровню');
+  const logger = createLogger(fanOut((record) => levels.inc({ level: record.level }), console, recorder.sink, ...(file ? [file.sink] : [])), runId, now);
 
   const delay = monitorEventLoopDelay({ resolution: 20 }); delay.enable();
   let last = { eventLoopP99Ms: 0, rssBytes: process.memoryUsage().rss };

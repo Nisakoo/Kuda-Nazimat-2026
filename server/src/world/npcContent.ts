@@ -15,6 +15,8 @@ export interface NpcDefinition {
 }
 
 const ID = /^[A-Za-z0-9_-]{1,80}$/;
+/** SERVER-WORLD-008 limits, shared with administrator edits (ADMIN-SRV-002). */
+export const NPC_LIMITS = { id: ID, name: 80, topic: 80, persona: 500, greeting: 500, maxRadius: 20, maxCoordinate: 1e6 } as const;
 const FIELDS = ['id', 'mapId', 'name', 'topic', 'persona', 'greeting', 'position', 'rotationY', 'interactionRadius', 'assetId'];
 
 function fail(index: number, field: string): never { throw new Error(`npcs.json[${index}].${field}: некорректное значение`); }

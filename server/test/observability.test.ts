@@ -7,7 +7,7 @@ import { createLogger, memoryLogger, type LogRecord } from '../src/common/logger
 import { MetricsRegistry } from '../src/common/metrics.ts';
 import { consoleSink, fanOut, FileSink } from '../src/obs/sinks.ts';
 import { FlightRecorder } from '../src/obs/recorder.ts';
-import { evaluateHealth, CounterWindow, type HealthInputs } from '../src/obs/health.ts';
+import { evaluateHealth, type HealthInputs } from '../src/obs/health.ts';
 import * as responders from '../src/npc/adapters/index.ts';
 import { hashToken } from '../src/auth/AuthService.ts';
 import { lanAddresses } from '../src/common/network.ts';
@@ -70,35 +70,33 @@ describe('logger and sinks (OBS-001–002)', () => {
 });
 
 describe('metrics and health (OBS-007, 010)', () => {
-  it('exposes counters, gauges and histograms in Prometheus text and as a JSON snapshot', () => {
+  it('keeps counters, gauges and histograms with bucket counts and a JSON snapshot', () => {
     const metrics = new MetricsRegistry();
     metrics.counter('auth_attempts_total', 'Попытки').inc({ method: 'login', outcome: 'ok' }, 2);
     metrics.gauge('game_players', 'Игроки', () => [{ labels: { state: 'connected' }, value: 3 }]);
     const tick = metrics.histogram('game_tick_duration_ms', 'Шаг', [1, 5, 10]);
     for (const value of [0.5, 0.7, 3, 20]) tick.observe(value);
-    const text = metrics.prometheus();
-    expect(text).toContain('# TYPE auth_attempts_total counter'); expect(text).toContain('auth_attempts_total{method="login",outcome="ok"} 2');
-    expect(text).toContain('game_players{state="connected"} 3');
-    expect(text).toContain('game_tick_duration_ms_bucket{le="1"} 2'); expect(text).toContain('game_tick_duration_ms_bucket{le="5"} 3'); expect(text).toContain('game_tick_duration_ms_bucket{le="+Inf"} 4'); expect(text).toContain('game_tick_duration_ms_count 4');
+    expect(metrics.histogramCounts('game_tick_duration_ms')).toEqual({ buckets: [1, 5, 10], counts: [2, 1, 0, 1] });
+    expect(metrics.value('game_players', { state: 'connected' })).toBe(3);
+    expect(metrics.total('auth_attempts_total', (labels) => labels.method === 'login')).toBe(2);
+    expect(metrics.has('game_players')).toBe(true); expect(metrics.has('missing')).toBe(false);
     expect(metrics.snapshot().game_tick_duration_ms).toEqual([{ labels: {}, count: 4, sum: 24.2, p50: 1, p95: Infinity }]);
     expect(metrics.value('auth_attempts_total', { outcome: 'ok' })).toBe(2);
     expect(() => metrics.gauge('auth_attempts_total', 'x')).toThrow();
   });
 
-  it('applies the OBS-010 rules and windows counters over five minutes', () => {
+  it('applies the OBS-010 rules, including slow network and low FPS per player', () => {
     const base: HealthInputs = { tickP95Ms: 1, broadcastP95Ms: 100, eventLoopP99Ms: 5, npcReady: true, languageReady: true, timeoutShare: 0, dbErrors5m: 0, logDropped5m: 0, diskFreeBytes: 10 * 1024 ** 3, players: [] };
     expect(evaluateHealth(base)).toEqual({ level: 'green', reasons: [] });
     expect(evaluateHealth({ ...base, tickP95Ms: 8, npcReady: false }).level).toBe('yellow');
     expect(evaluateHealth({ ...base, tickP95Ms: 25 }).level).toBe('red');
     expect(evaluateHealth({ ...base, dbErrors5m: 1 }).level).toBe('red');
     expect(evaluateHealth({ ...base, diskFreeBytes: 100 * 1024 ** 2 }).level).toBe('red');
-    const unstable = evaluateHealth({ ...base, players: [{ name: 'Аня', mapId: 'test', connected: true, releaseInMs: null, rttMs: 20, reconnects: 3, seatedSeconds: 60 }] });
+    const unstable = evaluateHealth({ ...base, players: [{ name: 'Аня', rttMs: 20, reconnects: 3 }] });
     expect(unstable.reasons.map((r) => r.text)).toEqual([expect.stringContaining('Нестабильная связь у игрока Аня')]);
-    const window = new CounterWindow(300_000);
-    window.sample(0, { t: 0 }); window.sample(200_000, { t: 5 }); window.sample(400_000, { t: 9 });
-    expect(window.delta('t')).toBe(9); // the oldest sample is kept until a newer one covers the whole window
-    window.sample(700_000, { t: 10 });
-    expect(window.delta('t')).toBe(1);
+    const slow = evaluateHealth({ ...base, players: [{ name: 'Соня', rttMs: 172, reconnects: 0, fps: 27 }, { name: 'Мира', rttMs: 150, reconnects: 0, fps: 30 }, { name: 'Артём', rttMs: null, reconnects: 0, fps: null }] });
+    expect(slow.level).toBe('yellow');
+    expect(slow.reasons.map((r) => r.text)).toEqual(['Медленная сеть у игрока Соня (ping 172 мс)', 'У игрока Соня тормозит картинка (27 FPS)']);
   });
 });
 
@@ -121,13 +119,14 @@ describe('invariants and crashes (OBS-003, 005)', () => {
 });
 
 describe('end to end (OBS-006, 008, 010, 011)', () => {
-  it('S5/S6/S7: no secrets or texts anywhere; /metrics and the operator screen work; health explains problems', async () => {
+  it('S5/S6/S7/S13: no secrets or texts anywhere; status groups, history and dumps work; health explains problems', async () => {
     const factory = vi.spyOn(responders, 'createResponder').mockReturnValue({ async start() { throw new Error('no model'); }, async stop() {}, async answer() { throw new Error('unused'); } });
     const dir = temp(); const metrics = new MetricsRegistry(); const records: LogRecord[] = [];
-    const recorder = new FlightRecorder({ dir, runId: 'e2e' });
+    let state: () => unknown = () => null;
+    const recorder = new FlightRecorder({ dir, runId: 'e2e', snapshot: () => ({ metrics: metrics.snapshot(), state: state() }) });
     const logger = createLogger(fanOut((r) => { records.push(r); }, recorder.sink), 'e2e');
     let server: Awaited<ReturnType<typeof setup>>;
-    try { server = await setup({ host: '0.0.0.0', auth: { passwordless: false }, monitoring: { token: 't'.repeat(40), pingIntervalMs: 1000 } }, undefined, 'test', logger, { metrics, recorder }); }
+    try { server = await setup({ host: '0.0.0.0', auth: { passwordless: false }, monitoring: { pingIntervalMs: 1000 } }, undefined, 'test', logger, { metrics, recorder, setSnapshot: (next) => { state = next; } }); }
     finally { factory.mockRestore(); }
     const { post, connect, origin, port } = server;
     const registered = (await post('/api/auth/register', { name: 'Аня', password: 'секрет12' })).body as { token: string };
@@ -142,32 +141,67 @@ describe('end to end (OBS-006, 008, 010, 011)', () => {
     expect(status.health.reasons.map((r) => r.text)).toEqual(expect.arrayContaining(['Персонажи (NPC) недоступны', expect.stringContaining('Нестабильная связь у игрока Аня')]));
     expect(status.warnings.length).toBeGreaterThan(0);
     const self = `https://127.0.0.1:${port}`;
+    expect(status).toMatchObject({
+      server: { env: 'test', uptimeSeconds: expect.any(Number) }, overview: { seats: { used: 1, max: 4 }, connected: 1, unstable: 1, npcCount: 1 },
+      tick: { p95Ms: null }, memory: { rssBytes: expect.any(Number) }, npcStats: { maxUnfinished: 4 }, errors: { hour: { total: null } },
+      thresholds: { rttMs: 150, fps: 30 },
+    });
+    expect((status as unknown as { players: Record<string, unknown>[] }).players[0]).toMatchObject({ name: 'Аня', fps: null, reportAgeSeconds: null });
     const dump = await post('/api/operator/actions/dump', {}, { Origin: self, 'X-Operator': '1' });
     expect(dump.status).toBe(200); expect(existsSync(dump.body!.file)).toBe(true);
-    const prometheus = await (await fetch(`${origin}/metrics`)).text();
-    for (const name of ['game_tick_duration_ms_bucket', 'game_players', 'realtime_packets_in_total', 'auth_attempts_total', 'http_requests_total', 'db_operation_ms_bucket']) expect(prometheus).toContain(name);
+    expect(lines(dump.body!.file)[1]).toMatchObject({ type: 'snapshot', snapshot: { metrics: expect.any(Object), state: { game: expect.any(Object), history: expect.any(Array) } } });
+    const history = await (await fetch(`${origin}/api/operator/history`)).text();
+    expect(JSON.parse(history)).toMatchObject({ stepMs: 10_000, series: { seated: [], tickP95Ms: [], rssBytes: [] }, players: {}, thresholds: { seats: 4 } });
+    expect((await fetch(`${origin}/metrics`)).status).toBe(404);
     const lan = lanAddresses().find((a) => a.kind !== 'link-local');
     if (lan) {
-      expect((await fetch(`https://${lan.address}:${port}/metrics`)).status).toBe(404);
-      expect((await fetch(`https://${lan.address}:${port}/metrics`, { headers: { Authorization: `Bearer ${'t'.repeat(40)}` } })).status).toBe(200);
+      for (const path of ['/metrics', '/api/operator/metrics', '/api/operator/history', '/api/operator/status']) {
+        expect((await fetch(`https://${lan.address}:${port}${path}`, { headers: { Authorization: 'Bearer anything' } })).status, path).toBe(404);
+      }
     }
-    const outputs = [JSON.stringify(records), prometheus, JSON.stringify(status), await (await fetch(`${origin}/api/operator/metrics`)).text(), ...readdirSync(dir).map((name) => readFileSync(join(dir, name), 'utf8'))].join('\n');
-    for (const secret of ['секрет12', registered.token, hashToken(registered.token), 'тайное слово', 'секретный вопрос', 't'.repeat(40), 'scrypt$']) expect(outputs, secret).not.toContain(secret);
+    const outputs = [JSON.stringify(records), history, JSON.stringify(status), await (await fetch(`${origin}/api/operator/metrics`)).text(), ...readdirSync(dir).map((name) => readFileSync(join(dir, name), 'utf8'))].join('\n');
+    for (const secret of ['секрет12', registered.token, hashToken(registered.token), 'тайное слово', 'секретный вопрос', 'scrypt$']) expect(outputs, secret).not.toContain(secret);
     expect(records.map((r) => r.event)).toEqual(expect.arrayContaining(['app.start', 'auth.register', 'realtime.connect', 'realtime.join', 'game.seat.attach', 'realtime.disconnect', 'http.request', 'npc.responder.unavailable', 'app.ready']));
   });
 
-  it('S8: client reports are authenticated, validated, rate-limited and logged without control characters', async () => {
+  it('S8: client reports are authenticated, validated, rate-limited per kind and logged without control characters', async () => {
     const logger = memoryLogger();
     const { post } = await setup({}, undefined, 'test', logger);
     const { token } = (await post('/api/auth/dev', {})).body as { token: string };
     const auth = { Authorization: `Bearer ${token}` };
     expect((await post('/api/telemetry/client', { v: 1, kind: 'error', message: 'x' })).status).toBe(401);
-    expect((await post('/api/telemetry/client', { v: 1, kind: 'error', extra: 1 }, auth)).status).toBe(400);
-    expect((await post('/api/telemetry/client', { v: 2, kind: 'error' }, auth)).status).toBe(400);
-    const statuses: number[] = [];
-    for (let i = 0; i < 10; i++) statuses.push((await post('/api/telemetry/client', { v: 1, kind: i ? 'perf' : 'error', message: 'TypeError: x\u0007', stack: 'at y', fps: 58 }, auth)).status);
-    statuses.push((await post('/api/telemetry/client', { v: 1, kind: 'error' }, auth)).status);
-    expect(statuses).toEqual([...Array(8).fill(204), 429, 429, 429]);
+    for (const invalid of [{ v: 1, kind: 'error', extra: 1 }, { v: 2, kind: 'error' }, { v: 1, kind: 'perf', fps: 60 }, { v: 1, kind: 'perf', visible: true }, { v: 1, kind: 'perf', fps: 2000, visible: true }, { v: 1, kind: 'perf', fps: 60, visible: 'yes' }, { v: 1, kind: 'perf', fps: 60, visible: true, drawCalls: 1.5 }])
+      expect((await post('/api/telemetry/client', invalid, auth)).status, JSON.stringify(invalid)).toBe(400);
+    const errors: number[] = []; const perf: number[] = [];
+    for (let i = 0; i < 12; i++) errors.push((await post('/api/telemetry/client', { v: 1, kind: 'error', message: 'TypeError: x\u0007', stack: 'at y', fps: 58 }, auth)).status);
+    for (let i = 0; i < 13; i++) perf.push((await post('/api/telemetry/client', { v: 1, kind: 'perf', fps: 58, visible: true, frameMs: 21, drawCalls: 140, map: 'test' }, auth)).status);
+    expect(errors).toEqual([...Array(10).fill(204), 429, 429]);
+    expect(perf).toEqual([...Array(12).fill(204), 429]);
     expect(logger.records.find((r) => r.event === 'client.error')).toMatchObject({ level: 'warn', message: 'TypeError: x', stack: 'at y', fps: 58 });
+    expect(logger.records.find((r) => r.event === 'client.perf')).toMatchObject({ level: 'debug', fps: 58, visible: true, frameMs: 21, drawCalls: 140 });
+  });
+
+  it('S10: the last visible perf report shows per player; a hidden tab does not count; no report means no data', async () => {
+    const { post, connect, origin } = await setup();
+    const join = async (name: string) => {
+      const { token } = (await post('/api/auth/dev', { name })).body as { token: string };
+      const c = await connect(token); c.command('join', { mapId: 'test' }); await c.wait((p) => p.type === 'joined');
+      return { Authorization: `Bearer ${token}` };
+    };
+    const fast = await join('Мира'); const slow = await join('Соня'); await join('Артём');
+    expect((await post('/api/telemetry/client', { v: 1, kind: 'perf', fps: 58, visible: true, frameMs: 18, drawCalls: 120 }, fast)).status).toBe(204);
+    expect((await post('/api/telemetry/client', { v: 1, kind: 'perf', fps: 22, visible: true }, slow)).status).toBe(204);
+    const status = async () => (await (await fetch(`${origin}/api/operator/status`)).json()) as { health: { reasons: { text: string }[] }; players: { name: string; fps: number | null; frameMs: number | null; drawCalls: number | null; visible: boolean | null; reportAgeSeconds: number | null }[]; overview: { avgFps: number | null } };
+    let current = await status();
+    const by = (name: string) => current.players.find((p) => p.name === name)!;
+    expect(by('Мира')).toMatchObject({ fps: 58, frameMs: 18, drawCalls: 120, visible: true, reportAgeSeconds: 0 });
+    expect(by('Соня')).toMatchObject({ fps: 22, visible: true });
+    expect(by('Артём')).toMatchObject({ fps: null, visible: null, reportAgeSeconds: null });
+    expect(current.overview.avgFps).toBe(40);
+    expect(current.health.reasons.map((r) => r.text)).toContain('У игрока Соня тормозит картинка (22 FPS)');
+    expect((await post('/api/telemetry/client', { v: 1, kind: 'perf', fps: 3, visible: false }, slow)).status).toBe(204);
+    current = await status();
+    expect(by('Соня')).toMatchObject({ fps: null, visible: false });
+    expect(current.health.reasons.map((r) => r.text).some((text) => text.includes('тормозит'))).toBe(false);
   });
 });

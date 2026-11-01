@@ -57,7 +57,9 @@ try {
     ...(certificate.uncovered.length ? [`Сертификат не покрывает адреса ${certificate.uncovered.join(', ')}: по ним игроки увидят ошибку. Выпустите новый: npm --prefix server run tls -- renew --yes`] : []),
     ...(daysLeft(certificate.info, new Date()) < EXPIRY_WARNING_DAYS ? ['Сертификат скоро истечёт: npm --prefix server run tls -- renew --yes'] : [])];
   process.stdout.write(`${connectionBlock({ ...info, warnings }, { fingerprint: certificate.info.fingerprint, notAfter: certificate.info.notAfter })}\n`);
-  shutdownOnSignals({ stop: async () => { try { await app.stop(); } finally { obs.close(); } } }, obs.logger);
+  shutdownOnSignals({ stop: async () => {
+    try { await app.stop(); process.stdout.write(`\nИтог запуска (OBS-017):\n${app.report()}`); } finally { obs.close(); }
+  } }, obs.logger);
 } catch (error) {
   obs.logger.fatal('app.start.failed', error instanceof Error ? error.message : 'Ошибка запуска', { error });
   obs.close();
