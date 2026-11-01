@@ -19,6 +19,8 @@ import urllib.request
 from local_common import WorkerError, _unique_pairs, compile_prompt, configure_offline, count_prompt_tokens, emit, normalize_text, read_message, verify_manifest
 
 MODEL = 'qwen3.5:2b-q4_K_M'
+SMALL_MODEL = 'qwen3.5:0.8b-q8_0'
+ALLOWED_MODELS = frozenset((MODEL, SMALL_MODEL))
 WIRE_LIMIT = 65536
 LINE_LIMIT = 32768
 MANIFEST_TYPE = 'application/vnd.docker.distribution.manifest.v2+json'
@@ -30,6 +32,13 @@ MANIFEST_REFERENCE_TYPES = frozenset((
     'application/vnd.oci.image.manifest.v1+json',
     'application/vnd.oci.image.index.v1+json',
 ))
+
+
+def require_model(value):
+    """Accept only explicit local model names, never aliases or path fragments."""
+    if not isinstance(value, str) or value not in ALLOWED_MODELS:
+        raise WorkerError('invalid_config', 'Invalid worker configuration')
+    return value
 
 
 def digest_hex(value):
@@ -53,13 +62,14 @@ def _legacy_anchor_matches(active, active_digest, active_size, legacy):
     return active['layers'] == [e for e in legacy['layers'] if e.get('mediaType') != MANIFEST_TYPE]
 
 
-def verify_ollama_model(directory, expected_digest):
+def verify_ollama_model(directory, expected_digest, model=MODEL):
     """Return the verified active SHA, with only direct legacy-anchor compatibility.
 
     No manifest-list traversal or runner selection is supported. Named v2 links
     are the sole symlink exception; all blobs and parent directories stay local.
     """
     try:
+        tag = require_model(model).split(':')[1]
         pin = digest_hex(expected_digest)
         root = Path(directory).resolve(strict=True)
         if not root.is_dir():
@@ -108,6 +118,13 @@ def verify_ollama_model(directory, expected_digest):
                     or not isinstance(manifest.get('layers'), list)
                     or not any(isinstance(e, dict) and e.get('mediaType') == MODEL_TYPE for e in manifest['layers'])):
                 raise ValueError()
+            # This profile forbids external speculative draft components. The
+            # runner can inspect/load them even when draft prediction is off.
+            if model == SMALL_MODEL and any(
+                    isinstance(e, dict) and isinstance(e.get('mediaType'), str)
+                    and e['mediaType'].startswith('application/vnd.ollama.image.draft')
+                    for e in manifest['layers']):
+                raise ValueError()
             return manifest, digest, len(data)
 
         def verify_blobs(manifest):
@@ -130,8 +147,8 @@ def verify_ollama_model(directory, expected_digest):
                 if total != size or h.hexdigest() != digest:
                     raise ValueError()
 
-        legacy_parts = ('manifests', 'registry.ollama.ai', 'library', 'qwen3.5', '2b-q4_K_M')
-        v2_parts = ('manifests-v2', 'ollama.com', 'library', 'qwen3.5', '2b-q4_K_M')
+        legacy_parts = ('manifests', 'registry.ollama.ai', 'library', 'qwen3.5', tag)
+        v2_parts = ('manifests-v2', 'ollama.com', 'library', 'qwen3.5', tag)
         # Check parents even when the final name is missing. A dangling link is
         # present, invalid v2 state, never permission to fall back to legacy.
         v2 = local_path(v2_parts[:-1]) / v2_parts[-1]
@@ -263,7 +280,8 @@ class OllamaWorker:
         o = self.options
         self.stage = 'ollama_options'
         try:
-            if (o['model'] != MODEL or not isinstance(self.port, int) or isinstance(self.port, bool)
+            model = require_model(o.get('model'))
+            if (not isinstance(self.port, int) or isinstance(self.port, bool)
                     or not 1 <= self.port <= 65535 or not isinstance(o['threads'], int) or isinstance(o['threads'], bool)
                     or o['threads'] < 1 or not isinstance(o.get('numGpu', 0), int) or isinstance(o.get('numGpu', 0), bool)
                     or o.get('numGpu', 0) < 0 or not isinstance(o['startupTimeoutMs'], int) or o['startupTimeoutMs'] <= 0
@@ -279,7 +297,7 @@ class OllamaWorker:
         configure_offline()
         verify_manifest(o['tokenizerDir'], o['tokenizerManifest'])
         self.stage = 'ollama_model_integrity'
-        self.model_digest = verify_ollama_model(o['modelsDir'], o['modelDigest'])
+        self.model_digest = verify_ollama_model(o['modelsDir'], o['modelDigest'], model)
         self.stage = 'ollama_dependencies'
         try:
             if importlib.metadata.version('transformers') != '4.57.6' or importlib.metadata.version('jinja2') != '3.1.6':
@@ -333,7 +351,7 @@ class OllamaWorker:
         self.stage = 'ollama_model_digest'
         tags = self.http('/api/tags', timeout=max(0.1, deadline - time.monotonic()))
         models = tags.get('models')
-        if not isinstance(models, list) or not any(isinstance(m, dict) and m.get('name') == MODEL and isinstance(m.get('digest'), str) and digest_hex(m['digest']) == self.model_digest for m in models):
+        if not isinstance(models, list) or not any(isinstance(m, dict) and m.get('name') == model and isinstance(m.get('digest'), str) and digest_hex(m['digest']) == self.model_digest for m in models):
             raise WorkerError('model_unavailable', 'Ollama model digest mismatch')
         self.stage = 'ollama_warmup'
         self.generate('', 0, timeout=max(0.1, deadline - time.monotonic()), allow_empty=True)
@@ -430,10 +448,13 @@ class OllamaWorker:
         if expected_tokens is not None and (not isinstance(expected_tokens, int) or isinstance(expected_tokens, bool) or not 0 <= expected_tokens <= 1792):
             raise WorkerError('input_too_long', 'Input token limit exceeded')
         o = self.options
-        payload = {'model': MODEL, 'prompt': prompt, 'raw': True, 'think': False, 'stream': True, 'keep_alive': -1,
+        payload = {'model': require_model(o.get('model')), 'prompt': prompt, 'raw': True, 'think': False, 'stream': True, 'keep_alive': -1,
                    'options': {'num_ctx': 2048, 'num_predict': predict, 'num_thread': o['threads'],
                                'num_gpu': o.get('numGpu', 0), 'temperature': 1.0, 'top_p': 1.0,
                                'top_k': 20, 'presence_penalty': 2.0, 'repeat_penalty': 1.0}}
+        if payload['model'] == SMALL_MODEL:
+            # Also disable speculative prediction for embedded draft metadata.
+            payload['options']['draft_num_predict'] = 0
         parts = []
         size = 0
         chunks = 0

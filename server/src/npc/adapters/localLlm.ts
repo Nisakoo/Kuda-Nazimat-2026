@@ -40,7 +40,7 @@ function validate(backend: Backend, input: Record<string, unknown>): Record<stri
   }
   if (typeof result.runnerVersion !== 'string' || result.runnerVersion.length > 64 || !/^\d+\.\d+\.\d+$/.test(result.runnerVersion)) throw new Error('Invalid npc.options.runnerVersion');
   if (backend === 'ollama') {
-    if (result.model !== 'qwen3.5:2b-q4_K_M') throw new Error('Invalid npc.options.model');
+    if (result.model !== 'qwen3.5:2b-q4_K_M' && result.model !== 'qwen3.5:0.8b-q8_0') throw new Error('Invalid npc.options.model');
     if (typeof result.modelDigest !== 'string' || !/^(?:sha256:)?[a-fA-F0-9]{64}$/.test(result.modelDigest)) throw new Error('Invalid npc.options.modelDigest');
   }
   return Object.freeze(result);

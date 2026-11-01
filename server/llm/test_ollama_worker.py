@@ -98,14 +98,15 @@ class CommonTests(unittest.TestCase):
 
 class ModelFixture:
     """Small local Docker manifests; no real weights or daemon."""
-    def __init__(self, root):
+    def __init__(self, root, model=worker.MODEL):
         self.root = Path(root)
         self.blobs = self.root / 'blobs'
-        self.blobs.mkdir()
-        self.legacy = self.root / 'manifests/registry.ollama.ai/library/qwen3.5/2b-q4_K_M'
-        self.active = self.root / 'manifests-v2/ollama.com/library/qwen3.5/2b-q4_K_M'
-        self.legacy.parent.mkdir(parents=True)
-        self.active.parent.mkdir(parents=True)
+        self.blobs.mkdir(exist_ok=True)
+        tag = model.split(':')[1]
+        self.legacy = self.root / 'manifests/registry.ollama.ai/library/qwen3.5' / tag
+        self.active = self.root / 'manifests-v2/ollama.com/library/qwen3.5' / tag
+        self.legacy.parent.mkdir(parents=True, exist_ok=True)
+        self.active.parent.mkdir(parents=True, exist_ok=True)
         self.manifest = {'schemaVersion': 2, 'mediaType': worker.MANIFEST_TYPE,
                          'runner': 'llamacpp', 'format': 'gguf',
                          'config': self.blob(b'config', 'application/vnd.docker.container.image.v1+json'),
@@ -387,12 +388,13 @@ class ManifestTests(unittest.TestCase):
 
 class WorkerTests(unittest.TestCase):
     def setUp(self):
-        self.w = worker.OllamaWorker({'threads': 2, 'numGpu': 0})
+        self.w = worker.OllamaWorker({'model': worker.MODEL, 'threads': 2, 'numGpu': 0})
 
     def test_generation_contract(self):
         with mock.patch.object(self.w, 'http', return_value=b'{"response":"hello","done":false}\n{"done":true}\n') as http:
             self.assertEqual(self.w.generate('prompt', 128), 'hello')
             payload = http.call_args.args[1]
+            self.assertEqual(payload['model'], worker.MODEL)
             self.assertTrue(payload['raw']); self.assertFalse(payload['think'])
             self.assertEqual(payload['keep_alive'], -1)
             self.assertEqual(payload['options']['num_ctx'], 2048)
@@ -887,14 +889,20 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.flush()
         (root / 'blocked').write_text('yes')
         time.sleep(60)
+def publish_number(name, value):
+    # Existence is the reader's readiness signal. Never expose an empty file
+    # between open(O_CREAT) and write(), including under scheduler pressure.
+    pending = root / (name + '.tmp')
+    pending.write_text(str(value))
+    pending.replace(root / name)
 server = HTTPServer(('127.0.0.1', 0), Handler)
-(root / 'port').write_text(str(server.server_port))
-(root / 'child_pid').write_text(str(os.getpid()))
+publish_number('child_pid', os.getpid())
+publish_number('port', server.server_port)
 server.serve_forever()
 '''
 
 _LEADER_FIXTURE = r'''
-import json, os, signal, subprocess, sys, time
+import json, os, signal, subprocess, sys, time, traceback
 from pathlib import Path
 from unittest import mock
 import ollama_worker as worker
@@ -927,6 +935,7 @@ def spawn(*args, **kwargs):
             (root / 'spawn_deferred').write_text('yes')
         return child
     except BaseException:
+        traceback.print_exc(file=sys.stderr)  # Fixture-only evidence, never production logging.
         child.terminate()
         child.wait(timeout=2)
         raise
@@ -1049,6 +1058,12 @@ def _supervise_signal_fixture(mode, directory):
             pid, status = os.waitpid(int((root / 'child_pid').read_text()), 0)
             result['group_child_killed'] = os.WIFSIGNALED(status) and os.WTERMSIG(status) == signal.SIGKILL
         return result
+    except Exception as exc:
+        if leader.poll() is None:
+            os.killpg(leader.pid, signal.SIGKILL)
+        out, err = leader.communicate(timeout=4)
+        raise AssertionError('fixture mode=%s failed: %s; leader_returncode=%s; stdout=%r; stderr=%r'
+                             % (mode, str(exc)[:1024], leader.returncode, out[:4096], err[:4096])) from exc
     finally:
         if leader.poll() is None:
             os.killpg(leader.pid, signal.SIGKILL)
@@ -1057,10 +1072,10 @@ def _supervise_signal_fixture(mode, directory):
 
 @unittest.skipUnless(os.name == 'posix', 'POSIX signal/group fixture')
 class SignalProcessTests(unittest.TestCase):
-    def run_fixture(self, mode):
+    def run_fixture(self, mode, child_fixture=None):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            (root / 'child.py').write_text(textwrap.dedent(_CHILD_FIXTURE))
+            (root / 'child.py').write_text(textwrap.dedent(_CHILD_FIXTURE if child_fixture is None else child_fixture))
             (root / 'leader.py').write_text(textwrap.dedent(_LEADER_FIXTURE))
             script = '''
 import ctypes, json, sys
@@ -1094,6 +1109,34 @@ print(json.dumps(_supervise_signal_fixture(sys.argv[1], sys.argv[2])))
                     if mode == 'streaming':
                         self.assertEqual(messages[2], {'type': 'progress', 'stage': 'decoding', 'outputChunks': 1})
                     self.assertFalse(any(m.get('stage') == 'complete' or m['type'] == 'answer' for m in messages))
+
+    def test_numeric_markers_are_atomic_during_delayed_writes(self):
+        # Force the formerly racy open-before-write window, not a longer
+        # startup timeout. This fails with the old direct marker writes.
+        delay = '''
+original_write_text = Path.write_text
+def delayed_write_text(path, value, *args, **kwargs):
+    if path.name in ('port', 'port.tmp', 'child_pid', 'child_pid.tmp'):
+        with path.open('w') as stream:
+            time.sleep(.15)
+            return stream.write(value)
+    return original_write_text(path, value, *args, **kwargs)
+Path.write_text = delayed_write_text
+'''
+        child = _CHILD_FIXTURE.replace('root = Path(sys.argv[1])\n', 'root = Path(sys.argv[1])\n' + delay)
+        self.assertNotEqual(child, _CHILD_FIXTURE)
+        for mode in ('startup', 'streaming', 'stubborn'):
+            with self.subTest(mode=mode):
+                result = self.run_fixture(mode, child_fixture=child)
+                self.assertEqual(result['stderr'], '')
+                if mode == 'stubborn':
+                    self.assertEqual(result['returncode'], -signal.SIGKILL, result)
+                    if sys.platform.startswith('linux'):
+                        self.assertTrue(result['group_child_killed'], result)
+                else:
+                    self.assertEqual(result['returncode'], 0, result)
+                    self.assertTrue(result['reaped'], result)
+                    self.assertTrue(result['cleaned'], result)
 
     def test_sigterm_during_popen_assigns_then_reaps_child(self):
         result = self.run_fixture('spawn')

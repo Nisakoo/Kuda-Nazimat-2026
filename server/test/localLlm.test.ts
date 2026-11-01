@@ -173,7 +173,8 @@ for (const backend of ['ollama', 'mlx'] as const) {
 }
 it('validates literal Ollama model, digest, port and explicit CPU/GPU setting', () => {
   const valid = options('ollama');
-  for (const model of ['other', 'qwen3.5:2b', 'qwen3.5:2b-q4_K_M-cloud', undefined]) expect(() => ollama({ ...valid, model }, deps)).toThrow();
+  for (const model of ['other', 'qwen3.5:2b', 'qwen3.5:2b-q4_K_M-cloud', 'qwen3.5:0.8b', 'qwen3.5:0.8b-mtp-q8_0', 'qwen3.5:0.8b-q4_K_M', 'qwen3.5:0.8b-q8_0-cloud', 'qwen3.5:../0.8b-q8_0', undefined]) expect(() => ollama({ ...valid, model }, deps)).toThrow();
+  expect(() => ollama({ ...valid, model: 'qwen3.5:0.8b-q8_0' }, deps)).not.toThrow();
   for (const modelDigest of ['latest', 'a'.repeat(63), 'g'.repeat(64), undefined]) expect(() => ollama({ ...valid, modelDigest }, deps)).toThrow();
   expect(() => ollama({ ...valid, modelDigest: `sha256:${'A'.repeat(64)}` }, deps)).not.toThrow();
   for (const port of [1023, 65536, 11501.1, '11501', null]) expect(() => ollama({ ...valid, port }, deps)).toThrow();
@@ -273,6 +274,15 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
     expect(responder.lastFailure()).toBe('protocol_error');
     await expect(responder.answer(answerRequest(), new AbortController().signal)).rejects.toThrow('unavailable');
     expect(events().filter((item) => item.type === 'answer')).toHaveLength(1);
+  });
+  it('passes the explicit small-model profile and separate tokenizer pins unchanged', async () => {
+    const overrides = { model: 'qwen3.5:0.8b-q8_0', modelDigest: 'b'.repeat(64),
+      tokenizerDir: '/prepared/tokenizer-08b', tokenizerManifest: '/prepared/tokenizer-08b.json' };
+    const { responder, events } = fixture('ollama', 'normal', {}, overrides);
+    await responder.start();
+    expect(events().find(event => event.type === 'start')!.options).toMatchObject(overrides);
+    await expect(responder.answer(answerRequest(), new AbortController().signal)).resolves.toEqual({ text: 'Ответ: Вопрос' });
+    await responder.stop();
   });
   it('sends strict defaults and offline environment through private IPC without mutating caller options', async () => {
     for (const backend of ['ollama', 'mlx'] as const) {

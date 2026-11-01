@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createServer, Socket } from 'node:net';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { parseConfig } from '../src/app/config.ts';
 import { createResponder } from '../src/npc/adapters/index.ts';
 import { createNpcDialogueService } from '../src/npc/NpcDialogueService.ts';
@@ -26,6 +28,16 @@ describe('configured game LLM integration without real models', () => {
     expect(() => createResponder('auto', {}, deps)).toThrow('Неизвестный');
     expect(() => createResponder('ollamaDiagnostic', {}, deps)).toThrow('Неизвестный');
     expect(parseConfig({ npc: { adapter: 'scripted', maxConcurrent: 2 } }, '/tmp/config.json').npc.maxConcurrent).toBe(2);
+  });
+  it('keeps the 0.8B example explicit, separately pinned and at the game 8s deadline', () => {
+    const path = fileURLToPath(new URL('../config.ollama-08b.example.json', import.meta.url));
+    const parsed = parseConfig(JSON.parse(readFileSync(path, 'utf8')), path);
+    expect(parsed.npc.adapter).toBe('ollama'); expect(parsed.npc.timeoutMs).toBe(8000);
+    expect(parsed.npc.maxConcurrent).toBe(1);
+    expect(parsed.npc.options.model).toBe('qwen3.5:0.8b-q8_0');
+    expect(parsed.npc.options.tokenizerDir).toContain('08b');
+    expect(parsed.npc.options.tokenizerManifest).toContain('08b');
+    expect(() => createResponder('ollama', { ...parsed.npc.options, modelDigest: 'a'.repeat(64), runnerVersion: '0.40.13' }, deps)).not.toThrow();
   });
   it.each([
     ['ollama_memory_insufficient', 'ollama_memory_insufficient'],
