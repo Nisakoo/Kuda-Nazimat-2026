@@ -90,7 +90,12 @@ export function parseClientMessage(raw: unknown): ClientMessage {
     case 'join': keys(p, [...base, 'mapId']); return { ...request, type: 'join', mapId: id(p.mapId) };
     case 'input': { keys(p, [...base, 'sequence', 'direction', 'preparedChunks', 'sprint', 'jumpId']); const preparedChunks = array(p.preparedChunks, 25, id); unique(preparedChunks); if (typeof p.sprint !== 'boolean') invalid(); return { ...request, type: 'input', sprint: p.sprint, jumpId: integer(p.jumpId), sequence: integer(p.sequence, 1), direction: direction(p.direction), preparedChunks }; }
     case 'interact': keys(p, [...base, 'targetId']); return { ...request, type: 'interact', targetId: id(p.targetId) };
-    case 'npc-question': keys(p, [...base, 'targetId', 'text']); return { ...request, type: 'npc-question', targetId: id(p.targetId), text: string(p.text, LIMITS.question) };
+    case 'npc-question': {
+      keys(p, [...base, 'targetId', 'text'], ['stream']);
+      if (p.stream !== undefined && typeof p.stream !== 'boolean') invalid();
+      return { ...request, type: 'npc-question', targetId: id(p.targetId), text: string(p.text, LIMITS.question), ...(p.stream === undefined ? {} : { stream: p.stream }) };
+    }
+    case 'npc-cancel': keys(p, [...base, 'questionId']); return { ...request, type: 'npc-cancel', questionId: id(p.questionId) };
     case 'chat-send': keys(p, [...base, 'text']); return { ...request, type: 'chat-send', text: string(p.text, LIMITS.chat) };
     case 'resync': keys(p, [...base, 'revision']); return { ...request, type: 'resync', revision: integer(p.revision) };
     default: return invalid();
@@ -103,6 +108,8 @@ export function parseServerMessage(raw: unknown): ServerMessage {
     case 'snapshot': keys(p, [...base, 'revision', 'snapshot']); return { v: 3, type: 'snapshot', revision: integer(p.revision), snapshot: snapshot(p.snapshot) };
     case 'delta': { keys(p, [...base, 'revision', 'baseRevision', 'tick', 'upsert', 'remove']); const upsert = entities(p.upsert); const remove = array(p.remove, 128, id); unique(remove); if (upsert.some((e) => remove.includes(e.id))) invalid(); return { v: 3, type: 'delta', revision: integer(p.revision, 1), baseRevision: integer(p.baseRevision), tick: integer(p.tick), upsert, remove }; }
     case 'interacted': keys(p, [...request, 'targetId']); return { v: 3, type: 'interacted', requestId: id(p.requestId), targetId: id(p.targetId) };
+    case 'npc-partial': keys(p, [...request, 'targetId', 'seq', 'text']); return { v: 3, type: 'npc-partial', requestId: id(p.requestId), targetId: id(p.targetId), seq: integer(p.seq, 1), text: string(p.text, LIMITS.answer) };
+    case 'npc-cancelled': keys(p, [...request, 'questionId']); return { v: 3, type: 'npc-cancelled', requestId: id(p.requestId), questionId: id(p.questionId) };
     case 'npc-answer': keys(p, [...request, 'targetId', 'text']); return { v: 3, type: 'npc-answer', requestId: id(p.requestId), targetId: id(p.targetId), text: string(p.text, LIMITS.answer) };
     case 'chat': keys(p, [...request, 'messageId', 'playerId', 'name', 'text']); return { v: 3, type: 'chat', requestId: id(p.requestId), messageId: id(p.messageId), playerId: id(p.playerId), name: string(p.name, 80), text: string(p.text, LIMITS.chat) };
     case 'error': { keys(p, [...request, 'code', 'message']); const codes: readonly unknown[] = ERROR_CODES; if (!codes.includes(p.code)) invalid(); return { v: 3, type: 'error', requestId: id(p.requestId), code: p.code as ErrorCode, message: string(p.message, 500) }; }

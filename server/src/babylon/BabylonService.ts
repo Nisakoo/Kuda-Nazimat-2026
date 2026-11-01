@@ -215,7 +215,7 @@ export class BabylonService {
     };
     // Matching languages and solo messages require no generation slot or model call.
     const noTranslation = captured && Object.values(captured.deliveries).every(d => d.status === 'delivered');
-    const result = noTranslation ? { ok: true as const, text: await work(new AbortController().signal, now() + 8000) } : await generate(pid, connectionId, work);
+    const result = noTranslation ? { ok: true as const, text: await work(new AbortController().signal, now() + 8000) } : await generate(pid, connectionId, work, { requestId: packet.requestId, kind: a.type === 'npc' ? 'babel-npc' : a.type });
     if (!result.ok) {
       store.transaction(() => {
         const current = store.party(party.id)!;

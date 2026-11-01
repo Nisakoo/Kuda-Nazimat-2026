@@ -9,7 +9,7 @@ related:
   - server-llm-runtime.md
   - server-ai.md
   - server-persistence.md
-  - system-offline-demo.md
+  - offline-multiplayer.md
 ---
 
 # LLM-QA — Квалификация модели и двух backend

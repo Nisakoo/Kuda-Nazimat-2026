@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: babylon
+    type: file
+    options:
+      path: ./dashboards   # relative to the Grafana working directory, see README

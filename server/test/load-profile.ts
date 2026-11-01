@@ -13,9 +13,9 @@ import { parseServerMessage } from '../../shared/protocol/validate.ts';
 const root = await mkdtemp(join(tmpdir(), 'load-profile-'));
 const world = await makeWorld([npc('guide', 0, 6)]);
 await writeFile(join(root, 'index.html'), 'UI');
-const config = { ...parseConfig({ ...world, host: '127.0.0.1', clientDir: root, dbPath: join(root, 'game.sqlite'), defaultMap: 'test', npc: { options: { delayMs: 5000 } } }, join(root, 'config.json')), port: 0 };
-const steps: Record<string, unknown>[] = []; const logs: string[] = [];
-const logger: Logger = { child: () => logger, info(message, fields) { if (message === 'Длительность шага, мс' && fields) steps.push(fields); }, warn(message) { logs.push(message); }, error(message) { logs.push(message); } };
+const config = { ...parseConfig({ ...world, host: '127.0.0.1', clientDir: root, dbPath: join(root, 'game.sqlite'), defaultMap: 'test', npc: { options: { delayMs: 5000 } } }, join(root, 'config.json'), 'test'), port: 0 };
+const steps: Record<string, unknown>[] = []; const logs: string[] = []; const warnings: Record<string, number> = {};
+const logger: Logger = { child: () => logger, debug() {}, info(event, _msg, fields) { if (event === 'game.tick.stats' && fields) steps.push(fields); }, warn(event) { warnings[event] = (warnings[event] ?? 0) + 1; }, error(event) { logs.push(event); }, fatal(event) { logs.push(event); } };
 const app = await startApplication(config, createGame, logger);
 const address = app.server.address(); if (!address || typeof address === 'string') throw new Error('No port');
 const origin = `http://127.0.0.1:${address.port}`;
@@ -44,7 +44,7 @@ try {
   questions(); timers.push(setInterval(questions, 10000));
   await new Promise<void>((resolve) => setTimeout(resolve, 61000));
   const sorted = intervals.sort((a, b) => a - b); const p95 = sorted[Math.floor(sorted.length * .95)];
-  const result = { node: process.version, players: 4, durationMs: 61000, npcDelayMs: 5000, steps, broadcast: { samples: sorted.length, p95Ms: p95, maxMs: sorted.at(-1) }, deltas, answers, unavailable: timeouts, errors: logs };
+  const result = { node: process.version, players: 4, durationMs: 61000, npcDelayMs: 5000, steps, broadcast: { samples: sorted.length, p95Ms: p95, maxMs: sorted.at(-1) }, deltas, answers, unavailable: timeouts, errors: logs, warnings };
   if (!steps.length || answers < 1 || timeouts < 1 || sorted.length < 100 || logs.length) throw new Error(`Profile incomplete: ${JSON.stringify(result)}`);
   console.log(JSON.stringify(result, null, 2));
 } finally { for (const timer of timers) clearInterval(timer); for (const socket of sockets) socket.disconnect(); await app.stop(); await rm(root, { recursive: true, force: true }); await rm(dirname(world.worldDir), { recursive: true, force: true }); }
