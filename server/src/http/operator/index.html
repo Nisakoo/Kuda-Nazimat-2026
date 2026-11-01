@@ -34,6 +34,7 @@
     <section id="view-overview" aria-label="Обзор">
       <div id="overview-cards" class="cards"></div>
       <section class="panel addresses"><h2>Подключение к игре</h2><p>Откройте этот адрес в браузере на устройстве игрока в вашей сети.</p><ul id="urls"></ul></section>
+      <section class="panel addresses" id="tls-panel" hidden><h2>Сертификат и доверие устройств</h2><p>Один раз на каждом устройстве откройте страницу по HTTP, сверьте отпечаток с этим экраном и установите сертификат:</p><ul id="setup"></ul><p>Отпечаток SHA-256: <strong id="fingerprint"></strong></p><p id="certinfo" class="muted"></p><p id="certwarn" class="notice danger" hidden></p><ul id="untrusted"></ul></section>
       <div class="columns"><section class="panel"><h2>Подключённые игроки</h2><div class="table-scroll"><table><thead><tr><th>Игрок</th><th>Карта</th><th>Ping</th><th>FPS</th><th>В игре</th></tr></thead><tbody id="overview-players"></tbody></table></div></section><section class="panel"><h2>Последние предупреждения</h2><div id="overview-events"></div></section></div>
       <div class="columns"><section class="panel"><h2>Игроки онлайн</h2><p class="empty">История подключений пока недоступна.</p></section><section class="panel"><h2>Время ответа NPC</h2><p class="empty">История ответов пока недоступна.</p></section></div>
     </section>

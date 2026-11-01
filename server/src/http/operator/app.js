@@ -118,6 +118,7 @@
     const perf = status.performance || {};
     cards('server-cards', [['Шаг сервера', number(perf.tickP95Ms, ' мс'), 'p95 за последнюю минуту'], ['Интервал рассылки', number(perf.broadcastP95Ms, ' мс'), 'p95 за последнюю минуту'], ['Память', number(perf.rssBytes == null ? null : perf.rssBytes / 1024 ** 2, ' МиБ'), 'Куча ' + number(perf.heapBytes == null ? null : perf.heapBytes / 1024 ** 2, ' МиБ')], ['Ошибки за час', 'нет данных', 'История пока недоступна']]);
     $('urls').replaceChildren(...status.addresses.map(address => node('li', address)));
+    renderTls();
     $('health').className = 'badge ' + status.health.level;
     $('health').textContent = levels[status.health.level] || 'Нет данных';
     $('connection').className = 'badge ' + status.health.level;
@@ -139,6 +140,21 @@
     if (maps.includes(selectedMap)) $('map-filter').value = selectedMap;
     renderPlayers();
     $('updated').textContent = 'Обновлено в ' + time(lastUpdate);
+  }
+  function renderTls() {
+    const tls = status.tls;
+    $('tls-panel').hidden = !tls;
+    if (!tls) return;
+    $('setup').replaceChildren(...(status.setup || []).map(address => node('li', address)));
+    $('fingerprint').textContent = tls.fingerprint;
+    const days = Math.floor((tls.notAfter - Date.now()) / 86400000);
+    $('certinfo').textContent = 'Действует до ' + new Date(tls.notAfter).toISOString().slice(0, 10) + ' (' + days + ' дн.). Адреса: ' + tls.names.join(', ');
+    const warnings = [];
+    if (days < 30) warnings.push('Сертификат скоро истечёт: выполните npm --prefix server run tls -- renew --yes и снова установите его на устройствах.');
+    if (tls.uncovered.length) warnings.push('Сертификат не покрывает адреса: ' + tls.uncovered.join(', ') + '. Выпустите новый (tls renew --yes) и установите его заново.');
+    $('certwarn').textContent = warnings.join(' ');
+    $('certwarn').hidden = !warnings.length;
+    $('untrusted').replaceChildren(...tls.untrusted.map(device => node('li', 'Устройство ' + device.ip + ' оборвало защищённое соединение, возможно, не доверяет сертификату — откройте на нём /setup (' + time(device.ts) + ').')));
   }
   async function refreshMetrics() {
     try {

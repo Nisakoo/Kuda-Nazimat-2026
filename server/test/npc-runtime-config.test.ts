@@ -7,6 +7,7 @@ import { silentLogger } from '../src/common/logger.ts';
 import { memoryStores } from './memory.ts';
 import type { GameRuntime } from '../src/contracts.ts';
 import { NPC_TIMING, npcRequestWaitMs, parseGameRuntimeConfig, validNpcTimeoutMs } from '../../shared/protocol/npcTiming.ts';
+import { testCertificate } from './tls-helpers.ts';
 
 const cleanup: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const close of cleanup.splice(0)) await close(); });
@@ -29,12 +30,12 @@ it('publishes only the effective NPC timeout with no-store and existing CORS rul
     corsOrigins: ['http://school-client.local'] }, '/tmp/game.json');
   const stores = memoryStores(); const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: { now: () => 1 }, ttlMs: 1000 });
   const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, presence: () => [], closeSessions() {}, state: () => ({}), stats: () => null, async stop() {}, worldFile: () => ({ ok: false }) };
-  const http = createHttpServer(config, { auth, game, npcReady: () => false, logger: silentLogger, clock: { now: () => 1 } });
+  const http = createHttpServer(config, { auth, game, npcReady: () => false, logger: silentLogger, clock: { now: () => 1 }, certificate: await testCertificate() });
   http.server.listen(0, '127.0.0.1'); await once(http.server, 'listening');
   cleanup.push(async () => { http.server.closeAllConnections(); await new Promise<void>(resolve => http.server.close(() => resolve())); });
   const address = http.server.address();
   if (!address || typeof address === 'string') throw new Error('fixture address');
-  const url = `http://127.0.0.1:${address.port}/api/game-config`;
+  const url = `https://127.0.0.1:${address.port}/api/game-config`;
   const response = await fetch(url, { headers: { Origin: 'http://school-client.local' } });
   expect(response.status).toBe(200); expect(response.headers.get('Cache-Control')).toBe('no-store');
   expect(response.headers.get('Access-Control-Allow-Origin')).toBe('http://school-client.local');

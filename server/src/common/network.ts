@@ -32,28 +32,38 @@ export function firewallHint(platform: NodeJS.Platform = process.platform): stri
   return 'Linux: откройте TCP-порт сервера, например `sudo ufw allow <порт>/tcp`.';
 }
 
-export interface Connection { readonly local: string; readonly lan: readonly (LanAddress & { readonly url: string })[]; readonly operator: string; readonly warnings: readonly string[] }
+export interface Connection {
+  readonly local: string; readonly lan: readonly (LanAddress & { readonly url: string })[]; readonly operator: string; readonly warnings: readonly string[];
+  /** TLS-010: the one plain-HTTP page, per reachable address; the game itself is https only. */
+  readonly setup: readonly string[];
+}
 
 /** Addresses players and the operator use for a server listening on host:port. */
 export function connectionInfo(host: string, port: number, addresses: readonly LanAddress[], platform: NodeJS.Platform = process.platform): Connection {
-  const url = (address: string) => `http://${address.includes(':') ? `[${address}]` : address}:${port}/`;
+  const authority = (address: string) => `${address.includes(':') ? `[${address}]` : address}:${port}`;
+  const url = (address: string) => `https://${authority(address)}/`;
   const warnings: string[] = [];
   let lan: LanAddress[] = [];
   if (host === '127.0.0.1' || host === 'localhost' || host === '::1') warnings.push(`host = ${host}: другие устройства не подключатся, доступен только этот компьютер.`);
   else if (host === '0.0.0.0' || host === '::') {
     lan = [...addresses];
-    if (!lan.some((entry) => entry.kind !== 'link-local')) warnings.push('Нет подключённой сети: доступен только режим одного компьютера (http://localhost).');
+    if (!lan.some((entry) => entry.kind !== 'link-local')) warnings.push('Нет подключённой сети: доступен только режим одного компьютера (https://localhost).');
   } else lan = [{ name: 'host', address: host, kind: addressKind(host) }];
   if (lan.length) warnings.push(firewallHint(platform).replace('<порт>', String(port)));
-  return { local: url('localhost'), lan: lan.map((entry) => ({ ...entry, url: url(entry.address) })), operator: `${url('localhost')}operator`, warnings };
+  const setup = [...(lan.some((entry) => entry.kind !== 'link-local') ? lan.filter((entry) => entry.kind !== 'link-local') : lan).map((entry) => `http://${authority(entry.address)}/setup`)];
+  return { local: url('localhost'), lan: lan.map((entry) => ({ ...entry, url: url(entry.address) })), operator: `${url('localhost')}operator`, warnings, setup };
 }
 
 /** The block printed at startup; it is meant to be read from across the room. */
-export function connectionBlock(info: Connection): string {
+export interface CertificateSummary { readonly fingerprint: string; readonly notAfter: Date }
+
+export function connectionBlock(info: Connection, certificate?: CertificateSummary): string {
   const line = '='.repeat(64);
   const lan = info.lan.length
     ? info.lan.map((entry) => `    ${entry.url.padEnd(30)} ${entry.name}${entry.kind === 'link-local' ? ' (нет сети)' : ''}`)
     : ['    —'];
   return [line, '  ВАВИЛОН ЗАПУЩЕН', '', `  Этот компьютер:     ${info.local}`, '  Другие устройства:', ...lan, `  Экран ведущего:     ${info.operator}`,
+    ...(certificate ? ['', '  Первый вход с устройства — один раз доверьте сертификат:', ...info.setup.map((url) => `    ${url}`),
+      '  Отпечаток SHA-256 (сверьте на устройстве):', `    ${certificate.fingerprint}`, `  Сертификат действует до ${certificate.notAfter.toISOString().slice(0, 10)}`] : []),
     ...(info.warnings.length ? ['', ...info.warnings.map((warning) => `  ! ${warning}`)] : []), line].join('\n');
 }

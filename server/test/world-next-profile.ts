@@ -11,6 +11,7 @@ import { createGame } from '../src/game/index.ts';
 import { createLogger } from '../src/common/logger.ts';
 import { parseServerMessage } from '../../shared/protocol/validate.ts';
 import type { SceneStateMessage } from '../../shared/world-life/types.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 const directory = await mkdtemp(join(tmpdir(), 'world-next-profile-'));
 const config = { ...parseConfig({ host: '127.0.0.1', clientDir: resolve('client/dist'), worldDir: resolve('client/public'), contentDir: resolve('server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'market', saveIntervalMs: 500 }, join(directory, 'config.json')), port: 0 };
@@ -21,11 +22,11 @@ const logger = createLogger(record => {
   if (record.level === 'error' || record.level === 'fatal' || (record.level === 'warn' && record.event !== 'auth.passwordless.enabled')) errors.push(`${record.event}: ${record.msg}`);
 }, 'world-next-profile');
 const startupBegan = performance.now();
-const app = await startApplication(config, createGame, logger);
+const app = await startTrusted(startApplication, config, createGame, logger);
 const startupMs = performance.now() - startupBegan;
 console.log(JSON.stringify({ startupMs }));
 const address = app.server.address(); if (!address || typeof address === 'string') throw new Error('No port');
-const origin = `http://127.0.0.1:${address.port}`;
+const origin = `https://127.0.0.1:${address.port}`;
 const sockets: Socket[] = [];
 const timers: ReturnType<typeof setInterval>[] = [];
 let deltas = 0;

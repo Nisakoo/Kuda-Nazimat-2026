@@ -19,6 +19,8 @@ export interface OperatorDeps {
   readonly dump: (reason: string) => string | null;
   /** OBS-008: bearer for `/metrics` from the network; null keeps it loopback-only. */
   readonly monitoringToken: string | null;
+  /** TLS-011, 012: certificate facts and devices that rejected it; absent in tests without TLS wiring. */
+  readonly tls?: () => { fingerprint: string; notAfter: number; names: readonly string[]; uncovered: readonly string[]; untrusted: readonly { ip: string; ts: number; reason: string }[] };
 }
 
 const startedAt = Date.now();
@@ -26,7 +28,7 @@ const startedAt = Date.now();
 /** AUTH-010 CSRF guard: same loopback origin as the server and the custom header a cross-site form cannot set. */
 function trustedAction(req: IncomingMessage): boolean {
   const port = req.socket.localPort;
-  const origins = ['localhost', '127.0.0.1', '[::1]'].map((host) => `http://${host}:${port}`);
+  const origins = ['localhost', '127.0.0.1', '[::1]'].map((host) => `https://${host}:${port}`);
   return req.headers['x-operator'] === '1' && origins.includes(req.headers.origin ?? '');
 }
 const sameToken = (given: string, expected: string): boolean => given.length === expected.length && timingSafeEqual(Buffer.from(given), Buffer.from(expected));
@@ -57,6 +59,7 @@ export async function handleOperator(req: IncomingMessage, res: ServerResponse, 
       environment: deps.environment ?? null, version: deps.version ?? null,
       performance: { tickP95Ms: stats?.tickP95Ms ?? null, broadcastP95Ms: stats?.broadcastP95Ms ?? null, rssBytes: memory.rss, heapBytes: memory.heapUsed },
       addresses: [info.local, ...info.lan.filter((entry) => entry.kind !== 'link-local').map((entry) => entry.url)],
+      setup: info.setup, tls: deps.tls?.() ?? null,
       health: deps.health(), players, seats: { used: players.length, max: deps.maxPlayers },
       npc: deps.npcReady() ? 'ready' : 'unavailable', language: deps.languageReady() ? 'ready' : 'unavailable',
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),

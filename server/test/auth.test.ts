@@ -171,7 +171,7 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     expect((await fetch(`${origin}/api/auth/logout`, { method: 'POST', headers: { Authorization: `Bearer ${anya.token}` } })).status).toBe(204);
     const boris = (await post('/api/auth/dev', { name: 'Борис' })).body as { token: string };
     const other = await connect(boris.token); other.command('join', { mapId: 'test' }); await other.wait((p) => p.type === 'joined');
-    const self = `http://127.0.0.1:${port}`;
+    const self = `https://127.0.0.1:${port}`;
     expect((await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: self })).status).toBe(403);
     expect((await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: 'http://evil.test', 'X-Operator': '1' })).status).toBe(403);
     expect(other.packets.some((p) => p.type === 'error')).toBe(false);

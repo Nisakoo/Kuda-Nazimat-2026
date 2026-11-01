@@ -141,15 +141,15 @@ describe('end to end (OBS-006, 008, 010, 011)', () => {
     expect(status.health.level).toBe('yellow');
     expect(status.health.reasons.map((r) => r.text)).toEqual(expect.arrayContaining(['Персонажи (NPC) недоступны', expect.stringContaining('Нестабильная связь у игрока Аня')]));
     expect(status.warnings.length).toBeGreaterThan(0);
-    const self = `http://127.0.0.1:${port}`;
+    const self = `https://127.0.0.1:${port}`;
     const dump = await post('/api/operator/actions/dump', {}, { Origin: self, 'X-Operator': '1' });
     expect(dump.status).toBe(200); expect(existsSync(dump.body!.file)).toBe(true);
     const prometheus = await (await fetch(`${origin}/metrics`)).text();
     for (const name of ['game_tick_duration_ms_bucket', 'game_players', 'realtime_packets_in_total', 'auth_attempts_total', 'http_requests_total', 'db_operation_ms_bucket']) expect(prometheus).toContain(name);
     const lan = lanAddresses().find((a) => a.kind !== 'link-local');
     if (lan) {
-      expect((await fetch(`http://${lan.address}:${port}/metrics`)).status).toBe(404);
-      expect((await fetch(`http://${lan.address}:${port}/metrics`, { headers: { Authorization: `Bearer ${'t'.repeat(40)}` } })).status).toBe(200);
+      expect((await fetch(`https://${lan.address}:${port}/metrics`)).status).toBe(404);
+      expect((await fetch(`https://${lan.address}:${port}/metrics`, { headers: { Authorization: `Bearer ${'t'.repeat(40)}` } })).status).toBe(200);
     }
     const outputs = [JSON.stringify(records), prometheus, JSON.stringify(status), await (await fetch(`${origin}/api/operator/metrics`)).text(), ...readdirSync(dir).map((name) => readFileSync(join(dir, name), 'utf8'))].join('\n');
     for (const secret of ['секрет12', registered.token, hashToken(registered.token), 'тайное слово', 'секретный вопрос', 't'.repeat(40), 'scrypt$']) expect(outputs, secret).not.toContain(secret);

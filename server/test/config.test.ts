@@ -9,7 +9,7 @@ const path = resolve('/srv/kn/server/config.json');
 it('SERVER-009: presets differ per environment and production never allows passwordless login', () => {
   const dev = parseConfig({}, path, 'development'); const prod = parseConfig({}, path, 'production'); const test = parseConfig({}, path, 'test');
   expect([dev.env, prod.env, test.env]).toEqual(['development', 'production', 'test']);
-  expect(dev).toMatchObject({ dbPath: resolve('/srv/kn/server/data/dev.sqlite'), corsOrigins: ['http://localhost:5173'], clientDebug: true, auth: { passwordless: true }, logs: { consoleLevel: 'debug', fileLevel: 'debug' }, monitoring: { validateOutgoing: true } });
+  expect(dev).toMatchObject({ dbPath: resolve('/srv/kn/server/data/dev.sqlite'), corsOrigins: ['https://localhost:5173'], clientDebug: true, auth: { passwordless: true }, logs: { consoleLevel: 'debug', fileLevel: 'debug' }, monitoring: { validateOutgoing: true } });
   expect(prod).toMatchObject({ dbPath: resolve('/srv/kn/server/data/game.sqlite'), corsOrigins: [], clientDebug: false, auth: { passwordless: false, maxSessions: 5 }, logs: { consoleLevel: 'info', fileLevel: 'debug', dir: resolve('/srv/kn/server/data/logs') }, monitoring: { token: null, validateOutgoing: false } });
   expect(test).toMatchObject({ dbPath: resolve('/srv/kn/server/data/test.sqlite'), auth: { passwordless: true }, logs: { consoleLevel: 'warn', fileLevel: 'off' } });
   expect(() => parseConfig({ auth: { passwordless: true } }, path, 'production')).toThrow('production');

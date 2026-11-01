@@ -65,6 +65,7 @@ prepare:
 	npm --prefix client ci
 	npm --prefix server ci
 	npm --prefix client run build
+	npm --prefix server run tls -- init --env production
 	npm --prefix server run lan:check -- --env production
 
 # OFFLINE-002: works offline once prepared; dependencies are installed only when missing.

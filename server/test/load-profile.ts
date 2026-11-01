@@ -9,6 +9,7 @@ import { parseConfig } from '../src/app/config.ts';
 import { createGame } from '../src/game/index.ts';
 import type { Logger } from '../src/common/logger.ts';
 import { parseServerMessage } from '../../shared/protocol/validate.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 const root = await mkdtemp(join(tmpdir(), 'load-profile-'));
 const world = await makeWorld([npc('guide', 0, 6)]);
@@ -16,9 +17,9 @@ await writeFile(join(root, 'index.html'), 'UI');
 const config = { ...parseConfig({ ...world, host: '127.0.0.1', clientDir: root, dbPath: join(root, 'game.sqlite'), defaultMap: 'test', npc: { options: { delayMs: 5000 } } }, join(root, 'config.json'), 'test'), port: 0 };
 const steps: Record<string, unknown>[] = []; const logs: string[] = []; const warnings: Record<string, number> = {};
 const logger: Logger = { child: () => logger, debug() {}, info(event, _msg, fields) { if (event === 'game.tick.stats' && fields) steps.push(fields); }, warn(event) { warnings[event] = (warnings[event] ?? 0) + 1; }, error(event) { logs.push(event); }, fatal(event) { logs.push(event); } };
-const app = await startApplication(config, createGame, logger);
+const app = await startTrusted(startApplication, config, createGame, logger);
 const address = app.server.address(); if (!address || typeof address === 'string') throw new Error('No port');
-const origin = `http://127.0.0.1:${address.port}`;
+const origin = `https://127.0.0.1:${address.port}`;
 const sockets: Socket[] = []; const timers: ReturnType<typeof setInterval>[] = [];
 const intervals: number[] = []; let last = 0; let answers = 0; let timeouts = 0; let deltas = 0;
 try {

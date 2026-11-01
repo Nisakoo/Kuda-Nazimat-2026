@@ -10,6 +10,7 @@ import { parseServerMessage } from '../../shared/protocol/validate.ts';
 import type { ServerMessage } from '../../shared/protocol/types.ts';
 import type { LanguagePort } from '../src/babylon/ports.ts';
 import { makeWorld, npc } from './a-helpers.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 /** A real server (HTTP, Socket.IO, SQLite) on a temporary world; every outgoing packet passes parseServerMessage. */
 const cleanups: (() => Promise<void>)[] = [];
@@ -20,15 +21,15 @@ export async function setup(overrides: Record<string, unknown> = {}, language?: 
   const world = await makeWorld([npc('guide', 0, 6, { mapId })], mapId); const root = dirname(world.worldDir);
   await writeFile(join(root, 'index.html'), '<main>UI</main>');
   const config = { ...parseConfig({ ...world, clientDir: root, dbPath: join(root, 'game.sqlite'), defaultMap: mapId, host: '127.0.0.1', staticChunkRadius: 0, saveIntervalMs: 50, disconnectGraceMs: 80, npc: { options: { delayMs: 100 } }, ...overrides }, join(root, 'config.json'), 'test'), port: 0 };
-  const app = await startApplication(config, createGame, logger, language, obs); const address = app.server.address();
-  if (!address || typeof address === 'string') throw new Error('No address'); const port = address.port; const origin = `http://127.0.0.1:${port}`;
+  const app = await startTrusted(startApplication, config, createGame, logger, language, obs); const address = app.server.address();
+  if (!address || typeof address === 'string') throw new Error('No address'); const port = address.port; const origin = `https://127.0.0.1:${port}`;
   cleanups.push(async () => { await app.stop(); await rm(root, { force: true, recursive: true }); });
   const guest = async (name: string) => {
     const response = await fetch(`${origin}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
     return await response.json() as { token: string; expiresAt: number };
   };
   async function connect(token: string, host = '127.0.0.1') {
-    const endpoint = host.startsWith('http://') || host.startsWith('https://') ? host : `http://${host}:${port}`;
+    const endpoint = host.startsWith('https://') ? host : `https://${host}:${port}`;
     const socket = io(`${endpoint}/game`, { auth: { version: 3, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
     cleanups.push(async () => { socket.disconnect(); });
     const packets: ServerMessage[] = []; socket.on('game', (raw) => packets.push(parseServerMessage(raw)));

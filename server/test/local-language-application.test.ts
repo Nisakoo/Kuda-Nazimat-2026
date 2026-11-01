@@ -10,6 +10,7 @@ import { memoryLogger } from '../src/common/logger.ts';
 import type { CreateGame, GameDeps } from '../src/contracts.ts';
 import type { BabylonAction, BabylonResult } from '../../shared/babylon/types.ts';
 import { NPCS } from '../src/babylon/content.ts';
+import { startTrusted } from './tls-helpers.ts';
 
 const cleanups: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const close of cleanups.splice(0).reverse()) await close(); vi.restoreAllMocks(); });
@@ -42,9 +43,9 @@ it.each([
     };
   };
   const logger = memoryLogger();
-  app = await startApplication(config, createGame, logger);
+  app = await startTrusted(startApplication, config, createGame, logger);
   const address = app.server.address(); if (!address || typeof address === 'string') throw new Error('Missing address');
-  const base = `http://127.0.0.1:${address.port}`;
+  const base = `https://127.0.0.1:${address.port}`;
   const status = async () => (await (await fetch(base + '/api/operator/status')).json()) as { npc: string; language: string };
   expect(await status()).toMatchObject({ npc: initiallyReady ? 'ready' : 'unavailable', language: adapter === 'test' || initiallyReady ? 'ready' : 'unavailable' });
   expect(logger.records.some(r => r.event === 'language.ready')).toBe(adapter === 'test' || initiallyReady);

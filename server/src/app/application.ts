@@ -16,6 +16,9 @@ import { createAuthService, REVOKE_MESSAGES } from '../auth/AuthService.ts';
 import { createResponder } from '../npc/adapters/index.ts';
 import { createNpcDialogueService } from '../npc/NpcDialogueService.ts';
 import { createHttpServer } from '../http/server.ts';
+import { lanAddresses } from '../common/network.ts';
+import { uncoveredNames } from '../tls/certificate.ts';
+import { certificateNames, loadCertificate, daysLeft, EXPIRY_WARNING_DAYS, type ServerCertificate } from '../tls/store.ts';
 import { CounterWindow, evaluateHealth } from '../obs/health.ts';
 import type { Config } from './config.ts';
 
@@ -60,6 +63,15 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   catch { throw new Error(`Нет сборки ${config.clientDir}/index.html. Выполните npm --prefix client run build`); }
   try { if (!(await stat(config.worldDir)).isDirectory()) throw new Error(); }
   catch { throw new Error(`Нет мира ${config.worldDir}. Выполните npm --prefix client run world:generate`); }
+
+  // TLS-001, 009: no certificate, no server; an existing one is never replaced silently.
+  const names = () => certificateNames(config.tls, lanAddresses());
+  const certificate: ServerCertificate = await loadCertificate(config.tls, names(), new Date());
+  const tlsLog = logger.child('tls');
+  tlsLog.info(certificate.created ? 'tls.certificate.created' : 'tls.certificate.loaded', certificate.created ? 'Создан сертификат сервера: устройства должны ему доверять (/setup)' : 'Сертификат сервера загружен',
+    { fingerprint: certificate.info.fingerprint, notAfter: certificate.info.notAfter.toISOString(), names: certificate.info.names });
+  if (certificate.uncovered.length) tlsLog.warn('tls.names.uncovered', 'Сертификат не покрывает текущие адреса', { uncovered: certificate.uncovered });
+  if (daysLeft(certificate.info, new Date()) < EXPIRY_WARNING_DAYS) tlsLog.warn('tls.certificate.expiring', 'Сертификат скоро истечёт', { notAfter: certificate.info.notAfter.toISOString() });
 
   const dbLog = logger.child('db');
   const dbTime = metrics.histogram('db_operation_ms', 'Длительность операции хранилища', MS_BUCKETS);
@@ -131,10 +143,11 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     };
     http = createHttpServer(config, {
       auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
+      certificate, uncoveredNames: () => uncoveredNames(certificate.info, names()),
       operator: { version: typeof startup.version === 'string' ? startup.version : undefined, languageReady: () => language?.ready?.() ?? languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
     });
     obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state() }));
-    game.attach(http.server);
+    game.attach(http.secure);
     stores.sessions.prune(Date.now() - 86400000);
     await new Promise<void>((resolve, reject) => {
       const failed = (error: NodeJS.ErrnoException) => reject(listenError(error, config.port));
@@ -159,7 +172,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   log.info('app.ready', 'Сервер готов', { host: config.host, port: address && typeof address !== 'string' ? address.port : config.port, maps: runtime.maps.map((map) => map.mapId) });
   let stopping: Promise<void> | undefined;
   return {
-    server: transport.server,
+    server: transport.server, certificate,
     stop(reason = 'shutdown'): Promise<void> {
       if (stopping) return stopping;
       stopping = (async () => {
