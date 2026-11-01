@@ -48,8 +48,8 @@ try {
   await new Promise<void>((resolve) => setTimeout(resolve, 61000));
   const sorted = intervals.sort((a, b) => a - b); const p95 = sorted[Math.floor(sorted.length * .95)];
   const result = { node: process.version, players: 4, durationMs: 61000, npcDelayMs: 5000, steps, broadcast: { samples: sorted.length, p95Ms: p95, maxMs: sorted.at(-1) }, deltas, answers, unavailable: timeouts, errors: logs, warnings };
+  // OBS-017: the same summary and thresholds as `npm run report` and the shutdown table, printed even for an incomplete run.
+  console.log(app.report());
   if (!steps.length || answers < 1 || timeouts < 1 || sorted.length < 100 || logs.length) throw new Error(`Profile incomplete: ${JSON.stringify(result)}`);
   console.log(JSON.stringify(result, null, 2));
-  // OBS-017: the same summary and thresholds as `npm run report` and the shutdown table.
-  console.log(app.report());
 } finally { for (const timer of timers) clearInterval(timer); for (const socket of sockets) socket.disconnect(); await app.stop(); await rm(root, { recursive: true, force: true }); await rm(dirname(world.worldDir), { recursive: true, force: true }); }
