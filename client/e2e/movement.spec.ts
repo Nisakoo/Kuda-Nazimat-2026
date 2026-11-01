@@ -56,7 +56,7 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1024, height: 600
     expect(card!.y + card!.height).toBeLessThanOrEqual(viewport.height / zoom - 10);
     const overlap = await ring.evaluate(element => {
       const a = element.getBoundingClientRect();
-      return [...document.querySelectorAll('.world-actions button, footer > *, header > *')].some(other => {
+      return [...document.querySelectorAll('.interaction, .hand-status, .controls-hint, .world-actions button, footer > *, header > *')].some(other => {
         const b = other.getBoundingClientRect(); return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
       });
     });
@@ -66,5 +66,28 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 1024, height: 600
     await page.keyboard.down('AltLeft'); await expect(ring).toHaveCount(0);
     await expect(page.getByRole('complementary', { name: 'Управление' })).toBeVisible();
     await page.keyboard.up('AltLeft'); await expect(ring).toBeVisible();
+  });
+}
+
+for (const viewport of [{ width: 1280, height: 800 }, { width: 640, height: 480 }, { width: 390, height: 844 }, { width: 320, height: 240 }]) {
+  test(`MOVE: nearby NPC prompt stays clear of stamina at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await start(page);
+    await page.keyboard.down('w'); await page.clock.runFor(1500); await page.keyboard.up('w');
+    await page.keyboard.down('ShiftLeft'); await page.keyboard.down('a'); await page.clock.runFor(600);
+    await page.keyboard.up('a'); await page.keyboard.up('ShiftLeft');
+    const prompt = page.locator('.interaction');
+    const ring = page.getByRole('progressbar', { name: 'Выносливость' });
+    await expect(prompt).toBeVisible(); await expect(prompt).toContainText('Лея');
+    await expect(ring).toBeVisible();
+    const a = (await prompt.boundingBox())!, b = (await ring.boundingBox())!;
+    expect(a.y + a.height + 8).toBeLessThanOrEqual(b.y);
+    expect(a.x).toBeGreaterThanOrEqual(0); expect(a.x + a.width).toBeLessThanOrEqual(viewport.width);
+    expect(b.x + b.width / 2).toBeCloseTo(viewport.width / 2, 0);
+    expect(b.y + b.height).toBeCloseTo(viewport.height - 24, 0);
+    await page.screenshot({ path: join(evidence, `npc-stamina-${viewport.width}.png`) });
+    await page.keyboard.press('e');
+    await expect(page.getByRole('dialog', { name: 'Лея' })).toBeVisible();
+    await expect(ring).toHaveCount(0); await expect(prompt).toHaveCount(0);
   });
 }

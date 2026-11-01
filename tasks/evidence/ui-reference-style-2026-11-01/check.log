@@ -1,0 +1,59 @@
+
+> educational-world-client@0.1.0 check
+> node scripts/generate-demo-world.mjs && svelte-check --tsconfig ./tsconfig.json && tsc --noEmit && npm run check:core
+
+Prepared 1024 chunks; 1024 unique collision resources; world 21928618 bytes.
+market: 728488 bytes; 26 collision rectangles; 223 ceiling volumes
+pasture: 420000 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 421808 bytes; 29 collision rectangles; 187 ceiling volumes
+cat: 31776 bytes; 0 collision rectangles; 0 ceiling volumes
+bird: 11240 bytes; 0 collision rectangles; 0 ceiling volumes
+pushable-pot: 11168 bytes; 0 collision rectangles; 0 ceiling volumes
+pickup-apple: 9848 bytes; 0 collision rectangles; 0 ceiling volumes
+house: 39416 bytes; 1 collision rectangles; 29 ceiling volumes
+wall: 2048 bytes; 1 collision rectangles; 0 ceiling volumes
+fence: 4352 bytes; 1 collision rectangles; 0 ceiling volumes
+paving: 2116 bytes; 0 collision rectangles; 0 ceiling volumes
+table: 5044 bytes; 1 collision rectangles; 0 ceiling volumes
+shelf: 2856 bytes; 1 collision rectangles; 0 ceiling volumes
+crate: 3612 bytes; 1 collision rectangles; 0 ceiling volumes
+basket: 16112 bytes; 0 collision rectangles; 0 ceiling volumes
+fruit: 3280 bytes; 0 collision rectangles; 0 ceiling volumes
+dates: 3280 bytes; 0 collision rectangles; 0 ceiling volumes
+textile-sign: 9164 bytes; 0 collision rectangles; 5 ceiling volumes
+fabric-roll: 2528 bytes; 0 collision rectangles; 0 ceiling volumes
+canopy: 32312 bytes; 4 collision rectangles; 24 ceiling volumes
+cart: 36824 bytes; 1 collision rectangles; 0 ceiling volumes
+bench: 4316 bytes; 1 collision rectangles; 0 ceiling volumes
+scroll-table: 6236 bytes; 1 collision rectangles; 0 ceiling volumes
+bowl: 4776 bytes; 0 collision rectangles; 0 ceiling volumes
+jar: 11156 bytes; 0 collision rectangles; 0 ceiling volumes
+palm: 32804 bytes; 1 collision rectangles; 11 ceiling volumes
+planter: 8320 bytes; 1 collision rectangles; 0 ceiling volumes
+vines: 6560 bytes; 0 collision rectangles; 0 ceiling volumes
+grass: 1764 bytes; 0 collision rectangles; 0 ceiling volumes
+merchant: 39016 bytes; 0 collision rectangles; 1 ceiling volumes
+shepherd: 39012 bytes; 0 collision rectangles; 1 ceiling volumes
+goat: 29732 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-ground: 17820 bytes; 5 collision rectangles; 0 ceiling volumes
+stepped-building: 209160 bytes; 1 collision rectangles; 124 ceiling volumes
+main-portal: 21576 bytes; 0 collision rectangles; 8 ceiling volumes
+exterior-stair: 69244 bytes; 3 collision rectangles; 9 ceiling volumes
+courtyard-arch: 6040 bytes; 2 collision rectangles; 2 ceiling volumes
+rest-canopy: 46980 bytes; 6 collision rectangles; 23 ceiling volumes
+courtyard-plants: 50872 bytes; 6 collision rectangles; 21 ceiling volumes
+courtyard-lanterns: 5988 bytes; 6 collision rectangles; 0 ceiling volumes
+babel-symbols: 6396 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-vessel: 11204 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-planter: 9472 bytes; 0 collision rectangles; 0 ceiling volumes
+courtyard-palm: 32864 bytes; 0 collision rectangles; 11 ceiling volumes
+courtyard-lantern: 5056 bytes; 0 collision rectangles; 0 ceiling volumes
+Market world 24320200 bytes.
+Loading svelte-check in workspace: /Users/nisakoo/Documents/competition-2026/client
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+> educational-world-client@0.1.0 check:core
+> tsc --project tsconfig.core.json
+

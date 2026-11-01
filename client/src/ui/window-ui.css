@@ -13,7 +13,7 @@ dialog button { line-height: 1.35; overflow-wrap: anywhere; }
 dialog button:not(.resident-word):not(.word-link) { min-height: 44px; }
 dialog button > svg { flex-shrink: 0; vertical-align: middle; }
 dialog input, dialog select, dialog textarea { min-width: 0; max-width: 100%; }
-dialog input:not([type=checkbox]):not([type=radio]), dialog select { min-height: 44px; }
+dialog input:not([type=checkbox]):not([type=radio]):not([type=range]), dialog select { min-height: 44px; }
 dialog .settings-form { gap: 16px; }
 dialog .advanced-settings { border: 1px solid var(--ui-line); border-radius: 8px; padding: 0 14px 12px; margin: 0; }
 dialog .advanced-settings:not([open]) { padding-bottom: 0; }
@@ -32,6 +32,9 @@ dialog.babel-panel .babel-word-tabs { display: grid; grid-template-columns: repe
 dialog.babel-panel .babel-word-tabs button { padding: 10px; }
 dialog.babel-panel .babel-word-layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 20px; padding-top: 20px; }
 dialog.babel-panel .babel-word-detail { padding-left: 20px; }
+dialog.babel-panel .babel-word-detail form label { display: grid; gap: 4px; margin: 0; }
+dialog.babel-panel .babel-word-actions { display: grid; grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr)); }
+dialog.babel-panel .babel-word-actions > button { padding-inline: 8px; }
 dialog.babel-panel .babel-word-list button { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; padding: 12px 8px; }
 dialog.babel-panel .babel-compose { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 10px; }
 dialog.babel-panel .babel-compose label { margin: 0; }
@@ -46,9 +49,20 @@ dialog.map-dialog .map-controls button { display: inline-flex; align-items: cent
 .capture-recovery { position: fixed; z-index: 10; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 14px; text-align: center; }
 .capture-recovery p { max-width: 420px; margin: 0 0 12px; font-size: 14px; line-height: 1.5; }
 .capture-recovery > button { margin: 4px; }
+.game-screen .world-actions {
+  position: absolute; inset: auto max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  display: grid; grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
+  grid-template-rows: auto minmax(56px, auto); align-items: end; gap: 12px;
+  margin: 0; pointer-events: none;
+}
+.game-screen .world-actions .interaction {
+  grid-area: 1 / 1 / 2 / -1; justify-self: center; max-width: min(480px, 100%);
+  min-width: 0; overflow-wrap: anywhere; text-align: center; padding: 10px 18px;
+  color: var(--ui-ink); background: var(--ui-paper); border: 1px solid var(--ui-line); border-radius: 6px;
+}
 .game-screen .stamina {
-  position: fixed; left: 50%; right: auto; bottom: max(24px, env(safe-area-inset-bottom));
-  transform: translateX(-50%); display: block; padding: 0; border: 0; background: none; box-shadow: none;
+  grid-area: 2 / 2; align-self: end; position: static;
+  transform: none; display: block; padding: 0; border: 0; background: none; box-shadow: none;
   pointer-events: none;
 }
 .game-screen .stamina-ring { background: none; }
@@ -67,6 +81,6 @@ dialog.map-dialog .map-controls button { display: inline-flex; align-items: cent
 }
 @media (prefers-reduced-motion: reduce) { .game-screen .stamina-arc { transition: none; } }
 
-.hand-status { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left)); max-width: min(240px, calc(50vw - 58px)); padding: 8px 14px; text-align: center; pointer-events: none; font-size: 13px; }
+.hand-status { grid-area: 2 / 1; justify-self: start; min-width: 0; max-width: min(240px, 100%); padding: 8px 12px; overflow-wrap: anywhere; text-align: center; pointer-events: none; font-size: 13px; }
 
 .debug > output { display: block; }

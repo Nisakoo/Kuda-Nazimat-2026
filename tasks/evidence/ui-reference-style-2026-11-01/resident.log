@@ -1,0 +1,8 @@
+
+Running 1 test using 1 worker
+
+(node:88872) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-hud.spec.ts:240:1 › confirmed held item, nearby NPC and stamina occupy separate HUD areas (8.7s)
+
+  1 passed (10.3s)

@@ -139,6 +139,8 @@ test('real server HUD switches one modal, blocks gameplay, preserves words and c
   await expect(page.getByLabel('Перевод примера', { exact: true })).toHaveValue('Козлёнок голоден.');
   await page.getByRole('button', { name: 'Запомнил', exact: true }).click();
   await page.getByRole('button', { name: 'Выучено · 1', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Выучено · 1', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Выучено · 1', exact: true })).toHaveCSS('border-bottom-color', 'rgb(7, 154, 150)');
   await expect(page.locator('.word-list')).toContainText('Уточнённая заметка перед изучением');
   await screenshot(page, 'dictionary-1280.png');
   await page.getByLabel('Поиск', { exact: true }).fill('не существует'); await expect(page.locator('.word-list li')).toHaveCount(0);
@@ -176,7 +178,7 @@ test('real server HUD switches one modal, blocks gameplay, preserves words and c
 test('windows close without pause and keep actions aligned at desktop and compact sizes', async ({ page }) => {
   test.setTimeout(120000);
   await enroll(page, 'UI-window-polish');
-  for (const [width, height] of [[1280, 800], [390, 844], [640, 480]]) {
+  for (const [width, height] of [[1622, 970], [1280, 800], [390, 844], [640, 480]]) {
     await page.setViewportSize({ width: width!, height: height! });
     for (const [key, name] of [['Tab', 'tasks'], ['1', 'chat'], ['2', 'words'], ['3', 'map'], ['4', 'languages']]) {
       await page.keyboard.press(key!);
@@ -185,7 +187,8 @@ test('windows close without pause and keep actions aligned at desktop and compac
       await expect(page.getByRole('dialog', { name: 'Пауза' })).toHaveCount(0);
       await withinViewport(page);
       expect(await dialog.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
-      const buttons = await dialog.locator('button').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => {
+      // Words inside prose keep the line height; only standalone actions have a 44 px target.
+      const buttons = await dialog.locator('button:not(.word-link):not(.resident-word)').evaluateAll(nodes => nodes.filter(node => node.getBoundingClientRect().height > 0).map(node => {
         const r = node.getBoundingClientRect(); return { text: node.textContent, x: r.x, right: r.right, y: r.y, bottom: r.bottom, height: r.height };
       }));
       for (const button of buttons) { expect(button.height).toBeGreaterThanOrEqual(44); expect(button.x).toBeGreaterThanOrEqual(0); expect(button.right).toBeLessThanOrEqual(width!); }
@@ -232,6 +235,57 @@ test('windows close without pause and keep actions aligned at desktop and compac
   await expect(page.getByRole('dialog', { name: 'Пауза' })).toHaveCount(0); await expectCapture(page, false);
   await page.getByRole('button', { name: 'Вернуть управление', exact: true }).click();
   await expectCapture(page, true);
+});
+
+test('confirmed held item, nearby NPC and stamina occupy separate HUD areas', async ({ page }) => {
+  test.setTimeout(60000);
+  await page.route('**/config.json', async route => {
+    const response = await route.fetch();
+    await route.fulfill({ json: { ...await response.json(), debug: true } });
+  });
+  await enroll(page, 'UI-HUD-spacing');
+  await page.keyboard.press('f');
+  const hand = page.getByLabel('Предмет в руке');
+  await expect(hand).toHaveText('В руке яблоко');
+  const coordinate = async (axis: 'X' | 'Z') => Number((await page.getByLabel('Положение игрока').textContent())!.match(new RegExp(`${axis} (-?[\\d.]+)`))![1]);
+  await page.keyboard.down('w');
+  await expect.poll(() => coordinate('Z'), { intervals: [50], timeout: 10000 }).toBeLessThanOrEqual(.7);
+  await page.keyboard.up('w');
+  await page.keyboard.down('a');
+  await expect.poll(() => coordinate('X'), { intervals: [50], timeout: 5000 }).toBeLessThanOrEqual(-2.3);
+  await page.keyboard.up('a');
+  const prompt = page.locator('.interaction');
+  await expect(prompt).toContainText('Торговец фруктами');
+  for (const [width, height] of [[1280, 800], [390, 844], [640, 480], [320, 240]]) {
+    await page.setViewportSize({ width: width!, height: height! });
+    await page.keyboard.down('ShiftLeft'); await page.keyboard.down('w'); await page.waitForTimeout(180); await page.keyboard.up('w');
+    await page.keyboard.down('s'); await page.waitForTimeout(180); await page.keyboard.up('s'); await page.keyboard.up('ShiftLeft');
+    const ring = page.getByRole('progressbar', { name: 'Выносливость' });
+    await expect(ring).toBeVisible(); await expect(prompt).toBeVisible(); await expect(hand).toBeVisible();
+    const boxes = await Promise.all([ring.boundingBox(), prompt.boundingBox(), hand.boundingBox()]);
+    for (const rect of boxes) {
+      expect(rect!.x).toBeGreaterThanOrEqual(0); expect(rect!.y).toBeGreaterThanOrEqual(0);
+      expect(rect!.x + rect!.width).toBeLessThanOrEqual(width!); expect(rect!.y + rect!.height).toBeLessThanOrEqual(height!);
+    }
+    for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+      const a = boxes[i]!, b = boxes[j]!;
+      expect(a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height).toBe(false);
+    }
+    await screenshot(page, `hand-npc-stamina-${width}.png`);
+  }
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.keyboard.press('e');
+  const resident = page.getByRole('dialog', { name: 'Разговор с жителем', exact: true });
+  await expect(resident).toBeVisible(); await expect(hand).toHaveCount(0);
+  await page.getByLabel('Вопрос NPC').fill('Привет');
+  await page.getByRole('button', { name: 'Спросить', exact: true }).click();
+  await expect(resident.locator('.resident-word').first()).toBeVisible();
+  for (const [width, height] of [[1280, 800], [390, 844], [640, 480]]) {
+    await page.setViewportSize({ width: width!, height: height! });
+    await withinViewport(page);
+    expect(await resident.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+    await screenshot(page, `resident-${width}.png`);
+  }
 });
 
 test('connection errors allow retry and disappear after entry polling recovers', async ({ page }) => {

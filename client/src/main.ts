@@ -4,6 +4,7 @@ import { parseConfig } from './app/config';
 import { rememberConnection, restoreConnection } from './app/connectionPreference';
 import App from './ui/App.svelte';
 import './ui/global.css';
+import './ui/controls.css';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('Не найден контейнер приложения.');

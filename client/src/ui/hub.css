@@ -5,7 +5,7 @@
 .hub-actions button { min-height: 56px; padding-inline: 8px; }
 .hub-tablet input { width: 100%; min-height: 48px; background: #f7e8ce; border: 1px solid #b99b76; padding: 10px; color: inherit; }
 .hub-saved { color: #086e70; }
-@media(max-width:700px) { .hub-profile { grid-template-columns: 1fr; gap: 12px; }.hub-tablet { padding: 16px; }.hub-actions { gap: 6px; }.hub-actions button { font-size: 12px; }.hub-tablet .entry-language-panel { padding: 12px; } }
+@media(max-width:700px) { .hub-profile { grid-template-columns: 1fr; gap: 12px; }.hub-tablet { padding: 16px; }.hub-actions { grid-template-columns: minmax(0, .7fr) minmax(0, 1.2fr) minmax(0, 1.1fr); gap: 6px; }.hub-actions button { font-size: 12px; }.hub-tablet .entry-language-panel { padding: 12px; } }
 
 .hub-portrait { width: 140px; height: 150px; object-fit: contain; background: #d4e2d3; border: 2px solid #086e70; border-radius: 8px; }
 .hub-saved-game { padding: 16px 22px; margin-top: 18px; color: #073c48; background: #f7e8ce; border: 2px solid #d7bb91; }

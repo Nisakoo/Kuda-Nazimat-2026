@@ -18,7 +18,7 @@
 
     {#if error}<p role="alert" class="capture-error">{error}</p>{/if}
     {#if appearance}<button class="secondary" type="button" onclick={appearance}>Изменить облик персонажа</button>{/if}
-    <label>Громкость <input aria-label="Громкость" type="range" min="0" max="100" step="1" value={Math.round(volume * 100)} oninput={(event) => setVolume(Number(event.currentTarget.value))} /> <output>{Math.round(volume * 100)}%</output></label>
+    <label class="volume-setting">Громкость <input aria-label="Громкость" type="range" min="0" max="100" step="1" style:--volume-fill={`${Math.round(volume * 100)}%`} value={Math.round(volume * 100)} oninput={(event) => setVolume(Number(event.currentTarget.value))} /> <output>{Math.round(volume * 100)}%</output></label>
     <details class="advanced-settings"><summary>Дополнительно</summary>
     <label>Режим <select aria-label="Режим сессии" bind:value={selected}><option value="local">Локальная прогулка</option><option value="mock">Тестовый сетевой режим</option><option value="online">Локальный сервер</option></select></label>
     {#if selected === 'mock'}<p class="small subtle">Проверка клиента без сервера: участник и ответы имитируются. Сохранений и адаптивного ИИ здесь нет.</p>{/if}

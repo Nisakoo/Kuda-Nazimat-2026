@@ -1,7 +1,5 @@
 :root { --ui-ink: #073c48; --ui-teal: #086e70; --ui-mint: #d4e2d3; --ui-paper: #fbf1df; --ui-line: #e5cfad; color: var(--ui-ink); font-family: 'Trebuchet MS', Arial, sans-serif; }
 button, input, select, textarea { font: inherit; }
-button { min-height: 44px; border-radius: 3px; background: linear-gradient(120deg, #128b89, var(--ui-teal)); box-shadow: inset 0 1px 0 #60b6ab50, inset 0 -1px 0 #024f5740; }
-button:hover { background: #055558; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #138e93; outline-offset: 3px; }
 .parchment { background: var(--ui-paper) linear-gradient(125deg, #fff8ec, var(--ui-paper) 55%, #f1e4cc); color: var(--ui-ink); border: 2px solid #fff9e9; box-shadow: 0 8px 28px #63412730, inset 0 0 0 1px var(--ui-line); border-radius: 4px; }
 header { padding: 22px 32px 12px; background: none; align-items: flex-start; }

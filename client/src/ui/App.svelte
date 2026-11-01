@@ -101,13 +101,13 @@
     {#if snapshot.debug}<div class="debug glass"><output aria-label="Область мира">{snapshot.region}</output><output aria-label="Состояние связи">{snapshot.networkStatus === 'connected' ? 'Подключён' : snapshot.networkStatus}</output><output aria-label="Положение игрока">{snapshot.coordinates}</output><p aria-label="Ресурсы оформления">{snapshot.modelStats}</p><p aria-label="Кеш мира">{snapshot.cacheStats}</p><p aria-label="Производительность">{snapshot.performance}</p><p aria-label="Ресурсы сцены">{snapshot.renderStats}</p><p aria-label="Звук">{snapshot.audioStats}</p></div>{/if}
     </div>
     {#if snapshot.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
+    <div class="world-actions">
     {#if snapshot.phase === 'running' && !snapshot.dialog && !snapshot.chatOpen && !snapshot.settingsOpen && !snapshot.marketPanel && !snapshot.babylonPanel && !snapshot.mapOpen && !snapshot.avatarOpen}
       {#if !snapshot.controlsHint && (snapshot.stamina < 100 || snapshot.sprintBlocked)}<Stamina value={snapshot.stamina} blocked={snapshot.sprintBlocked} />{/if}
     {/if}
     {#if !overlayOpen && snapshot.phase === 'running' && (snapshot.carryHint || snapshot.carryPending || snapshot.carryError || snapshot.heldItemId)}
       <aside class="hand-status parchment" role="status" aria-label="Предмет в руке">{snapshot.carryError ?? (snapshot.carryPending ? 'Подождите…' : snapshot.heldItemId ? 'В руке яблоко' : snapshot.carryHint)}</aside>
     {/if}
-    <div class="world-actions">
     {#if snapshot.nearby && !snapshot.dialog && snapshot.phase === 'running'}
       <div class="interaction glass"><span>{snapshot.nearby.name}</span></div>
     {/if}</div>

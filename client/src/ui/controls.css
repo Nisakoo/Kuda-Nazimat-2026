@@ -1,0 +1,126 @@
+/* Reference palette and states for the existing controls, shared by entry and game. */
+:root {
+  --ui-ink: #073c48;
+  --ui-teal: #086e70;
+  --ui-mint: #d4e2d3;
+  --ui-paper: #fbf1df;
+  --ui-line: #e5cfad;
+  --ui-muted: #62777b;
+  --control-cut: 8px;
+  --control-shape: polygon(var(--control-cut) 0, calc(100% - var(--control-cut)) 0, 100% var(--control-cut), 100% calc(100% - var(--control-cut)), calc(100% - var(--control-cut)) 100%, var(--control-cut) 100%, 0 calc(100% - var(--control-cut)), 0 var(--control-cut));
+}
+
+button {
+  position: relative; cursor: pointer;
+  min-height: 44px; padding: 12px 20px; border: 1px solid #087d7c; border-radius: 0;
+  background: linear-gradient(115deg, #087a79, #06585d); color: #fffaf0;
+  font-size: 16px; font-weight: 600; line-height: 1.35; clip-path: var(--control-shape);
+  box-shadow: inset 0 1px 0 #a0e2d83d, inset 0 -1px 0 #003f4b40;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+button:hover:not(:disabled) { background: linear-gradient(115deg, #098987, #076a6b); }
+button:active:not(:disabled) { background: #054e54; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+button > svg { flex-shrink: 0; vertical-align: middle; }
+
+button.secondary, button.question, button.avatar-back {
+  --control-edge: #d9c0a0;
+  border: 1px solid var(--control-edge); background: linear-gradient(120deg, #fffaf1, #f4e8d7);
+  color: var(--ui-ink); box-shadow: inset 0 1px 0 #ffffffa6;
+}
+button.secondary:hover:not(:disabled), button.question:hover:not(:disabled), button.avatar-back:hover:not(:disabled) {
+  --control-edge: #80a49b;
+  background: #e1e9dc; border-color: var(--control-edge); color: var(--ui-ink);
+}
+button.secondary:active:not(:disabled), button.question:active:not(:disabled), button.avatar-back:active:not(:disabled) { background: #cbded1; }
+button.secondary.selected { background: var(--ui-mint); border-color: var(--ui-teal); box-shadow: inset 0 0 0 1px var(--ui-teal); }
+/* Continue the outline along the four bevels instead of cutting its corners off. */
+button.secondary::after, button.question::after, button.avatar-back::after {
+  content: ''; position: absolute; inset: -1px; pointer-events: none;
+  background:
+    linear-gradient(135deg, var(--control-edge) calc(var(--control-cut) * .7071 + 1px), transparent 0) top left,
+    linear-gradient(225deg, var(--control-edge) calc(var(--control-cut) * .7071 + 1px), transparent 0) top right,
+    linear-gradient(45deg, var(--control-edge) calc(var(--control-cut) * .7071 + 1px), transparent 0) bottom left,
+    linear-gradient(315deg, var(--control-edge) calc(var(--control-cut) * .7071 + 1px), transparent 0) bottom right;
+  background-size: 50% 50%; background-repeat: no-repeat;
+}
+
+button.entry-primary, button.avatar-confirm {
+  --control-cut: 12px; clip-path: var(--control-shape); border: 1px solid #087d7c;
+  background: linear-gradient(115deg, #087a79, #06585d); color: #fffaf0;
+  box-shadow: inset 0 1px 0 #a0e2d83d, inset 0 -1px 0 #003f4b40;
+}
+button.entry-primary:hover:not(:disabled), button.avatar-confirm:hover:not(:disabled) { background: linear-gradient(115deg, #098987, #076a6b); }
+button.entry-primary:active:not(:disabled), button.avatar-confirm:active:not(:disabled) { background: #054e54; }
+
+/* These are text/icon affordances, not filled action buttons. */
+button:is(.icon-button, .entry-eye, .entry-link, .entry-demo-link, .avatar-turn),
+.babel-panel button.babel-add-word {
+  clip-path: none; border: 0; border-radius: 4px; box-shadow: none;
+  background: transparent; color: var(--ui-ink);
+}
+button:is(.icon-button, .entry-eye, .avatar-turn):hover:not(:disabled),
+.babel-panel button.babel-add-word:hover:not(:disabled) { background: var(--ui-mint); color: var(--ui-teal); }
+button:is(.entry-link, .entry-demo-link):hover:not(:disabled) { background: transparent; color: var(--ui-teal); text-decoration: underline; }
+button.entry-back { border: 0; clip-path: none; box-shadow: none; }
+button.entry-back:hover:not(:disabled), button.entry-back:active:not(:disabled) { background: url('/assets/ui/stone-sign.svg') center / 100% 100% no-repeat; }
+
+.entry-auth-tabs button, .babel-panel .babel-word-tabs button {
+  clip-path: none; box-shadow: none; border-radius: 0; background: transparent;
+}
+.entry-auth-tabs button { border-bottom-width: 3px; }
+.entry-auth-tabs button:hover:not(:disabled), .babel-panel .babel-word-tabs button:hover:not(:disabled) { background: #d4e2d350; color: var(--ui-teal); }
+.babel-panel .babel-word-list button { clip-path: var(--control-shape); border: 1px solid transparent; box-shadow: none; background: transparent; color: var(--ui-ink); }
+.babel-panel .babel-word-list button:hover:not(:disabled) { background: #e3eadd; }
+.babel-panel .babel-word-list button.active { background: var(--ui-mint); }
+.babel-panel .babel-tool-card { clip-path: var(--control-shape); box-shadow: none; }
+.babel-panel .babel-tool-card:hover:not(:disabled) { background: #e3eadd; }
+.babel-panel .babel-tool-card.selected { border-width: 1px; box-shadow: inset 0 0 0 1px var(--ui-teal); }
+.babel-panel .babel-item:hover:not(:disabled) { background: var(--ui-mint); }
+.avatar-card { border-width: 2px; }
+.avatar-card.selected { border-width: 2px; box-shadow: inset 0 0 0 1px var(--ui-teal), inset 0 0 0 4px #eff5e6; }
+.avatar-card:hover { background: #e3eadd; }
+.avatar-card.selected:hover { background: var(--ui-mint); }
+
+button.word-link, .game-screen .babel-panel button.resident-word {
+  min-height: 0; border: 0; clip-path: none; box-shadow: none; background: transparent; color: inherit;
+}
+button.word-link:hover:not(:disabled), .game-screen .babel-panel button.resident-word:hover:not(:disabled),
+.game-screen .babel-panel button.resident-word.selected { background: var(--ui-mint); }
+
+/* Clipped controls need an inset focus ring; the external outline alone is cut off. */
+button:focus-visible, button.entry-primary:focus-visible, button.avatar-confirm:focus-visible,
+.babel-panel button:focus-visible {
+  outline: 3px solid var(--ui-teal); outline-offset: 3px;
+  box-shadow: inset 0 0 0 2px #fffaf0, inset 0 0 0 4px var(--ui-teal);
+}
+/* Uniform form surfaces; ranges and checkboxes keep their own native interaction. */
+input:not([type=range]):not([type=checkbox]):not([type=radio]), select, textarea {
+  color: var(--ui-ink); caret-color: var(--ui-teal); font: inherit;
+}
+.settings-form input:not([type=checkbox]):not([type=range]), .settings-form select,
+.input-row input, .babel-panel input, .babel-panel textarea, .babel-panel select {
+  border: 1px solid var(--ui-line); border-radius: 4px; background: #fff8ed;
+  box-shadow: inset 0 1px 3px #80633b0d; color: var(--ui-ink);
+}
+.entry-login .entry-password input { padding-right: 62px; }
+.entry-login .entry-eye { top: 0; right: 2px; height: 100%; min-height: 44px; }
+.settings-form input[type=range] {
+  appearance: none; width: 100%; min-height: 44px; margin: 0; padding: 0; border: 0;
+  border-radius: 0; box-shadow: none; background: transparent; cursor: pointer; accent-color: var(--ui-teal);
+}
+.settings-form input[type=range]::-webkit-slider-runnable-track {
+  height: 8px; border-radius: 8px; background: linear-gradient(to right, var(--ui-teal) var(--volume-fill), #e5cfb8 var(--volume-fill));
+}
+.settings-form input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 26px; height: 26px; margin-top: -9px; border: 2px solid var(--ui-teal);
+  border-radius: 50%; background: #fffcf4; box-shadow: 0 2px 4px #384d4326;
+}
+.settings-form input[type=range]::-moz-range-track { height: 8px; border-radius: 8px; background: #e5cfb8; }
+.settings-form input[type=range]::-moz-range-progress { height: 8px; border-radius: 8px; background: var(--ui-teal); }
+.settings-form input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border: 2px solid var(--ui-teal); border-radius: 50%; background: #fffcf4; }
+.settings-form .volume-setting { grid-template-columns: 1fr auto; align-items: center; padding-block: 18px; border-block: 1px solid var(--ui-line); }
+.volume-setting input { grid-column: 1 / -1; grid-row: 2; }
+.volume-setting output { grid-column: 2; grid-row: 1; font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
