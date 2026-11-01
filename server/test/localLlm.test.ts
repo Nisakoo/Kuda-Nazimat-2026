@@ -634,6 +634,13 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
       bytes = 100; await responder.start(); expect(responder.status()).toBe('ready'); await responder.stop();
     }
   });
+  it('accepts a macOS sample slower than the former deadline but never announces ready before measurement', async () => {
+    const { responder } = fixture('ollama', 'normal', { platform: 'darwin', memoryBytes: async () => { await wait(800); return 100; } });
+    const starting = responder.start();
+    await wait(700); expect(responder.status()).toBe('unavailable');
+    await starting; expect(responder.status()).toBe('ready');
+    await responder.stop();
+  });
   it('bounds hung startup memory sampling and refuses ready before the initial sample', async () => {
     const { responder, pid } = fixture('ollama', 'normal', { memoryBytes: () => new Promise(() => {}) });
     const pending = responder.start(); const rejected = expect(pending).rejects.toThrow('memory_sample_deadline');
