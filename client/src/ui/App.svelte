@@ -109,7 +109,7 @@
       {#if !snapshot.controlsHint && (snapshot.stamina < 100 || snapshot.sprintBlocked)}<Stamina value={snapshot.stamina} blocked={snapshot.sprintBlocked} />{/if}
     {/if}
     {#if !overlayOpen && snapshot.phase === 'running' && (snapshot.carryHint || snapshot.carryPending || snapshot.carryError || snapshot.heldItemId)}
-      <aside class="hand-status parchment" role="status" aria-label="Предмет в руке">{snapshot.carryError ?? (snapshot.carryPending ? 'Подождите…' : snapshot.heldItemId ? 'В руке яблоко' : snapshot.carryHint)}</aside>
+      <aside class="hand-status parchment" role="status" aria-label="Предмет в руке">{snapshot.carryError ?? (snapshot.carryPending ? 'Подождите…' : snapshot.heldItemId && snapshot.carryHint === 'Положить яблоко' ? 'В руке яблоко' : snapshot.carryHint)}</aside>
     {/if}
     {#if snapshot.cityBoundary && marketMap && !overlayOpen && snapshot.phase === 'running'}<aside class="hand-status parchment" role="status" title={boundaryText[snapshot.cityBoundary][profile?.native ?? 'ru']}>{boundaryText[snapshot.cityBoundary][profile?.learning ?? 'ru']}</aside>{/if}
     {#if snapshot.nearby && !snapshot.dialog && snapshot.phase === 'running'}

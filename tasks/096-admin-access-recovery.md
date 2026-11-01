@@ -11,7 +11,7 @@ related:
     requirements: [ADMIN-SRV-009, ADMIN-SRV-012–014]
   - spec: ../specs/admin-panel-ui.md
     requirements: [ADMIN-001, ADMIN-007, ADMIN-019–028]
-depends_on: [TASK-080, TASK-093, TASK-095]
+depends_on: [TASK-080, TASK-100, TASK-095]
 ---
 
 # Завершение admin-server и перенос решений прерванной admin-panel
@@ -41,4 +41,6 @@ depends_on: [TASK-080, TASK-093, TASK-095]
 - Перенесены отдельные административные сессии/роль, Windows CLI, `/admin` с входом/сменой пароля/выходом, авторство журнала, revision и защита embedded/BABEL. Prometheus/Grafana удалены; `/metrics` отсутствует.
 - Admin-server отдельно: 724 теста, TypeScript/import check и два браузерных сценария — pass на Node 24.15. Совместно с HTTPS: 737 тестов и оба браузерных сценария — pass; type/import check — pass (121 modules / 441 dependencies).
 - Браузер использовал Chrome на macOS и настоящий сервер/SQLite/Socket.IO; автоматический HTTPS-контекст разрешает тестовый сертификат. Это не проверка установки сертификата в Windows.
-- Открытая приёмка: физические Windows/два ноутбука/Wi-Fi off; TASK-081 (реальные FPS), TASK-091/094 (клиентский handoff); браузерные ADMIN S5/S9 с живой генерацией/сценой. Полное выполнение всех спецификаций не заявляется. Исторические аппаратные критерии TASK-080/095 остаются открыты.
+- Открытая приёмка: физические Windows/два ноутбука/Wi-Fi off; TASK-081 (реальные FPS), TASK-098/094 (клиентский handoff); браузерные ADMIN S5/S9 с живой генерацией/сценой. Полное выполнение всех спецификаций не заявляется. Исторические аппаратные критерии TASK-080/095 остаются открыты.
+
+- Перед отправкой origin/main продвинулся до `288b30d`: новые изменения города/предметов сохранены, конфликт WorldLifeStore объединён. Итог на этой основе: **754 passed / 52 files**, server/shared type/import check и HTTPS admin browser — pass. Номера задач TLS/контента перенесены в 097–101, чтобы сохранить новые upstream TASK-090–094.

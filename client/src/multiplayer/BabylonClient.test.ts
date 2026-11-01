@@ -2,7 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { BabylonClient, type BabylonView } from './BabylonClient';
 import { EMPTY_INVENTORY, type BabylonRequest, type BabylonState } from '../../../shared/babylon/types';
 
-const state: BabylonState = { v: 2, playerId: 'p', backend: 'test', languages: ['ru', 'en'], profile: null, introSeen: false, party: null, availableParty: null, task: '', taskTitle: '', taskTarget: null, partyPositions: [], goatGuide: null, inventory: EMPTY_INVENTORY, fed: [], stones: [], words: [], messages: [], replies: [] };
+const state: BabylonState = { v: 2, playerId: 'p', backend: 'test', languages: ['ru', 'en'], profile: null, introSeen: false, party: null, availableParties: [], availablePartiesTruncated: false, availableParty: null, task: '', taskTitle: '', taskTarget: null, partyPositions: [], goatGuide: null, inventory: EMPTY_INVENTORY, fed: [], stones: [], words: [], messages: [], replies: [] };
 const clients: BabylonClient[] = [];
 afterEach(() => { clients.splice(0).forEach(client => client.dispose()); vi.unstubAllGlobals(); });
 function fixture() {

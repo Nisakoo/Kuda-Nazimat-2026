@@ -1,0 +1,9 @@
+
+ RUN  v4.1.12 /Users/nisakoo/Documents/competition-2026
+
+
+ Test Files  3 passed (3)
+      Tests  42 passed (42)
+   Start at  17:13:50
+   Duration  7.14s (transform 403ms, setup 0ms, import 673ms, tests 7.91s, environment 0ms)
+

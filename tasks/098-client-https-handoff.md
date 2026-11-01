@@ -1,5 +1,5 @@
 ---
-id: TASK-091
+id: TASK-098
 type: implementation-task
 status: todo
 spec: ../specs/server-tls.md
@@ -7,7 +7,7 @@ requirements: [TLS-007, TLS-008, TLS-010]
 related:
   - spec: ../specs/world-next-stage.md
     requirements: [NEXT-009]
-depends_on: [TASK-090]
+depends_on: [TASK-097]
 scheduling_note: передача от серверной команды 2026-11-01; объём, UI и клиентские требования определяет клиентская команда по SDD; общий контракт PROTO v3 и формат API не меняются
 ---
 

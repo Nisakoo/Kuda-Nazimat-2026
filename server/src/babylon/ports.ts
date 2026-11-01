@@ -20,7 +20,8 @@ export interface BabylonStore {
   profile(playerId: string): Profile | null;
   saveProfile(playerId: string, profile: Profile): void;
   party(id: string): Party | null;
-  openParty(): Party | null;
+  /** At most MAX_AVAILABLE_PARTIES + 1 waiting groups, newest first; extra row signals overflow. */
+  openParties(): Party[];
   saveParty(party: Party): void;
   deleteParty(id: string): void;
   operation(playerId: string, requestId: string): Operation | null;

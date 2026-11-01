@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { rasterizePolygons } from './collision-raster.mjs';
 import ts from 'typescript';
 import { MARKET_MODEL_IDS } from './generate-market-models.mjs';
 import { CITY_MODEL_IDS, CITY_LOCATIONS, CITY_RESIDENTS, insideCity, cityBoundaryDistance } from './generate-city-models.mjs';
@@ -27,8 +28,7 @@ for(const [name,id] of [['market','0_0'],['pasture','0_-2'],['main-building','-1
  assets[path]={bytes:bytes.length,memory:name==='market'?8*1024*1024:6*1024*1024};models[name]=`market/${name}.glb`;
  const gltf=JSON.parse(bytes.subarray(20,20+bytes.readUInt32LE(12)).toString());
  const rectangles=gltf.nodes.find(node=>node.extras?.collisions)?.extras.collisions;if(!rectangles)throw new Error('Missing authored collision data');
- const collision=Buffer.alloc(base.collisionResolution**2);const res=base.collisionResolution;
- for(const [minX,minZ,maxX,maxZ] of rectangles){const left=Math.max(0,Math.floor((minX+16)*res/32)),right=Math.min(res-1,Math.floor((maxX+16)*res/32));const top=Math.max(0,Math.floor((minZ+16)*res/32)),bottom=Math.min(res-1,Math.floor((maxZ+16)*res/32));for(let z=top;z<=bottom;z++)collision.fill(1,z*res+left,z*res+right+1);}
+ const collision=Buffer.from(rasterizePolygons(rectangles.map(([x0,z0,x1,z1])=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]]),base.collisionResolution));
  const entry=chunks.find(c=>c.id===id);
  const ceilings=compactVolumes(ceilingVolumesFromGlb(gltf).filter(v=>v.bottomY<=3.1 || name==='main-building' && v.minX<=10.25 && v.maxX>=7.75 && v.minZ<=7.25 && v.maxZ>=-5.65));
  if(ceilings.length>128)throw new Error(`Too many ceilings in ${name}: ${ceilings.length}`);
@@ -51,14 +51,7 @@ for (const location of cityAreas) {
  const model=`city-${location.id}`,bytes=await readFile(new URL(`assets/models/city/${model}.glb`,publicRoot));
  const gltf=JSON.parse(bytes.subarray(20,20+bytes.readUInt32LE(12)).toString());
  const polygons=gltf.nodes.find(n=>n.extras?.collisions)?.extras.collisions??[];
- const collision=Buffer.alloc(base.collisionResolution**2),res=base.collisionResolution;
- const contains=(polygon,x,z)=>{let inside=false;for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){const a=polygon[i],b=polygon[j];if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;};
- for(const polygon of polygons){
-  const xs=polygon.map(p=>p[0]),zs=polygon.map(p=>p[1]);
-  const left=Math.max(0,Math.floor((Math.min(...xs)+16)*res/32)),right=Math.min(res-1,Math.floor((Math.max(...xs)+16)*res/32));
-  const top=Math.max(0,Math.floor((Math.min(...zs)+16)*res/32)),bottom=Math.min(res-1,Math.floor((Math.max(...zs)+16)*res/32));
-  for(let z=top;z<=bottom;z++)for(let x=left;x<=right;x++)if(contains(polygon,(x+.5)*32/res-16,(z+.5)*32/res-16))collision[z*res+x]=1;
- }
+ const collision=Buffer.from(rasterizePolygons(polygons,base.collisionResolution));
  const json=JSON.stringify({id:entry.id,objects:[{id:model,assetId:model,transform:{position:{x:location.x,y:0,z:location.z},rotationY:0}}]});
  entry.url=`maps/market/${model}-${entry.id}.json`;entry.bytes=Buffer.byteLength(json);entry.region=location.name.ru;
  entry.assets=[model];

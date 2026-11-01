@@ -32,6 +32,15 @@ function box(color,x,y,z,sx,sy,sz,parent=root) { return part(new BoxGeometry(1,1
 function ball(color,x,y,z,sx,sy,sz,parent=root) { return part(new IcosahedronGeometry(1,0),color,x,y,z,sx,sy,sz,parent); }
 function cyl(color,x,y,z,r,h,top=r,parent=root) { return part(new CylinderGeometry(top,r,h,8),color,x,y,z,1,1,1,parent); }
 function obstacle(x,z,w,d) {collisions.push([x-w/2,z-d/2,x+w/2,z+d/2]);}
+// A short stack of strips follows round vessels without blocking the square corners.
+function roundObstacle(x,z,r) {
+ for(let i=0;i<8;i++){
+  const low=-r+i*r/4,high=low+r/4,nearest=low<=0&&high>=0?0:Math.min(Math.abs(low),Math.abs(high));
+  const half=Math.sqrt(Math.max(0,r*r-nearest*nearest));
+  collisions.push([x-half,z+low,x+half,z+high]);
+ }
+}
+function groundProp(y,parent) {return y<.15&&parent===root&&!root.name.startsWith('pickup-')&&root.name!=='pushable-pot';}
 function triangle(color,x,y,z,size,parent=root) {
  const g=new BufferGeometry();const a=-.866*size,b=-.5*size;
  g.setAttribute('position',new Float32BufferAttribute([a,b,0,-a,b,0,0,size,0, 0,size,0,-a,b,0,a,b,0],3));g.computeVertexNormals();
@@ -39,12 +48,13 @@ function triangle(color,x,y,z,size,parent=root) {
 }
 function band(x,y,z,w,parent=root) {box(C.teal,x,y,z,w,.14,.06,parent);for(let i=-w/2+.25;i<w/2;i+=.55)triangle(C.ochre,x+i,y+.2,z+.04,.15,parent);}
 function pot(x,y,z,s=1,color=C.clay,kind='jar',parent=root) {
+  if(groundProp(y,parent))roundObstacle(x,z,(kind==='tall'?.37:.5)*s);
   const profile=kind==='bowl'?[[.12,0],[.28,.08],[.5,.32],[.49,.39],[.42,.37],[.2,.12]]:kind==='tall'?[[.23,0],[.34,.12],[.37,.55],[.22,.87],[.2,1.05],[.26,1.08],[.25,1.16],[.17,1.14],[.16,1]]:[[.24,0],[.43,.15],[.48,.5],[.32,.75],[.19,.86],[.19,.98],[.25,1],[.25,1.08],[.15,1.07],[.15,.9]];
   cyl('#875f41',x,y+.006,z,s*.48,.012,s*.48,parent);
   part(new LatheGeometry(profile.map(p=>new Vector2(...p)),10),color,x,y,z,s,s,s,parent);
   if(kind!=='bowl') {cyl(C.teal,x,y+s*.55,z,s*.44,s*.1,s*.4,parent); for(const side of [-1,1])ball(color,x+side*.34*s,y+.72*s,z,.12*s,.21*s,.08*s,parent);}
 }
-function basket(x,y,z,s=1,filled=false,parent=root) {cyl(C.wood,x,y+.24*s,z,.28*s,.48*s,.4*s,parent);for(let i=0;i<4;i++)cyl(C.ochre,x,y+(.08+i*.12)*s,z,(.3+i*.025)*s,.03*s,(.3+i*.025)*s,parent);if(filled)for(let i=0;i<5;i++)ball(C.gold,x+Math.sin(i*2)*.18*s,y+.5*s,z+Math.cos(i*2)*.18*s,.14*s,.14*s,.14*s,parent);}
+function basket(x,y,z,s=1,filled=false,parent=root) {if(groundProp(y,parent))roundObstacle(x,z,.4*s);cyl(C.wood,x,y+.24*s,z,.28*s,.48*s,.4*s,parent);for(let i=0;i<4;i++)cyl(C.ochre,x,y+(.08+i*.12)*s,z,(.3+i*.025)*s,.03*s,(.3+i*.025)*s,parent);if(filled)for(let i=0;i<5;i++)ball(C.gold,x+Math.sin(i*2)*.18*s,y+.5*s,z+Math.cos(i*2)*.18*s,.14*s,.14*s,.14*s,parent);}
 function palm(x,z,h=5) {obstacle(x,z,.6,.6);for(let i=0;i<7;i++){const trunk=cyl(i%2?C.wood:'#a17b50',x+Math.sin(i*.3)*.15,(i+.5)*h/7,z,.19,h/7,.23);trunk.rotation.z=.04;}
 for(let i=0;i<7;i++){const angle=i*Math.PI*2/7;const leaf=flexible(ball(i%2?C.leaf:C.olive,x+Math.sin(angle)*1.15,h,z+Math.cos(angle)*1.15,.42,.13,1.8),'leaf');leaf.rotation.y=angle;leaf.rotation.x=.2;}ball(C.wood,x,h-.15,z,.35,.3,.35);}
 function plant(x,z,s=1){box(C.sand,x,.25,z,s,.5,s);obstacle(x,z,s,s);for(let i=0;i<5;i++)flexible(ball(i%2?C.leaf:C.olive,x+Math.sin(i*3)*s*.2,.6+s*.25,z+Math.cos(i*3)*s*.2,s*.3,s*.45,s*.3),'leaf');}
@@ -124,7 +134,7 @@ function cart(x,z){
  const parent=root,g=new Group();g.name='cart';g.position.set(x,0,z);parent.add(g);root=g;
  box(C.wood,0,.65,0,1.8,.2,2.5);for(const side of [-1,1]){box(C.wood,side*.88,1,0,.12,.7,2.5);const wheel=cyl(C.dark,side*1.05,.55,.3,.58,.14);wheel.rotation.z=Math.PI/2;
  for(let i=0;i<6;i++){const spoke=box(C.ochre,side*1.14,.55,.3,.07,.95,.08);spoke.rotation.x=i*Math.PI/3;}box(C.wood,side*.55,.7,1.9,.12,.12,1.7);}
- pot(-.3,.8,.2,.8);basket(.4,.8,-.2,.8,true);root=parent;obstacle(x,z+.1,2.4,2.8);
+ pot(-.3,.8,.2,.8);basket(.4,.8,-.2,.8,true);root=parent;obstacle(x,z,2.4,2.5);for(const side of [-1,1])obstacle(x+side*.55,z+1.9,.12,1.7);
 }
 function market(){begin('market');horizon();paving();for(const b of MARKET_MAP_BUILDINGS.filter(b=>b.area==='market'))house(b.x,b.z,b.width,b.height,b.depth);
 // Wide passable visual steps; no obstacle rises into the walking capsule.
@@ -168,7 +178,7 @@ function mainBuilding(){
   let prefab=prefabs.get(key);
   if(!prefab){const parent=root,group=new Group(),start=collisions.length;root=group;build();root=parent;prefab={group,obstacles:collisions.splice(start)};prefabs.set(key,prefab);}
   const instance=prefab.group.clone(true);instance.name=key;instance.position.set(x,y,z);instance.scale.set(scale,scale*heightScale,scale);root.add(instance);
-  for(const [x0,z0,x1,z1] of prefab.obstacles)collisions.push([x+x0*scale,z+z0*scale,x+x1*scale,z+z1*scale]);
+  for(const [x0,z0,x1,z1] of (y<1.7?prefab.obstacles:[]))collisions.push([x+x0*scale,z+z0*scale,x+x1*scale,z+z1*scale]);
  };
  const vessel=(x,y,z,scale=1)=>prop('courtyard-vessel',x,y,z,()=>pot(0,0,0),scale);
  const planter=(x,z,scale)=>prop('courtyard-planter',x,0,z,()=>{plant(0,0,1);band(0,.4,.51,1);},scale);
@@ -250,7 +260,7 @@ function mainBuilding(){
   for(const side of [-1,1]){box(C.cream,side*3.3,2.3,14,.9,4.6,1);box(C.teal,side*3.3,3.8,14,.95,.18,1.05);obstacle(side*3.3,14,1,1.1);}
   box(C.cream,0,5.0,14,7.6,.8,1);box(C.light,0,5.48,14,7.9,.18,1.2);
  });
- component('rest-canopy',()=>{canopy(-6,5,C.ochre);bench(-6,4.3);vessel(-7,0,6.8,1.15);vessel(-5.5,0,6.8,.7);box(C.teal,-5.4,.62,4.3,.4,.045,.55);obstacle(-7,6.8,1.1,1.1);});
+ component('rest-canopy',()=>{canopy(-6,5,C.ochre);bench(-6,4.3);vessel(-7,0,6.8,1.15);vessel(-5.5,0,6.8,.7);box(C.teal,-5.4,.62,4.3,.4,.045,.55);});
  component('courtyard-plants',()=>{courtyardPalm(-9,10,6.5);courtyardPalm(6,-.2,5.5);planter(5.5,5,1.3);planter(-9,-.5,1.4);planter(5.7,11.6,1.2);bench(5,2.8);const scroll=cyl(C.light,5,.65,2.8,.1,.8);scroll.rotation.z=Math.PI/2;});
  component('courtyard-lanterns',()=>{for(const z of [3.4,11.8])for(const side of [-1,1])lantern(side*2.45,z);lantern(-9,3);lantern(6,7);});
  component('babel-symbols',()=>{
@@ -282,10 +292,13 @@ function bird(){begin('bird');ball('#777a70',0,0,0,.10,.10,.26);ball('#b9b6a0',0
 function apple(){begin('pickup-apple');ball(C.red,0,.14,0,.145,.135,.14);for(const side of [-1,1])ball('#c35440',side*.057,.20,0,.087,.074,.10);
  const stem=cyl(C.wood,0,.29,0,.018,.105,.014);stem.rotation.z=-.18;const leaf=ball(C.leaf,.065,.30,0,.085,.025,.035);leaf.rotation.z=.35;
 }
+function carryTablet(){begin('pickup-tablet');box(C.clay,0,.07,0,.23,.12,.26);for(let r=0;r<4;r++)for(let c=0;c<3;c++){const mark=box(C.dark,-.07+c*.065,.135,-.08+r*.05,.035,.012,.012);mark.rotation.y=.4;}}
+function carryJug(){begin('pickup-jug');pot(0,0,0,.28,C.clay);for(let i=0;i<6;i++){const a=i*Math.PI/5;ball(C.ochre,.08+Math.sin(a)*.06,.14+Math.cos(a)*.07,0,.025,.025,.025);}}
+function carryBasket(){begin('pickup-basket');basket(0,0,0,.28,false);}
 // Catalogue exports call the same authoring functions as the locations. A placement needs only an asset ID and transform.
 const prefab=(name,build)=>()=>{begin(name);build();};
 const buildings=['courtyard-ground','stepped-building','main-portal','exterior-stair','courtyard-arch','rest-canopy','courtyard-plants','courtyard-lanterns','babel-symbols'];
-const exports=[['market',market],['pasture',pasture],['main-building',mainBuilding],['cat',cat],['bird',bird],['pushable-pot',prefab('pushable-pot',()=>pot(0,0,0,.6))],['pickup-apple',apple],
+const exports=[['market',market],['pasture',pasture],['main-building',mainBuilding],['cat',cat],['bird',bird],['pushable-pot',prefab('pushable-pot',()=>pot(0,0,0,.6))],['pickup-apple',apple],['pickup-tablet',carryTablet],['pickup-jug',carryJug],['pickup-basket',carryBasket],
  ['house',prefab('house',()=>house(0,0))],['wall',prefab('wall',()=>{box(C.sand,0,.55,0,4,1.1,.5);obstacle(0,0,4,.5);})],
  ['fence',prefab('fence',()=>{for(const x of [-1,1])box(C.wood,x,.6,0,.16,1.2,.16);for(const y of [.4,.85])box(C.wood,0,y,0,2,.12,.12);obstacle(0,0,2,.2);})],
  ['paving',prefab('paving',()=>box(C.cream,0,0,0,1.7,.08,1.9))],['table',prefab('table',()=>table(0,0))],

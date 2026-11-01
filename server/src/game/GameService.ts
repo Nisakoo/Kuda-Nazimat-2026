@@ -266,6 +266,7 @@ export class GameService {
   /** One simulation step; every `broadcastEvery` steps the AOI deltas go out. */
   tick(deltaSeconds: number): void {
     this.world.step(deltaSeconds, this.clock.now());
+    this.world.life?.updateBirds(this.world.placedPlayers(), this.clock.now());
     if (this.world.tick % this.settings.broadcastEvery !== 0) return;
     const scenes = new Map<string,SceneStateMessage>(); const now = this.clock.now();
     for (const seat of this.seats.values()) {

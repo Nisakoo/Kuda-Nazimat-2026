@@ -73,7 +73,10 @@ export class OnlineSession implements GameSession {
   private readonly handPrefix: string;
   get carryState(): CarryState {
     const heldItemId = this.scene?.apples.find(apple => apple.state === 'held' && apple.holderId === this.id)?.id ?? null;
-    const hint = this.value.status !== 'connected' || !this.scene ? null : heldItemId ? 'Положить яблоко' : this.nearestApple() ? 'Поднять яблоко' : null;
+    const targetId=heldItemId??this.nearestApple();
+    const template=this.scene?.definition.instances.find(i=>i.id===targetId)?.templateId;
+    const label=template==='pickup-tablet'?'табличку':template==='pickup-jug'?'кувшин':template==='pickup-basket'?'корзинку':'яблоко';
+    const hint = this.value.status !== 'connected' || !this.scene ? null : heldItemId ? `Положить ${label}` : targetId ? `Поднять ${label}` : null;
     return { pending: this.handPending !== null, error: this.handError, heldItemId, hint };
   }
 
@@ -146,7 +149,7 @@ export class OnlineSession implements GameSession {
     }
     const state = this.carryState;
     const targetId = state.heldItemId ? null : this.nearestApple();
-    if (!state.heldItemId && !targetId) { this.handError = 'Рядом нет доступного яблока.'; this.publishCarry(); return null; }
+    if (!state.heldItemId && !targetId) { this.handError = 'Рядом нет доступного предмета.'; this.publishCarry(); return null; }
     const requestId = `${this.handPrefix}_${this.nextId()}`;
     const packet: HandRequest = state.heldItemId ? { v: 1, type: 'hand', action: 'place', requestId } : { v: 1, type: 'hand', action: 'pickup', targetId: targetId!, requestId };
     const timer = this.clock.set(() => {

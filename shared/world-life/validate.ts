@@ -49,7 +49,7 @@ function cat(v: unknown): CatDefinition {
   return { instanceId: id(o.instanceId), behavior, route, cycleMs, pauseMs };
 }
 export function parseWorldLifeDefinition(raw: unknown, models?: Readonly<Record<string, string>>, mapId?: string): WorldLifeDefinition {
-  const o = packet(raw); keys(o, ['v','mapId','seed','templates','instances','cats','flock','wind']);
+  const o = packet(raw); keys(o, ['v','mapId','seed','templates','instances','cats','flock','wind'], ['perches','packAnimals']);
   const templates = arr(o.templates, L.templates, v => { const t = obj(v); keys(t, ['id','assetId','behavior','animation']); return { id: id(t.id), assetId: id(t.assetId), behavior: choice(t.behavior, ['static','animated','pushable','pickup']), animation: id(t.animation) }; }, 1);
   const instances = arr(o.instances, L.instances, instance, 12);
   unique(templates, t => t.id); unique(instances, i => i.id);
@@ -57,9 +57,13 @@ export function parseWorldLifeDefinition(raw: unknown, models?: Readonly<Record<
     const template = templates.find(t => t.id === i.templateId); if (!template || (template.behavior === 'pushable') !== !!i.zone) fail();
     if (i.zone && (i.position.x - L.potRadius < i.zone.minX || i.position.x + L.potRadius > i.zone.maxX || i.position.z - L.potRadius < i.zone.minZ || i.position.z + L.potRadius > i.zone.maxZ)) fail();
   }
-  for (const [behavior, count] of [['pushable',L.pots],['pickup',L.apples]] as const) if (instances.filter(i => templates.find(t => t.id === i.templateId)?.behavior === behavior).length !== count) fail();
+  for (const [behavior, count] of [['pushable',L.pots],['pickup',L.apples]] as const) if (instances.filter(i => templates.find(t => t.id === i.templateId)?.behavior === behavior).length > count) fail();
   const cats = arr(o.cats, L.cats, cat, L.cats); unique(cats, c => c.instanceId); unique(cats, c => c.behavior);
   for (const c of cats) { const i = instances.find(i => i.id === c.instanceId); if (!i || templates.find(t => t.id === i.templateId)?.behavior !== 'animated' || JSON.stringify(i.position) !== JSON.stringify(c.route[0])) fail(); }
+  const packAnimals=arr(o.packAnimals??[],8,v=>{const a=obj(v);keys(a,['instanceId','kind','behavior','route','cycleMs']);return {instanceId:id(a.instanceId),kind:choice(a.kind,['camel','mule']),behavior:choice(a.behavior,['feed','walk']),route:arr(a.route,L.routePoints,vector,1),cycleMs:integer(a.cycleMs,8000,120000)};});
+  unique(packAnimals,a=>a.instanceId);for(const a of packAnimals){const i=instances.find(i=>i.id===a.instanceId);if(!i||templates.find(t=>t.id===i.templateId)?.behavior!=='animated'||JSON.stringify(i.position)!==JSON.stringify(a.route[0])||a.behavior==='walk'&&a.route.length<3||a.behavior==='feed'&&a.route.length!==1)fail();}
+  const perches = arr(o.perches ?? [], L.birds, v => { const b=obj(v); keys(b,['id','position','rotationY']); return {id:id(b.id),position:vector(b.position),rotationY:num(b.rotationY)}; });
+  unique(perches,b=>b.id); if(perches.some(b=>instances.some(i=>i.id===b.id)))fail();
   const f = obj(o.flock); keys(f, ['assetId','count','route','schedule']);
   const flock = { assetId: id(f.assetId), count: integer(f.count, 4, 6), route: arr(f.route, L.routePoints, vector, 2), schedule: schedule(f.schedule, 90000, 150000, 8000, 12000) };
   if (flock.route.some(p => p.y < 10 || p.y > 16)) fail();
@@ -67,7 +71,7 @@ export function parseWorldLifeDefinition(raw: unknown, models?: Readonly<Record<
   const wind = { strength: num(w.strength, 0, 1), gustStrength: num(w.gustStrength, 0, 1), schedule: schedule(w.schedule, 45000, 90000, 2000, 4000) };
   if (models && [...templates.map(t => t.assetId), flock.assetId].some(a => !Object.hasOwn(models, a))) fail();
   const parsedMap = id(o.mapId); if (mapId && parsedMap !== mapId) fail();
-  return { v: 1, mapId: parsedMap, seed: integer(o.seed, 0, 0xffffffff), templates, instances, cats, flock, wind };
+  return { v: 1, mapId: parsedMap, seed: integer(o.seed, 0, 0xffffffff), templates, instances, cats, flock, wind, ...(o.perches !== undefined ? {perches} : {}), ...(o.packAnimals !== undefined ? {packAnimals} : {}) };
 }
 export function parseWorldLifeClientMessage(raw: unknown): WorldLifeClientMessage {
   const o = packet(raw); const requestId = id(o.requestId);
@@ -96,10 +100,10 @@ export function parseWorldLifeServerMessage(raw: unknown): WorldLifeServerMessag
     keys(o, ['v','type','requestId','ok','code','message']); if (o.ok !== false) fail();
     return { v: 1, type: 'hand-result', requestId, ok: false, code: choice(o.code, CODES), message: text(o.message) };
   }
-  keys(o, ['v','type','sceneId','revision','serverTimeMs','epochMs','definition','pots','apples']); if (o.type !== 'scene-state') fail();
+  keys(o, ['v','type','sceneId','revision','serverTimeMs','epochMs','definition','pots','apples'], ['birds']); if (o.type !== 'scene-state') fail();
   const definition = parseWorldLifeDefinition(o.definition);
-  const pots = arr(o.pots, L.pots, v => { const p = obj(v); keys(p, ['id','position']); return { id: id(p.id), position: vector(p.position) }; }, L.pots);
-  const apples = arr(o.apples, L.apples, parseAppleState, L.apples);
+  const pots = arr(o.pots, L.pots, v => { const p = obj(v); keys(p, ['id','position']); return { id: id(p.id), position: vector(p.position) }; });
+  const apples = arr(o.apples, L.apples, parseAppleState);
   unique(pots, p => p.id); unique(apples, a => a.id); unique(apples.filter(a => a.state === 'held'), a => a.state === 'held' ? a.holderId : '');
   for (const [items, behavior] of [[pots,'pushable'],[apples,'pickup']] as const) for (const item of items) {
     const i = definition.instances.find(i => i.id === item.id); if (!i || definition.templates.find(t => t.id === i.templateId)?.behavior !== behavior) fail();
@@ -109,6 +113,9 @@ export function parseWorldLifeServerMessage(raw: unknown): WorldLifeServerMessag
     if (p.position.x-L.potRadius < zone.minX || p.position.x+L.potRadius > zone.maxX || p.position.z-L.potRadius < zone.minZ || p.position.z+L.potRadius > zone.maxZ) fail();
   }
   if (apples.some(a => a.mapId !== definition.mapId)) fail();
-  return { v: 1, type: 'scene-state', sceneId: id(o.sceneId), revision: integer(o.revision), serverTimeMs: integer(o.serverTimeMs), epochMs: integer(o.epochMs), definition, pots, apples };
+  for(const [items,behavior] of [[pots,'pushable'],[apples,'pickup']] as const) if(items.length!==definition.instances.filter(i=>definition.templates.find(t=>t.id===i.templateId)?.behavior===behavior).length)fail();
+  const birds=arr(o.birds ?? [],L.birds,v=>{const b=obj(v);keys(b,['id','startedMs','landingMs','yaw'],['resumedFrom']);const startedMs=b.startedMs===null?null:integer(b.startedMs);const landingMs=b.landingMs===null?null:integer(b.landingMs);if(landingMs!==null&&(startedMs===null||landingMs<startedMs))fail();if(b.resumedFrom!==undefined&&startedMs===null)fail();return {id:id(b.id),startedMs,landingMs,yaw:num(b.yaw),...(b.resumedFrom!==undefined?{resumedFrom:vector(b.resumedFrom)}:{})};});
+  unique(birds,b=>b.id);if(birds.length!==(definition.perches?.length??0)||birds.some(b=>!definition.perches?.some(p=>p.id===b.id)))fail();
+  return { v: 1, type: 'scene-state', sceneId: id(o.sceneId), revision: integer(o.revision), serverTimeMs: integer(o.serverTimeMs), epochMs: integer(o.epochMs), definition, pots, apples, ...(o.birds !== undefined ? {birds} : {}) };
 }
 export function handFailure(requestId: string, code: HandErrorCode, message: string): HandResultMessage { return { v: 1, type: 'hand-result', requestId, ok: false, code, message }; }

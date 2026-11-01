@@ -1,7 +1,7 @@
 import { PASTURE_ORIGIN } from '../../../shared/city/catalogue.ts';
 import { CityError, cityAction, cityView, discoverCity } from '../city/progress.ts';
 import { createHash } from 'node:crypto';
-import { EMPTY_INVENTORY } from '../../../shared/babylon/types.ts';
+import { EMPTY_INVENTORY, MAX_AVAILABLE_PARTIES } from '../../../shared/babylon/types.ts';
 import type { BabylonRequest, BabylonResult, BabylonState, BabylonErrorCode, ChatEntry, Language } from '../../../shared/babylon/types.ts';
 import type { NpcProfile, PlayerIdentity } from '../contracts.ts';
 import type { BabylonStore, Generate, LanguagePort, Profile, Party, BabylonLocation, Message, NpcSessionScope, LanguageCallContext } from './ports.ts';
@@ -43,7 +43,8 @@ export class BabylonService {
   state(identity: PlayerIdentity, scope?: NpcSessionScope): BabylonState {
     if (scope && (!scope.sessionId || !scope.isActive())) fail('UNAUTHORIZED', 'Сессия истекла');
     const { store, language, now } = this.deps;
-    const p = store.profile(identity.playerId), g = p?.groupId ? store.party(p.groupId) : null, open = store.openParty();
+    const p = store.profile(identity.playerId), g = p?.groupId ? store.party(p.groupId) : null, waiting = store.openParties();
+    const open = waiting.length === 1 ? waiting[0] : null;
     if (p && discoverCity(p, this.deps.location(identity.accountId))) store.saveProfile(identity.playerId, p);
     const role = g?.members.find(m => m.id === identity.playerId)?.role ?? 0;
     const partyPositions: BabylonState['partyPositions'][number][] = [];
@@ -76,6 +77,8 @@ export class BabylonService {
       profile: p ? { native: p.native, learning: p.learning } : null, introSeen: p?.introSeen ?? false,
       party: g ? { id: g.id, size: g.size, count: g.members.length, role, members: g.members, started: g.startedAt !== null, completed: g.completedAt !== null, seconds: g.startedAt === null ? 0 : Math.max(0, Math.floor(((g.completedAt ?? now()) - g.startedAt) / 1000)) } : null,
       availableParty: open ? { size: open.size, count: open.members.length } : null,
+      availableParties: waiting.slice(0, MAX_AVAILABLE_PARTIES).map(party => ({ id: party.id, hostName: party.members[0]!.name, size: party.size, count: party.members.length })),
+      availablePartiesTruncated: waiting.length > MAX_AVAILABLE_PARTIES,
       partyPositions,
       task: p && g ? task(p.learning, g.size, role, g.startedAt !== null, g.completedAt !== null) : '',
       taskTitle: p && g ? TASK_TITLE[p.learning] : '',
@@ -158,13 +161,15 @@ export class BabylonService {
         if (replacing && !oldParty?.members.some(member => member.id === pid)) fail('CONFLICT', 'Сохранённая игра недоступна для замены.');
         if (previous?.groupId && !replacing) {
           if (a.type !== 'join') fail('CONFLICT', 'У вас уже есть игра. Подключитесь к ней, чтобы продолжить без потери прогресса.');
+          if (a.type === 'join' && a.partyId !== undefined && a.partyId !== previous.groupId) fail('CONFLICT', 'У вас уже есть другая игра. Продолжите её или создайте новую с подтверждением замены.');
         } else {
           const languages = a.type === 'enroll' ? a : previous;
           if (!languages) fail('NOT_READY', 'Сначала сохраните языки в профиле');
           this.pair(languages!.native, languages!.learning);
-          const waiting = store.openParty();
-          const open = waiting?.id === oldParty?.id && oldParty?.members.length === 1 ? null : waiting;
-          if (a.type === 'create' && open) fail('CONFLICT', 'На сервере уже ждёт группа. Используйте подключение.');
+          const waiting = a.type === 'create' ? [] : store.openParties();
+          if (a.type !== 'create' && !(a.type === 'join' && a.partyId !== undefined) && waiting.length > 1) fail('CONFLICT', 'Выберите группу для подключения.');
+          const open = a.type === 'join' && a.partyId !== undefined ? store.party(a.partyId) : waiting[0] ?? null;
+          if (a.type === 'join' && a.partyId !== undefined && (!open || open.startedAt !== null || open.members.length >= open.size || !open.members.length)) fail('CONFLICT', 'Выбранная группа уже недоступна. Обновите список игр.');
           if (a.type === 'join' && !open) fail('NOT_READY', 'Нет игры для подключения. Создайте игру.');
           const g: Party = (a.type === 'create' ? null : open) ?? { id: id(), size: a.type === 'join' ? 1 : a.size, members: [], startedAt: null, completedAt: null, fed: [], inventory: {}, stones: [], messages: [] };
           if ((a.type === 'enroll' && g.size !== a.size) || g.members.length >= g.size) fail('CONFLICT', 'Режим группы уже выбран первым игроком');

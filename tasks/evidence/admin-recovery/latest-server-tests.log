@@ -1,0 +1,13 @@
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /private/tmp/kuda-main-delivery
+
+
+ Test Files  52 passed (52)
+      Tests  754 passed (754)
+   Start at  17:49:53
+   Duration  16.52s (transform 2.16s, setup 0ms, import 4.89s, tests 74.06s, environment 3ms)
+

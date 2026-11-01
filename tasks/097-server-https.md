@@ -1,5 +1,5 @@
 ---
-id: TASK-090
+id: TASK-097
 type: implementation-task
 status: in-progress
 spec: ../specs/server-tls.md
@@ -10,7 +10,7 @@ related:
   - spec: ../specs/offline-multiplayer.md
     requirements: [OFFLINE-002, OFFLINE-004, OFFLINE-008, OFFLINE-009, OFFLINE-015]
 depends_on: []
-scheduling_note: решения TLS подтверждены пользователем 2026-11-01 (самоподписанный сертификат вместо CA, свой DER на node:crypto, HTTPS во всех окружениях, один порт 8080); клиентская часть — TASK-091; server/ не меняет client/
+scheduling_note: решения TLS подтверждены пользователем 2026-11-01 (самоподписанный сертификат вместо CA, свой DER на node:crypto, HTTPS во всех окружениях, один порт 8080); клиентская часть — TASK-098; server/ не меняет client/
 ---
 
 # Сервер: HTTPS/WSS с самоподписанным сертификатом
@@ -32,7 +32,7 @@ scheduling_note: решения TLS подтверждены пользоват�
 - [x] Vitest S1, S3–S7 (S5 — предупреждения без перевыпуска; S6 — отказ запуска в store-тестах) спеки TLS на временных каталогах и реальном `https`/`socket.io-client` с самоподписанным сертификатом как единственным доверенным.
 - [ ] `make server-test`, `npm --prefix server run check` проходят: `tsc`, `depcruise`, vitest выполнены; осталось 3 падения, которые были и до изменений (building-height, два теста занятого порта в llm-diagnostic).
 - [ ] Ручной запуск `make start` на ноутбуке-сервере: блок подключения, `/setup`, `/operator`, вход в браузере этого ноутбука после доверия сертификату.
-- [ ] S8 (два физических ноутбука, R1 и R3) — совместно с TASK-091; без него NEXT-009 не считается выполненным.
+- [ ] S8 (два физических ноутбука, R1 и R3) — совместно с TASK-098; без него NEXT-009 не считается выполненным.
 
 ## Результат
 - Ветка `feat/server-https` от origin/main 6938f9d; изменения не закоммичены.

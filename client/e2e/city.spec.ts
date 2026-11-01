@@ -71,10 +71,10 @@ async function walk(page:Page,target:{x:number;z:number},district:string){
 }
 async function shot(page:Page,name:string){
  if(process.env.CITY_CAPTURE === 'off')return;
- // The user capped ALL captures, including retries, at seven. Never overwrite or reset this budget.
+ // The capture budget includes retries. New work is capped at three. Never overwrite or reset this budget.
  const files=(await readdir(evidence)).filter(file=>file.endsWith('.png'));
  if(files.some(file=>file.endsWith(`-${name}.png`)))return;
- if(files.length>=7)throw new Error('User screenshot budget exhausted');
+ if(files.length>=Number(process.env.CITY_CAPTURE_LIMIT??3))throw new Error('User screenshot budget exhausted');
  await page.screenshot({path:join(evidence,`${files.length+1}-${name}.png`)});console.log('SHOT',files.length+1,name);
 }
 test('walks every district with real keyboard input, checks UI and captures at most seven images',async({page})=>{
@@ -117,6 +117,12 @@ test('whole-city overview fits narrow and wide screens without horizontal croppi
    const svg=node as SVGSVGElement, rect=svg.getBoundingClientRect(),matrix=svg.getScreenCTM()!;
    return [[cityBounds.minX,cityBounds.minZ],[cityBounds.maxX,cityBounds.minZ],[cityBounds.minX,cityBounds.maxZ],[cityBounds.maxX,cityBounds.maxZ]].every(([x,z])=>{const point=new DOMPoint((x!-z!)*.8660254,(x!+z!)*.5).matrixTransform(matrix);return point.x>=rect.left&&point.x<=rect.right&&point.y>=rect.top&&point.y<=rect.bottom;});
   },CITY_BOUNDS);expect(inside).toBe(true);
+  const svg=page.locator('.world-map'),box=await svg.boundingBox();if(!box)throw Error('Map bounds');
+  const before=await svg.evaluate(node=>{const svg=node as SVGSVGElement;return {x:svg.viewBox.baseVal.x,y:svg.viewBox.baseVal.y,scale:svg.getScreenCTM()!.a};});
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2+24,box.y+box.height/2+24,{steps:4});await page.mouse.up();
+  const after=await svg.evaluate(node=>({x:(node as SVGSVGElement).viewBox.baseVal.x,y:(node as SVGSVGElement).viewBox.baseVal.y}));
+  expect(before.x-after.x).toBeCloseTo(24/before.scale,1);expect(before.y-after.y).toBeCloseTo(24/before.scale,1);
+  await page.getByRole('button',{name:'Рынок и окрестности',exact:true}).click();await page.getByRole('button',{name:'Весь город',exact:true}).click();
  }
 });
 
@@ -132,4 +138,38 @@ test('city task UI starts at the resident, rejects the wrong recipe amount, and 
  await page.getByRole('button',{name:'Two bags',exact:true}).click();
  await expect(page.getByLabel('Текущее задание',{exact:true})).toContainText('2 / 5');
  await page.keyboard.press('Escape');await resume(page);await hudWindow(page,'Tab');await expect(page.getByRole('dialog')).toContainText('Take dates');
+});
+
+
+test('living city: carry artifacts, scatter birds, feeding camels, walking mule and detailed map',async({page})=>{
+ test.setTimeout(180000);recordTrail=false;walkerName='life inspector';
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ let scene:import('../../shared/world-life/types').SceneStateMessage|null=null;
+ const currentScene=():import('../../shared/world-life/types').SceneStateMessage|null=>scene;
+ page.on('websocket',socket=>socket.on('framereceived',frame=>{const text=String(frame.payload),start=text.indexOf('["world-life",');if(start<0)return;try{const packet=JSON.parse(text.slice(start))[1];if(packet.type==='scene-state')scene=packet;}catch{}}));
+ await page.goto(origin);await page.getByLabel('Имя игрока').fill('Life inspector');await page.getByRole('button',{name:'Демонстрационный вход по имени',exact:true}).click();await createFromHub(page);
+ await expect.poll(()=>currentScene()?.birds?.length).toBe(12);
+ await walk(page,{x:-1.6,z:9},'tablet');await expect(page.getByLabel('Предмет в руке')).toContainText('Поднять табличку');await page.keyboard.press('f');
+ await expect(page.getByLabel('Предмет в руке')).toContainText('Положить табличку');
+ expect(database.prepare("SELECT state FROM world_apples WHERE id='city-tablet-market'").get()?.state).toBe('held');
+ await walk(page,{x:0,z:10.5},'place-tablet');await page.keyboard.press('f');
+ await expect.poll(()=>database.prepare("SELECT state FROM world_apples WHERE id='city-tablet-market'").get()?.state).toBe('world');
+ await walk(page,{x:7,z:9},'birds');await expect.poll(()=>currentScene()?.birds?.find(b=>b.id==='city-bird-1')?.startedMs).not.toBeNull();
+ await walk(page,{x:1,z:10},'birds-return');await expect.poll(()=>currentScene()?.birds?.find(b=>b.id==='city-bird-1')?.startedMs,{timeout:15000}).toBeNull();
+ await walk(page,{x:21.5,z:31},'camels');await page.waitForTimeout(700);await shot(page,'camel-feeding');
+ expect(currentScene()?.definition.packAnimals?.filter(a=>a.behavior==='feed')).toHaveLength(2);
+ await walk(page,{x:-30,z:32.6},'mule');await page.waitForTimeout(700);await shot(page,'mule-circuit');
+ const mule=currentScene()?.definition.packAnimals?.find(a=>a.kind==='mule');
+ expect(mule?.route).toHaveLength(12);
+ expect(mule!.route.reduce((sum,p)=>sum+p.z/12,0)).toBeCloseTo(24.802,2);
+ await walk(page,CITY_RESIDENTS.find(n=>n.id==='sharrum')!,'boat-approach');
+ expect(Math.hypot(position().x-CITY_RESIDENTS.find(n=>n.id==='sharrum')!.x,position().z-CITY_RESIDENTS.find(n=>n.id==='sharrum')!.z)).toBeLessThan(2.7);
+ await hudWindow(page,'3');await page.getByRole('button',{name:'Весь город',exact:true}).click();
+ expect(await page.locator('.city-map-details polygon').count()).toBeGreaterThan(100);
+ await page.getByRole('button',{name:'Жители',exact:true}).click();await expect(page.getByRole('button',{name:'Жители',exact:true})).toHaveAttribute('aria-pressed','true');
+ const frame=page.locator('.map-frame'),before=await page.locator('.world-map').getAttribute('viewBox');await frame.focus();await page.keyboard.press('ArrowRight');expect(await page.locator('.world-map').getAttribute('viewBox')).not.toBe(before);
+ await page.getByRole('button',{name:'К игроку',exact:true}).click();await page.getByRole('button',{name:'Рынок и окрестности',exact:true}).click();await page.getByRole('button',{name:'Весь город',exact:true}).click();
+ await page.setViewportSize({width:1280,height:900});await shot(page,'detailed-map');
+ await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect(await frame.evaluate(node=>node.scrollWidth<=node.clientWidth+1)).toBe(true);
+ await page.getByRole('button',{name:'Закрыть',exact:true}).click();expect(errors).toEqual([]);
 });

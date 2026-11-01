@@ -1,3 +1,4 @@
+import { birdPose, restingBird } from '../../shared/world-life/birds.ts';
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -51,11 +52,13 @@ describe('world-life executable contract',()=>{
     expect(()=>parseWorldLifeClientMessage({...pickup(),holderId:'victim'})).toThrow();
     expect(()=>parseWorldLifeClientMessage({...pickup(),requestId:'x'.repeat(65537)})).toThrow();
   });
-  it('publishes a reusable production catalogue with 5 stable apples and 4 reserved RAM pots',()=>{
+  it('publishes a reusable production catalogue with stable apples, varied carry items and bounded RAM pots',()=>{
     const parsed=parseWorldLifeDefinition(MARKET_WORLD_LIFE,Object.fromEntries(MARKET_WORLD_LIFE.templates.map(t=>[t.assetId,`${t.assetId}.glb`])),'market');
-    expect(parsed.templates).toHaveLength(42);
+    expect(parsed.templates).toHaveLength(47);
+    expect(parsed.perches).toHaveLength(12);
+    expect(parsed.instances.filter(i=>parsed.templates.find(t=>t.id===i.templateId)?.behavior==='pickup')).toHaveLength(17);
     expect(parsed.instances.filter(i=>i.templateId==='pickup-apple').map(i=>i.id)).toEqual(['market-apple-1','market-apple-2','market-apple-3','market-apple-4','market-apple-5']);
-    expect(parsed.instances.filter(i=>i.templateId==='pushable-pot')).toHaveLength(4);
+    expect(parsed.instances.filter(i=>i.templateId==='pushable-pot')).toHaveLength(8);
   });
   it('computes the same late-join phase and closed cat route without per-client randomness',()=>{
     const d=sceneFixture.definition;
@@ -216,4 +219,58 @@ it.each([2, 3])('migrates an actual v%i DB to the current schema without losing 
   expect(()=>transaction(upgraded,()=>applyMigrations(upgraded,[...loadMigrations(),{version:loadMigrations().length+1,sql:'CREATE TABLE transient(id INTEGER); INSERT INTO missing VALUES(1)'}],4))).toThrow();
   expect(upgraded.prepare("SELECT name FROM sqlite_master WHERE name='transient'").get()).toBeUndefined();
   upgraded.prepare('INSERT INTO schema_migrations VALUES(?,4)').run(loadMigrations().length+1);upgraded.close();expect(()=>openDatabase(path)).toThrow('Не удалось открыть БД');
+});
+
+const perch={id:'perched-1',position:{x:0,y:0,z:0},rotationY:.4};
+function birdScene(){const definition={...sceneFixture.definition,perches:[perch]},map=mapFixture(definition),life=new WorldLife(new Map([['test',map]]),1000,'birds-test');life.setApples(sceneFixture.apples);return life;}
+const actor=(x:number,mapId='test')=>({id:'player',name:'Player',mapId,position:{x,y:0,z:0},rotationY:0});
+describe('server-authoritative perched birds',()=>{
+  it('rests, scatters from an approaching player, stays airborne nearby and lands only after players leave',()=>{
+    const life=birdScene();life.updateBirds([actor(10)],1000);expect(life.snapshot('test',1000)!.birds![0]).toEqual(restingBird(perch));
+    life.updateBirds([actor(1)],2000);const flight=life.snapshot('test',2000)!,revision=flight.revision;
+    expect(flight.birds![0]!.startedMs).toBe(1000);
+    expect(birdPose(perch,flight.birds![0]!,2200).position.y).toBeGreaterThan(2);
+    life.updateBirds([actor(1)],9000);expect(life.snapshot('test',9000)!.revision).toBe(revision);
+    life.updateBirds([actor(10)],9100);expect(life.snapshot('test',9100)!.birds![0]!.landingMs).toBe(8100);
+    life.updateBirds([],11200);expect(life.snapshot('test',11200)!.birds![0]!.startedMs).toBeNull();
+  });
+  it('shares the phase for two clients and late joins, ignores another map, and rejects forged bird state',()=>{
+    const life=birdScene();life.updateBirds([actor(1,'other')],2000);expect(life.currentRevision()).toBe(0);
+    life.updateBirds([actor(1)],3000);const first=life.snapshot('test',3500)!;
+    const late=parseWorldLifeServerMessage(life.snapshot('test',4500));if(late.type!=='scene-state')throw Error('scene');
+    expect(birdPose(perch,first.birds![0]!,late.serverTimeMs-late.epochMs)).toEqual(birdPose(perch,late.birds![0]!,late.serverTimeMs-late.epochMs));
+    expect(()=>parseWorldLifeServerMessage({...first,birds:[]})).toThrow();
+    expect(()=>parseWorldLifeServerMessage({...first,birds:[{...first.birds![0],id:'unknown'}]})).toThrow();
+    expect(()=>parseWorldLifeServerMessage({...first,birds:[{...first.birds![0],landingMs:1}]})).toThrow();
+  });
+});
+
+it('adds new kinds of carry items to an existing durable catalogue without losing a held item',()=>{
+  const db=openDatabase(':memory:');dbs.push(db);const account=sqliteStores(db).accounts.findOrCreate('Carrier','carrier',1),store=sqliteWorldLife(db);
+  const original=sceneFixture.definition;store.initialize([original]);
+  store.execute(account.playerId,'test',pickup('carry-old'),()=>({v:1,type:'hand-result',requestId:'carry-old',ok:true,action:'pickup',apple:{id:'apple-1',mapId:'test',state:'held',holderId:account.playerId}}));
+  const extended={...original,templates:[...original.templates,{id:'tablet',assetId:'t',behavior:'pickup' as const,animation:'idle'}],instances:[...original.instances,{id:'new-tablet',templateId:'tablet',position:pos(2,2),rotationY:0}]};
+  const restored=store.initialize([extended]);expect(restored.find(i=>i.id==='apple-1')).toMatchObject({state:'held',holderId:account.playerId});expect(restored.find(i=>i.id==='new-tablet')).toMatchObject({state:'world',position:pos(2,2)});
+  expect(store.initialize([extended])).toHaveLength(sceneFixture.apples.length+1);
+});
+
+it('cancels a bird landing continuously when a player approaches again',()=>{
+ const life=birdScene();life.updateBirds([actor(1)],2000);life.updateBirds([],8000);
+ const before=life.snapshot('test',8500)!.birds![0]!,position=birdPose(perch,before,7500).position;
+ life.updateBirds([actor(1)],8500);const resumed=life.snapshot('test',8500)!.birds![0]!;
+ expect(resumed.landingMs).toBeNull();expect(birdPose(perch,resumed,7500).position).toEqual(position);
+ expect(()=>parseWorldLifeServerMessage(life.snapshot('test',8500))).not.toThrow();
+ life.updateBirds([actor(1)],16000);expect(life.snapshot('test',16000)!.birds![0]!.landingMs).toBeNull();
+});
+
+it('reconciles an older saved ground item against a newly authored pot and persists the safe position',()=>{
+ const db=openDatabase(':memory:');dbs.push(db);const account=sqliteStores(db).accounts.findOrCreate('Mover','mover',1),store=sqliteWorldLife(db),original=sceneFixture.definition;
+ store.initialize([original]);store.execute(account.playerId,'test',place('old-position'),()=>({v:1,type:'hand-result',requestId:'old-position',ok:true,action:'place',apple:{id:'apple-1',mapId:'test',state:'world',position:pos(-3,3)}}));
+ const potTemplate=original.templates.find(t=>t.behavior==='pushable')!;
+ const extended={...original,instances:[...original.instances,{id:'new-pot',templateId:potTemplate.id,position:pos(-3,3),rotationY:0,zone:{minX:-4,maxX:-2,minZ:2,maxZ:4}}]};
+ const map=mapFixture(extended),life=new WorldLife(new Map([['test',map]]),1000,'new-city');
+ const restored=store.initialize([extended],items=>life.restoreApples(items));expect(()=>life.setApples(restored)).not.toThrow();
+ const item=restored.find(i=>i.id==='apple-1')!;expect(item.state).toBe('world');if(item.state!=='world')throw Error('world');
+ expect(Math.hypot(item.position.x+3,item.position.z-3)).toBeGreaterThan(.5);
+ expect(store.initialize([extended],items=>life.restoreApples(items))).toEqual(restored);
 });

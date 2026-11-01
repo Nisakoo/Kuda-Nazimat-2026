@@ -1,3 +1,6 @@
+import {WorldLife} from '../src/game/WorldLife.ts';
+import {parseWorldLifeServerMessage} from '../../shared/world-life/validate.ts';
+import {packAnimalPosition} from '../../shared/world-life/phase.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -16,6 +19,22 @@ const embedded = (name: string, constant: string): unknown => {
 
 // Requires `npm --prefix client run world:generate`; skipped (= unverified) otherwise.
 describe.runIf(ready)('real client worlds (SERVER-WORLD S1, SERVER-DEMO-005)', () => {
+  it('loads new carry items, clear animal circuits and perched birds in the authoritative scene',async()=>{
+    const loaded=await loadWorld({worldDir:publicDir,contentDir:fileURLToPath(new URL('../content/',import.meta.url)),maps:{market:'maps/market/manifest.json',demo:'maps/demo/manifest.json',science:'maps/demo/science.json'}});
+    const map=loaded.maps.get('market')!,definition=map.manifest.worldLife!,life=new WorldLife(loaded.maps,1000,'city-life');
+    life.setApples(definition.instances.filter(i=>definition.templates.find(t=>t.id===i.templateId)?.behavior==='pickup').map(i=>({id:i.id,mapId:'market',state:'world',position:i.position})));
+    expect(parseWorldLifeServerMessage(life.snapshot('market',1000)).type).toBe('scene-state');
+    expect(life.snapshot('market',1000)!.apples).toHaveLength(17);expect(definition.packAnimals).toHaveLength(3);
+    for(const animal of definition.packAnimals??[])for(let t=0;t<animal.cycleMs;t+=100){
+      const p=packAnimalPosition(animal,t),next=packAnimalPosition(animal,t+70);
+      expect(map.isSafeSupport(p.x,p.z),animal.instanceId).toBe(true);
+      // Check hoof support in the actual heading. Whole-body mesh clearance is verified
+      // separately in pack-animal-clearance; a second expanded player square is not an animal.
+      const yaw=animal.behavior==='walk'?Math.atan2(next.x-p.x,next.z-p.z):0,c=Math.cos(yaw),s=Math.sin(yaw);
+      for(const side of [-.3,.3])for(const end of [-.55,.55])expect(map.isWalkable(p.x+c*side+s*end,p.z-s*side+c*end),animal.instanceId).toBe(true);
+    }
+    for(const bird of definition.perches??[])for(let a=0;a<6.29;a+=.2)expect(map.isSafeSupport(bird.position.x+Math.sin(a)*1.2,bird.position.z+Math.cos(a)*1.2),bird.id).toBe(true);
+  });
   it('loads market/demo/science with server NPC content and matches the client bootstrap byte for byte', async () => {
     const world = await loadWorld({
       worldDir: publicDir,
@@ -129,7 +148,8 @@ describe.runIf(ready)('real client worlds (SERVER-WORLD S1, SERVER-DEMO-005)', (
     }
     for(const centre of manifest.chunks){
       const window=manifest.chunks.filter(c=>Math.abs(c.x-centre.x)<=2&&Math.abs(c.z-centre.z)<=2);
-      const ids=new Set([...window.flatMap(c=>c.assets),...Object.keys(manifest.models).filter(id=>id.startsWith('avatar-'))]);
+      const life=JSON.parse(manifestBytes.toString()).worldLife as {templates:{behavior:string;assetId:string}[];flock:{assetId:string}};
+      const ids=new Set([...window.flatMap(c=>c.assets),...Object.keys(manifest.models).filter(id=>id.startsWith('avatar-')),...life.templates.filter(t=>t.behavior!=='static').map(t=>t.assetId),life.flock.assetId]);
       const resources=new Map<string,number>([["manifest",Math.max(131072,manifestBytes.length*16)]]);
       for(const chunk of window){resources.set(chunk.url,Math.max(131072,chunk.bytes*16));resources.set(chunk.collisionUrl,Math.max(131072,chunk.collisionBytes*3));}
       for(const id of ids){const path='assets/models/'+manifest.models[id];resources.set(path,manifest.assets[path]!.memory);}

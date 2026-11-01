@@ -1,5 +1,5 @@
 ---
-id: TASK-093
+id: TASK-100
 type: implementation-task
 status: done
 spec: ../specs/server-admin-content.md
@@ -16,7 +16,7 @@ related:
   - spec: ../specs/server-observability.md
     requirements: [OBS-003]
 depends_on: [TASK-043]
-scheduling_note: серверная часть разделов «NPC», «Журнал», «Аккаунты» и живого мира админки; вёрстка страницы — TASK-083, клиентское подтверждение контракта — TASK-094
+scheduling_note: серверная часть разделов «NPC», «Журнал», «Аккаунты» и живого мира админки; вёрстка страницы — TASK-083, клиентское подтверждение контракта — TASK-101
 ---
 
 # Сервер: правка NPC на ходу, живой мир, журнал и аккаунты для админки
