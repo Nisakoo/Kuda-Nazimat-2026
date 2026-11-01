@@ -3,6 +3,8 @@ import { GUIDE } from './content.ts';
 /** Explicit fixture backend. Unknown phrases fail instead of echoing the source as a translation. */
 export const testLanguagePort: LanguagePort = {
   mode: 'test', languages: ['ru', 'en', 'es'],
+  async start() {},
+  async stop() {},
   async translate(text, source, target, signal) {
     if (signal.aborted) throw new Error('Cancelled');
     if (source === target) return text;

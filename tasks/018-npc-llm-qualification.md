@@ -12,7 +12,7 @@ related:
   - spec: ../specs/server-persistence.md
     requirements: [STORE-006–010]
 depends_on: [TASK-015, TASK-017]
-scheduling_note: до итоговой TASK-016; без целевых машин и утверждённого корпуса квалификация невозможна
+scheduling_note: выполняет владелец LLM-части; до итоговой TASK-016; без целевых машин и утверждённого корпуса квалификация невозможна
 ---
 
 # Квалификация модели NPC на MLX и Ollama

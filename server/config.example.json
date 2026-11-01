@@ -8,6 +8,11 @@
     "maxConcurrent": 1,
     "maxUnfinished": 4,
     "timeoutMs": 8000,
+    "streamTimeoutMs": 30000,
+    "options": {}
+  },
+  "language": {
+    "adapter": "test",
     "options": {}
   }
 }

@@ -1,16 +1,18 @@
-import { access } from 'node:fs/promises';
 import type { CreateGame } from '../contracts.ts';
 import { consoleLogger } from '../common/logger.ts';
+import { createGame } from '../game/index.ts';
 import { shutdownOnSignals } from './shutdown.ts';
 import { startApplication } from './application.ts';
-import { configArgument, loadConfig } from './config.ts';
+import { loadConfig, serverArguments } from './config.ts';
+import { connectionBlock, connectionInfo, lanAddresses } from '../common/network.ts';
 const logger = consoleLogger();
 try {
-  const config = await loadConfig(configArgument());
-  const entry = new URL('../game/index.ts', import.meta.url);
-  try { await access(entry); }
-  catch { throw new Error('Набор A не готов: отсутствует server/src/game/index.ts (createGame). Финальная интеграция TASK-026 выполняется после слияния A.'); }
-  const { createGame } = await import(entry.href) as { createGame: CreateGame };
-  const app = await startApplication(config, createGame, logger);
+  const args = serverArguments();
+  const loaded = await loadConfig(args.configPath);
+  const config = args.port === undefined ? loaded : { ...loaded, port: args.port };
+  const app = await startApplication(config, createGame satisfies CreateGame, logger);
+  const address = app.server.address();
+  const port = address && typeof address !== 'string' ? address.port : config.port;
+  process.stdout.write(`${connectionBlock(connectionInfo(config.host, port, lanAddresses()))}\n`);
   shutdownOnSignals(app, logger);
 } catch (error) { logger.error(error instanceof Error ? error.message : 'Ошибка запуска'); process.exitCode = 1; }

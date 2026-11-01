@@ -44,18 +44,23 @@ export function scripted(options: Record<string, unknown>, deps: { clock: Clock;
   return {
     async start() { running = true; },
     async stop() { running = false; for (const stop of [...cancel]) stop(); },
-    answer(request, signal) {
+    answer(request, signal, onPartial) {
       if (!running || signal.aborted || request.deadlineAt <= deps.clock.now()) return Promise.reject(new Error('Unavailable'));
       const call = ++calls;
+      const text = reply(request);
       return new Promise((resolve, reject) => {
         const remaining = request.deadlineAt - deps.clock.now();
+        const duration = Math.min(Number(delayMs), remaining);
+        // Streaming demo: growing word prefixes at even steps before the final text.
+        const words = text.split(' ');
+        const partials = onPartial ? [1, 2, 3].map((step) => deps.scheduler.setTimeout(() => onPartial(words.slice(0, Math.max(1, Math.ceil((words.length * step) / 4))).join(' ')), (duration * step) / 4)) : [];
         const timer = deps.scheduler.setTimeout(() => {
           cleanup();
           if (deps.clock.now() >= request.deadlineAt || (Number(failEvery) > 0 && call % Number(failEvery) === 0)) reject(new Error('Unavailable'));
-          else resolve({ text: reply(request) });
-        }, Math.min(Number(delayMs), remaining));
+          else resolve({ text });
+        }, duration);
         const abort = () => { cleanup(); reject(new Error('Aborted')); };
-        const cleanup = () => { deps.scheduler.clearTimeout(timer); signal.removeEventListener('abort', abort); cancel.delete(abort); };
+        const cleanup = () => { for (const partial of partials) deps.scheduler.clearTimeout(partial); deps.scheduler.clearTimeout(timer); signal.removeEventListener('abort', abort); cancel.delete(abort); };
         cancel.add(abort); signal.addEventListener('abort', abort, { once: true });
       });
     },

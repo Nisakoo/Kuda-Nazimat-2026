@@ -6,7 +6,8 @@ import type { GameConfig } from '../contracts.ts';
 export interface Config extends GameConfig {
   host: string; port: number; clientDir: string; defaultMap: string; dbPath: string;
   sessionTtlMs: number; logWorldAccess: boolean;
-  npc: { adapter: string; maxConcurrent: number; maxUnfinished: number; timeoutMs: number; options: Record<string, unknown> };
+  language: { adapter: string; options: Record<string, unknown> };
+  npc: { adapter: string; maxConcurrent: number; maxUnfinished: number; timeoutMs: number; streamTimeoutMs: number; options: Record<string, unknown> };
 }
 export const defaultConfigPath = fileURLToPath(new URL('../../config.json', import.meta.url));
 const defaults: Config = {
@@ -15,7 +16,8 @@ const defaults: Config = {
   defaultMap: 'market', contentDir: 'content', dbPath: 'data/game.sqlite', maxPlayers: 4,
   sessionTtlMs: 43200000, tickHz: 20, broadcastHz: 10, aoiRadius: 64, staticChunkRadius: 3,
   disconnectGraceMs: 10000, saveIntervalMs: 10000, corsOrigins: [], logWorldAccess: false,
-  npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000, options: {} },
+  language: { adapter: 'test', options: {} },
+  npc: { adapter: 'scripted', maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000, streamTimeoutMs: 30000, options: {} },
 };
 export function record(value: unknown, key: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Неверный объект: ${key}`);
@@ -26,7 +28,11 @@ export function parseConfig(raw: unknown, path: string): Config {
   for (const key of Object.keys(input)) if (!Object.hasOwn(defaults, key)) throw new Error(`Неизвестный ключ config.${key}`);
   const npc = { ...defaults.npc, ...record(input.npc ?? {}, 'npc') };
   for (const key of Object.keys(npc)) if (!Object.hasOwn(defaults.npc, key)) throw new Error(`Неизвестный ключ npc.${key}`);
-  const config = { ...defaults, ...input, npc } as Config;
+  const language = { ...defaults.language, ...record(input.language ?? {}, 'language') };
+  for (const key of Object.keys(language)) if (!Object.hasOwn(defaults.language, key)) throw new Error(`Неизвестный ключ language.${key}`);
+  if (typeof language.adapter !== 'string' || !language.adapter) throw new Error('Неверный language.adapter');
+  record(language.options, 'language.options');
+  const config = { ...defaults, ...input, npc, language } as Config;
   for (const key of ['host', 'clientDir', 'worldDir', 'contentDir', 'dbPath', 'defaultMap'] as const) {
     if (typeof config[key] !== 'string' || !config[key].trim()) throw new Error(`Неверный config.${key}`);
   }
@@ -45,7 +51,7 @@ export function parseConfig(raw: unknown, path: string): Config {
   })) throw new Error('Неверный corsOrigins');
   if (typeof npc.adapter !== 'string' || !npc.adapter) throw new Error('Неверный npc.adapter');
   record(npc.options, 'npc.options');
-  for (const [key, max] of [['maxConcurrent', 2], ['maxUnfinished', 4], ['timeoutMs', 9000]] as const) {
+  for (const [key, max] of [['maxConcurrent', 2], ['maxUnfinished', 4], ['timeoutMs', 9000], ['streamTimeoutMs', 60000]] as const) {
     if (!Number.isSafeInteger(npc[key]) || npc[key] < 1 || npc[key] > max) throw new Error(`Неверный npc.${key}`);
   }
   if (npc.maxConcurrent > npc.maxUnfinished) throw new Error('npc.maxConcurrent > maxUnfinished');
@@ -56,6 +62,17 @@ export async function loadConfig(path = defaultConfigPath): Promise<Config> {
   try { raw = JSON.parse(await readFile(path, 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT' || path !== defaultConfigPath) throw new Error(`Не удалось прочитать конфигурацию ${path}`, { cause: error }); }
   return parseConfig(raw, path);
+}
+/** `make start` / `npm start`: optional `--config <path>` and `--port <number>` in any order (OFFLINE-003). */
+export function serverArguments(args = process.argv.slice(2)): { configPath: string; port?: number } {
+  const result: { configPath: string; port?: number } = { configPath: defaultConfigPath };
+  for (let i = 0; i < args.length; i += 2) {
+    const [flag, value] = [args[i], args[i + 1]];
+    if (flag === '--config' && value) result.configPath = resolve(value);
+    else if (flag === '--port' && value && /^\d{1,5}$/.test(value) && Number(value) >= 1 && Number(value) <= 65535) result.port = Number(value);
+    else throw new Error('Использование: [--config <путь>] [--port <1–65535>]');
+  }
+  return result;
 }
 export function configArgument(args = process.argv.slice(2)): string {
   if (!args.length) return defaultConfigPath;

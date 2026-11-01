@@ -11,6 +11,7 @@ import type { GameService } from '../game/GameService.ts';
 import type { Channel } from '../game/ports.ts';
 import { hashToken } from '../auth/AuthService.ts';
 import { TokenBucket } from './TokenBucket.ts';
+import { PartialThrottle } from './PartialThrottle.ts';
 
 export interface GatewayDeps {
   readonly babylon?: { enrolled(playerId: string): boolean };
@@ -28,6 +29,8 @@ const CONTROL = /[\x00-\x09\x0b-\x1f\x7f]/;
 const INVALID_LIMIT = 10;
 const INVALID_WINDOW_MS = 10_000;
 const MAX_TIMER_MS = 2_147_000_000;
+/** PROTO-007: npc-partial at most 10 times per second per question. */
+const PARTIAL_INTERVAL_MS = 100;
 
 class HandshakeError extends Error {
   readonly data: { code: ErrorCode; message: string };
@@ -72,9 +75,13 @@ class Connection implements Channel {
   private readonly log: Logger;
   private readonly identity: PlayerIdentity;
   private readonly expiresAt: number;
+  /** Device address for operational logs (OFFLINE-016). */
+  private readonly ip: string;
   private readonly usedRequestIds = new Set<string>();
   private readonly inputBucket: TokenBucket;
   private readonly chatBucket: TokenBucket;
+  /** Streamed questions still waiting for their terminal message. */
+  private readonly streams = new Map<string, PartialThrottle>();
   private invalidTimes: number[] = [];
   private expiry: TimerHandle | null = null;
   private closed = false;
@@ -84,6 +91,7 @@ class Connection implements Channel {
     this.id = socket.id; this.sessionKey = socket.data.sessionKey as string;
     this.identity = socket.data.identity as PlayerIdentity;
     this.expiresAt = socket.data.expiresAt as number;
+    this.ip = socket.handshake.address;
     this.inputBucket = new TokenBucket(deps.clock, 30, 30);
     this.chatBucket = new TokenBucket(deps.clock, 1, 3);
   }
@@ -92,12 +100,18 @@ class Connection implements Channel {
     if (!this.deps.game.attach(this.identity, this)) { this.fail('UNAVAILABLE', 'Сервер заполнен: в мире уже 4 игрока.'); return; }
     this.scheduleExpiry();
     this.socket.on('game', (raw: unknown) => this.receive(raw));
-    this.socket.on('disconnect', () => this.onDisconnect());
+    this.socket.on('disconnect', (reason) => this.onDisconnect(reason));
   }
 
   send(message: ServerMessage): void { if (!this.closed) this.socket.emit('game', message); }
 
-  close(reason: string): void { this.fail('UNAUTHORIZED', reason); }
+  /** Droppable packets (npc-partial) must not pile up in Socket.IO's offline buffer. */
+  private sendVolatile(message: ServerMessage): void { if (!this.closed) this.socket.volatile.emit('game', message); }
+
+  close(reason: string): void {
+    if (!this.closed) this.log.info('Соединение закрыто сервером', { playerId: this.identity.playerId, ip: this.ip, reason });
+    this.fail('UNAUTHORIZED', reason);
+  }
 
   private fail(code: ErrorCode, message: string): void {
     if (this.closed) return;
@@ -112,9 +126,12 @@ class Connection implements Channel {
     this.expiry = this.deps.scheduler.setTimeout(() => this.scheduleExpiry(), Math.min(remaining, MAX_TIMER_MS));
   }
 
-  private onDisconnect(): void {
+  private onDisconnect(reason: string): void {
+    this.log.info('Игрок отключился', { playerId: this.identity.playerId, ip: this.ip, reason });
     this.closed = true;
     if (this.expiry) this.deps.scheduler.clearTimeout(this.expiry);
+    for (const stream of this.streams.values()) stream.stop();
+    this.streams.clear();
     this.deps.npc.cancelConnection(this.id);
     this.deps.game.detach(this);
   }
@@ -150,7 +167,7 @@ class Connection implements Channel {
     const game = this.deps.game;
     if (message.type === 'join') {
       const result = game.join(this, message.mapId);
-      if (result.ok) this.send(result.message(message.requestId));
+      if (result.ok) { this.log.info('Вход в мир', { playerId: this.identity.playerId, mapId: message.mapId, ip: this.ip }); this.send(result.message(message.requestId)); }
       else if (result.reason === 'unknown-map') this.error(message.requestId, 'INVALID', 'Неизвестная карта.');
       else if (result.reason === 'already-joined') this.error(message.requestId, 'INVALID', 'Вход в мир уже выполнен.');
       return;
@@ -180,21 +197,36 @@ class Connection implements Channel {
         return;
       }
       case 'npc-question':
-        this.ask(message.requestId, message.targetId, message.text.trim());
+        this.ask(message.requestId, message.targetId, message.text.trim(), message.stream === true);
+        return;
+      case 'npc-cancel':
+        this.endStream(message.questionId);
+        this.deps.npc.cancel(this.id, message.questionId);
+        this.send({ v: 3, type: 'npc-cancelled', requestId: message.requestId, questionId: message.questionId });
         return;
     }
   }
 
   /** NPC-001: target and distance are checked here; queueing and answering belong to NpcQuestions. */
-  private ask(requestId: string, targetId: string, question: string): void {
+  private ask(requestId: string, targetId: string, question: string, stream: boolean): void {
     const target = this.deps.game.interact(this, targetId);
     if (!target.ok) { this.error(requestId, 'FORBIDDEN', target.reason === 'too-far' ? 'Подойдите ближе.' : 'Собеседник недоступен.'); return; }
     const { id, name, topic, persona, greeting } = target.npc;
-    this.deps.npc.ask({ connectionId: this.id, requestId, player: this.identity, npc: { id, name, topic, persona, greeting }, question })
+    let onPartial: ((text: string) => void) | undefined;
+    if (stream) {
+      const throttle = new PartialThrottle(this.deps.scheduler, PARTIAL_INTERVAL_MS, (seq, text) => this.sendVolatile({ v: 3, type: 'npc-partial', requestId, targetId, seq, text }));
+      this.streams.set(requestId, throttle);
+      onPartial = (text) => throttle.push(text);
+    }
+    this.deps.npc.ask({ connectionId: this.id, requestId, player: this.identity, npc: { id, name, topic, persona, greeting }, question }, onPartial)
       .then((answer) => this.deliver(requestId, targetId, answer), () => this.deliver(requestId, targetId, { ok: false, reason: 'unavailable' }));
   }
 
+  private endStream(requestId: string): void { this.streams.get(requestId)?.stop(); this.streams.delete(requestId); }
+
+  /** Terminal message of a question: a pending partial is dropped so it can never arrive after the answer. */
   private deliver(requestId: string, targetId: string, answer: NpcAnswer): void {
+    this.endStream(requestId);
     if (this.closed || !this.deps.game.isControlling(this)) return;
     if (answer.ok) { this.send({ v: 3, type: 'npc-answer', requestId, targetId, text: answer.text }); return; }
     switch (answer.reason) {

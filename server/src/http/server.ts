@@ -7,6 +7,8 @@ import type { Logger } from '../common/logger.ts';
 import { validName, hashToken } from '../auth/AuthService.ts';
 import { parseBabylonRequest } from '../../../shared/babylon/validate.ts';
 import { BabylonError, type BabylonService } from '../babylon/BabylonService.ts';
+import { connectionInfo, isLoopback, lanAddresses } from '../common/network.ts';
+import { OPERATOR_PAGE } from './operatorPage.ts';
 
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 function json(res: ServerResponse, status: number, value: unknown): void { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(value)); }
@@ -32,6 +34,13 @@ async function body(req: IncomingMessage, limit = 1024): Promise<unknown> {
 }
 export function createHttpServer(config: Config, deps: { auth: SessionVerifier & { guest(name: string): { token: string; expiresAt: number } }; game: GameRuntime; npcReady(): boolean; logger: Logger; babylon?: BabylonService; cancelBabylon?(connectionId: string): void }) {
   let stopping = false;
+  const startedAt = Date.now();
+  /** OFFLINE-010: operator data, loopback only; names and maps but no tokens, chat or NPC texts. */
+  function operatorStatus(req: IncomingMessage) {
+    const info = connectionInfo(config.host, req.socket.localPort ?? config.port, lanAddresses());
+    const players = deps.game.presence();
+    return { addresses: [info.local, ...info.lan.filter((entry) => entry.kind !== 'link-local').map((entry) => entry.url)], players, seats: { used: players.length, max: config.maxPlayers }, npc: deps.npcReady() ? 'ready' : 'unavailable', uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000) };
+  }
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
     if (stopping) { error(res, 503, 'UNAVAILABLE', 'Сервер останавливается'); return; }
@@ -76,6 +85,12 @@ export function createHttpServer(config: Config, deps: { auth: SessionVerifier &
       return;
     }
     if (!['GET', 'HEAD'].includes(req.method ?? '')) { res.writeHead(404); res.end(); return; }
+    if (path === '/operator' || path === '/api/operator/status') {
+      if (!isLoopback(req.socket.remoteAddress)) { res.writeHead(404); res.end(); return; }
+      if (path === '/api/operator/status') { json(res, 200, operatorStatus(req)); return; }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'" });
+      res.end(req.method === 'HEAD' ? undefined : OPERATOR_PAGE); return;
+    }
     if (path === '/api/health') { json(res, 200, { status: 'ok', protocol: 3, npc: deps.npcReady() ? 'ready' : 'unavailable' }); return; }
     if (path === '/config.json') { json(res, 200, { session: 'online', serverUrl: null, mapId: config.defaultMap, chunkRadius: null, debug: false }); return; }
     if (path.startsWith('/world/')) {
@@ -84,8 +99,10 @@ export function createHttpServer(config: Config, deps: { auth: SessionVerifier &
       if (!session.ok) { error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
       const access = deps.game.worldFile(path.slice('/world/'.length), session.identity.accountId);
       let data: Buffer | undefined;
-      if (access.ok) { try { data = await readFile(access.file.absolutePath); } catch { /* Resource unavailable -> 404. */ } }
-      const status = data ? 200 : 404;
+      let failed = false;
+      // SERVER-WORLD-005: a vanished or unreadable allowlisted file is a server error, reported without the disk path.
+      if (access.ok) { try { data = await readFile(access.file.absolutePath); } catch { failed = true; deps.logger.error('Файл мира не прочитан', { path }); } }
+      const status = data ? 200 : failed ? 500 : 404;
       if (config.logWorldAccess) deps.logger.info('world', { playerId: session.identity.playerId, path, status, bytes: data?.byteLength ?? 0 });
       res.writeHead(status, data && access.ok ? { 'Content-Type': access.file.contentType, 'Content-Length': data.byteLength } : {});
       res.end(req.method === 'HEAD' ? undefined : data); return;

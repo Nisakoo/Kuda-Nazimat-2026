@@ -20,10 +20,17 @@ export interface BabylonStore {
   saveOperation(playerId: string, requestId: string, operation: Operation): void;
   interrupt(): void;
 }
-/** The local LLM adapter is supplied by the runtime task, never by the browser. */
+/**
+ * BABEL translation and learning-language NPC replies. The local LLM adapter is supplied by the runtime task,
+ * never by the browser; it registers in babylon/adapters.ts and is selected by config `language.adapter`.
+ */
 export interface LanguagePort {
   readonly mode: 'test' | 'local';
   readonly languages: readonly Language[];
+  /** Loads the model before the port opens; a failure leaves BABEL language actions UNAVAILABLE. */
+  start(): Promise<void>;
+  /** Releases the model; in-flight calls are aborted through their signals first. */
+  stop(): Promise<void>;
   translate(text: string, source: Language, target: Language, signal: AbortSignal): Promise<string>;
   answer(npc: NpcProfile, question: string, language: Language, history: readonly NpcReply[], signal: AbortSignal): Promise<string>;
 }

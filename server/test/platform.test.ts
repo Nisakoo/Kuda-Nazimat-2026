@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { request } from 'node:http';
 import { spawn } from 'node:child_process';
@@ -19,6 +19,8 @@ import type { GameRuntime } from '../src/contracts.ts';
 const directories: string[] = []; const databases: DatabaseSync[] = [];
 function directory() { const path = mkdtempSync(join(tmpdir(), 'platform-')); directories.push(path); return path; }
 function database() { const path = join(directory(), 'game.sqlite'); const db = openDatabase(path); databases.push(db); return { path, db, stores: sqliteStores(db) }; }
+/** Windows without developer mode forbids symlinks; the escaping-alias check then runs against a missing file. */
+function linkIfPermitted(target: string, path: string): void { try { symlinkSync(target, path); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'EPERM') throw error; } }
 afterEach(() => { for (const db of databases.splice(0)) { try { db.close(); } catch {} } for (const path of directories.splice(0)) rmSync(path, { recursive: true, force: true }); });
 
 describe('SQLite v1', () => {
@@ -86,15 +88,16 @@ it('auth creates opaque hash-only sessions, preserves identity and expires at bo
 
 it('validates configuration keys, types, paths and scheduler bounds', () => {
   const path = '/tmp/config/config.json'; const config = parseConfig({}, path);
-  expect(config.clientDir).toBe('/tmp/client/dist'); expect(config.npc.timeoutMs).toBe(8000);
-  for (const input of [{ typo: true }, { port: '8080' }, { npc: { timeoutMs: 10000 } }, { npc: { extra: 1 } }, { maps: { market: '../secret' } }, { corsOrigins: ['*'] }, { defaultMap: 'missing' }, { logWorldAccess: 1 }]) expect(() => parseConfig(input, path)).toThrow();
+  expect(config.clientDir).toBe(resolve('/tmp/client/dist')); expect(config.npc.timeoutMs).toBe(8000);
+  for (const input of [{ typo: true }, { port: '8080' }, { npc: { timeoutMs: 10000 } }, { npc: { extra: 1 } }, { maps: { market: '../secret' } }, { corsOrigins: ['*'] }, { defaultMap: 'missing' }, { logWorldAccess: 1 }, { npc: { streamTimeoutMs: 60001 } }, { language: { adapter: '' } }, { language: { extra: 1 } }, { language: { options: [] } }]) expect(() => parseConfig(input, path)).toThrow();
+  expect(config.language).toEqual({ adapter: 'test', options: {} }); expect(config.npc.streamTimeoutMs).toBe(30000);
 });
 
 it('serves public UI/config, strict guest login, protected world and allowlisted CORS without secrets', async () => {
-  const root = directory(); mkdirSync(join(root, 'maps')); writeFileSync(join(root, 'index.html'), 'UI'); writeFileSync(join(root, 'config.json'), 'secret'); writeFileSync(join(root, 'maps/private.json'), 'world'); symlinkSync(join(root, 'maps/private.json'), join(root, 'alias'));
+  const root = directory(); mkdirSync(join(root, 'maps')); writeFileSync(join(root, 'index.html'), 'UI'); writeFileSync(join(root, 'config.json'), 'secret'); writeFileSync(join(root, 'maps/private.json'), 'world'); linkIfPermitted(join(root, 'maps/private.json'), join(root, 'alias'));
   const stores = memoryStores(); const auth = createAuthService(stores.accounts, stores.sessions, { now: () => 100 }, 1000);
   const logs: unknown[] = [];
-  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, async stop() {}, worldFile(path) { return path === 'near' ? { ok: true, file: { absolutePath: join(root, 'maps/private.json'), bytes: 5, contentType: 'application/json' } } : { ok: false }; } };
+  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, presence: () => [{ name: 'Аня', mapId: 'market', connected: false, releaseInMs: 4000 }], async stop() {}, worldFile(path) { return path === 'near' ? { ok: true, file: { absolutePath: join(root, 'maps/private.json'), bytes: 5, contentType: 'application/json' } } : { ok: false }; } };
   const config = parseConfig({ clientDir: root, corsOrigins: ['http://localhost:5173'], logWorldAccess: true }, join(root, 'config.json'));
   const { server } = createHttpServer(config, { auth, game, npcReady: () => true, logger: { ...silentLogger, info: (message, fields) => logs.push({ message, fields }) } });
   server.listen(0, '127.0.0.1'); await once(server, 'listening'); const address = server.address(); const url = `http://127.0.0.1:${typeof address === 'object' && address ? address.port : 0}`;

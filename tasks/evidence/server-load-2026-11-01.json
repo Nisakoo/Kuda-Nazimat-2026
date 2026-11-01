@@ -1,0 +1,23 @@
+{
+  "node": "v24.15.0",
+  "players": 4,
+  "durationMs": 61000,
+  "npcDelayMs": 5000,
+  "steps": [
+    {
+      "p50": 0.445,
+      "p95": 1.275,
+      "max": 10.013,
+      "players": 4
+    }
+  ],
+  "broadcast": {
+    "samples": 609,
+    "p95Ms": 110.32759999999996,
+    "maxMs": 147.14589999999953
+  },
+  "deltas": 2440,
+  "answers": 6,
+  "unavailable": 16,
+  "errors": []
+}
