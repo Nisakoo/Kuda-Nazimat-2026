@@ -3,6 +3,7 @@ import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
 import type { NpcResponder } from './NpcResponder.ts';
 import type { DialogueStore } from './ports.ts';
+import { isNpcFailureCode } from './failureCodes.ts';
 
 interface Job {
   question: NpcQuestion; deadline: number; controller: AbortController; running: boolean; settled: boolean;
@@ -23,8 +24,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
       catch {
         available = false;
         const code = responder.lastFailure?.();
-        const allowed = ['unsupported_platform', 'startup_timeout', 'resource_limit', 'memory_unavailable', 'model_unavailable', 'runner_mismatch', 'tokenizer_unavailable', 'protocol_error', 'unavailable'];
-        logger.error('NpcResponder недоступен: проверьте локальные пакеты, модель, платформу и профиль', { code: code && allowed.includes(code) ? code : 'unavailable' });
+        logger.error('NpcResponder недоступен: проверьте локальные пакеты, модель, платформу и профиль', { code: isNpcFailureCode(code) ? code : 'unavailable' });
       }
     })();
     starting = operation;

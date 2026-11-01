@@ -30,9 +30,17 @@ scheduling_note: интегрированный v1-срез с явным выб
 
 ## Приёмка
 
-- [ ] Серверные unit/integration, strict types/imports и Python syntax/fixture tests проходят; fake workers не называются модельными тестами.
+- [x] Серверные unit/integration, strict types/imports и Python syntax/fixture tests проходят; fake workers не называются модельными тестами.
 - [ ] Настоящий запуск через игру, hardware RAM/скорость, network isolation и physical cancel каждого backend проверены на соответствующем пользовательском оборудовании. Без них задача не done.
 - [x] При отсутствии пакетов/модели мир доступен, health unavailable, NPC не подменяется scripted.
+
+## Диагностика первого запуска Intel Mac
+
+- Пользователь сообщил: macOS 15.7.3/x86_64, Node24.22.2, Python3.12.8; официальный Ollama0.40.13 запускается на `127.0.0.1:11501`, cloud disabled, CPU, 8GiB total/1.6GiB available. Модель успешно скачана с проверкой digest, tokenizer smoke `Tokenizer OK, tokens: 15` пройден. Это пользовательские наблюдения, не hardware qualification.
+- Первый запуск игры оставил мир доступным, но `/api/health` вернул NPC unavailable с общим `model_unavailable`. Точная причина не установлена; нельзя приписывать её памяти или несовпадению tokenizer без диагностики.
+- Исправлен покрытый LLM-001/015 дефект: worker передаёт 14 фиксированных стадий startup и категории HTTP/token-count отказов; supervisor и service принимают только общий whitelist `failureCodes.ts`, произвольные поля не логируют. Для HTTPError читается ≤32KiB и распознаётся явный отказ runner по памяти, без выдачи body. После ready startup-stage очищается. Health/клиент остаются с общим unavailable. Защитные лимиты и raw/tokenizer проверки не ослаблены; стадия/категория диагностирует отказ, но не исправляет неизвестную причину автоматически.
+- Дополнительные regression: Python — startup stages, cleared stage, HTTP bounded read/no-body exposure, token mismatch; Node — только allowlisted diagnostics, отказ публикации чужой строки/exception. Итоговый прогон patch: `npm --prefix server run check` PASS (48 modules/130 dependencies); `npm --prefix server test` **128 passed, 1 skipped**; Python discovery **25 passed** (18 Ollama/common +7 MLX). Syntax-only проверка всех shell/Python блоков `MAC-INTEL.md`, docs metadata/links/ranges/DAG и `git diff --check` — PASS. Make отсутствует, выполнен npm-эквивалент. Настоящий Ollama на сервере разработки не запускался.
+- Инструкция Intel исправлена по наблюдениям пользователя: не запускать глобальный Homebrew upgrade; готовые official Node/Ollama с закреплёнными SHA вне проекта, уже установленный Python, HOME подготовительного daemon и HF cache также вне проекта. Существующий checkout обновляется без повторного clone; config/веса/venv не пересоздаются при диагностике. Повторный модельный запуск игры после patch ещё предстоит пользователю.
 
 ## Результат
 

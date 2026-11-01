@@ -114,8 +114,9 @@ class WorkerTests(unittest.TestCase):
             if actual is not None:
                 terminal['prompt_eval_count'] = actual
             with self.subTest(actual=actual), mock.patch.object(self.w, 'http', return_value=json.dumps(terminal).encode()):
-                with self.assertRaises(common.WorkerError):
+                with self.assertRaises(common.WorkerError) as error:
                     self.w.generate('prompt', 128, expected_tokens=17)
+                self.assertEqual(error.exception.diagnostic, 'ollama_token_count_mismatch')
         with mock.patch.object(self.w, 'http') as http:
             with self.assertRaises(common.WorkerError): self.w.generate('prompt', 128, expected_tokens=1793)
             http.assert_not_called()
@@ -174,6 +175,66 @@ class WorkerTests(unittest.TestCase):
              mock.patch.object(self.w.opener, 'open', return_value=response):
             with self.assertRaises(common.WorkerError) as error: self.w.http('/api/generate', stream=True)
             self.assertEqual(error.exception.code, 'output_limit')
+
+    def test_http_diagnostics_are_bounded_and_private(self):
+        self.w.child = mock.Mock(pid=42); self.w.child.poll.return_value = None
+        cases = [(b'{"error":"model requires more system memory SECRET"}', 'ollama_memory_insufficient'),
+                 (b'{"error":"not enough memory SECRET"}', 'ollama_memory_insufficient'),
+                 (b'{"error":"other SECRET"}', 'ollama_runner_rejected'),
+                 (b'not json SECRET', 'ollama_runner_rejected')]
+        with mock.patch.object(worker, 'owned_listener', return_value=True):
+            for body, diagnostic in cases:
+                fp = mock.Mock(wraps=io.BytesIO(body))
+                exc = worker.urllib.error.HTTPError('http://localhost', 500, 'SECRET', {}, fp)
+                with self.subTest(diagnostic=diagnostic), mock.patch.object(self.w.opener, 'open', side_effect=exc):
+                    with self.assertRaises(common.WorkerError) as error: self.w.http('/api/tags')
+                    self.assertEqual(error.exception.diagnostic, diagnostic)
+                    self.assertNotIn('SECRET', str(error.exception))
+                    fp.read.assert_called_once_with(32768)
+            with mock.patch.object(self.w.opener, 'open', side_effect=worker.urllib.error.URLError('SECRET')):
+                with self.assertRaises(common.WorkerError) as error: self.w.http('/api/tags')
+                self.assertEqual(error.exception.diagnostic, 'ollama_runner_connection')
+            response = mock.MagicMock()
+            response.__enter__.return_value.read.return_value = b'not json'
+            with mock.patch.object(self.w.opener, 'open', return_value=response):
+                with self.assertRaises(common.WorkerError) as error: self.w.http('/api/tags')
+                self.assertEqual(error.exception.diagnostic, 'ollama_response_invalid')
+
+    def test_main_startup_stage_and_answer_stage_clear(self):
+        stages = ('options tokenizer_integrity model_integrity dependencies tokenizer_load template port '
+                  'runtime_directory spawn listener version model_digest warmup calibration').split()
+        for stage in stages:
+            for generic in (False, True):
+                instance = mock.Mock(stage='ollama_' + stage)
+                instance.start.side_effect = RuntimeError('SECRET') if generic else common.WorkerError('invalid_config', 'safe')
+                messages = [{'op': 'start', 'options': {}}]
+                emitted = []
+                with self.subTest(stage=stage, generic=generic), \
+                     mock.patch.object(worker, 'OllamaWorker', return_value=instance), \
+                     mock.patch.object(worker, 'read_message', side_effect=messages), \
+                     mock.patch.object(worker, 'emit', side_effect=emitted.append):
+                    worker.main()
+                    self.assertEqual(emitted[0]['diagnostic'], 'ollama_' + stage)
+                    self.assertNotIn('SECRET', json.dumps(emitted))
+        instance = mock.Mock(stage='ollama_warmup')
+        error = common.WorkerError('model_unavailable', 'Ollama request failed')
+        error.diagnostic = 'ollama_memory_insufficient'
+        instance.start.side_effect = error
+        with mock.patch.object(worker, 'OllamaWorker', return_value=instance), \
+             mock.patch.object(worker, 'read_message', return_value={'op': 'start', 'options': {}}), \
+             mock.patch.object(worker, 'emit') as emit:
+            worker.main()
+            self.assertEqual(emit.call_args.args[0], {'type': 'error', 'code': 'model_unavailable',
+                                                      'message': 'Ollama request failed',
+                                                      'diagnostic': 'ollama_memory_insufficient'})
+        instance = mock.Mock(stage='ollama_calibration')
+        instance.answer.side_effect = common.WorkerError('invalid_response', 'safe')
+        with mock.patch.object(worker, 'OllamaWorker', return_value=instance), \
+             mock.patch.object(worker, 'read_message', side_effect=[{'op': 'start', 'options': {}}, {'op': 'answer', 'request': {}}]), \
+             mock.patch.object(worker, 'emit') as emit:
+            worker.main()
+            self.assertEqual(emit.call_args_list[0].args[0], {'type': 'ready'})
+            self.assertNotIn('diagnostic', emit.call_args_list[1].args[0])
 
     def test_stop_owned_child_and_runtime(self):
         self.w.child = mock.Mock(); self.w.child.poll.return_value = None

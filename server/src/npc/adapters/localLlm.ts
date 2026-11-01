@@ -3,12 +3,11 @@ import { isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Clock, Scheduler, TimerHandle } from '../../common/time.ts';
 import type { NpcAnswerRequest, NpcResponder } from '../NpcResponder.ts';
+import { isNpcFailureCode, type NpcFailureCode } from '../failureCodes.ts';
 
 type Backend = 'ollama' | 'mlx';
 type Deps = { clock: Clock; scheduler: Scheduler };
-type Failure = 'unavailable' | 'unsupported_platform' | 'startup_timeout' | 'timeout' | 'aborted' | 'stopped' |
-  'protocol_error' | 'input_too_long' | 'output_limit' | 'resource_limit' | 'memory_unavailable' |
-  'model_unavailable' | 'runner_mismatch' | 'tokenizer_unavailable';
+type Failure = NpcFailureCode;
 export interface LocalLlmResponder extends NpcResponder {
   status(): 'ready' | 'unavailable';
   lastFailure(): Failure | undefined;
@@ -264,7 +263,10 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     if (message.type === 'error') {
       // Do not expose arbitrary worker output, paths, prompts or stderr in health/errors.
       if (typeof message.code !== 'string' || typeof message.message !== 'string' || Buffer.byteLength(message.message) > 1024) { fail(s, 'protocol_error'); return; }
-      fail(s, failures.has(message.code as Failure) ? message.code as Failure : 'unavailable'); return;
+      const code = isNpcFailureCode(message.diagnostic) && message.diagnostic.startsWith('ollama_')
+        ? message.diagnostic
+        : failures.has(message.code as Failure) ? message.code as Failure : 'unavailable';
+      fail(s, code); return;
     }
     if (s.phase === 'starting' && message.type === 'ready' && Object.keys(message).length === 1 && !s.readyReceived) {
       s.readyReceived = true; ready(s); return;

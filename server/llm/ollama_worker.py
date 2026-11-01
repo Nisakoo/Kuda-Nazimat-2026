@@ -126,6 +126,7 @@ def owned_listener(pid, port):
 class OllamaWorker:
     def __init__(self, options):
         self.options = options
+        self.stage = None
         self.child = None
         self.runtime = None
         self.tokenizer = None
@@ -134,6 +135,7 @@ class OllamaWorker:
 
     def start(self):
         o = self.options
+        self.stage = 'ollama_options'
         try:
             if (o['model'] != MODEL or not isinstance(self.port, int) or isinstance(self.port, bool)
                     or not 1 <= self.port <= 65535 or not isinstance(o['threads'], int) or isinstance(o['threads'], bool)
@@ -147,20 +149,27 @@ class OllamaWorker:
                     raise ValueError()
         except (KeyError, TypeError, ValueError):
             raise WorkerError('invalid_config', 'Invalid worker configuration') from None
+        self.stage = 'ollama_tokenizer_integrity'
         configure_offline()
         verify_manifest(o['tokenizerDir'], o['tokenizerManifest'])
+        self.stage = 'ollama_model_integrity'
         verify_ollama_model(o['modelsDir'], o['modelDigest'])
+        self.stage = 'ollama_dependencies'
         try:
             if importlib.metadata.version('transformers') != '4.57.6' or importlib.metadata.version('jinja2') != '3.1.6':
                 raise WorkerError('model_unavailable', 'Tokenizer dependency version mismatch')
         except importlib.metadata.PackageNotFoundError:
             raise WorkerError('model_unavailable', 'Tokenizer dependency unavailable') from None
         from transformers import AutoTokenizer
+        self.stage = 'ollama_tokenizer_load'
         self.tokenizer = AutoTokenizer.from_pretrained(o['tokenizerDir'], local_files_only=True, trust_remote_code=False)
+        self.stage = 'ollama_template'
         compile_prompt({'locale': 'ru', 'question': 'Привет', 'history': [],
                         'npc': {'name': 'NPC', 'topic': 'учёба', 'persona': 'кратко', 'greeting': 'Привет'}}, self.tokenizer)
+        self.stage = 'ollama_port'
         if not port_free(self.port):
             raise WorkerError('model_unavailable', 'Ollama port is occupied')
+        self.stage = 'ollama_runtime_directory'
         models_root = Path(o['modelsDir']).resolve(strict=True)
         if not models_root.is_dir():
             raise WorkerError('invalid_config', 'Invalid models directory')
@@ -177,8 +186,10 @@ class OllamaWorker:
                    OLLAMA_MAX_LOADED_MODELS='1', OLLAMA_ORIGINS='http://127.0.0.1',
                    OMP_NUM_THREADS=str(o['threads']))
         # The supervisor owns the process group. The daemon must inherit it.
+        self.stage = 'ollama_spawn'
         self.child = subprocess.Popen([o['executable'], 'serve'], env=env, stdin=subprocess.DEVNULL,
                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.stage = 'ollama_listener'
         deadline = time.monotonic() + o['startupTimeoutMs'] / 1000
         while time.monotonic() < deadline:
             if self.child.poll() is not None:
@@ -188,14 +199,18 @@ class OllamaWorker:
             time.sleep(0.05)
         else:
             raise WorkerError('model_unavailable', 'Ollama did not become ready')
+        self.stage = 'ollama_version'
         version = self.http('/api/version', timeout=max(0.1, deadline - time.monotonic()))
         if version.get('version') != o['runnerVersion']:
             raise WorkerError('model_unavailable', 'Ollama version mismatch')
+        self.stage = 'ollama_model_digest'
         tags = self.http('/api/tags', timeout=max(0.1, deadline - time.monotonic()))
         models = tags.get('models')
         if not isinstance(models, list) or not any(isinstance(m, dict) and m.get('name') == MODEL and isinstance(m.get('digest'), str) and digest_hex(m['digest']) == digest_hex(o['modelDigest']) for m in models):
             raise WorkerError('model_unavailable', 'Ollama model digest mismatch')
+        self.stage = 'ollama_warmup'
         self.generate('', 0, timeout=max(0.1, deadline - time.monotonic()), allow_empty=True)
+        self.stage = 'ollama_calibration'
         for question in ('Почему небо голубое?', 'Explain a small example.', 'Что значит 🚀?'):
             probe = {'locale': 'ru', 'question': question, 'history': [],
                      'npc': {'name': 'NPC', 'topic': 'учёба', 'persona': 'кратко', 'greeting': 'Привет'}}
@@ -203,6 +218,7 @@ class OllamaWorker:
             expected = count_prompt_tokens(prompt, self.tokenizer)
             self.generate(prompt, 1, timeout=max(0.1, deadline - time.monotonic()),
                           allow_empty=True, expected_tokens=expected)
+        self.stage = None
 
     def http(self, path, payload=None, timeout=10, stream=False):
         if path not in ('/api/version', '/api/tags', '/api/generate'):
@@ -227,8 +243,27 @@ class OllamaWorker:
             return result
         except WorkerError:
             raise
-        except (OSError, ValueError, UnicodeError, urllib.error.URLError):
-            raise WorkerError('model_unavailable', 'Ollama request failed') from None
+        except urllib.error.HTTPError as exc:
+            diagnostic = 'ollama_runner_rejected'
+            try:
+                body = exc.read(LINE_LIMIT)
+                parsed = json.loads(body)
+                message = parsed.get('error', '') if isinstance(parsed, dict) else ''
+                if isinstance(message, str) and re.search(r'model requires more system memory|not enough memory', message, re.IGNORECASE):
+                    diagnostic = 'ollama_memory_insufficient'
+            except (OSError, ValueError, UnicodeError):
+                pass
+            error = WorkerError('model_unavailable', 'Ollama request failed')
+            error.diagnostic = diagnostic
+            raise error from None
+        except (OSError, urllib.error.URLError):
+            error = WorkerError('model_unavailable', 'Ollama request failed')
+            error.diagnostic = 'ollama_runner_connection'
+            raise error from None
+        except (ValueError, UnicodeError):
+            error = WorkerError('model_unavailable', 'Ollama request failed')
+            error.diagnostic = 'ollama_response_invalid'
+            raise error from None
 
     def generate(self, prompt, predict, timeout=10, allow_empty=False, expected_tokens=None):
         if expected_tokens is not None and (not isinstance(expected_tokens, int) or isinstance(expected_tokens, bool) or not 0 <= expected_tokens <= 1792):
@@ -261,11 +296,15 @@ class OllamaWorker:
                     actual = obj.get('prompt_eval_count')
                     if (not isinstance(actual, int) or isinstance(actual, bool)
                             or actual < 0 or actual > 1792 or actual != expected_tokens):
-                        raise ValueError()
+                        error = WorkerError('invalid_response', 'Invalid runner response')
+                        error.diagnostic = 'ollama_token_count_mismatch'
+                        raise error
             if not done:
                 raise ValueError()
         except (ValueError, UnicodeError):
-            raise WorkerError('invalid_response', 'Invalid runner response') from None
+            error = WorkerError('invalid_response', 'Invalid runner response')
+            error.diagnostic = 'ollama_response_invalid'
+            raise error from None
         text = ''.join(parts)
         if allow_empty and not text:
             return ''
@@ -300,6 +339,7 @@ def main():
             raise WorkerError('invalid_message', 'Expected start message')
         worker = OllamaWorker(first['options'])
         worker.start()
+        worker.stage = None
         emit({'type': 'ready'})
         while True:
             msg = read_message()
@@ -309,9 +349,16 @@ def main():
                 raise WorkerError('invalid_message', 'Expected answer message')
             emit({'type': 'answer', 'text': worker.answer(msg['request'])})
     except WorkerError as exc:
-        emit({'type': 'error', 'code': exc.code, 'message': str(exc)[:200]})
+        result = {'type': 'error', 'code': exc.code, 'message': str(exc)[:200]}
+        diagnostic = getattr(exc, 'diagnostic', None) or (worker.stage if worker is not None else None)
+        if diagnostic:
+            result['diagnostic'] = diagnostic
+        emit(result)
     except Exception:
-        emit({'type': 'error', 'code': 'model_unavailable', 'message': 'Local worker failed'})
+        result = {'type': 'error', 'code': 'model_unavailable', 'message': 'Local worker failed'}
+        if worker is not None and worker.stage:
+            result['diagnostic'] = worker.stage
+        emit(result)
     finally:
         if worker is not None:
             try:

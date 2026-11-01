@@ -49,6 +49,8 @@ readline.createInterface({input:process.stdin}).on('line', (line) => {
     if (startup === 'silent' || startup === 'stubborn') return;
     if (startup === 'startup-error') return send({type:'error',code:'model_unavailable',message:'secret local model path'});
     if (startup === 'malformed') return process.stdout.write('not json\\n');
+    if (startup === 'safe-diagnostic') return send({type:'error',code:'model_unavailable',message:'secret prompt, path and body',diagnostic:'ollama_model_integrity'});
+    if (startup === 'unsafe-diagnostic') return send({type:'error',code:'model_unavailable',message:'secret prompt, path and body',diagnostic:'secret prompt /Users/private/path'});
     if (startup === 'descendant') {
       descendant = spawn(process.execPath, ['-e','setInterval(() => {}, 1000)'], {stdio:'ignore'});
       log({type:'descendant',pid:descendant.pid});
@@ -198,6 +200,15 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
       await expect(responder.start()).rejects.toThrow(reason);
       expect(responder.status()).toBe('unavailable'); expect(responder.lastFailure()).toBe(reason);
       await responder.stop(); expect(alive(pid())).toBe(false);
+    }
+  });
+  it('keeps only allowlisted startup diagnostics, never a worker message or an arbitrary diagnostic', async () => {
+    for (const [startup, reason] of [['safe-diagnostic', 'ollama_model_integrity'], ['unsafe-diagnostic', 'model_unavailable']]) {
+      const { responder } = fixture('ollama', startup);
+      await expect(responder.start()).rejects.toThrow(reason);
+      expect(responder.lastFailure()).toBe(reason);
+      expect(responder.status()).toBe('unavailable');
+      await responder.stop();
     }
   });
   it('enforces wall deadline even without timer delivery and the 9 s monotonic ceiling after a clock rollback', async () => {

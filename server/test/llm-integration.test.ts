@@ -26,6 +26,23 @@ describe('configured game LLM integration without real models', () => {
     expect(() => createResponder('auto', {}, deps)).toThrow('Неизвестный');
     expect(parseConfig({ npc: { adapter: 'scripted', maxConcurrent: 2 } }, '/tmp/config.json').npc.maxConcurrent).toBe(2);
   });
+  it.each([
+    ['ollama_memory_insufficient', 'ollama_memory_insufficient'],
+    ['ollama_token_count_mismatch', 'ollama_token_count_mismatch'],
+    ['secret prompt /Users/private/path', 'unavailable'],
+  ])('logs only a fixed startup diagnostic (%s) and leaves health unavailable', async (failure, expected) => {
+    const error = vi.fn();
+    const responder: NpcResponder = {
+      async start() { throw new Error('secret body and prompt'); }, async stop() {},
+      async answer() { throw new Error(); }, status: () => 'unavailable', lastFailure: () => failure,
+    };
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, config);
+    await service.start();
+    expect(service.ready()).toBe(false);
+    expect(error).toHaveBeenCalledExactlyOnceWith('NpcResponder недоступен: проверьте локальные пакеты, модель, платформу и профиль', { code: expected });
+    expect(JSON.stringify(error.mock.calls)).not.toContain('secret');
+    await service.stop();
+  });
   it('reports an idle backend failure immediately and recovers once without replaying a question', async () => {
     vi.useFakeTimers(); let status: 'ready' | 'unavailable' = 'unavailable';
     const responder: NpcResponder = {

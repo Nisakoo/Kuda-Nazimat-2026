@@ -21,17 +21,46 @@ git clone --branch npc-llm-clean-start https://github.com/Nisakoo/Kuda-Nazimat-2
 cd Kuda-Nazimat-2026
 ```
 
-Нужны Node 24.15+ в пределах 24.x, Python 3.12 и Ollama с поддержкой данного Intel Mac/macOS. Если Homebrew уже установлен, кандидат установки:
+Нужны Node 24.15+ в пределах 24.x, Python 3.12 и Ollama с поддержкой данного Intel Mac/macOS. Сначала проверить существующие инструменты:
 
 ```sh
-brew install node@24 python@3.12 ollama
-export PATH="$(brew --prefix node@24)/bin:$PATH"
+sw_vers -productVersion
+uname -m
+command -v node npm python3.12 ollama
 node --version
 python3.12 --version
-command -v ollama
 ```
 
-Homebrew/текущая формула Ollama могут не поддерживать конкретную версию Intel macOS. Ошибка установки не обходится выбором MLX: MLX требует Apple Silicon. Использовать совместимый официальный runtime; этот документ не утверждает, что он проверен. Не выполнять `brew services start ollama`: игровому worker нужен собственный процесс.
+**Не начинать с `brew install node@24 python@3.12 ollama` на Intel.** На пользовательском macOS15.7.3 Homebrew сообщил об отсутствии поддержки/bottles, начал длительную сборку и обновление глобальных зависимостей; Ollama formula завершилась ошибкой. Уже установленный Python3.12.8 подошёл без обновления. Если Python3.12 отсутствует, отдельно подготовить совместимый официальный runtime, не запускать цепочку глобальных upgrade вслепую.
+
+Готовые официальные архивы Node24.22.2 x64 и Ollama0.40.13 universal с проверкой SHA-256 (ссылки/хеши закреплены, не latest):
+
+```sh
+TOOLS="$HOME/kuda-llm/tools"
+mkdir -p "$TOOLS"
+curl --fail --location --retry 2 https://nodejs.org/dist/v24.22.2/node-v24.22.2-darwin-x64.tar.gz -o "$TOOLS/node-v24.22.2-darwin-x64.tar.gz" \
+&& printf '%s  %s\n' 'd5e336d588c45be0c37dbd52cc29895593009ca4997a77a1fd02815131ed0e52' "$TOOLS/node-v24.22.2-darwin-x64.tar.gz" | shasum -a 256 -c - \
+&& tar -xzf "$TOOLS/node-v24.22.2-darwin-x64.tar.gz" -C "$TOOLS" \
+&& export PATH="$TOOLS/node-v24.22.2-darwin-x64/bin:$PATH" \
+&& node --version
+```
+
+```sh
+mkdir -p "$TOOLS/ollama-0.40.13"
+curl --fail --location --retry 2 https://github.com/ollama/ollama/releases/download/v0.40.13/ollama-darwin.tgz -o "$TOOLS/ollama-darwin-0.40.13.tgz" \
+&& printf '%s  %s\n' 'bae29252232b9e1358cf5801a7d65a07442af18fb5467cb68c7fc3711f59c511' "$TOOLS/ollama-darwin-0.40.13.tgz" | shasum -a 256 -c - \
+&& tar -xzf "$TOOLS/ollama-darwin-0.40.13.tgz" -C "$TOOLS/ollama-0.40.13" \
+&& export PATH="$TOOLS/ollama-0.40.13:$PATH" \
+&& file "$TOOLS/ollama-0.40.13/ollama"
+```
+
+Не переносить только executable: библиотеки/runner должны остаться рядом в исходном layout. Пользователь подтвердил оба SHA, Node24.22.2, наличие x86_64 в Ollama и запуск serve0.40.13 на CPU. Это **не подтверждает** загрузку модели/игровой ответ или RAM qualification. PATH действует только в текущем терминале; в новом терминале выполнить:
+
+```sh
+export PATH="$HOME/kuda-llm/tools/node-v24.22.2-darwin-x64/bin:$HOME/kuda-llm/tools/ollama-0.40.13:$PATH"
+```
+
+Не выполнять `brew services start ollama`: игровому worker нужен собственный процесс. MLX не является обходом проблем Intel: он требует Apple Silicon.
 
 ## 2. Пакеты и сборка игры
 
@@ -49,7 +78,8 @@ python3.12 -m venv "$HOME/kuda-llm/venv"
 В терминале A запустить только подготовительный daemon:
 
 ```sh
-mkdir -p "$HOME/kuda-llm/models"
+mkdir -p "$HOME/kuda-llm/models" "$HOME/kuda-llm/prepare-home"
+HOME="$HOME/kuda-llm/prepare-home" \
 OLLAMA_MODELS="$HOME/kuda-llm/models" \
 OLLAMA_HOST=127.0.0.1:11501 \
 OLLAMA_NO_CLOUD=1 \
@@ -61,8 +91,9 @@ ollama serve
 В терминале B:
 
 ```sh
-OLLAMA_HOST=127.0.0.1:11501 ollama pull qwen3.5:2b-q4_K_M
-curl --fail --silent --show-error http://127.0.0.1:11501/api/version > "$HOME/kuda-llm/ollama-version.json"
+HOME="$HOME/kuda-llm/prepare-home" OLLAMA_HOST=127.0.0.1:11501 \
+"$HOME/kuda-llm/tools/ollama-0.40.13/ollama" pull qwen3.5:2b-q4_K_M \
+&& curl --fail --silent --show-error http://127.0.0.1:11501/api/version -o "$HOME/kuda-llm/ollama-version.json"
 ```
 
 После успешного завершения вернуться в терминал A и нажать **Ctrl+C**. Подготовительный daemon должен остановиться до запуска игры. Не выполнять `ollama run`: для подготовки нужен только pull.
@@ -72,6 +103,7 @@ curl --fail --silent --show-error http://127.0.0.1:11501/api/version > "$HOME/ku
 В терминале A, из корня проекта, выполнить весь блок. Он скачивает только выбранные root-файлы tokenizer/template/config из закреплённой ревизии, не safetensors/GGUF. Загруженные файлы копируются из HF cache как обычные файлы, без symlinks.
 
 ```sh
+HF_HOME="$HOME/kuda-llm/hf-cache" HF_HUB_DISABLE_TELEMETRY=1 \
 "$HOME/kuda-llm/venv/bin/python3" - <<'PY'
 from pathlib import Path
 import shutil
@@ -151,6 +183,6 @@ npm --prefix server start
 - **http://localhost:8080/api/health** — нужен `npc: "ready"` для доступного NPC.
 - **http://localhost:8080/** — войти по имени, подойти к NPC и задать короткий вопрос.
 
-`npc: unavailable` — реальная модель не стартовала; мир остаётся доступен. Не считать scripted-фразу доказательством LLM. При ошибке сохранить безопасный startup-log и вывод health. Если `ready`, но игровые вопросы истекают, CPU может не укладываться в v1 deadline. Не увеличивать deadline сверх 9 с и не обходить memory/tokenizer guards ради демонстрации.
+`npc: unavailable` — реальная модель не стартовала; мир остаётся доступен. Не считать scripted-фразу доказательством LLM. При ошибке сохранить безопасный startup-log и вывод health. Операционный `code` различает стадии: `ollama_tokenizer_integrity` / `ollama_model_integrity` — pin/inventory файлов; `ollama_dependencies` — Python-пакеты; `ollama_tokenizer_load` / `ollama_template` — tokenizer/template; `ollama_port` — занятый порт; `ollama_spawn` / `ollama_listener` — запуск выделенного процесса; `ollama_version` / `ollama_model_digest` — HTTP pin; `ollama_warmup` / `ollama_calibration` — прогрев/проверка count. Отдельные причины: `ollama_memory_insufficient` — runner прямо сообщил недостаток памяти, `ollama_token_count_mismatch` — count не совпал или отсутствует, `ollama_runner_rejected` — HTTP отказ без публикации body. Код стадии показывает место отказа, но сам по себе не доказывает причину. Не скачивать веса заново и не переписывать manifest вслепую. Если `ready`, но игровые вопросы истекают, CPU может не укладываться в v1 deadline. Не увеличивать deadline сверх 9 с и не обходить memory/tokenizer guards ради демонстрации.
 
 Повторный запуск после успешной подготовки: перейти в корень проекта, активировать Node 24 в PATH при необходимости и выполнить `npm --prefix server start`. Веса/venv/tokenizer/config сохраняются. Offline запуск проверяется отдельно после первого успешного online-подготовленного старта.
