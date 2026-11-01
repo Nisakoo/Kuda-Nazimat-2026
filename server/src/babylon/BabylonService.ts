@@ -222,7 +222,7 @@ export class BabylonService {
       const npc = NPCS[a.targetId]; if (!npc) fail('INVALID', 'Неизвестный собеседник'); this.near(identity, npc!);
     }
     const captured = message;
-    const work = async (signal: AbortSignal, deadline: number): Promise<string> => {
+    const work = async (signal: AbortSignal, deadline: number, budget?: { expired(): boolean }): Promise<string> => {
       store.transaction(() => {
         if (store.profile(pid)?.groupId !== party.id) fail('CONFLICT', 'Игра сменилась. Старый запрос отменён.');
         if (captured) {
@@ -243,7 +243,9 @@ export class BabylonService {
       } else if (a.type === 'suggest') output = clean(await language.translate(a.word, profile.learning, profile.native, signal), 200);
       else if (a.type === 'npc') output = clean(await language.answer(NPCS[a.targetId]!, a.text, profile.learning, profile.replies.filter(r => r.npcId === a.targetId).slice(-6), signal));
       if (signal.aborted || now() >= deadline || !await authorize()) fail('UNAUTHORIZED', 'Запрос отменён или сессия истекла');
-      if (signal.aborted || now() >= deadline) fail('UNAVAILABLE', 'Время запроса истекло');
+      // Authorization is asynchronous. Recheck the queue's monotonic budget immediately before the terminal transaction.
+      // Legacy generators and the no-translation path retain their signal/wall-clock guards.
+      if (budget?.expired() || signal.aborted || now() >= deadline) fail('UNAVAILABLE', 'Время запроса истекло');
       store.transaction(() => {
         if (store.profile(pid)?.groupId !== party.id) fail('CONFLICT', 'Игра сменилась. Старый запрос отменён.');
         if (captured) {

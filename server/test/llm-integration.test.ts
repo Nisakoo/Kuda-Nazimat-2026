@@ -7,10 +7,19 @@ import { createResponder } from '../src/npc/adapters/index.ts';
 import { createNpcDialogueService } from '../src/npc/NpcDialogueService.ts';
 import type { NpcResponder } from '../src/npc/NpcResponder.ts';
 import { systemClock, systemScheduler } from '../src/common/time.ts';
-import { silentLogger } from '../src/common/logger.ts';
+import { silentLogger, type Logger } from '../src/common/logger.ts';
 import { memoryStores } from './memory.ts';
 import { answerRequest, auditResponderNetwork } from './responderContract.ts';
 
+// These assertions inspect adapter lifecycle/timing events, separately from main queue metrics/logs.
+function llmLogger(methods: Partial<Logger>): Logger {
+  const selected = (event: string) => event.startsWith('npc.responder.') || event.startsWith('npc.answer.');
+  const logger: Logger = { ...silentLogger, child: () => logger,
+    info: (event, message, fields) => { if (selected(event)) methods.info?.(event, message, fields); },
+    error: (event, message, fields) => { if (selected(event)) methods.error?.(event, message, fields); },
+  };
+  return logger;
+}
 const deps = { clock: systemClock, scheduler: systemScheduler };
 const config = { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000 };
 const q = (player = 'p', id = 'r') => ({ connectionId: 'c' + player, requestId: id,
@@ -54,10 +63,10 @@ describe('configured game LLM integration without real models', () => {
       async start() { throw new Error('secret body and prompt'); }, async stop() {},
       async answer() { throw new Error(); }, status: () => 'unavailable', lastFailure: () => failure,
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, config);
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ error }) }, config);
     await service.start();
     expect(service.ready()).toBe(false);
-    expect(error).toHaveBeenCalledExactlyOnceWith('NpcResponder недоступен: проверьте локальные пакеты, модель, платформу и профиль', { code: expected });
+    expect(error).toHaveBeenCalledExactlyOnceWith('npc.responder.unavailable', 'NpcResponder недоступен: проверьте локальные пакеты, модель, платформу и профиль', { code: expected });
     expect(JSON.stringify(error.mock.calls)).not.toContain('secret');
     await service.stop();
   });
@@ -68,10 +77,10 @@ describe('configured game LLM integration without real models', () => {
       start: vi.fn(() => new Promise<void>(resolve => { finish = () => { status = 'ready'; resolve(); }; })),
       async stop() { status = 'unavailable'; }, status: () => status, async answer() { return { text: 'Ответ' }; },
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, config);
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ info }) }, config);
     const started = service.start(); expect(info).not.toHaveBeenCalled();
     finish(); await started;
-    expect(info).toHaveBeenCalledExactlyOnceWith('NPC готов к вопросам', { status: 'ready' });
+    expect(info).toHaveBeenCalledExactlyOnceWith('npc.responder.ready', 'NPC готов к вопросам', { status: 'ready' });
     status = 'unavailable'; await service.ask(q()); await vi.advanceTimersByTimeAsync(2000);
     expect(info).toHaveBeenCalledTimes(1); finish(); await vi.advanceTimersByTimeAsync(0);
     expect(info).toHaveBeenCalledTimes(2); await service.stop();
@@ -83,7 +92,7 @@ describe('configured game LLM integration without real models', () => {
         start: () => new Promise<void>((resolve, reject) => { finish = () => failure ? reject(new Error('private')) : resolve(); }),
         async stop() {}, status: () => 'ready', async answer() { return { text: 'Ответ' }; },
       };
-      const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, config);
+      const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ info }) }, config);
       const started = service.start(); const stopped = service.stop(); finish(); await started; await stopped;
       expect(info).not.toHaveBeenCalled();
     }
@@ -97,10 +106,10 @@ describe('configured game LLM integration without real models', () => {
         signal.addEventListener('abort', () => { sample = undefined; reject(new Error('abort')); }, { once: true });
       }),
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, { ...config, timeoutMs: 100 });
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ info }) }, { ...config, timeoutMs: 100 });
     await service.start(); const pending = service.ask(q()); await vi.advanceTimersByTimeAsync(100);
     expect(await pending).toEqual({ ok: false, reason: 'timeout' });
-    expect(info).toHaveBeenLastCalledWith('Этапы ответа NPC', { reason: 'timeout', stage: 'decoding', elapsedMs: 100, promptTokens: 80, firstTokenMs: 40, outputChunks: 3 });
+    expect(info).toHaveBeenLastCalledWith('npc.answer.timing', 'Этапы ответа NPC', { reason: 'timeout', stage: 'decoding', elapsedMs: 100, promptTokens: 80, firstTokenMs: 40, outputChunks: 3 });
     expect(JSON.stringify(info.mock.calls)).not.toContain('private'); await service.stop();
   });
   it.each(['throws', 'bad-stage', 'unsafe-count', 'negative', 'missing-elapsed', 'excessive-elapsed', 'excessive-first-token'])('ignores invalid timing (%s) without changing delivery', async (mode) => {
@@ -116,9 +125,9 @@ describe('configured game LLM integration without real models', () => {
         return value as NonNullable<ReturnType<NonNullable<NpcResponder['diagnostics']>>>;
       },
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, info } }, config);
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ info }) }, config);
     await service.start(); expect(await service.ask(q())).toEqual({ ok: true, text: 'Ответ' });
-    expect(info).toHaveBeenCalledExactlyOnceWith('NPC готов к вопросам', { status: 'ready' }); await service.stop();
+    expect(info).toHaveBeenCalledExactlyOnceWith('npc.responder.ready', 'NPC готов к вопросам', { status: 'ready' }); await service.stop();
   });
   it.each([[50, 20], [200000, 150000], [300000, 300000]])('logs bounded timing (%i/%i ms) after a successful committed answer', async (elapsedMs, firstTokenMs) => {
     const info = vi.fn(); const store = memoryStores();
@@ -126,10 +135,10 @@ describe('configured game LLM integration without real models', () => {
       async start() {}, async stop() {}, status: () => 'ready', async answer() { return { text: 'Ответ' }; },
       diagnostics: () => ({ stage: 'complete', elapsedMs, promptTokens: 80, firstTokenMs, outputChunks: 4 }),
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: store.dialogue, logger: { ...silentLogger, info } }, config);
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: store.dialogue, logger: llmLogger({ info }) }, config);
     await service.start(); expect(await service.ask(q())).toEqual({ ok: true, text: 'Ответ' });
     expect(store.dialogue.history('p', 'n')).toHaveLength(1);
-    expect(info).toHaveBeenLastCalledWith('Этапы ответа NPC', { reason: 'completed', stage: 'complete', elapsedMs, promptTokens: 80, firstTokenMs, outputChunks: 4 });
+    expect(info).toHaveBeenLastCalledWith('npc.answer.timing', 'Этапы ответа NPC', { reason: 'completed', stage: 'complete', elapsedMs, promptTokens: 80, firstTokenMs, outputChunks: 4 });
     await service.stop();
   });
   it('reports an idle backend failure immediately and recovers once without replaying a question', async () => {
@@ -165,11 +174,11 @@ describe('configured game LLM integration without real models', () => {
       async answer() { status = 'unavailable'; throw new Error('secret exception and prompt'); },
     };
     const stores = memoryStores();
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: stores.dialogue, logger: { ...silentLogger, error } }, config);
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: stores.dialogue, logger: llmLogger({ error }) }, config);
     await service.start();
     expect(await service.ask(q())).toEqual({ ok: false, reason: 'unavailable' });
     for (let i = 0; i < 3; i++) expect(await service.ask(q('p2', String(i)))).toEqual({ ok: false, reason: 'unavailable' });
-    expect(error).toHaveBeenCalledExactlyOnceWith('NpcResponder недоступен во время игры', { code: expected });
+    expect(error).toHaveBeenCalledExactlyOnceWith('npc.responder.failed', 'NpcResponder недоступен во время игры', { code: expected });
     expect(JSON.stringify(error.mock.calls)).not.toContain('secret');
     expect(stores.dialogue.history('p', 'n')).toEqual([]);
     await vi.advanceTimersByTimeAsync(2000); expect(service.ready()).toBe(true);
@@ -183,11 +192,11 @@ describe('configured game LLM integration without real models', () => {
       async start() {}, async stop() {}, status: () => status, lastFailure: () => 'memory_unavailable',
       answer: vi.fn(async () => ({ text: 'must not run' })),
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, config);
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ error }) }, config);
     await service.start(); status = 'unavailable';
     await service.ask(q()); await service.ask(q('p2'));
     expect(responder.answer).not.toHaveBeenCalled();
-    expect(error).toHaveBeenCalledExactlyOnceWith('NpcResponder недоступен во время игры', { code: 'memory_unavailable' });
+    expect(error).toHaveBeenCalledExactlyOnceWith('npc.responder.failed', 'NpcResponder недоступен во время игры', { code: 'memory_unavailable' });
     await service.stop();
   });
   it.each(['cancelled', 'timeout'] as const)('distinguishes normal cancellation from an active timeout (%s)', async (reason) => {
@@ -198,13 +207,13 @@ describe('configured game LLM integration without real models', () => {
         signal.addEventListener('abort', () => { status = 'unavailable'; reject(new Error('secret cancelled computation')); }, { once: true });
       }),
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, { ...config, timeoutMs: 100 });
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ error }) }, { ...config, timeoutMs: 100 });
     await service.start(); const pending = service.ask(q());
     if (reason === 'cancelled') service.cancelConnection('cp');
     await vi.advanceTimersByTimeAsync(100);
     expect(await pending).toEqual({ ok: false, reason });
     await service.ask(q('p2'));
-    if (reason === 'timeout') expect(error).toHaveBeenCalledExactlyOnceWith('Истёк deadline ответа NPC', { code: 'timeout' });
+    if (reason === 'timeout') expect(error).toHaveBeenCalledExactlyOnceWith('npc.answer.deadline', 'Истёк deadline ответа NPC', { code: 'timeout' });
     else expect(error).not.toHaveBeenCalled();
     await service.stop();
   });
@@ -218,13 +227,13 @@ describe('configured game LLM integration without real models', () => {
         signal.addEventListener('abort', () => reject(new Error('private timeout')), { once: true });
       }),
     };
-    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: { ...silentLogger, error } }, { ...config, timeoutMs: 100 });
+    const service = createNpcDialogueService({ ...deps, responder, dialogue: memoryStores().dialogue, logger: llmLogger({ error }) }, { ...config, timeoutMs: 100 });
     await service.start(); const first = service.ask(q()); await vi.advanceTimersByTimeAsync(100);
     expect(await first).toEqual({ ok: false, reason: 'timeout' }); expect(service.ready()).toBe(true);
-    expect(error).toHaveBeenCalledExactlyOnceWith('Истёк deadline ответа NPC', { code: 'timeout' });
+    expect(error).toHaveBeenCalledExactlyOnceWith('npc.answer.deadline', 'Истёк deadline ответа NPC', { code: 'timeout' });
     shouldFail = true;
     expect(await service.ask(q('p', 'next'))).toEqual({ ok: false, reason: 'unavailable' });
-    expect(error).toHaveBeenNthCalledWith(2, 'NpcResponder недоступен во время игры', { code: 'resource_limit' });
+    expect(error).toHaveBeenNthCalledWith(2, 'npc.responder.failed', 'NpcResponder недоступен во время игры', { code: 'resource_limit' });
     expect(error).toHaveBeenCalledTimes(2); await service.stop();
   });
   it('clears queued jobs on physical backend failure, commits none, and does not start a restart loop', async () => {

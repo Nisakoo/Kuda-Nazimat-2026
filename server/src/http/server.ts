@@ -32,9 +32,85 @@ export interface HttpDeps {
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
   readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump'>;
 }
-export function createHttpServer(config: Config, deps: { auth: SessionVerifier & { guest(name: string): { token: string; expiresAt: number } }; game: GameRuntime; npcReady(): boolean; logger: Logger }) {
+
+/** AUTH-014: per-session token buckets; the map is cleared when it grows past any realistic session count. */
+function sessionLimiter(clock: Clock, rate: number, burst: number) {
+  const buckets = new Map<string, TokenBucket>();
+  return (key: string): boolean => {
+    if (buckets.size > 1000) buckets.clear();
+    let bucket = buckets.get(key); if (!bucket) { bucket = new TokenBucket(clock, rate, burst); buckets.set(key, bucket); }
+    return bucket.take();
+  };
+}
+
+export function createHttpServer(config: Config, deps: HttpDeps) {
   let stopping = false;
-  async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const log = deps.logger.child('http');
+  const metrics = deps.metrics ?? new MetricsRegistry();
+  const requests = metrics.counter('http_requests_total', 'HTTP-запросы по маршруту и статусу');
+  const latency = metrics.histogram('http_request_ms', 'Длительность HTTP-запроса', MS_BUCKETS);
+  const worldBytes = metrics.counter('http_world_bytes_total', 'Байты, отданные из /world/*');
+  const limited = metrics.counter('http_rate_limited_total', 'HTTP-запросы, отклонённые лимитом сессии');
+  const babylonLimit = sessionLimiter(deps.clock, 10, 20);
+  const worldLimit = sessionLimiter(deps.clock, 50, 300);
+  const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger });
+  const operator: OperatorDeps = {
+    auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
+    npcReady: deps.npcReady, monitoringToken: config.monitoring.token,
+    languageReady: () => true, health: () => ({ level: 'green', reasons: [] }), warnings: () => [], dump: () => null,
+    ...deps.operator,
+  };
+
+  async function babel(req: IncomingMessage, res: ServerResponse, babylon: BabylonService, context: RequestContext): Promise<void> {
+    const token = bearer(req);
+    const session = token ? await deps.auth.verify(token) : { ok: false as const };
+    if (!session.ok) { req.resume(); error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+    context.sessionId = session.sessionId; context.playerId = session.identity.playerId;
+    const sessionKey = hashToken(token!);
+    if (!babylonLimit(sessionKey)) { req.resume(); limited.inc({ route: '/api/babylon' }); error(res, 429, 'RATE_LIMIT', 'Слишком частые запросы', { retryAfterSeconds: 1 }); return; }
+    let packet;
+    try { packet = parseBabylonRequest(await body(req, 262144)); }
+    catch { error(res, 400, 'INVALID', 'Некорректное действие BABEL v2'); return; }
+    const type = packet.action.type;
+    if (type === 'state') context.route = '/api/babylon:state';
+    const gameplay = ['buy', 'feed', 'npc', 'chat', 'carve'].includes(type);
+    if (gameplay && !deps.game.canAct?.(session.identity.accountId, sessionKey)) { error(res, 403, 'FORBIDDEN', 'Войдите в мир в этом окне, чтобы выполнить действие'); return; }
+    const connectionId = 'babel:' + sessionKey;
+    const close = () => { if (!res.writableEnded) deps.cancelBabylon?.(connectionId); };
+    res.once('close', close);
+    const began = performance.now();
+    let result = 'ok';
+    try {
+      const value = await babylon.handle(session.identity, packet, connectionId, async () => (await deps.auth.verify(token!)).ok && (!gameplay || !!deps.game.canAct?.(session.identity.accountId, sessionKey)));
+      if (!res.destroyed) json(res, 200, value);
+    } catch (cause) {
+      const failure = cause instanceof BabylonError ? cause : new BabylonError('UNAVAILABLE', 'Сервис временно недоступен');
+      result = failure.code;
+      if (!(cause instanceof BabylonError)) log.error('http.failed', 'Ошибка BABEL', { route: '/api/babylon', type, error: cause });
+      if (!res.destroyed) json(res, BABEL_STATUS[failure.code], { v: 2, requestId: packet.requestId, error: { code: failure.code, message: failure.message } });
+    } finally { res.off('close', close); }
+    if (type !== 'state') log.info('babylon.action', 'Действие BABEL', { playerId: session.identity.playerId, sessionId: session.sessionId, requestId: packet.requestId, type, result, durationMs: Math.round(performance.now() - began) });
+  }
+
+  async function world(req: IncomingMessage, res: ServerResponse, path: string, context: RequestContext): Promise<void> {
+    const token = bearer(req);
+    const session = token ? await deps.auth.verify(token) : { ok: false as const };
+    if (!session.ok) { error(res, 401, 'UNAUTHORIZED', 'Требуется вход'); return; }
+    context.sessionId = session.sessionId; context.playerId = session.identity.playerId;
+    if (!worldLimit(hashToken(token!))) { limited.inc({ route: '/world/*' }); error(res, 429, 'RATE_LIMIT', 'Слишком частые запросы', { retryAfterSeconds: 1 }); return; }
+    const access = deps.game.worldFile(path.slice('/world/'.length), session.identity.accountId);
+    let data: Buffer | undefined;
+    let failed = false;
+    // SERVER-WORLD-005: a vanished or unreadable allowlisted file is a server error, reported without the disk path.
+    if (access.ok) { try { data = await readFile(access.file.absolutePath); } catch (cause) { failed = true; log.error('world.file.read_failed', 'Файл мира не прочитан', { path, error: cause }); } }
+    const status = data ? 200 : failed ? 500 : 404;
+    if (data) worldBytes.inc({}, data.byteLength);
+    if (config.logWorldAccess) log.info('world.access', 'Выдача файла мира', { playerId: session.identity.playerId, path, status, bytes: data?.byteLength ?? 0 });
+    res.writeHead(status, data && access.ok ? { 'Content-Type': access.file.contentType, 'Content-Length': data.byteLength } : {});
+    res.end(req.method === 'HEAD' ? undefined : data);
+  }
+
+  async function handle(req: IncomingMessage, res: ServerResponse, context: RequestContext): Promise<void> {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
     if (stopping) { error(res, 503, 'UNAVAILABLE', 'Сервер останавливается'); return; }
     const origin = req.headers.origin;
@@ -104,6 +180,7 @@ export function createHttpServer(config: Config, deps: { auth: SessionVerifier &
     if (path === '/config.json') { context.route = path; json(res, 200, { session: 'online', serverUrl: null, mapId: config.defaultMap, chunkRadius: null, debug: config.clientDebug }); return; }
     if (path.startsWith('/world/')) { context.route = '/world/*'; await world(req, res, path, context); return; }
     if (/^\/(?:maps|assets\/models|api)(?:\/|$)/.test(path)) { res.writeHead(404); res.end(); return; }
+    context.route = 'static';
     try {
       const root = await realpath(config.clientDir);
       const file = await realpath(resolve(root, `.${path === '/' ? '/index.html' : path}`));
@@ -113,8 +190,21 @@ export function createHttpServer(config: Config, deps: { auth: SessionVerifier &
       res.end(req.method === 'HEAD' ? undefined : data);
     } catch { res.writeHead(404); res.end(); }
   }
+
   const server = createServer((req, res) => {
-    void handle(req, res).catch(() => { deps.logger.error('HTTP request failed'); if (!res.headersSent) error(res, 503, 'UNAVAILABLE', 'Сервис временно недоступен'); else res.destroy(); });
+    const context: RequestContext = { route: 'other' };
+    const began = performance.now();
+    res.once('finish', () => {
+      const durationMs = performance.now() - began;
+      const status = String(res.statusCode);
+      requests.inc({ route: context.route, status }); latency.observe(durationMs, { route: context.route });
+      const fields = { method: req.method, route: context.route, status: res.statusCode, durationMs: Math.round(durationMs * 10) / 10, bytes: Number(res.getHeader('Content-Length') ?? 0) || undefined, ip: clientIp(req), sessionId: context.sessionId, playerId: context.playerId };
+      if (QUIET.has(context.route) && res.statusCode < 500) log.debug('http.request', 'HTTP-запрос', fields); else log.info('http.request', 'HTTP-запрос', fields);
+    });
+    void handle(req, res, context).catch((cause: unknown) => {
+      log.error('http.failed', 'Необработанная ошибка HTTP-обработчика', { route: context.route, method: req.method, error: cause });
+      if (!res.headersSent) error(res, 503, 'UNAVAILABLE', 'Сервис временно недоступен'); else res.destroy();
+    });
   });
   server.requestTimeout = 10000; server.headersTimeout = 10000;
   return { server, rejectNewRequests() { stopping = true; } };

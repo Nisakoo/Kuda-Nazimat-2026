@@ -28,7 +28,7 @@ make server
 make demo BACKEND=ollama MODEL=2b
 ```
 
-`make demo` — прежняя подготовительная команда: может установить отсутствующие npm dependencies и пересобрать client/world, поэтому её выполняют до offline-демонстрации. `make server` ничего не устанавливает, не собирает и не скачивает, а запускает сервер уже подготовленной игры. Node24 и dependencies должны быть доступны заранее. `NODE=/absolute/path/to/node` переопределяет Node для server/import; для npm/client build Node24 должен быть в PATH.
+После синхронизации main `make demo` — alias `make start`: может установить отсутствующие npm dependencies, пересобирает client/world и запускает **production**. Production требует парольного входа, а существующий UI поддерживает пока только development guest (TASK-044). Для текущей локальной проверки используйте make server; подготовку dependencies выполняйте до offline-демонстрации. `make server` ничего не устанавливает, не собирает и не скачивает, а запускает сервер уже подготовленной игры. Node24 и dependencies должны быть доступны заранее. `NODE=/absolute/path/to/node` переопределяет Node для server/import; для npm/client build Node24 должен быть в PATH.
 
 Путь каталога можно указать явно (в том числе с пробелами):
 
@@ -42,14 +42,14 @@ Make передаёт селекторы как environment data `KUDA_LLM_BACKE
 npm --prefix server start -- --backend ollama --model 2b
 ```
 
-Также доступны `--config /absolute/game.json` и `--profiles /absolute/profiles.json`. CLI-пара backend/model имеет приоритет над env-парой, но неполный CLI-выбор не дополняется environment. Аргументы не позволяют runtime downloads или обход validation.
+Также доступны `--config /absolute/game.json`, `--profiles /absolute/profiles.json`, `--env development|production|test`, `--port 9000` и `--npc-timeout 60`. Общие пресеты окружения/PORT/HOST сохраняются; профиль заменяет только npc.adapter/options. CLI-пара backend/model имеет приоритет над env-парой, но неполный CLI-выбор не дополняется environment. Аргументы не позволяют runtime downloads или обход validation.
 
 ## Перенести уже подготовленный Mac, вернуть2B и оставить30с
 
 **Только на Mac оператора. На сервере с Pi реальные модели/веса не запускаются и не скачиваются.**
 
 1. Остановить игру/диагностику/подготовительный Ollama через Ctrl+C и дождаться shell prompt. Не менять конфиги параллельно.
-2. Обновить `npc-llm-clean-start`, без повторного clone/install/model pull.
+2. Обновить код по [UPDATING.md](UPDATING.md), без повторного clone/install/model pull. Если profiles.json уже создан, импорт ниже пропустить: существующий каталог не удалять.
 3. Указать существующий внешний Node24, затем выполнить **один раз**:
 
 ```sh

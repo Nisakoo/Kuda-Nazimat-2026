@@ -9,7 +9,7 @@ export interface NpcAnswerRequest {
  * Private current/last answer timing only. No identifiers, content, or IO.
  * Preparing includes IPC/tokenization. Prefill is the operational wait for first
  * text (also HTTP setup), not an isolated runner prefill measurement. Complete
- * means the adapter accepted the full answer. Times <=120000 ms, prompt <=1792,
+ * means the adapter accepted the full answer. Times <=300000 ms, prompt <=1792,
  * nonempty output chunk count <=4096; all numbers are nonnegative safe integers.
  */
 export interface NpcDiagnostics {
@@ -19,9 +19,12 @@ export interface NpcDiagnostics {
   readonly firstTokenMs?: number;
   readonly outputChunks?: number;
 }
+/** Whole generated text so far, not a delta. Numeric private IPC progress is not text. */
+export type PartialAnswer = (text: string) => void;
 export interface NpcResponder {
   start(): Promise<void>;
-  answer(request: NpcAnswerRequest, signal: AbortSignal): Promise<{ text: string }>;
+  /** Non-streaming adapters can ignore onPartial. No calls after settlement or abort. */
+  answer(request: NpcAnswerRequest, signal: AbortSignal, onPartial?: PartialAnswer): Promise<{ text: string }>;
   stop(): Promise<void>;
   /** Optional local-runtime health; never performs IO or starts recovery. */
   status?(): 'ready' | 'unavailable';

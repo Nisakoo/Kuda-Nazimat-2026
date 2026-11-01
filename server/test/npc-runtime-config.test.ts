@@ -27,9 +27,9 @@ it('validates the small public timing contract without admitting server-only fie
 it('publishes only the effective NPC timeout with no-store and existing CORS rules, without auth or inference', async () => {
   const config = parseConfig({ npc: { timeoutMs: 60000, options: { privatePath: '/private/weights', modelDigest: 'secret-digest' } },
     corsOrigins: ['http://school-client.local'] }, '/tmp/game.json');
-  const stores = memoryStores(); const auth = createAuthService(stores.accounts, stores.sessions, { now: () => 1 }, 1000);
-  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, async stop() {}, worldFile: () => ({ ok: false }) };
-  const http = createHttpServer(config, { auth, game, npcReady: () => false, logger: silentLogger });
+  const stores = memoryStores(); const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: { now: () => 1 }, ttlMs: 1000 });
+  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, presence: () => [], closeSessions() {}, state: () => ({}), stats: () => null, async stop() {}, worldFile: () => ({ ok: false }) };
+  const http = createHttpServer(config, { auth, game, npcReady: () => false, logger: silentLogger, clock: { now: () => 1 } });
   http.server.listen(0, '127.0.0.1'); await once(http.server, 'listening');
   cleanup.push(async () => { http.server.closeAllConnections(); await new Promise<void>(resolve => http.server.close(() => resolve())); });
   const address = http.server.address();

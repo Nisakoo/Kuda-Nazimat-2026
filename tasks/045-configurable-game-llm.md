@@ -1,5 +1,5 @@
 ---
-id: TASK-030
+id: TASK-045
 type: implementation-task
 status: in-progress
 spec: ../specs/server-llm-runtime.md
@@ -18,6 +18,8 @@ scheduling_note: интегрированный v1-срез с явным выб
 ---
 
 # Настраиваемые backend LLM в существующем игровом сервере
+
+> До синхронизации main эта задача называлась TASK-030. Номер изменён на TASK-045 из-за занятого в main TASK-030 world-next-stage; старые commit IDs и численные результаты ниже — исторические. Актуальная интеграция PROTO v3/GenerationQueue/env/AUTH/OBS описана в [TASK-046](046-llm-docs-main-sync.md).
 
 ## Цель и изменения требований
 

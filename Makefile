@@ -4,7 +4,7 @@
 CLIENT_RUN_CMD ?= npm --prefix client run dev
 CLIENT_TEST_CMD ?= npm --prefix client test
 NODE ?= node
-# Export values as data, not interpolated shell arguments. Empty values keep the saved choice.
+# Startup values are environment data, never interpolated into shell commands.
 export KUDA_LLM_BACKEND = $(BACKEND)
 export KUDA_LLM_MODEL = $(MODEL)
 export KUDA_LLM_PROFILES = $(LLM_PROFILES)
@@ -13,7 +13,7 @@ export KUDA_NPC_TIMEOUT = $(NPC_TIMEOUT)
 .PHONY: help client client-test
 
 help:
-	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the LAN server' 'make server-test  Run server/shared tests' 'make demo         Prepare client/world and start server' 'make server BACKEND=ollama MODEL=2b   Use a prepared profile for one run' 'make server NPC_TIMEOUT=60   NPC deadline in whole seconds (1-300), including queue' 'make llm-import   Import existing local profiles and select Ollama 2B (no downloads)' 'NODE=/path/to/node and LLM_PROFILES=/path/to/profiles.json are optional overrides'  'See README.md for installation, type checks, build and browser checks.'
+	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the server in development (ENV=production to override)' 'make server-test  Run server/shared tests' 'make prepare      Once, with internet: install, build client/world, self-check' 'make start        Offline delivery: build and start in production (alias: make demo)' 'make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=60   Prepared model; whole seconds (1-300)' 'make llm-import   One-time import of existing local 2B/0.8B configs; no downloads' 'NODE=/path/to/node and LLM_PROFILES=/path/to/profiles.json are optional overrides' 'See README.md for installation, type checks, build and browser checks.'
 
 client:
 ifeq ($(strip $(CLIENT_RUN_CMD)),)
@@ -31,18 +31,33 @@ else
 	$(CLIENT_TEST_CMD)
 endif
 
-.PHONY: server server-test demo llm-import
+.PHONY: server server-test prepare start demo llm-import
+# PORT=9000 overrides the configured port (OFFLINE-003); ENV picks the environment (SERVER-009), development by default.
+ENV ?= development
+export APP_ENV = $(ENV)
+export PORT
 server:
-	$(NODE) server/src/app/main.ts
+	"$(NODE)" server/src/app/main.ts
 
 llm-import:
-	$(NODE) server/src/cli/importLlmProfiles.ts
+	"$(NODE)" server/src/cli/importLlmProfiles.ts
 
 server-test:
 	npm --prefix server test
 
-demo:
+# OFFLINE-001: idempotent; never touches the players' database.
+prepare:
+	@node -e "const [a,b]=process.versions.node.split('.').map(Number); if (a!==24||b<15) { console.error('Нужен Node 24.15+ в ветке 24, сейчас '+process.versions.node); process.exit(1); }"
+	npm --prefix client ci
+	npm --prefix server ci
+	npm --prefix client run build
+	npm --prefix server run lan:check -- --env production
+
+# OFFLINE-002: works offline once prepared; dependencies are installed only when missing.
+start:
 	@test -d client/node_modules || npm --prefix client ci
 	@test -d server/node_modules || npm --prefix server ci
 	npm --prefix client run build
-	$(MAKE) server
+	$(MAKE) server ENV=production
+
+demo: start

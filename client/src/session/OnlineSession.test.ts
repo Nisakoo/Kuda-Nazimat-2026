@@ -109,7 +109,7 @@ it('accepts an NPC answer at 29.9 seconds but ignores one at the 32-second deadl
   expect(accepted).not.toBeNull();
   s.clock.advance(29900);
   expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: accepted }));
-  s.adapter.receive({ v: 1, type: 'npc-answer', requestId: accepted, targetId: 'guide', text: 'answer' }); s.clock.advance(0);
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId: accepted, targetId: 'guide', text: 'answer' }); s.clock.advance(0);
   expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: accepted, text: 'answer' }));
 
   const expired = s.session.askNpc('guide', 'second');
@@ -117,7 +117,7 @@ it('accepts an NPC answer at 29.9 seconds but ignores one at the 32-second deadl
   expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: expired }));
   s.clock.advance(1);
   expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: expired, message: expect.stringContaining('32 секунд') }));
-  s.adapter.receive({ v: 1, type: 'npc-answer', requestId: expired, targetId: 'guide', text: 'late' }); s.clock.advance(0);
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId: expired, targetId: 'guide', text: 'late' }); s.clock.advance(0);
   expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: expired }));
   s.session.dispose(); expect(s.clock.pending).toBe(0);
 });
@@ -138,7 +138,7 @@ it('clears NPC requests on disconnect and dispose without replay', () => {
   s.adapter.drop();
   expect(s.notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: dropped }));
   s.session.reconnect(); s.clock.advance(100);
-  s.adapter.receive({ v: 1, type: 'npc-answer', requestId: dropped, targetId: 'guide', text: 'stale' }); s.clock.advance(0);
+  s.adapter.receive({ v: 3, type: 'npc-answer', requestId: dropped, targetId: 'guide', text: 'stale' }); s.clock.advance(0);
   expect(s.notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: dropped }));
   expect(s.sent.filter((message) => message.type === 'npc-question' && message.text === 'drop')).toHaveLength(1);
   const disposed = s.session.askNpc('guide', 'dispose'); s.clock.advance(50);
@@ -194,7 +194,7 @@ it('smooths the camera-followed player between network updates without changing 
 it('refreshes real timing, ignores stale metadata and uses a 62-second deadline', async () => {
   const clock = new TestClock();
   const adapter = new MockNetworkAdapter(clock, (message, peer) => {
-    if (message.type === 'join') peer.receive({ v: 1, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world });
+    if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world });
   });
   const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' });
   const requests: { signal: AbortSignal; resolve: (value: number) => void }[] = [];
@@ -208,18 +208,18 @@ it('refreshes real timing, ignores stale metadata and uses a 62-second deadline'
   expect(session.askNpc('guide', 'stale')).toBeNull();
   requests[1]!.resolve(60000); await Promise.resolve(); await Promise.resolve();
   const first = session.askNpc('guide', 'first'); expect(first).not.toBeNull();
-  clock.advance(45000); adapter.receive({ v: 1, type: 'npc-answer', requestId: first, targetId: 'guide', text: 'answer' }); clock.advance(0);
+  clock.advance(45000); adapter.receive({ v: 3, type: 'npc-answer', requestId: first, targetId: 'guide', text: 'answer' }); clock.advance(0);
   expect(notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: first }));
   const late = session.askNpc('guide', 'late'); clock.advance(62000);
   expect(notices).toHaveBeenCalledWith(expect.objectContaining({ type: 'request-error', requestId: late }));
-  adapter.receive({ v: 1, type: 'npc-answer', requestId: late, targetId: 'guide', text: 'late' }); clock.advance(0);
+  adapter.receive({ v: 3, type: 'npc-answer', requestId: late, targetId: 'guide', text: 'late' }); clock.advance(0);
   expect(notices).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'npc', requestId: late }));
   session.dispose(); expect(requests[1]!.signal.aborted).toBe(true); expect(clock.pending).toBe(0);
 });
 
 it('recovers after metadata failure on reconnect and ignores resolution after disposal', async () => {
   const clock = new TestClock();
-  const adapter = new MockNetworkAdapter(clock, (message, peer) => { if (message.type === 'join') peer.receive({ v: 1, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world }); });
+  const adapter = new MockNetworkAdapter(clock, (message, peer) => { if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world }); });
   const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' });
   let resolve!: (value: number) => void; let cancelled = false; let count = 0;
   const session = new OnlineSession(adapter, 'demo', clock, () => ({
@@ -241,7 +241,7 @@ it('recovers after metadata failure on reconnect and ignores resolution after di
 it('disables NPC questions without valid real metadata without blocking chat', async () => {
   for (const provider of [undefined, async () => { throw new Error('offline'); }, async () => 300001]) {
     const clock = new TestClock();
-    const adapter = new MockNetworkAdapter(clock, (message, peer) => { if (message.type === 'join') peer.receive({ v: 1, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world }); });
+    const adapter = new MockNetworkAdapter(clock, (message, peer) => { if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [player('p1')] }, world }); });
     const connect = adapter.connect.bind(adapter); adapter.connect = () => connect({ kind: 'mock' });
     const session = new OnlineSession(adapter, 'demo', clock, provider ? () => ({ result: provider(), cancel: () => {} }) : undefined); const notices = vi.fn(); session.subscribeNotices(notices);
     session.connect(); clock.advance(100); await Promise.resolve(); await Promise.resolve(); await Promise.resolve();

@@ -46,14 +46,19 @@ export function responderContract(name: string, factory: () => NpcResponder, opt
       }, options.network);
     });
     it('streams only before settlement: no partial after the answer or an abort', async () => {
-      vi.useFakeTimers(); const responder = factory(); await responder.start();
+      if (!options.realTimers) vi.useFakeTimers();
+      const responder = factory(); await responder.start();
+      const advance = async () => {
+        if (options.realTimers) await new Promise(resolve => setTimeout(resolve, 25));
+        else await vi.advanceTimersByTimeAsync(9000);
+      };
       try {
         let settled = false; let late = 0;
         const answer = responder.answer(answerRequest(), new AbortController().signal, () => { if (settled) late++; }).finally(() => { settled = true; });
-        await vi.advanceTimersByTimeAsync(9000); await answer; await vi.advanceTimersByTimeAsync(9000); expect(late).toBe(0);
+        await advance(); await answer; await advance(); expect(late).toBe(0);
         const controller = new AbortController(); let afterAbort = 0;
         const aborted = responder.answer(answerRequest(), controller.signal, () => { if (controller.signal.aborted) afterAbort++; });
-        const rejected = expect(aborted).rejects.toThrow(); controller.abort(); await vi.advanceTimersByTimeAsync(9000); await rejected;
+        const rejected = expect(aborted).rejects.toThrow(); controller.abort(); await advance(); await rejected;
         expect(afterAbort).toBe(0);
       } finally { await responder.stop(); }
     });

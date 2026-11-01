@@ -1,12 +1,37 @@
-import { access } from 'node:fs/promises';
-import type { CreateGame } from '../contracts.ts';
-import { consoleLogger } from '../common/logger.ts';
+import { createGame } from '../game/index.ts';
+import { consoleSink } from '../obs/sinks.ts';
+import { createObservability, installProcessHooks } from '../obs/index.ts';
+import { createLogger } from '../common/logger.ts';
+import { connectionBlock, connectionInfo, lanAddresses } from '../common/network.ts';
 import { shutdownOnSignals } from './shutdown.ts';
 import { startApplication } from './application.ts';
 import { loadLaunchConfig } from './launch.ts';
-const logger = consoleLogger();
+
+const profileErrors: Record<string, string> = {
+  llm_profiles_invalid: 'Некорректный profiles.json: проверьте схему, пары backend/model и полный набор options',
+  llm_profiles_unavailable: 'Каталог профилей недоступен. Для уже подготовленных моделей выполните make llm-import; существующий файл не удаляйте вслепую',
+  llm_profile_selection_invalid: 'Некорректный выбор профиля: BACKEND и MODEL задаются вместе',
+  llm_profile_not_found: 'Выбранная пара BACKEND/MODEL отсутствует в подготовленных профилях; автоматической подмены нет',
+  llm_profile_unprepared: 'Файлы выбранного профиля недоступны или некорректны: проверьте runtime, model manifest и tokenizer inventory; автоматической загрузки нет',
+  llm_profile_concurrency_invalid: 'Подготовленный LLM-профиль требует npc.maxConcurrent: 1',
+  unsupported_platform: 'Выбранный backend несовместим с ОС/архитектурой. MLX требует macOS Apple Silicon; автоматической смены backend нет',
+};
+function launchMessage(error: unknown): string {
+  const code = error instanceof Error ? error.message : '';
+  return profileErrors[code] ?? (code || 'Ошибка запуска');
+}
+
+let config;
+let profile;
+try { ({ config, profile } = await loadLaunchConfig()); }
+catch (error) {
+  // No configuration yet, so no file log: report to the console and exit (OBS-003 config.invalid).
+  createLogger(consoleSink('info'), 'config').fatal('config.invalid', launchMessage(error));
+  process.exit(1);
+}
+const obs = createObservability(config.logs);
+installProcessHooks(obs);
 try {
-  const { config, profile } = await loadLaunchConfig();
   const options = config.npc.options;
   const model = profile?.model ?? (config.npc.adapter === 'scripted' ? 'scripted' : options.model === 'qwen3.5:0.8b-q8_0' ? '0.8b' : options.model === 'qwen3.5:2b-q4_K_M' || config.npc.adapter === 'mlx' ? '2b' : 'configured');
   const fields: Record<string, string | number> = {
@@ -21,23 +46,14 @@ try {
       if (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 && value <= 128) fields[key] = value;
     }
   }
-  logger.info('Выбран профиль NPC', fields);
-  const entry = new URL('../game/index.ts', import.meta.url);
-  try { await access(entry); }
-  catch { throw new Error('Набор A не готов: отсутствует server/src/game/index.ts (createGame). Финальная интеграция TASK-026 выполняется после слияния A.'); }
-  const { createGame } = await import(entry.href) as { createGame: CreateGame };
-  const app = await startApplication(config, createGame, logger);
-  shutdownOnSignals(app, logger);
+  obs.logger.info('npc.profile.selected', 'Выбран профиль NPC', fields);
+  const app = await startApplication(config, createGame, obs.logger, undefined, obs);
+  const address = app.server.address();
+  const port = address && typeof address !== 'string' ? address.port : config.port;
+  process.stdout.write(`${connectionBlock(connectionInfo(config.host, port, lanAddresses()))}\n`);
+  shutdownOnSignals({ stop: async () => { try { await app.stop(); } finally { obs.close(); } } }, obs.logger);
 } catch (error) {
-  const profileErrors: Record<string, string> = {
-    llm_profiles_invalid: 'Некорректный profiles.json: проверьте схему, пары backend/model и полный набор options',
-    llm_profiles_unavailable: 'Каталог профилей недоступен. Для уже подготовленных моделей выполните make llm-import; существующий файл не удаляйте вслепую',
-    llm_profile_selection_invalid: 'Некорректный выбор профиля: BACKEND и MODEL задаются вместе',
-    llm_profile_not_found: 'Выбранная пара BACKEND/MODEL отсутствует в подготовленных профилях; автоматической подмены нет',
-    llm_profile_unprepared: 'Файлы выбранного профиля недоступны или некорректны: проверьте runtime, model manifest и tokenizer inventory; автоматической загрузки нет',
-    llm_profile_concurrency_invalid: 'Подготовленный LLM-профиль требует npc.maxConcurrent: 1',
-    unsupported_platform: 'Выбранный backend несовместим с ОС/архитектурой. MLX требует macOS Apple Silicon; автоматической смены backend нет',
-  };
-  const code = error instanceof Error ? error.message : '';
-  logger.error(profileErrors[code] ?? (code || 'Ошибка запуска')); process.exitCode = 1;
+  obs.logger.fatal('app.start.failed', error instanceof Error ? error.message : 'Ошибка запуска', { error });
+  obs.close();
+  process.exitCode = 1;
 }

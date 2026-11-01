@@ -1,7 +1,7 @@
 {
   "host": "127.0.0.1",
   "port": 8080,
-  "defaultMap": "market",
+  "defaultMap": "demo",
   "npc": {
     "adapter": "ollama",
     "maxConcurrent": 1,

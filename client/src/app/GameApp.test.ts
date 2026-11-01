@@ -560,7 +560,7 @@ describe('application lifecycle', () => {
         const adapter = new MockNetworkAdapter(clock, (message, peer) => {
           sent.push(message.type);
           if (message.type === 'join') peer.receive({ v: 3, type: 'joined', requestId: message.requestId, playerId: 'p1', revision: 0, snapshot: { tick: 0, entities: [
-            { id: 'p1', character: { kind: 'player', name: 'Player' }, transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 } },
+            { id: 'p1', motion: motionStatus(initialMotion({ x: 0, y: 0, z: 0 })), character: { kind: 'player', name: 'Player' }, transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 } },
             { id: 'guide', character: { kind: 'npc', name: 'Guide' }, transform: { position: { x: 0, y: 0, z: 1 }, rotationY: 0 }, interactable: { radius: 2, label: 'Talk' } },
           ] }, world: DEMO_WORLD });
           if (message.type === 'interact') peer.receive({ v: 3, type: 'interacted', requestId: message.requestId, targetId: message.targetId });

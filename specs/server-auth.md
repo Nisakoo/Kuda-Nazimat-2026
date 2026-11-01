@@ -118,7 +118,7 @@ related:
 
 ## Передача клиенту
 
-В development текущий клиент работает как раньше (форма имени → `guest`). В production он войти не сможет, пока не поддержит пароли. Клиенту нужны: `GET /api/auth/mode` для выбора формы и автовхода `dev` в development, `register`/`login`/`password` с таблицей ошибок AUTH-006 (покрывает ошибки ENTRY-009), обработка `PASSWORD_CHANGE_REQUIRED` экраном смены пароля, `POST /api/auth/logout` при выходе и показ сообщения из `error UNAUTHORIZED` при отзыве. Задача передачи создаётся вместе с серверной реализацией, как TASK-041.
+В development текущий клиент работает как раньше (форма имени → `guest`). В production он войти не сможет, пока не поддержит пароли. Клиенту нужны: `GET /api/auth/mode` для выбора формы и автовхода `dev` в development, `register`/`login`/`password` с таблицей ошибок AUTH-006 (покрывает ошибки ENTRY-009), обработка `PASSWORD_CHANGE_REQUIRED` экраном смены пароля, `POST /api/auth/logout` при выходе и показ сообщения из `error UNAUTHORIZED` при отзыве. Передача клиенту оформлена в [TASK-044](../tasks/044-client-auth-observability-handoff.md); TASK-041 относится к NPC streaming.
 
 ## Открытые вопросы
 

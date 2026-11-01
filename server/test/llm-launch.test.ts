@@ -14,8 +14,8 @@ const directories: string[] = [];
 afterEach(async () => { for (const directory of directories.splice(0)) await rm(directory, { recursive: true, force: true }); });
 
 it('keeps legacy config arguments and saved selection when no override exists', () => {
-  expect(launchArguments([], {})).toEqual({ configPath: defaultConfigPath, selection: {} });
-  expect(launchArguments(['--config', '/tmp/game.json'], {})).toEqual({ configPath: '/tmp/game.json', selection: {} });
+  expect(launchArguments([], {})).toEqual({ configPath: defaultConfigPath, env: 'development', serverArgs: [], selection: {} });
+  expect(launchArguments(['--config', '/tmp/game.json'], {})).toEqual({ configPath: '/tmp/game.json', env: 'development', serverArgs: ['--config', '/tmp/game.json'], selection: {} });
   expect(launchArguments([], { KUDA_LLM_BACKEND: '', KUDA_LLM_MODEL: '', KUDA_LLM_PROFILES: '' }).selection).toEqual({});
 });
 it('selects an explicit pair from CLI or Make environment without mixing partial sources', () => {
@@ -73,11 +73,11 @@ it('the real entrypoint fails before game startup for an explicit missing catalo
 
 it('Make forwards profile values as environment data, and server never installs/builds/downloads', async () => {
   const root = await mkdtemp(join(tmpdir(), 'kuda-launch-')); directories.push(root);
-  const capture = join(root, 'capture.mjs'); const output = join(root, 'captured.json');
-  await writeFile(capture, `import {writeFileSync} from 'node:fs'; writeFileSync(process.env.CAPTURE_OUTPUT,JSON.stringify({args:process.argv.slice(2),backend:process.env.KUDA_LLM_BACKEND,model:process.env.KUDA_LLM_MODEL,profiles:process.env.KUDA_LLM_PROFILES,timeout:process.env.KUDA_NPC_TIMEOUT}));`);
-  await run('make', ['server', `NODE=${process.execPath} ${capture}`, 'BACKEND=ollama', 'MODEL=2b', 'LLM_PROFILES=/tmp/local profiles.json', 'NPC_TIMEOUT=60'],
+  const capture = join(root, 'capture node.mjs'); const output = join(root, 'captured.json');
+  await writeFile(capture, `#!${process.execPath}\nimport {writeFileSync} from 'node:fs'; writeFileSync(process.env.CAPTURE_OUTPUT,JSON.stringify({args:process.argv.slice(2),backend:process.env.KUDA_LLM_BACKEND,model:process.env.KUDA_LLM_MODEL,profiles:process.env.KUDA_LLM_PROFILES,timeout:process.env.KUDA_NPC_TIMEOUT,env:process.env.APP_ENV,port:process.env.PORT}));`, { mode: 0o700 });
+  await run('make', ['server', `NODE=${capture}`, 'BACKEND=ollama', 'MODEL=2b', 'LLM_PROFILES=/tmp/local profiles.json', 'NPC_TIMEOUT=60', 'ENV=test', 'PORT=9001'],
     { cwd: resolve(import.meta.dirname, '../..'), env: { ...process.env, CAPTURE_OUTPUT: output } });
-  expect(JSON.parse(await readFile(output, 'utf8'))).toEqual({ args: ['server/src/app/main.ts'], backend: 'ollama', model: '2b', profiles: '/tmp/local profiles.json', timeout: '60' });
+  expect(JSON.parse(await readFile(output, 'utf8'))).toEqual({ args: ['server/src/app/main.ts'], backend: 'ollama', model: '2b', profiles: '/tmp/local profiles.json', timeout: '60', env: 'test', port: '9001' });
   const { stdout } = await run('make', ['-n', 'server', 'BACKEND=ollama', 'MODEL=0.8b'], { cwd: resolve(import.meta.dirname, '../..') });
   expect(stdout).toContain('server/src/app/main.ts');
   expect(stdout).not.toMatch(/npm|install|ollama\s+(?:pull|serve)|run build/);

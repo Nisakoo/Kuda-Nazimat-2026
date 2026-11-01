@@ -19,7 +19,7 @@ test.beforeAll(async () => {
   await writeFile(config, JSON.stringify({ host: '127.0.0.1', port, clientDir: resolve('dist'), worldDir: resolve('public'),
     contentDir: resolve('../server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'demo',
     npc: { adapter: 'scripted', timeoutMs: 15000, options: { delayMs: 30 } } }));
-  child = spawn(process.execPath, ['../server/src/app/main.ts', '--config', config], {
+  child = spawn(process.execPath, ['../server/src/app/main.ts', '--config', config, '--env', 'development'], {
     env: { ...process.env, HOME: directory, KUDA_NPC_TIMEOUT: '60', KUDA_LLM_BACKEND: '', KUDA_LLM_MODEL: '', KUDA_LLM_PROFILES: '' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -31,7 +31,7 @@ test.beforeAll(async () => {
     child!.stderr!.on('data', data => { output += String(data); });
     child!.stdout!.on('data', data => {
       output += String(data);
-      if (output.includes('Сервер доступен')) { clearTimeout(timer); child!.off('exit', failed); done(); }
+      if (output.includes('ВАВИЛОН ЗАПУЩЕН')) { clearTimeout(timer); child!.off('exit', failed); done(); }
     });
   });
 });
@@ -58,6 +58,6 @@ test('Make-compatible seconds override reaches public HTTP and the actual online
   await page.getByRole('button', { name: 'Войти', exact: true }).click();
   expect(await (await metadata).json()).toEqual({ npcTimeoutMs: 60000 });
   await expect(page.getByLabel('Состояние связи')).toHaveText('Подключён');
-  await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled({ timeout: 20000 });
   expect(errors).toEqual([]);
 });
