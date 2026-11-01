@@ -74,6 +74,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
       startLoop();
     },
     activePlayers: () => game.activePlayers,
+    presence: () => game.presence(),
     async stop(reason: string): Promise<void> {
       running = false;
       for (const timer of timers) if (timer) deps.scheduler.clearTimeout(timer);

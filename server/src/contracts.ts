@@ -49,7 +49,10 @@ export type NpcAnswer =
   | { readonly ok: true; readonly text: string }
   | { readonly ok: false; readonly reason: 'player-busy' | 'server-busy' | 'timeout' | 'unavailable' | 'cancelled' };
 export interface NpcQuestions {
-  ask(question: NpcQuestion): Promise<NpcAnswer>;
+  /** With onPartial the answer is streamed (PROTO-007): whole text so far, display-only, with the longer stream deadline. */
+  ask(question: NpcQuestion, onPartial?: (text: string) => void): Promise<NpcAnswer>;
+  /** npc-cancel: aborts one question of this connection; unknown or finished questions are ignored. */
+  cancel(connectionId: string, requestId: string): void;
   /** Disconnect, takeover, session expiry. */
   cancelConnection(connectionId: string): void;
 }
@@ -59,6 +62,9 @@ export interface NpcQuestions {
 /** SERVER-WORLD-005/006: resolved file for GET /world/<path>; ok:false → 404. */
 export interface WorldFile { readonly absolutePath: string; readonly bytes: number; readonly contentType: string }
 export type WorldFileAccess = { readonly ok: true; readonly file: WorldFile } | { readonly ok: false };
+
+/** OFFLINE-010: who holds a seat, for the operator screen; no tokens, texts or positions. */
+export interface PlayerPresence { readonly name: string; readonly mapId: string | null; readonly connected: boolean; readonly releaseInMs: number | null }
 
 export interface MapSummary { readonly mapId: string; readonly worldBytes: number; readonly chunks: number }
 
@@ -101,6 +107,7 @@ export interface GameRuntime {
   /** Mounts Socket.IO namespace /game on B's HTTP server and starts the tick loop. */
   attach(server: HttpServer): void;
   activePlayers(): number;
+  presence(): readonly PlayerPresence[];
   /** SERVER-005: closes connections and saves positions. */
   stop(reason: string): Promise<void>;
 }

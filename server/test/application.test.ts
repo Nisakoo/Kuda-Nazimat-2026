@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { once } from 'node:events';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { startApplication, addresses } from '../src/app/application.ts';
+import { startApplication } from '../src/app/application.ts';
 import { parseConfig } from '../src/app/config.ts';
 import { silentLogger } from '../src/common/logger.ts';
 import type { CreateGame, GameDeps } from '../src/contracts.ts';
@@ -25,7 +25,7 @@ it('assembles exclusively through the frozen contract, restarts with memory and 
   const { config } = fixture(); let deps!: GameDeps; let savedId = '';
   const createGame: CreateGame = async (_config, injected) => {
     deps = injected;
-    return { maps: [{ mapId: 'demo', chunks: 1, worldBytes: 1000 }], worldFile: () => ({ ok: false }), attach() {}, activePlayers: () => 1,
+    return { maps: [{ mapId: 'demo', chunks: 1, worldBytes: 1000 }], worldFile: () => ({ ok: false }), attach() {}, activePlayers: () => 1, presence: () => [],
       async stop() { if (savedId) deps.players.save([{ id: savedId, mapId: 'demo', position: { x: 2, y: 0, z: 3 }, rotationY: 1 }]); } };
   };
   const app = await startApplication(config, createGame, silentLogger);
@@ -49,6 +49,7 @@ it('fails before listening for missing client/world, invalid adapter, or failed 
   await expect(startApplication({ ...config, clientDir: join(root, 'missing') }, game, silentLogger)).rejects.toThrow('npm --prefix client run build'); expect(called).toBe(false);
   await expect(startApplication({ ...config, worldDir: join(root, 'missing') }, game, silentLogger)).rejects.toThrow('world:generate');
   await expect(startApplication({ ...config, npc: { ...config.npc, adapter: 'missing' } }, game, silentLogger)).rejects.toThrow('npc.adapter');
+  await expect(startApplication({ ...config, language: { adapter: 'missing', options: {} } }, game, silentLogger)).rejects.toThrow('language.adapter');
   await expect(startApplication(config, game, silentLogger)).rejects.toThrow('Invalid world manifest');
   const db = openDatabase(config.dbPath); expect(db.prepare('PRAGMA integrity_check').get()!.integrity_check).toBe('ok'); db.close();
 });
@@ -66,12 +67,7 @@ it('inspect reads a running WAL database without secrets and backup restores a s
     expect(() => execFileSync(process.execPath, [fileURLToPath(new URL('../src/cli/backup.ts', import.meta.url)), backup, '--config', path], { stdio: 'pipe' })).toThrow();
   } finally { db.close(); }
 });
-it('prints loopback and LAN addresses for the configured host', () => {
-  expect(addresses('127.0.0.1', 8080)).toEqual(['http://localhost:8080/']);
-  expect(addresses('192.168.1.2', 8080)).toContain('http://192.168.1.2:8080/');
-  expect(addresses('0.0.0.0', 8080)).toContain('http://localhost:8080/');
-});
-
+// Windows cannot deliver SIGTERM to a child gracefully, so the handler is triggered from inside the process there.
 it('SIGTERM closes the process within ten seconds after saving through PlayerStore', async () => {
   const { root, config } = fixture();
   const seed = openDatabase(config.dbPath); const player = sqliteStores(seed).accounts.findOrCreate('Аня', 'аня', 1); seed.close();
@@ -79,12 +75,13 @@ it('SIGTERM closes the process within ten seconds after saving through PlayerSto
   const shutdown = new URL('../src/app/shutdown.ts', import.meta.url).href;
   const logger = new URL('../src/common/logger.ts', import.meta.url).href;
   const script = `import {startApplication} from ${JSON.stringify(application)}; import {shutdownOnSignals} from ${JSON.stringify(shutdown)}; import {silentLogger} from ${JSON.stringify(logger)};
-    const config=${JSON.stringify(config)}; const app=await startApplication(config, async (_config,deps)=>({maps:[],attach(){},worldFile(){return {ok:false}},activePlayers(){return 1},async stop(){deps.players.save([{id:${JSON.stringify(player.playerId)},mapId:'demo',position:{x:7,y:0,z:8},rotationY:0}])}}),silentLogger);
-    shutdownOnSignals(app,silentLogger); console.log('ready');`;
+    const config=${JSON.stringify(config)}; const app=await startApplication(config, async (_config,deps)=>({maps:[],attach(){},worldFile(){return {ok:false}},activePlayers(){return 1},presence(){return []},async stop(){deps.players.save([{id:${JSON.stringify(player.playerId)},mapId:'demo',position:{x:7,y:0,z:8},rotationY:0}])}}),silentLogger);
+    shutdownOnSignals(app,silentLogger); process.stdin.once('data',()=>process.emit('SIGTERM')); process.stdin.unref(); console.log('ready');`;
   const file = join(root, 'signal.mjs'); writeFileSync(file, script);
-  const child = spawn(process.execPath, [file], { stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, [file], { stdio: ['pipe', 'pipe', 'pipe'] });
   try {
-    await once(child.stdout!, 'data'); const start = Date.now(); child.kill('SIGTERM');
+    await once(child.stdout!, 'data'); const start = Date.now();
+    if (process.platform === 'win32') child.stdin!.write('stop\n'); else child.kill('SIGTERM');
     const [code] = await once(child, 'exit'); expect(code).toBe(0); expect(Date.now() - start).toBeLessThan(10000);
     const db = openDatabase(config.dbPath); expect(sqliteStores(db).players.load(player.playerId)?.position.x).toBe(7); db.close();
   } finally { child.kill('SIGKILL'); }

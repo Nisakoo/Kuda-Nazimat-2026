@@ -2,12 +2,13 @@ import type { ServerMessage } from '../../../shared/protocol/types.ts';
 import type { Direction } from '../../../shared/world/types.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
-import type { AvatarStore, EquipmentStore, PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
+import type { AvatarStore, EquipmentStore, PlayerPresence, PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
 import type { ToolId } from '../../../shared/equipment/types.ts';
 import type { AvatarId } from '../../../shared/avatar/types.ts';
 import type { PlayerLocation } from '../world/access.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
 import { AoiStream } from './AoiStream.ts';
+import { chooseSpawn, isFree } from './spawn.ts';
 import type { Channel } from './ports.ts';
 import type { PlacedPlayer, World } from './World.ts';
 
@@ -18,6 +19,7 @@ interface Seat {
   channel: Channel | null;
   stream: AoiStream | null;
   grace: TimerHandle | null;
+  releaseAt: number | null;
 }
 
 export type JoinResult =
@@ -56,8 +58,8 @@ export class GameService {
   attach(identity: PlayerIdentity, channel: Channel): boolean {
     if (!this.canAdmit(identity.accountId)) return false;
     let seat = this.seats.get(identity.accountId);
-    if (!seat) { seat = { identity, channel: null, stream: null, grace: null }; this.seats.set(identity.accountId, seat); }
-    if (seat.grace) { this.scheduler.clearTimeout(seat.grace); seat.grace = null; }
+    if (!seat) { seat = { identity, channel: null, stream: null, grace: null, releaseAt: null }; this.seats.set(identity.accountId, seat); }
+    if (seat.grace) { this.scheduler.clearTimeout(seat.grace); seat.grace = null; seat.releaseAt = null; }
     const previous = seat.channel;
     seat.channel = channel;
     seat.stream = null;
@@ -77,16 +79,18 @@ export class GameService {
     seat.channel = null;
     seat.stream = null;
     this.world.resetInput(seat.identity.playerId);
+    seat.releaseAt = this.clock.now() + this.settings.disconnectGraceMs;
     seat.grace = this.scheduler.setTimeout(() => this.release(seat), this.settings.disconnectGraceMs);
   }
 
   private release(seat: Seat): void {
-    seat.grace = null;
+    seat.grace = null; seat.releaseAt = null;
     if (seat.channel) return;
     const placed = this.world.locate(seat.identity.playerId);
     if (placed) this.persist([placed]);
     this.world.remove(seat.identity.playerId);
     this.seats.delete(seat.identity.accountId);
+    this.log.info('Место освобождено', { playerId: seat.identity.playerId });
   }
 
   join(channel: Channel, mapId: string): JoinResult {
@@ -104,7 +108,11 @@ export class GameService {
       const saved = this.loadSaved(playerId);
       const usable = !force && saved !== null && saved.mapId === mapId && map.isSafeSupport(saved.position.x, saved.position.z);
       const spawn = initial?.mapId === mapId && map.isSafeSupport(initial.position.x, initial.position.z) ? initial.position : map.spawn;
-      this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : spawn, rotationY: usable ? saved.rotationY : Math.PI });
+      // REALTIME-010: never stack players; a free saved position is kept with its rotation.
+      const others = this.world.playerPositions(mapId);
+      const placement = usable && isFree(saved.position, others) ? { position: saved.position, rotationY: saved.rotationY }
+        : chooseSpawn(usable ? saved.position : spawn, (x, z) => map.isSafeSupport(x, z), others);
+      this.world.add({ id: playerId, name: displayName, mapId, ...placement });
       this.world.setAvatar(playerId, this.avatars?.load(playerId) ?? null);
       this.world.setEquipment(playerId, this.equipment?.load(playerId) ?? null);
     }
@@ -198,6 +206,14 @@ export class GameService {
   }
 
   get activePlayers(): number { return this.seats.size; }
+
+  presence(): PlayerPresence[] {
+    const now = this.clock.now();
+    return [...this.seats.values()].map((seat) => ({
+      name: seat.identity.displayName, mapId: this.world.locate(seat.identity.playerId)?.mapId ?? null,
+      connected: seat.channel !== null, releaseInMs: seat.releaseAt === null ? null : Math.max(0, seat.releaseAt - now),
+    }));
+  }
 
   private loadSaved(playerId: string): SavedPosition | null {
     try { return this.players.load(playerId); }

@@ -11,7 +11,7 @@ related:
   - client-render.md
   - client-world-streaming.md
   - server-world.md
-  - system-offline-demo.md
+  - offline-multiplayer.md
 ---
 
 # SCENE — Демо-сцена «Рынок Вавилона»

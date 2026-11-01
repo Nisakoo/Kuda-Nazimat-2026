@@ -17,6 +17,18 @@ export function responderContract(name: string, factory: () => NpcResponder): vo
         await responder.stop(); await responder.stop(); expect(network).toBe(0);
       } finally { hook.disable(); await responder.stop(); }
     });
+    it('streams only before settlement: no partial after the answer or an abort', async () => {
+      vi.useFakeTimers(); const responder = factory(); await responder.start();
+      try {
+        let settled = false; let late = 0;
+        const answer = responder.answer(answerRequest(), new AbortController().signal, () => { if (settled) late++; }).finally(() => { settled = true; });
+        await vi.advanceTimersByTimeAsync(9000); await answer; await vi.advanceTimersByTimeAsync(9000); expect(late).toBe(0);
+        const controller = new AbortController(); let afterAbort = 0;
+        const aborted = responder.answer(answerRequest(), controller.signal, () => { if (controller.signal.aborted) afterAbort++; });
+        const rejected = expect(aborted).rejects.toThrow(); controller.abort(); await vi.advanceTimersByTimeAsync(9000); await rejected;
+        expect(afterAbort).toBe(0);
+      } finally { await responder.stop(); }
+    });
     it('settles abort before and during answer within two seconds and respects deadline', async () => {
       vi.useFakeTimers(); const responder = factory(); await responder.start();
       try {

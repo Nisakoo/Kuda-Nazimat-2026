@@ -1,13 +1,15 @@
 ---
 id: system-offline-demo
 type: module-design
-status: draft
+status: retired
 implementation: not-started
 parent: architecture
 summary: Подтвердить работу полного учебного мира в LAN и на одном ноутбуке.
 ---
 
 # DEMO — Интеграция и автономная демонстрация
+
+> **Retired 2026-10-31.** Заменена на [OFFLINE](offline-multiplayer.md): курс сменился с разовой демонстрации на продукт. Соответствие: DEMO-001 → OFFLINE-005, 017, 019 (R1); DEMO-002 → OFFLINE-019 (R3), 012; DEMO-003 → OFFLINE-001, 019; DEMO-004 → OFFLINE-012 и MAP-006; DEMO-005 → OFFLINE-002, 006, 008–009; DEMO-006 → OFFLINE-017 (игра и сервер), квалификация LLM — [LLM-QA](npc-llm-evaluation.md). ID DEMO-001–006 больше не используются.
 
 ## Цель
 

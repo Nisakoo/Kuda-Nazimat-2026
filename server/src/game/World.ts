@@ -89,6 +89,11 @@ export class World {
     return p && { id: p.id, name: p.name, mapId: p.mapId, position: p.position, rotationY: p.rotationY };
   }
 
+  /** Current positions of every player on a map (REALTIME-010 spawn clearance). */
+  playerPositions(mapId: string): Vector3[] {
+    return [...this.players.values()].filter((p) => p.mapId === mapId).map((p) => p.position);
+  }
+
   /** A new connection restarts sequence numbering and readiness (PROTO v3). */
   resetInput(playerId: string): void {
     const p = this.players.get(playerId);

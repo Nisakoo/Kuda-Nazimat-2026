@@ -25,15 +25,27 @@ else
 	$(CLIENT_TEST_CMD)
 endif
 
-.PHONY: server server-test demo
+.PHONY: server server-test prepare start demo
+# PORT=9000 overrides the configured port (OFFLINE-003).
 server:
-	npm --prefix server start
+	npm --prefix server start$(if $(PORT), -- --port $(PORT))
 
 server-test:
 	npm --prefix server test
 
-demo:
+# OFFLINE-001: idempotent; never touches the players' database.
+prepare:
+	@node -e "const [a,b]=process.versions.node.split('.').map(Number); if (a!==24||b<15) { console.error('Нужен Node 24.15+ в ветке 24, сейчас '+process.versions.node); process.exit(1); }"
+	npm --prefix client ci
+	npm --prefix server ci
+	npm --prefix client run build
+	npm --prefix server run lan:check$(if $(PORT), -- --port $(PORT))
+
+# OFFLINE-002: works offline once prepared; dependencies are installed only when missing.
+start:
 	@test -d client/node_modules || npm --prefix client ci
 	@test -d server/node_modules || npm --prefix server ci
 	npm --prefix client run build
 	$(MAKE) server
+
+demo: start

@@ -9,6 +9,7 @@ import type { Channel } from '../src/game/ports.ts';
 import { loadWorld } from '../src/world/loader.ts';
 import type { LoadedWorld } from '../src/world/loader.ts';
 import { makeWorld, npc, SPAWN, WALL_MIN_X } from './a-helpers.ts';
+import { chooseSpawn } from '../src/game/spawn.ts';
 
 const ALL_CHUNKS: string[] = [];
 for (let z = -2; z <= 2; z++) for (let x = -2; x <= 2; x++) ALL_CHUNKS.push(`${x}_${z}`);
@@ -110,5 +111,41 @@ describe('AOI stream (PROTO-008 §3)', () => {
     const moved = { ...a, transform: { position: { x: 1, y: 0, z: 0 }, rotationY: 0 } };
     expect(stream.diff([moved, { id: 'b' }])).toEqual({ revision: 1, baseRevision: 0, upsert: [moved, { id: 'b' }], remove: [] });
     expect(stream.diff([moved])).toEqual({ revision: 2, baseRevision: 1, upsert: [], remove: ['b'] });
+  });
+});
+
+describe('spawn placement (REALTIME-010 / S8)', () => {
+  it('spreads new players around spawn and moves a saved position away from an occupant', () => {
+    const world = new World(loaded.maps, loaded.npcs);
+    const saved = new Map<string, SavedPosition>();
+    const game = new GameService(world, { load: (id) => saved.get(id) ?? null, save() {} }, systemClock, systemScheduler, { maxPlayers: 4, disconnectGraceMs: 100, broadcastEvery: 2 }, silentLogger);
+    const join = (id: string) => {
+      const channel: Channel = { id: `c-${id}`, sessionKey: id, send() {}, close() {} };
+      game.attach({ playerId: id, accountId: id, displayName: id }, channel);
+      expect(game.join(channel, 'test').ok).toBe(true);
+      return world.locate(id)!;
+    };
+    const first = join('a'); join('b'); join('c');
+    expect(first.position).toMatchObject({ x: SPAWN.x, z: SPAWN.z }); expect(first.rotationY).toBe(Math.PI);
+    saved.set('d', { mapId: 'test', position: first.position, rotationY: 0.5 });
+    const fourth = join('d');
+    const placed = ['a', 'b', 'c', 'd'].map((id) => world.locate(id)!);
+    for (const [i, p] of placed.entries()) for (const q of placed.slice(i + 1)) expect(Math.hypot(p.position.x - q.position.x, p.position.z - q.position.z)).toBeGreaterThanOrEqual(1.2);
+    const map = loaded.maps.get('test')!;
+    for (const p of placed) expect(map.isSafeSupport(p.position.x, p.position.z)).toBe(true);
+    expect(Math.hypot(fourth.position.x - first.position.x, fourth.position.z - first.position.z)).toBeLessThanOrEqual(4.5);
+    // A second player facing the spawn centre looks back towards it.
+    const second = world.locate('b')!;
+    expect(Math.atan2(SPAWN.x - second.position.x, SPAWN.z - second.position.z)).toBeCloseTo(second.rotationY);
+  });
+
+  it('keeps a free saved position and rotation, and falls back to the base when everything is blocked', () => {
+    const world = new World(loaded.maps, loaded.npcs);
+    const position = { x: -3, y: 0, z: 2 };
+    const game = new GameService(world, { load: () => ({ mapId: 'test', position, rotationY: 0.25 }), save() {} }, systemClock, systemScheduler, { maxPlayers: 4, disconnectGraceMs: 100, broadcastEvery: 2 }, silentLogger);
+    const channel: Channel = { id: 'c', sessionKey: 'k', send() {}, close() {} };
+    game.attach({ playerId: 'p', accountId: 'p', displayName: 'P' }, channel); game.join(channel, 'test');
+    expect(world.locate('p')).toMatchObject({ position: { x: -3, z: 2 }, rotationY: 0.25 });
+    expect(chooseSpawn(SPAWN, () => false, [])).toEqual({ position: SPAWN, rotationY: Math.PI });
   });
 });

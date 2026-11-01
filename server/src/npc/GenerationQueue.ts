@@ -1,8 +1,10 @@
 import type { NpcAnswer } from '../contracts.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
+/** requestId lets one question be cancelled; timeoutMs overrides the queue default (streamed answers). */
+export interface GenerationOptions { readonly requestId?: string; readonly timeoutMs?: number }
 interface Job {
-  playerId: string; connectionId: string; deadline: number; controller: AbortController;
+  playerId: string; connectionId: string; requestId?: string; deadline: number; controller: AbortController;
   work: (signal: AbortSignal, deadline: number) => Promise<string>;
   running: boolean; settled: boolean; resolve: (answer: NpcAnswer) => void;
   timeout?: TimerHandle; stuck?: TimerHandle;
@@ -44,17 +46,19 @@ export function createGenerationQueue(deps: { clock: Clock; scheduler: Scheduler
   }
   return {
     start() { stopped = false; },
-    generate(playerId: string, connectionId: string, work: Job['work']): Promise<NpcAnswer> {
+    generate(playerId: string, connectionId: string, work: Job['work'], options: GenerationOptions = {}): Promise<NpcAnswer> {
       if (stopped) return Promise.resolve({ ok: false, reason: 'unavailable' });
       if ([...jobs].some(job => job.playerId === playerId)) return Promise.resolve({ ok: false, reason: 'player-busy' });
       if (jobs.size >= config.maxUnfinished) return Promise.resolve({ ok: false, reason: 'server-busy' });
       return new Promise(resolve => {
-        const job: Job = { playerId, connectionId, work, deadline: clock.now() + config.timeoutMs, controller: new AbortController(), running: false, settled: false, resolve };
+        const timeoutMs = options.timeoutMs ?? config.timeoutMs;
+        const job: Job = { playerId, connectionId, ...(options.requestId ? { requestId: options.requestId } : {}), work, deadline: clock.now() + timeoutMs, controller: new AbortController(), running: false, settled: false, resolve };
         jobs.add(job); queue.push(job);
-        job.timeout = scheduler.setTimeout(() => abort(job, 'timeout'), config.timeoutMs);
+        job.timeout = scheduler.setTimeout(() => abort(job, 'timeout'), timeoutMs);
         pump();
       });
     },
+    cancel(connectionId: string, requestId: string) { for (const job of [...jobs]) if (job.connectionId === connectionId && job.requestId === requestId) abort(job, 'cancelled'); },
     cancelConnection(connectionId: string) { for (const job of [...jobs]) if (job.connectionId === connectionId) abort(job, 'cancelled'); },
     stop() { stopped = true; for (const job of [...jobs]) abort(job, 'cancelled'); },
   };
