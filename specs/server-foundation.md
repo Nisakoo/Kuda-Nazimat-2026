@@ -61,7 +61,7 @@ related:
   | logWorldAccess | `false` | лог выдачи `/world/*` (OFFLINE-016) |
   | auth | `{maxSessions: 5, passwordless}` | сессии, [AUTH](server-auth.md); `passwordless` задаёт окружение (SERVER-009) |
   | logs | `{consoleLevel: "info", fileLevel: "debug", dir: "data/logs", maxFileMb: 20, maxTotalMb: 200, retentionDays: 14}` | логи, [OBS](server-observability.md) |
-  | monitoring | `{token: null, pingIntervalMs: 5000, validateOutgoing: false}` | `/metrics` из сети, RTT, проверка исходящих пакетов (OBS-005/008/010) |
+  | monitoring | `{pingIntervalMs: 5000, validateOutgoing: false}` | RTT, проверка исходящих пакетов (OBS-005/010); `token` снят вместе с OBS-009 |
   | clientDebug | `false` | поле `debug` в `/config.json` |
   | npc | `{adapter: "scripted", maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 30000, streamTimeoutMs: 30000, options: {}}` | [NPC](server-npc-dialogue.md) NPC-002, 005, 008 |
   | language | `{adapter: "test", options: {}}` | переводчик BABEL, [NPC](server-npc-dialogue.md) NPC-009 |

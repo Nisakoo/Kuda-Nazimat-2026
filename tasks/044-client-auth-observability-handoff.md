@@ -27,7 +27,7 @@ scheduling_note: передача от серверной команды 2026-11
 - `POST /api/auth/register` `{name, password}` → 201 `{token, expiresAt}`; `login` → 200; `password` `{name, password, newPassword}` → 200 и новая сессия (все прежние отозваны). Пароль 6–128 символов, не равен имени.
 - Ошибки `{error: {code, message, retryAfterSeconds?}}`, `message` — готовый текст: `INVALID`, `CREDENTIALS`, `NAME_TAKEN`, `PASSWORD_REQUIRED`, `PASSWORD_CHANGE_REQUIRED` (вход временным паролем — показать смену пароля), `DISABLED`, `RATE_LIMIT` (+ `Retry-After`), `UNAVAILABLE`. 401 от `/api/auth/*` — ошибка формы, а не потеря сессии.
 - `POST /api/auth/logout` с Bearer → 204 при выходе.
-- Отзыв (выход в другой вкладке, смена пароля, ведущий) приходит в игровой канал как `error {requestId: "server", code: "UNAUTHORIZED", message}` — показать `message`.
+- Отзыв (выход в другой вкладке, смена пароля, администратор) приходит в игровой канал как `error {requestId: "server", code: "UNAUTHORIZED", message}` — показать `message`.
 - Development: `POST /api/auth/dev` с JSON `{}` или `{name}` → сессия без ввода данных, если `mode.dev === true`.
 - Необязательно: `POST /api/telemetry/client` с Bearer `{v: 1, kind: "error" | "unhandled_rejection" | "perf", message?, stack?, source?, build?, fps?, frameMs?, drawCalls?, map?}` → 204; ≤10 в минуту; без текстов игроков.
 - `/config.json` в development отдаёт `debug: true`.

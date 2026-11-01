@@ -46,7 +46,7 @@ make prepare   # один раз, с интернетом
 make start     # без интернета; make demo — синоним, PORT=9000 меняет порт
 ```
 
-Сервер печатает блок подключения с адресами для этого компьютера и для других устройств; экран ведущего — `http://localhost:8080/operator` (только на самом сервере). Самопроверка без запуска — `npm --prefix server run lan:check`. Подробности и диагностика — [server/README.md](server/README.md), [OFFLINE](specs/offline-multiplayer.md).
+Сервер печатает блок подключения с адресами для этого компьютера и для других устройств; экран администратора — `http://localhost:8080/operator` (только на самом сервере). Самопроверка без запуска — `npm --prefix server run lan:check`. Подробности и диагностика — [server/README.md](server/README.md), [OFFLINE](specs/offline-multiplayer.md).
 
 Откройте [http://localhost:8080/](http://localhost:8080/) (или LAN-адрес из вывода сервера). Зарегистрируйтесь с именем и паролем, подтвердите облик, выберите режим и два разных языка. Для существующего аккаунта используйте вкладку «Вход». В режиме «С друзьями» можно выбрать 2–4 игроков. Первый участник задаёт размер группы, остальные присоединяются. В соло доступны все шаги; в совместном задании первый игрок у пастуха получает список, остальные покупают и кормят. Группа стартует после заполнения ролей. Повторный вход восстанавливает данные. Отдельная кнопка «Демонстрационный вход по имени» открывает тестовый гостевой вход без пароля.
 
@@ -176,7 +176,7 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 | 040 | [Сервер: поток NPC и модельные порты](tasks/040-npc-stream-model-ports.md) | [NPC](specs/server-npc-dialogue.md), [PROTO-007](specs/protocol.md) | 014, 025, 032 |
 | 041 | [Клиент: потоковый ответ NPC (передача от сервера)](tasks/041-client-npc-stream.md) | [PROTO-007](specs/protocol.md) | 040 · клиент |
 | 042 | [Сервер: пароли, сессии с отзывом, окружения](tasks/042-server-auth-sessions.md) | [AUTH](specs/server-auth.md), SERVER-009 | 012, 016 |
-| 043 | [Сервер: логи, метрики, экран ведущего](tasks/043-server-observability.md) | [OBS](specs/server-observability.md) | 016 |
+| 043 | [Сервер: логи, метрики, экран администратора](tasks/043-server-observability.md) | [OBS](specs/server-observability.md) | 016 |
 | 044 | [Клиент: пароли и отчёты (передача от сервера)](tasks/044-client-auth-observability-handoff.md) | AUTH, OBS-011 | 042, 043 · клиент |
 | 015 | [Сервер: локальные NPC (полный AI)](tasks/015-server-ai.md) | [AI](specs/server-ai.md) | 011, 014, 017, 025 |
 | 067 | [Ollama/MLX в игре, профили и timeout](tasks/067-configurable-game-llm.md) | [LLM](specs/server-llm-runtime.md) | 025 |
@@ -194,7 +194,7 @@ PROTO v3: namespace `/game`, событие `game`, auth `{version:3, token}`. �
 
 Серверный MVP делится на две независимые части с общим контрактом [`server/src/contracts.ts`](server/src/contracts.ts): **A — мир и сеть** (024 → 013 → 014: `shared/`, `server/src/{world,game,realtime}/`, `server/content/`) и **B — платформа и данные** (010 → 011 → 012, 025 → 026: `server/src/{app,http,auth,persistence,npc,cli,common}/`, `server/package.json`, Makefile). Каждая часть меняет только свои каталоги; стык — только через контракт. TASK-026 — финальная интеграция.
 
-Наборы A и B объединены, полный серверный `check` проходит. Работают UI входа, SQLite, защищённая потоковая карта, чат, NPC с памятью через scripted, раздельное появление игроков, потоковый ответ NPC (PROTO-007, клиент его пока не включает), экран ведущего и `lan:check`. TASK-010–014, 024–026 и 040 выполнены; в TASK-016 остаются ручная приёмка на устройствах (R1–R3) и прогоны на macOS/Linux. Запуск — `make start`, подробности — [server/README.md](server/README.md). Клиент использует корневой shared. Результаты реальной браузерной интеграции — [TASK-028](tasks/028-client-guest-login.md); оставшиеся критерии защиты — [TASK-026](tasks/026-server-demo.md).
+Наборы A и B объединены, полный серверный `check` проходит. Работают UI входа, SQLite, защищённая потоковая карта, чат, NPC с памятью через scripted, раздельное появление игроков, потоковый ответ NPC (PROTO-007, клиент его пока не включает), экран администратора и `lan:check`. TASK-010–014, 024–026 и 040 выполнены; в TASK-016 остаются ручная приёмка на устройствах (R1–R3) и прогоны на macOS/Linux. Запуск — `make start`, подробности — [server/README.md](server/README.md). Клиент использует корневой shared. Результаты реальной браузерной интеграции — [TASK-028](tasks/028-client-guest-login.md); оставшиеся критерии защиты — [TASK-026](tasks/026-server-demo.md).
 
 
 ## Локальные NPC и LLM
