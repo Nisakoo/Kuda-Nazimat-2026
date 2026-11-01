@@ -26,15 +26,15 @@ depends_on: []
 
 ## План и приёмка
 
-- [ ] Сверить runtime/backend/model/pins/token limits/очередь/deadline/diagnostics с кодом; отделить планы квалификации и клиентские handoffs от реализованного. Все ссылки и ID однозначны.
-- [ ] Написать server/llm/SETUP.md для чистой установки, с matrix ОС/backend и явными непроверенными путями. Разделить online preparation/runtime offline, fresh config/существующая установка, Make profile/timeout и импортер старых конфигов.
-- [ ] Сохранить main AUTH/env/OBS/MOVE/BABEL/PROTO3 и server stream API. Сохранить LLM prepared profiles, guarded owned runtime, fail-closed memory, cancellation/quarantine и runtime-unavailable/recovery без повтора вопроса.
-- [ ] Одна GenerationQueue для NPC и BABEL; монотонный deadline не восстанавливается после rollback, pending слот не освобождается до окончания физического cleanup. HTTP metadata и клиентский timeout остаются согласованы, ordinary pending10с.
-- [ ] main environment CLI/Make и LLM flags работают вместе; examples/defaults/guides согласованы. Production name-only UI не объявляется готовым: TASK-044 остаётся открытым. Client NPC streaming TASK-041 также не входит в этот срез.
-- [ ] После semantic merge выполнить server/shared tests, client tests, Python fixtures, strict types/imports/build, relevant browser/integration/CLI checks и проверку docs. Фиксировать конкретные ошибки/недоступные проверки, не скрывать их как PASS.
+- [x] Сверить runtime/backend/model/pins/token limits/очередь/deadline/diagnostics с кодом; отделить планы квалификации и клиентские handoffs от реализованного. Все ссылки и ID однозначны.
+- [x] Написать server/llm/SETUP.md для чистой установки, с matrix ОС/backend и явными непроверенными путями. Разделить online preparation/runtime offline, fresh config/существующая установка, Make profile/timeout и импортер старых конфигов.
+- [x] Сохранить main AUTH/env/OBS/MOVE/BABEL/PROTO3 и server stream API. Сохранить LLM prepared profiles, guarded owned runtime, fail-closed memory, cancellation/quarantine и runtime-unavailable/recovery без повтора вопроса.
+- [x] Одна GenerationQueue для NPC и BABEL; монотонный deadline не восстанавливается после rollback, pending слот не освобождается до окончания физического cleanup. HTTP metadata и клиентский timeout остаются согласованы, ordinary pending10с.
+- [x] main environment CLI/Make и LLM flags работают вместе; examples/defaults/guides согласованы. Production name-only UI не объявляется готовым: TASK-044 остаётся открытым. Client NPC streaming TASK-041 также не входит в этот срез.
+- [x] После semantic merge выполнить server/shared tests, client tests, Python fixtures, strict types/imports/build, relevant browser/integration/CLI checks и проверку docs. Фиксировать конкретные ошибки/недоступные проверки, не скрывать их как PASS.
 - [ ] Проверить diff against origin/main: изменения main не потеряны, версия wire3 не откатилась, main ref не менялся. Проверить чистоту worktree и безопасно опубликовать нашу ветку.
 
-## Проверки и review (обновляются до публикации)
+## Проверки и review
 
 - Клиент: 211 unit tests/24files, typecheck/import/build PASS (предупреждение о большом bundle). Scoped Chromium NPC timeout: PASS, HTTP metadata и текущий OnlineSession получили60000мс.
 - Расширенный serial Chromium запуск npc-timeout + server-auth: **3/6PASS**. Вход/отмена/малый экран и401/session expiry PASS. Takeover и chat/NPC-memory ждут ready второй страницы; BABEL market истёк при закрытии welcome. Причина пока не установлена; расширенный UI suite не считается PASS. Worker только scripted, HOME/config изолированы, новый main startup marker.
@@ -44,7 +44,33 @@ depends_on: []
 - YAML/ID/links/dependency checker:31specs/45tasks/383requirements PASS. Номера main TASK-030/041/044 сохранены; LLM task переименован в045.
 - Worker/supervisor/diagnose code побайтово не изменён относительно backup302b814. Остановленная telemetry не реализована. Общая application composition остаётся main398d2fb; contracts и protocol validators не изменены.
 
-Финальная server/shared/Python/type/import/build проверка ещё не записана. Публикация ещё не выполнена. Во время работы main продвинулся398d2fb→09fd771 только на4документа/макет TALK; после текущего прогона интегрируется и этот tip. `refs/heads/main` локально остаётся02eb786.
+### Итоговая приёмка 2026-11-01
+
+На semantic integration tree7ec3683 выполнено последовательно, без параллельного browser/build:
+
+```sh
+export KUDA_TEST_PYTHON=/tmp/tokenizer-check.q9QYYJ/runtime/python/bin/python3
+npm --prefix server run check
+make server-test
+"$KUDA_TEST_PYTHON" -B -m unittest discover -s server/llm -p 'test_*.py'
+make client-test
+npm --prefix client run check
+npm --prefix client run check:imports
+npm --prefix client run build
+node --check server/llm/diagnose.mjs
+node /tmp/check-local-npc-specs.cjs
+git diff --check
+```
+
+- Server/shared: **530PASS/36files**, без skipped; включает17guide fixtures и6BABEL deadline regressions. Types/imports PASS:85modules/276dependencies.
+- Python mocked/structural fixtures: **83PASS**,18с; реальная модель/daemon/inference/diagnose CLI не запускались.
+- Client: **211PASS/24files**; Svelte0errors/0warnings, строгие types/core/imports PASS:100modules/298dependencies; build PASS,922.79kB JS/251.29kB gzip и предупреждение chunk>500kB (это не FPS/memory qualification).
+- После тестов main продвинулся398d2fb→**09fd7710c802dcda6b134dd1c988714ac79b9c8d** только на4документа/макет TALK. Выполнен дополнительный rebase;2README conflicts объединены вручную с сохранением новой TALK-ссылки и текущего PROTO3/streaming описания. Runtime/tests/config/dependencies дерева после rebase совпадают с проверенным7ec3683; diff содержит только5docs/image файлов. Затем добавлено пояснение о целевом draft TALK, без изменения требований.
+- Финальный docs checker после нового main: **32specs/45tasks/397requirements PASS**. Links/YAML/IDs/dependency DAG и diffcheck PASS.
+- Browser итог остаётся **3/6**, а не общий PASS: scoped timeout PASS; три расширенных сценария не дошли до целевых assertions. Сохранённые traces не содержат recorded console/page/HTTP errors; причина задержек не установлена, регрессия или software rendering не доказаны. Расширенный UI retest остаётся отдельной незавершённой проверкой, не скрыт fixture/юнитами.
+- Независимый reviewer повторно подтвердил ограниченный BABEL fix и детерминированный AUTH fixture: новых static blockers не найдено.
+
+Публикация ещё не выполнена. `refs/heads/main` локально остаётся02eb786; worker/watchdog код не менялся. TASK017/018/045 остаются in-progress. TASK041/044 не закрывались.
 
 ## Ограничения результата
 
