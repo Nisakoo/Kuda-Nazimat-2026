@@ -2,7 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { createNpcDialogueService, normalizeAnswer } from '../src/npc/NpcDialogueService.ts';
 import { scripted } from '../src/npc/adapters/scripted.ts';
 import { systemClock, systemScheduler } from '../src/common/time.ts';
-import { silentLogger } from '../src/common/logger.ts';
+import { memoryLogger } from '../src/common/logger.ts';
 import type { NpcQuestion } from '../src/contracts.ts';
 import type { NpcResponder } from '../src/npc/NpcResponder.ts';
 import { memoryStores } from './memory.ts';
@@ -12,9 +12,9 @@ responderContract('scripted', () => scripted({ delayMs: 10 }, deps));
 afterEach(() => vi.useRealTimers());
 function question(id = '1', requestId = 'r'): NpcQuestion { return { connectionId: `c${id}`, requestId, player: { accountId: `a${id}`, playerId: `p${id}`, displayName: 'Аня' }, npc: answerRequest().npc, question: 'Расскажи' }; }
 function service(responder: NpcResponder, options = { maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000 }) {
-  const stores = memoryStores(); const errors: unknown[] = [];
-  const npc = createNpcDialogueService({ ...deps, responder, dialogue: stores.dialogue, logger: { ...silentLogger, error: (message, fields) => errors.push({ message, fields }) } }, options);
-  return { npc, stores, errors };
+  const stores = memoryStores(); const logger = memoryLogger();
+  const npc = createNpcDialogueService({ ...deps, responder, dialogue: stores.dialogue, logger }, options);
+  return { npc, stores, logger };
 }
 it('FIFO with one slot, four unfinished, one/player and total queue deadline', async () => {
   vi.useFakeTimers(); const { npc, stores } = service(scripted({ delayMs: 3000 }, deps)); await npc.start();
@@ -31,12 +31,12 @@ it('FIFO with one slot, four unfinished, one/player and total queue deadline', a
 it('cancels queued and running work without history, preserving a stuck slot until settlement', async () => {
   vi.useFakeTimers(); let finish!: (value: { text: string }) => void;
   const responder: NpcResponder = { async start() {}, async stop() {}, answer: () => new Promise((resolve) => { finish = resolve; }) };
-  const { npc, stores, errors } = service(responder); await npc.start();
+  const { npc, stores, logger } = service(responder); await npc.start();
   const running = npc.ask(question('1')); const queued = npc.ask(question('2'));
   npc.cancelConnection('c2'); expect(await queued).toEqual({ ok: false, reason: 'cancelled' });
   npc.cancelConnection('c1'); expect(await running).toEqual({ ok: false, reason: 'cancelled' });
   expect(await npc.ask(question('1'))).toEqual({ ok: false, reason: 'player-busy' });
-  await vi.advanceTimersByTimeAsync(2000); expect(errors).toHaveLength(1);
+  await vi.advanceTimersByTimeAsync(2000); expect(logger.records.filter((r) => r.event === 'npc.slot.stuck')).toHaveLength(1);
   finish({ text: 'late' }); await vi.advanceTimersByTimeAsync(0);
   expect(stores.dialogue.history('p1', 'n')).toEqual([]);
   const next = npc.ask(question('1')); finish({ text: 'new' }); expect(await next).toEqual({ ok: true, text: 'new' }); await npc.stop();

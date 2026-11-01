@@ -1,0 +1,149 @@
+{
+  "measuredAt": "2026-11-01T09:10:17.830Z",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+    "viewport": "1280x800",
+    "dpr": 1
+  },
+  "baselineHeap": 10522060,
+  "baselineResources": {
+    "drawCalls": 285,
+    "geometries": 15,
+    "textures": 13
+  },
+  "samples": [
+    {
+      "fps": 59.9,
+      "p95": 18.1,
+      "cpuMs": 3.2,
+      "drawCalls": 259,
+      "worldMemoryBytes": 46842952,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 59.9,
+      "p95": 18.1,
+      "cpuMs": 3.2,
+      "drawCalls": 125,
+      "worldMemoryBytes": 47160616,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.9,
+      "cpuMs": 2.9,
+      "drawCalls": 84,
+      "worldMemoryBytes": 31281524,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.7,
+      "cpuMs": 2,
+      "drawCalls": 93,
+      "worldMemoryBytes": 31264252,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.6,
+      "cpuMs": 1.6,
+      "drawCalls": 98,
+      "worldMemoryBytes": 31264252,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.6,
+      "cpuMs": 1.6,
+      "drawCalls": 94,
+      "worldMemoryBytes": 31264252,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.6,
+      "cpuMs": 1.6,
+      "drawCalls": 98,
+      "worldMemoryBytes": 31281524,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.6,
+      "cpuMs": 1.5,
+      "drawCalls": 92,
+      "worldMemoryBytes": 31281524,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.6,
+      "cpuMs": 1.2,
+      "drawCalls": 103,
+      "worldMemoryBytes": 31281524,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.7,
+      "cpuMs": 1.1,
+      "drawCalls": 92,
+      "worldMemoryBytes": 31281524,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.7,
+      "cpuMs": 1.4,
+      "drawCalls": 99,
+      "worldMemoryBytes": 31846516,
+      "worldMemoryLimit": 67108864
+    },
+    {
+      "fps": 60,
+      "p95": 17.7,
+      "cpuMs": 1.5,
+      "drawCalls": 95,
+      "worldMemoryBytes": 31563764,
+      "worldMemoryLimit": 67108864
+    }
+  ],
+  "heaps": [
+    12082576,
+    12370832,
+    12205300,
+    12607444,
+    12489508
+  ],
+  "counts": [
+    {
+      "drawCalls": 285,
+      "geometries": 15,
+      "textures": 13
+    },
+    {
+      "drawCalls": 285,
+      "geometries": 15,
+      "textures": 13
+    },
+    {
+      "drawCalls": 285,
+      "geometries": 15,
+      "textures": 13
+    },
+    {
+      "drawCalls": 285,
+      "geometries": 15,
+      "textures": 13
+    },
+    {
+      "drawCalls": 285,
+      "geometries": 15,
+      "textures": 13
+    }
+  ],
+  "external": [],
+  "errors": []
+}

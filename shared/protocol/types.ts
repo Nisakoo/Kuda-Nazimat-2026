@@ -19,7 +19,9 @@ export type ClientMessage = Request & (
   | { readonly type: 'join'; readonly mapId: string }
   | { readonly type: 'input'; readonly sequence: number; readonly direction: Direction; readonly sprint: boolean; readonly jumpId: number; readonly preparedChunks: readonly string[] }
   | { readonly type: 'interact'; readonly targetId: string }
-  | { readonly type: 'npc-question'; readonly targetId: string; readonly text: string }
+  /** stream: true opts in to `npc-partial` snapshots before the terminal answer (PROTO-007). */
+  | { readonly type: 'npc-question'; readonly targetId: string; readonly text: string; readonly stream?: boolean }
+  | { readonly type: 'npc-cancel'; readonly questionId: string }
   | { readonly type: 'chat-send'; readonly text: string }
   | { readonly type: 'resync'; readonly revision: number }
 );
@@ -28,7 +30,10 @@ export type ServerMessage =
   | { readonly v: 3; readonly type: 'snapshot'; readonly revision: number; readonly snapshot: WorldSnapshot }
   | { readonly v: 3; readonly type: 'delta'; readonly revision: number; readonly baseRevision: number; readonly tick: number; readonly upsert: readonly Entity[]; readonly remove: readonly string[] }
   | (Request & { readonly type: 'interacted'; readonly targetId: string })
+  /** Whole text generated so far for an npc-question with stream: true; droppable, never terminal. */
+  | (Request & { readonly type: 'npc-partial'; readonly targetId: string; readonly seq: number; readonly text: string })
   | (Request & { readonly type: 'npc-answer'; readonly targetId: string; readonly text: string })
+  | (Request & { readonly type: 'npc-cancelled'; readonly questionId: string })
   | (Request & { readonly type: 'chat'; readonly messageId: string; readonly playerId: string; readonly name: string; readonly text: string })
   | (Request & { readonly type: 'error'; readonly code: ErrorCode; readonly message: string });
 export interface NetworkState { readonly status: ConnectionStatus; readonly error: string | null }

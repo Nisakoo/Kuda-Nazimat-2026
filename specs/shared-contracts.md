@@ -2,7 +2,7 @@
 id: shared-contracts
 type: module-design
 status: ready
-implementation: partial
+implementation: complete
 parent: architecture
 summary: Общий исполняемый TypeScript-контракт клиента и сервера — протокол, сущности, формат карты и проходимость.
 related:
@@ -61,7 +61,7 @@ Vite разрешает импорт корневого `shared/`, TypeScript �
 
 ## Открытые вопросы
 
-- Прежний полный запрет npm-пакета расходится с `shared/package.json`, добавленным в A для ESM. Нужен ли этот маркер при ESNext/Bundler — отдельное решение; интеграция сохраняет его. Публикация пакета, зависимость по npm и workspaces не используются.
+- *(решено)* `shared/package.json` — только маркер `{"type": "module"}` для ESM, не пакет: не публикуется, не ставится через npm, не участвует в workspaces. Он обязателен для запуска `shared/*.ts` в Node без сборки.
 
 ## Расширение MOVE
 

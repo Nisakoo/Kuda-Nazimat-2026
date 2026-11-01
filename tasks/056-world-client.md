@@ -1,10 +1,10 @@
 ---
-id: TASK-041
+id: TASK-056
 type: implementation-task
 status: in-progress
 spec: ../specs/world-next-stage.md
 requirements: [NEXT-006, NEXT-010, NEXT-011, NEXT-013, NEXT-014, NEXT-015]
-depends_on: [TASK-040]
+depends_on: [TASK-055]
 ---
 
 # Клиент живого мира и переноски
@@ -41,7 +41,7 @@ depends_on: [TASK-040]
 
 OnlineSession хранит один ожидающий HandRequest, устойчиво уникальные идентификаторы запросов, timeout 10 с, корреляцию receipt и текущий SceneStateMessage. Исторический receipt не изменяет текущее владение: руки/UI и рендер получают только scene-state. Старые revision отбрасываются; новый sceneId допускает сброс revision. Reconnect не повторяет намерение. В GameApp передаётся `RenderAdapter.setSceneState`, а UI показывает подтверждённые руки, подсказку, ожидание и отказ. Локальная прогулка не подменяет серверную переноску. MockWorldLife — явно тестовый backend с ограниченными receipts, одним слотом и общей формой ошибок; его синтетическая геометрия и отсутствие SQLite не доказывают серверную приёмку.
 
-GameApp интегрирует принадлежащий TASK-042 WorldAudio с общим WorldBudget: unlock по жесту, подтверждённое движение/начало прыжка, silent snapshot/history, освобождение отсутствующих персонажей через retainEntities, новые видимые реплики и dispose до смены бюджета. Чат BABEL использует составной ключ authorId/id; translating не становится baseline, silent события одной polling-пачки предшествуют live. Один регулятор 0–100% передаёт 0–1 в аудиомодуль, сохраняющий значение. Debug-вывод звука обновляется с прежней секундной metrics cadence, а не каждый кадр, и обнуляется при освобождении сцены.
+GameApp интегрирует принадлежащий TASK-057 WorldAudio с общим WorldBudget: unlock по жесту, подтверждённое движение/начало прыжка, silent snapshot/history, освобождение отсутствующих персонажей через retainEntities, новые видимые реплики и dispose до смены бюджета. Чат BABEL использует составной ключ authorId/id; translating не становится baseline, silent события одной polling-пачки предшествуют live. Один регулятор 0–100% передаёт 0–1 в аудиомодуль, сохраняющий значение. Debug-вывод звука обновляется с прежней секундной metrics cadence, а не каждый кадр, и обнуляется при освобождении сцены.
 
 Доступные имена для browser acceptance: `Руки` (Руки свободны / В руках: яблоко), `Действие с предметом` (кнопка F, disabled при ожидании), `Громкость` (range 0–100, step 1), `Звук` (Источники / Буферы / Загрузки / Память в байтах).
 

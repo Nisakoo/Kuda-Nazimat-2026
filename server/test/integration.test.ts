@@ -1,44 +1,12 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { expect, it, vi } from 'vitest';
+import { defer, setup } from './harness.ts';
 import * as responders from '../src/npc/adapters/index.ts';
-import { writeFile, rm } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { io, type Socket } from 'socket.io-client';
-import { startApplication } from '../src/app/application.ts';
-import { parseConfig } from '../src/app/config.ts';
-import { createGame } from '../src/game/index.ts';
-import { silentLogger } from '../src/common/logger.ts';
-import { parseServerMessage } from '../../shared/protocol/validate.ts';
 import type { ServerMessage } from '../../shared/protocol/types.ts';
-import { makeWorld, npc } from './a-helpers.ts';
 import { testLanguagePort } from '../src/babylon/TestLanguagePort.ts';
 import type { LanguagePort } from '../src/babylon/ports.ts';
 
-const cleanups: (() => Promise<void>)[] = [];
-afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
-async function setup(overrides: Record<string, unknown> = {}, language?: LanguagePort, mapId = 'test') {
-  const world = await makeWorld([npc('guide', 0, 6, { mapId })], mapId); const root = dirname(world.worldDir);
-  await writeFile(join(root, 'index.html'), '<main>UI</main>');
-  const config = { ...parseConfig({ ...world, clientDir: root, dbPath: join(root, 'game.sqlite'), defaultMap: mapId, host: '127.0.0.1', staticChunkRadius: 0, saveIntervalMs: 50, disconnectGraceMs: 80, npc: { options: { delayMs: 100 } }, ...overrides }, join(root, 'config.json')), port: 0 };
-  const app = await startApplication(config, createGame, silentLogger, language); const address = app.server.address();
-  if (!address || typeof address === 'string') throw new Error('No address'); const origin = `http://127.0.0.1:${address.port}`;
-  cleanups.push(async () => { await app.stop(); await rm(root, { force: true, recursive: true }); });
-  const guest = async (name: string) => {
-    const response = await fetch(`${origin}/api/auth/guest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
-    return await response.json() as { token: string; expiresAt: number };
-  };
-  async function connect(token: string) {
-    const socket = io(`${origin}/game`, { auth: { version: 3, token }, transports: ['websocket'], reconnection: false, forceNew: true, autoConnect: false });
-    cleanups.push(async () => { socket.disconnect(); });
-    const packets: ServerMessage[] = []; socket.on('game', (raw) => packets.push(parseServerMessage(raw)));
-    const connected = new Promise<void>((resolve, reject) => { socket.once('connect', resolve); socket.once('connect_error', reject); }); socket.connect(); await connected;
-    let count = 0;
-    const command = (type: string, fields = {}) => { const requestId = `r${++count}`; socket.emit('game', { v: 3, type, requestId, ...(type === 'input' ? { sprint: false, jumpId: 0 } : {}), ...fields }); return requestId; };
-    const wait = async (predicate: (p: ServerMessage) => boolean) => { await expect.poll(() => packets.find(predicate), { timeout: 3000 }).toBeDefined(); return packets.find(predicate)!; };
-    return { socket, packets, command, wait };
-  }
-  return { app, config, origin, guest, connect };
-}
 it('real HTTP auth, join, private world, periodic/grace save and NPC commit work together', async () => {
   const { config, origin, guest, connect } = await setup(); const session = await guest('Аня');
   const headers = { Authorization: `Bearer ${session.token}` };
@@ -49,7 +17,7 @@ it('real HTTP auth, join, private world, periodic/grace save and NPC commit work
   expect((await fetch(`${origin}/world/maps/test/chunks/0_0.json`, { headers })).status).toBe(200);
   expect((await fetch(`${origin}/world/maps/test/chunks/2_2.json`, { headers })).status).toBe(404);
   client.command('input', { sequence: 1, direction: { x: 1, z: 0 }, preparedChunks: ['0_0'] });
-  const db = new DatabaseSync(config.dbPath, { readOnly: true }); cleanups.push(async () => { db.close(); });
+  const db = new DatabaseSync(config.dbPath, { readOnly: true }); defer(async () => { db.close(); });
   await expect.poll(() => Number(db.prepare('SELECT x FROM players WHERE id = ?').get(joined.playerId)!.x)).toBeGreaterThan(0);
   const requestId = client.command('npc-question', { targetId: 'guide', text: 'История' });
   await client.wait((p) => p.type === 'npc-answer' && p.requestId === requestId);
@@ -72,7 +40,7 @@ it('v3 jump/sprint are authoritative over a real socket; takeover and a released
   const stock = entity(airborne)!.motion!.stamina; expect(stock).toBeLessThan(100);
   first.command('input', { sequence: 2, direction: { x: 0, z: 0 }, preparedChunks: ['0_0'], sprint: false, jumpId: 2 });
   await first.wait(p => entity(p)?.motion?.jumpAck === 2);
-  const db = new DatabaseSync(config.dbPath, { readOnly: true }); cleanups.push(async () => { db.close(); });
+  const db = new DatabaseSync(config.dbPath, { readOnly: true }); defer(async () => { db.close(); });
   await expect.poll(() => Number(db.prepare('SELECT y FROM players WHERE id = ?').get(joined.playerId)!.y)).toBe(0);
   const next = await connect(session.token); next.command('join', { mapId: 'test' });
   const takeover = await next.wait(p => p.type === 'joined');
@@ -153,4 +121,47 @@ it('an enrolled BABEL player can still use legacy chat and NPCs on the old maps'
   const client = await connect(session.token); client.command('join', { mapId: 'test' }); await client.wait(p => p.type === 'joined');
   const chat = client.command('chat-send', { text: 'Прежняя карта' }); await client.wait(p => p.type === 'chat' && p.requestId === chat);
   const question = client.command('npc-question', { targetId: 'guide', text: 'История' }); await client.wait(p => p.type === 'npc-answer' && p.requestId === question);
+});
+
+it('streams an NPC answer over a real socket only on request, and npc-cancel ends it without an answer (PROTO-007)', async () => {
+  const { config, guest, connect } = await setup({ npc: { options: { delayMs: 600 } } });
+  const client = await connect((await guest('Поток')).token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
+  const streamed = client.command('npc-question', { targetId: 'guide', text: 'История', stream: true });
+  const answer = await client.wait((p) => p.type === 'npc-answer' && p.requestId === streamed);
+  const partials = client.packets.filter((p) => p.type === 'npc-partial' && p.requestId === streamed);
+  expect(partials.length).toBeGreaterThan(0);
+  const seqs = partials.map((p) => p.type === 'npc-partial' ? p.seq : 0); expect(seqs).toEqual([...seqs].sort((a, b) => a - b)); expect(new Set(seqs).size).toBe(seqs.length);
+  for (const p of partials) if (p.type === 'npc-partial' && answer.type === 'npc-answer') expect(answer.text.startsWith(p.text)).toBe(true);
+  const answerIndex = client.packets.indexOf(answer);
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  expect(client.packets.slice(answerIndex).some((p) => p.type === 'npc-partial')).toBe(false);
+
+  const plain = client.command('npc-question', { targetId: 'guide', text: 'Без потока' });
+  await client.wait((p) => p.type === 'npc-answer' && p.requestId === plain);
+  expect(client.packets.some((p) => p.type === 'npc-partial' && p.requestId === plain)).toBe(false);
+
+  const cancelled = client.command('npc-question', { targetId: 'guide', text: 'Отменить', stream: true });
+  await client.wait((p) => p.type === 'npc-partial' && p.requestId === cancelled);
+  const cancel = client.command('npc-cancel', { questionId: cancelled });
+  await client.wait((p) => p.type === 'npc-cancelled' && p.requestId === cancel && p.questionId === cancelled);
+  const after = client.packets.length; await new Promise((resolve) => setTimeout(resolve, 800));
+  expect(client.packets.slice(after).some((p) => 'requestId' in p && p.requestId === cancelled)).toBe(false);
+  const db = new DatabaseSync(config.dbPath, { readOnly: true });
+  try { expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue').get()!.n).toBe(2); } finally { db.close(); }
+  const next = client.command('npc-question', { targetId: 'guide', text: 'Слот свободен' });
+  await client.wait((p) => p.type === 'npc-answer' && p.requestId === next);
+});
+
+
+it('a LanguagePort that fails to start makes only BABEL language actions unavailable and is still stopped', async () => {
+  let stopped = 0;
+  const language: LanguagePort = { ...testLanguagePort, async start() { throw new Error('model missing'); }, async stop() { stopped++; } };
+  const { app, origin, guest, connect } = await setup({}, language, 'market');
+  const player = await guest('Без переводчика');
+  const post = (action: unknown, requestId: string) => fetch(`${origin}/api/babylon`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${player.token}` }, body: JSON.stringify({ v: 2, requestId, action }) });
+  expect((await post({ type: 'enroll', size: 1, native: 'ru', learning: 'en' }, 'enroll')).status).toBe(200);
+  const client = await connect(player.token); client.command('join', { mapId: 'market' }); await client.wait((p) => p.type === 'joined');
+  expect((await post({ type: 'suggest', word: 'коза' }, 'suggest')).status).toBe(503);
+  expect((await post({ type: 'word-save', word: 'goat', translation: 'коза', note: '' }, 'word')).status).toBe(200);
+  await app.stop(); expect(stopped).toBe(1);
 });

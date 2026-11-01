@@ -1,0 +1,33 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-next-merge
+
+ ❯ server/test/world-life.test.ts (27 tests | 1 failed) 292ms
+   × migrates an actual v2 DB to v3 without losing account, position or NPC history; future/failed migration rolls back 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/test/world-life.test.ts > migrates an actual v2 DB to v3 without losing account, position or NPC history; future/failed migration rolls back
+Error: table accounts has no column named password_hash
+ ❯ insertAccount server/src/persistence/database.ts:40:8
+
+ ❯ server/src/persistence/database.ts:46:144
+ ❯ transaction server/src/persistence/database.ts:12:23
+ ❯ server/src/persistence/database.ts:46:51
+ ❯ timed server/src/persistence/database.ts:33:25
+ ❯ Object.findOrCreate server/src/persistence/database.ts:46:14
+ ❯ server/test/world-life.test.ts:185:52
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 23 passed (24)
+      Tests  1 failed | 222 passed (223)
+   Start at  12:04:53
+   Duration  10.64s (transform 3.31s, setup 0ms, import 6.93s, tests 45.64s, environment 5ms)
+
+make: *** [server-test] Error 1

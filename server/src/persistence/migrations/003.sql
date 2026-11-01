@@ -1,18 +1,12 @@
-CREATE TABLE world_apples (
-  id TEXT PRIMARY KEY,
-  map_id TEXT NOT NULL,
-  state TEXT NOT NULL CHECK (state IN ('world', 'held')),
-  x REAL, y REAL, z REAL,
-  holder_id TEXT REFERENCES players(id),
-  CHECK ((state = 'world' AND x IS NOT NULL AND y IS NOT NULL AND z IS NOT NULL AND holder_id IS NULL)
-    OR (state = 'held' AND x IS NULL AND y IS NULL AND z IS NULL AND holder_id IS NOT NULL))
-);
-CREATE UNIQUE INDEX world_one_hand ON world_apples(holder_id) WHERE holder_id IS NOT NULL;
-CREATE TABLE world_hand_receipts (
-  player_id TEXT NOT NULL REFERENCES players(id),
-  request_id TEXT NOT NULL,
-  fingerprint TEXT NOT NULL,
-  result TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  PRIMARY KEY (player_id, request_id)
-);
+-- AUTH-015: passwords, public session ids and revocation. No data is removed (STORE-002).
+ALTER TABLE accounts ADD COLUMN password_hash TEXT;
+ALTER TABLE accounts ADD COLUMN password_set_at INTEGER;
+ALTER TABLE accounts ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0 CHECK (must_change_password IN (0, 1));
+ALTER TABLE accounts ADD COLUMN temp_password_expires_at INTEGER;
+ALTER TABLE sessions ADD COLUMN id TEXT;
+ALTER TABLE sessions ADD COLUMN created_ip TEXT;
+ALTER TABLE sessions ADD COLUMN revoked_at INTEGER;
+ALTER TABLE sessions ADD COLUMN revoke_reason TEXT;
+UPDATE sessions SET id = lower(hex(randomblob(6))) WHERE id IS NULL;
+CREATE UNIQUE INDEX sessions_id ON sessions(id);
+CREATE INDEX sessions_account ON sessions(account_id, revoked_at, expires_at);

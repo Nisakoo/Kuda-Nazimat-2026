@@ -23,6 +23,7 @@ const asked: NpcQuestion[] = [];
 const cancelled: string[] = [];
 const npcs: NpcQuestions = {
   ask: async (q) => { asked.push(q); return { ok: true, text: `Ответ ${q.npc.name}` }; },
+  cancel: () => {},
   cancelConnection: (id) => { cancelled.push(id); },
 };
 

@@ -1,0 +1,12 @@
+
+> educational-world-server@0.1.0 test
+> vitest run server/test/auth.test.ts
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-next-merge
+
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  12:08:02
+   Duration  14.15s (transform 1.17s, setup 0ms, import 1.75s, tests 12.08s, environment 0ms)

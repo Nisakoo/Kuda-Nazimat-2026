@@ -1,0 +1,30 @@
+{
+  "node": "v24.15.0",
+  "players": 4,
+  "durationMs": 61000,
+  "npcDelayMs": 5000,
+  "steps": [
+    {
+      "p50": 0.612,
+      "p95": 1.968,
+      "max": 100.196,
+      "broadcastP95": 113.214,
+      "broadcastMax": 205.087,
+      "players": 4
+    }
+  ],
+  "broadcast": {
+    "samples": 609,
+    "p95Ms": 113.88870000000315,
+    "maxMs": 206.9946
+  },
+  "deltas": 2440,
+  "answers": 6,
+  "unavailable": 14,
+  "errors": [],
+  "warnings": {
+    "auth.passwordless.enabled": 1,
+    "npc.request.timeout": 14,
+    "game.tick.slow": 1
+  }
+}

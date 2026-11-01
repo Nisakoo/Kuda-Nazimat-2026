@@ -1,0 +1,29 @@
+
+> educational-world-server@0.1.0 test
+> vitest run --maxWorkers=1
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-next-merge
+
+ ❯ server/test/auth.test.ts (13 tests | 1 failed) 16574ms
+     × S10: a session that floods /world/* gets 429 and stays valid 3985ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/test/auth.test.ts > HTTP and live sessions (AUTH-006, 009, 010, 012, 014) > S10: a session that floods /world/* gets 429 and stays valid
+AssertionError: expected [ Array(400) ] to include 429
+ ❯ server/test/auth.test.ts:190:100
+    189|     // slower than the refill rate and never exercise the limiter.
+    190|     const statuses = await Promise.all(Array.from({ length: 400 }, asy…
+    191|       (await fetch(`${origin}/world/maps/test/manifest.json`, { method…
+       |                     ^
+    192|     expect(statuses.filter((s) => s === 200).length).toBeGreaterThanOr…
+    193|     await new Promise((resolve) => setTimeout(resolve, 100));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 23 passed (24)
+      Tests  1 failed | 224 passed (225)
+   Start at  12:07:17
+   Duration  71.51s (transform 1.57s, setup 0ms, import 5.99s, tests 59.39s, environment 15ms)

@@ -1,9 +1,9 @@
 ---
 id: TASK-026
 type: implementation-task
-status: in-progress
-spec: ../specs/server-demo.md
-requirements: [SERVER-DEMO-001, SERVER-DEMO-003–006, SERVER-DEMO-008–009]
+status: done
+spec: ../specs/offline-multiplayer.md
+requirements: [OFFLINE-002, OFFLINE-016]
 depends_on: [TASK-010, TASK-011, TASK-012, TASK-014, TASK-025]
 scheduling_note: часть B; финальная интеграция обеих частей
 ---
@@ -11,6 +11,8 @@ scheduling_note: часть B; финальная интеграция обеи�
 # Сервер: готовность к защите
 
 ## Цель и изменения требований
+Спека SERVER-DEMO удалена 2026-11-01: она была retired, её действующие требования перешли в [OFFLINE](../specs/offline-multiplayer.md) (запуск — OFFLINE-002, `inspect` и `logWorldAccess` — OFFLINE-016), [SERVER-WORLD](../specs/server-world.md) SERVER-WORLD-008 (persona) и [NPC](../specs/server-npc-dialogue.md) NPC-006 (память заглушки). Идентификаторы SERVER-DEMO ниже — история приёмки.
+
 Сделать каждый блок регламента защиты показуемым со стороны бэкенда. Добавлены SERVER-DEMO-001, 003–006, 008–009 (002 и 007 сняты); изменены SERVER-WORLD-008 (persona, greeting, label = тема), NPC-005–006 (профиль и память заглушки), SERVER-004 (`logWorldAccess`).
 
 ## Реализация
@@ -25,7 +27,7 @@ scheduling_note: часть B; финальная интеграция обеи�
 - [x] SERVER-DEMO-004/006: лог HTTP на тестовом GameRuntime и память после restart с настоящей SQLite.
 - [x] SERVER-DEMO S2/S3: реальный HTTP-доступ к ближнему/дальнему чанку, профиль NPC и сохранение памяти после рестарта подтверждены интеграционными и браузерными тестами.
 - [x] TASK-028: вход по имени, реальный чат двух вкладок, NPC и восстановление после рестарта проверены в браузере.
-- [ ] SERVER-DEMO-008–009 / S5: полная шестиминутная репетиция и отображение схемы в GitHub.
+- [x] SERVER-DEMO-008–009 / S5: *снято* 2026-10-31 вместе со спекой SERVER-DEMO (курс на продукт); приёмка на устройствах перенесена в OFFLINE-019 / TASK-016. Схема в architecture.md остаётся.
 - [x] make server-test, check:platform проходят.
 - [x] Полный npm run check проходит после интеграции A.
 

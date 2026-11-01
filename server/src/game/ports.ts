@@ -9,6 +9,8 @@ export interface Channel {
   readonly sessionKey?: string;
   send(message: ServerMessage): void;
   sendLife?(message: WorldLifeServerMessage, volatile?: boolean): void;
+  /** OBS-010: median heartbeat RTT of the last minute, null before the first sample. */
+  rttMs?(): number | null;
   /** Ends the connection with a server-originated UNAUTHORIZED error (takeover, expiry, shutdown). */
   close(reason: string): void;
 }

@@ -1,0 +1,13 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-next-merge
+
+
+ Test Files  24 passed (24)
+      Tests  225 passed (225)
+   Start at  12:08:49
+   Duration  24.46s (transform 8.68s, setup 0ms, import 20.43s, tests 86.15s, environment 7ms)

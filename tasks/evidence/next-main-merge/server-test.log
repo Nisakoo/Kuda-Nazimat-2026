@@ -1,0 +1,179 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /private/tmp/competition-2026-next-merge
+
+ ❯ server/test/world-life.test.ts (27 tests | 1 failed) 415ms
+   × migrates an actual v2 DB to v3 without losing account, position or NPC history; future/failed migration rolls back 67ms
+ ❯ server/test/platform.test.ts (8 tests | 1 failed) 370ms
+   × serves public UI/config, strict guest login, protected world and allowlisted CORS without secrets 19ms
+ ❯ server/test/world-life-realtime.test.ts (1 test | 1 failed) 284ms
+   × real HTTP auth, 4 BABEL roles, world-life sockets, pickup race, lost reply, takeover and durable restart agree 283ms
+ ❯ server/test/observability.test.ts (8 tests | 2 failed) 1470ms
+     × S5/S6/S7: no secrets or texts anywhere; /metrics and the operator screen work; health explains problems 170ms
+     × S8: client reports are authenticated, validated, rate-limited and logged without control characters 652ms
+ ❯ server/test/integration.test.ts (9 tests | 9 failed) 2411ms
+   × real HTTP auth, join, private world, periodic/grace save and NPC commit work together 139ms
+   × v3 jump/sprint are authoritative over a real socket; takeover and a released seat preserve stamina and SQLite saves support 211ms
+   × BABEL HTTP requires auth and the controlling seat, rejects forged ownership and cannot commit after takeover 252ms
+   × session expiry closes the real socket and rejects protected HTTP and old tokens 97ms
+   × takeover cancels a running NPC answer before SQLite commit and preserves the player 323ms
+   × failed responder startup leaves real movement and chat available with a degraded health status 493ms
+   × an enrolled BABEL player can still use legacy chat and NPCs on the old maps 276ms
+   × streams an NPC answer over a real socket only on request, and npc-cancel ends it without an answer (PROTO-007) 358ms
+   × a LanguagePort that fails to start makes only BABEL language actions unavailable and is still stopped 260ms
+ ❯ server/test/realtime-scenarios.test.ts (5 tests | 5 failed) 1976ms
+   × S3: forged fields, foreign playerId and v2 are rejected; an input flood is dropped silently 459ms
+   × S4: resync answers the current revision and the next delta builds on it; leaving the AOI removes the entity 310ms
+   × S5: a reconnect inside the grace period is invisible to the observer and keeps the position 452ms
+   × S6: interact succeeds near the NPC and is FORBIDDEN 5 m away; chat reaches both with unique ids and stays text 448ms
+   × S3: chat is limited to one message per second after a burst of three; more than ten invalid packets in 10 s disconnect 302ms
+ ❯ server/test/world-checks.test.ts (5 tests | 1 failed) 3222ms
+   × S3: traversal, encoded separators, unknown files and trailing slashes are 404 with a valid token; a vanished file is 500 256ms
+ ❯ server/test/a-realtime.test.ts (3 tests | 3 skipped) 10023ms
+ ❯ server/test/auth.test.ts (13 tests | 3 failed) 13579ms
+     × serves the auth API with exact bodies, codes and Retry-After 102ms
+     × S6/S9: logout and operator revoke close the live socket with a reason; CSRF-less actions are refused 75ms
+     × S10: a session that floods /world/* gets 429 and stays valid 79ms
+ ❯ server/test/offline.test.ts (8 tests | 5 failed) 16088ms
+   × two players over a non-loopback IPv4 (172.16.246.32): login, movement, chat and protected world 220ms
+   × operator screen and status are 404 from a non-loopback address 300ms
+   × operator screen shows seats, presence and NPC state without secrets; logs carry IP but no tokens or texts (OFFLINE-010, 016) 124ms
+   × a busy port fails with a clear message and a way out (OFFLINE-003) 421ms
+   × lan:check reports every start precondition and fails on a busy port, missing build/world or a newer database (OFFLINE-008) 15011ms
+ ❯ server/test/application.test.ts (4 tests | 2 failed) 17520ms
+   × assembles exclusively through the frozen contract, restarts with memory and saves on stop 107ms
+   × SIGTERM closes the process within ten seconds after saving through PlayerStore 15007ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/test/a-realtime.test.ts [ server/test/a-realtime.test.ts ]
+Error: Hook timed out in 10000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+ ❯ server/test/a-realtime.test.ts:35:1
+     33| const sockets: Socket[] = [];
+     34|
+     35| beforeAll(async () => {
+       | ^
+     36|   const world = await makeWorld([npc('near', 1, 6), npc('far', -10, -1…
+     37|   game = await createGame({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/31]⎯
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 30 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/test/application.test.ts > assembles exclusively through the frozen contract, restarts with memory and saves on stop
+ FAIL  server/test/auth.test.ts > HTTP and live sessions (AUTH-006, 009, 010, 012, 014) > serves the auth API with exact bodies, codes and Retry-After
+ FAIL  server/test/auth.test.ts > HTTP and live sessions (AUTH-006, 009, 010, 012, 014) > S6/S9: logout and operator revoke close the live socket with a reason; CSRF-less actions are refused
+ FAIL  server/test/auth.test.ts > HTTP and live sessions (AUTH-006, 009, 010, 012, 014) > S10: a session that floods /world/* gets 429 and stays valid
+ FAIL  server/test/integration.test.ts > real HTTP auth, join, private world, periodic/grace save and NPC commit work together
+ FAIL  server/test/integration.test.ts > v3 jump/sprint are authoritative over a real socket; takeover and a released seat preserve stamina and SQLite saves support
+ FAIL  server/test/integration.test.ts > BABEL HTTP requires auth and the controlling seat, rejects forged ownership and cannot commit after takeover
+ FAIL  server/test/integration.test.ts > session expiry closes the real socket and rejects protected HTTP and old tokens
+ FAIL  server/test/integration.test.ts > takeover cancels a running NPC answer before SQLite commit and preserves the player
+ FAIL  server/test/integration.test.ts > failed responder startup leaves real movement and chat available with a degraded health status
+ FAIL  server/test/integration.test.ts > an enrolled BABEL player can still use legacy chat and NPCs on the old maps
+ FAIL  server/test/integration.test.ts > streams an NPC answer over a real socket only on request, and npc-cancel ends it without an answer (PROTO-007)
+ FAIL  server/test/integration.test.ts > a LanguagePort that fails to start makes only BABEL language actions unavailable and is still stopped
+ FAIL  server/test/observability.test.ts > end to end (OBS-006, 008, 010, 011) > S8: client reports are authenticated, validated, rate-limited and logged without control characters
+ FAIL  server/test/offline.test.ts > operator screen shows seats, presence and NPC state without secrets; logs carry IP but no tokens or texts (OFFLINE-010, 016)
+ FAIL  server/test/offline.test.ts > a busy port fails with a clear message and a way out (OFFLINE-003)
+ FAIL  server/test/platform.test.ts > serves public UI/config, strict guest login, protected world and allowlisted CORS without secrets
+ FAIL  server/test/realtime-scenarios.test.ts > S3: forged fields, foreign playerId and v2 are rejected; an input flood is dropped silently
+ FAIL  server/test/realtime-scenarios.test.ts > S4: resync answers the current revision and the next delta builds on it; leaving the AOI removes the entity
+ FAIL  server/test/realtime-scenarios.test.ts > S5: a reconnect inside the grace period is invisible to the observer and keeps the position
+ FAIL  server/test/realtime-scenarios.test.ts > S6: interact succeeds near the NPC and is FORBIDDEN 5 m away; chat reaches both with unique ids and stays text
+ FAIL  server/test/realtime-scenarios.test.ts > S3: chat is limited to one message per second after a burst of three; more than ten invalid packets in 10 s disconnect
+ FAIL  server/test/world-checks.test.ts > S3: traversal, encoded separators, unknown files and trailing slashes are 404 with a valid token; a vanished file is 500
+ FAIL  server/test/world-life-realtime.test.ts > real HTTP auth, 4 BABEL roles, world-life sockets, pickup race, lost reply, takeover and durable restart agree
+Error: listen EPERM: operation not permitted 127.0.0.1
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/31]⎯
+
+ FAIL  server/test/application.test.ts > SIGTERM closes the process within ten seconds after saving through PlayerStore
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ server/test/application.test.ts:71:1
+     69| });
+     70| // Windows cannot deliver SIGTERM to a child gracefully, so the handle…
+     71| it('SIGTERM closes the process within ten seconds after saving through…
+       | ^
+     72|   const { root, config } = fixture();
+     73|   const seed = openDatabase(config.dbPath); const player = sqliteStore…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/31]⎯
+
+ FAIL  server/test/observability.test.ts > end to end (OBS-006, 008, 010, 011) > S5/S6/S7: no secrets or texts anywhere; /metrics and the operator screen work; health explains problems
+ FAIL  server/test/offline.test.ts > two players over a non-loopback IPv4 (172.16.246.32): login, movement, chat and protected world
+ FAIL  server/test/offline.test.ts > operator screen and status are 404 from a non-loopback address
+Error: listen EPERM: operation not permitted 0.0.0.0
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/31]⎯
+
+ FAIL  server/test/offline.test.ts > lan:check reports every start precondition and fails on a busy port, missing build/world or a newer database (OFFLINE-008)
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ server/test/offline.test.ts:102:1
+    100| });
+    101|
+    102| it('lan:check reports every start precondition and fails on a busy por…
+       | ^
+    103|   const world = await makeWorld([npc('guide', 0, 6)]); const root = di…
+    104|   defer(() => rm(root, { recursive: true, force: true }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/31]⎯
+
+ FAIL  server/test/world-life.test.ts > migrates an actual v2 DB to v3 without losing account, position or NPC history; future/failed migration rolls back
+Error: table accounts has no column named password_hash
+ ❯ insertAccount server/src/persistence/database.ts:40:8
+
+ ❯ server/src/persistence/database.ts:46:144
+ ❯ transaction server/src/persistence/database.ts:12:23
+ ❯ server/src/persistence/database.ts:46:51
+ ❯ timed server/src/persistence/database.ts:33:25
+ ❯ Object.findOrCreate server/src/persistence/database.ts:46:14
+ ❯ server/test/world-life.test.ts:185:52
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/31]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 2 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: listen EPERM: operation not permitted 127.0.0.1
+ ❯ Server.setupListenHandle [as _listen2] server/node:net:1986:21
+ ❯ listenInCluster server/node:net:2065:12
+ ❯ server/node:net:2274:7
+ ❯ process.processTicksAndRejections server/node:internal/process/task_queues:90:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'EPERM', errno: -1, syscall: 'listen', address: '127.0.0.1' }
+This error originated in "server/test/a-realtime.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: listen EPERM: operation not permitted 127.0.0.1
+ ❯ Server.setupListenHandle [as _listen2] server/node:net:1986:21
+ ❯ listenInCluster server/node:net:2065:12
+ ❯ server/node:net:2274:7
+ ❯ process.processTicksAndRejections server/node:internal/process/task_queues:90:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'EPERM', errno: -1, syscall: 'listen', address: '127.0.0.1' }
+This error originated in "server/test/offline.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "lan:check reports every start precondition and fails on a busy port, missing build/world or a newer database (OFFLINE-008)". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  11 failed | 13 passed (24)
+      Tests  30 failed | 190 passed | 3 skipped (223)
+     Errors  2 errors
+   Start at  12:04:27
+   Duration  20.02s (transform 5.56s, setup 0ms, import 16.79s, tests 81.32s, environment 5ms)
+
+make: *** [server-test] Error 1

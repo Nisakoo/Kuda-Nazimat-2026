@@ -1,5 +1,5 @@
 ---
-id: TASK-040
+id: TASK-055
 type: implementation-task
 status: in-progress
 spec: ../specs/world-next-stage.md
@@ -11,7 +11,7 @@ depends_on: []
 
 ## Границы
 
-Только согласованный блок TASK-030: server/shared для NEXT-006/010/011 и необходимые подконтракты NEXT-013/014. NEXT-015 принадлежит TASK-042 и клиентской интеграции. Другие NEXT, редизайн, новая локация, TLS и LLM не входят. Основа: origin/main `87124f4`; ветка `impl/next-006-010-011-015`. Main подтвердил через read-only метаданные Pocket конфигурацию всех делегированных сессий: `openai/gpt-6.1-sol`, `thinkingLevel high`.
+Только согласованный блок TASK-030: server/shared для NEXT-006/010/011 и необходимые подконтракты NEXT-013/014. NEXT-015 принадлежит TASK-057 и клиентской интеграции. Другие NEXT, редизайн, новая локация, TLS и LLM не входят. Основа: origin/main `87124f4`; ветка `impl/next-006-010-011-015`. Main подтвердил через read-only метаданные Pocket конфигурацию всех делегированных сессий: `openai/gpt-6.1-sol`, `thinkingLevel high`.
 
 ## Реализация
 
@@ -32,7 +32,7 @@ depends_on: []
 
 Полный bounded scene-state содержит определение сцены, sceneId/epoch/serverTime/revision, 4 RAM-горшка и 5 durable-яблок. Изменившиеся полные снимки идут надёжно перед game delta; неизменные clock heartbeats идут volatile не чаще 1 Гц. Снимок строится 1 раз на карту за broadcast-шаг, без повторного parsing definition на каждом seat. Оба надёжных канала имеют общий предел 32 ожидающих пакета / 1 MiB и принудительное закрытие медленного транспорта вместо потери delta. MOVE дедуплицируется sequence без Set requestId; прочие game-ID ограничены 4096 на соединение и частотой 5/с, burst 10. Hand intent — явно pickup(targetId) либо place без клиентской позиции/holder/role. Все роли равноправны. Ближайший доступный pickup в пределах 2 м; place выбирает сервер на опоре в 0,9 м перед поворотом и требует именно authoritative grounded. Rising с Y<0,05 м тоже отклоняется. BABEL inventory не меняется.
 
-Миграция 003: `world_apples` со взаимоисключающими world/held полями, FK holder и UNIQUE partial index одного слота; `world_hand_receipts` с fingerprint и исходным результатом. Проверка/изменение/receipt — одна BEGIN IMMEDIATE транзакция вне tick. Повтор возвращает прежнее подтверждение и актуальный scene-state; другое действие с тем же ID даёт CONFLICT. Отказы геометрии тоже durable; ошибки БД не объявляются сохранёнными. Startup seed добавляет только отсутствующие устойчивые ID, не сбрасывает владение и сверяет полный набор сохранённых ID/maps. Удаление всего каталога при имеющихся яблоках тоже даёт отказ старта и rollback.
+Миграция 004: `world_apples` со взаимоисключающими world/held полями, FK holder и UNIQUE partial index одного слота; `world_hand_receipts` с fingerprint и исходным результатом. Проверка/изменение/receipt — одна BEGIN IMMEDIATE транзакция вне tick. Повтор возвращает прежнее подтверждение и актуальный scene-state; другое действие с тем же ID даёт CONFLICT. Отказы геометрии тоже durable; ошибки БД не объявляются сохранёнными. Startup seed добавляет только отсутствующие устойчивые ID, не сбрасывает владение и сверяет полный набор сохранённых ID/maps. Удаление всего каталога при имеющихся яблоках тоже даёт отказ старта и rollback.
 
 Горшки толкаются только фактическим наземным движением. Атомарный RAM-план проверяет swept square footprints, bitmap, опору/ceiling, prepared chunks, карту/zone, горшки, яблоки и других игроков. Заблокированный горшок не пропускает игрока сквозь себя. Отдельного loop/SQL в tick нет.
 

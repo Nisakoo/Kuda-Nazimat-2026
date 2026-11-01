@@ -8,7 +8,7 @@ import { io, type Socket } from 'socket.io-client';
 import { startApplication } from '../src/app/application.ts';
 import { parseConfig } from '../src/app/config.ts';
 import { createGame } from '../src/game/index.ts';
-import type { Logger } from '../src/common/logger.ts';
+import { createLogger } from '../src/common/logger.ts';
 import { parseServerMessage } from '../../shared/protocol/validate.ts';
 import type { SceneStateMessage } from '../../shared/world-life/types.ts';
 
@@ -16,7 +16,10 @@ const directory = await mkdtemp(join(tmpdir(), 'world-next-profile-'));
 const config = { ...parseConfig({ host: '127.0.0.1', clientDir: resolve('client/dist'), worldDir: resolve('client/public'), contentDir: resolve('server/content'), dbPath: join(directory, 'game.sqlite'), defaultMap: 'market', saveIntervalMs: 500 }, join(directory, 'config.json')), port: 0 };
 const steps: Record<string, unknown>[] = [];
 const errors: string[] = [];
-const logger: Logger = { child: () => logger, info(message, fields) { if (message === 'Длительность шага, мс' && fields) steps.push(fields); }, warn(message) { errors.push(message); }, error(message) { errors.push(message); } };
+const logger = createLogger(record => {
+  if (record.event === 'game.tick.stats') steps.push({ p50: record.p50, p95: record.p95, max: record.max, broadcastP95: record.broadcastP95, players: record.players });
+  if (record.level === 'error' || record.level === 'fatal' || (record.level === 'warn' && record.event !== 'auth.passwordless.enabled')) errors.push(`${record.event}: ${record.msg}`);
+}, 'world-next-profile');
 const startupBegan = performance.now();
 const app = await startApplication(config, createGame, logger);
 const startupMs = performance.now() - startupBegan;
@@ -52,8 +55,8 @@ try {
     timers.push(setInterval(() => socket.emit('game', { v: 3, type: 'input', requestId: `p${index}_${++request}`, sequence: ++sequence, direction: { x: 0, z: Math.floor((performance.now() - began) / 1200) % 2 ? -1 : 1 }, preparedChunks: ['0_0'], sprint: false, jumpId: 0 }), 50));
   }
   await new Promise<void>(done => setTimeout(done, durationMs));
-  const report = { baseRevision: '87124f488feb02280234c52797e53ccd145e62e0', node: process.version, players: 4, durationMs, startupMs, backend: 'real generated world and temporary SQLite; explicit test LLM', steps, deltas, scenePackets, scenes: scenes.map(scene => ({ sceneId: scene.sceneId, epochMs: scene.epochMs, cats: scene.definition.cats.length, pots: scene.pots.length, apples: scene.apples.length })), errors, targetHardware: 'unverified: Linux container, not the target laptop' };
-  await writeFile('tasks/evidence/world-next/server-four-player-profile.json', JSON.stringify(report, null, 2) + '\n');
+  const report = { baseRevision: '09fd771', node: process.version, players: 4, durationMs, startupMs, backend: 'real generated world and temporary SQLite; explicit test LLM', steps, deltas, scenePackets, scenes: scenes.map(scene => ({ sceneId: scene.sceneId, epochMs: scene.epochMs, cats: scene.definition.cats.length, pots: scene.pots.length, apples: scene.apples.length })), errors, targetHardware: `${process.platform}/${process.arch}; browser GPU measured separately` };
+  await writeFile(process.env.PROFILE_OUTPUT ?? 'tasks/evidence/next-main-merge/server-four-player-profile.json', JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
   if (errors.length || steps.length < 1 || deltas < 100 || scenes.length !== 4 || scenes.some(scene => scene.definition.cats.length !== 3 || scene.pots.length !== 4 || scene.apples.length !== 5) || new Set(scenes.map(scene => scene.sceneId)).size !== 1) throw new Error('Four-player profile failed');
 } finally { for (const timer of timers) clearInterval(timer); for (const socket of sockets) socket.disconnect(); await app.stop(); await rm(directory, { recursive: true, force: true }); }

@@ -120,7 +120,7 @@ it('rolls back apple and receipt on a receipt write failure; the same request ca
 it('requires the actual grounded flag even at the first sub-centimetre rising jump step',()=>{
   const f=durable(),id=f.people[0]!.playerId;
   expect(f.act(player(id),pickup('hold-before-jump'))).toMatchObject({ok:true});
-  const world=new World(f.maps,[],undefined,f.life);world.add(player(id));
+  const world=new World(f.maps,[],undefined,{},f.life);world.add(player(id));
   world.setIntent(id,1,{x:0,z:0},['0_0'],1,false,1);world.step(.001,1);
   const actor=world.locate(id)!;expect(actor.position.y).toBeGreaterThan(0);expect(actor.position.y).toBeLessThan(.05);expect(world.isGrounded(id)).toBe(false);
   const apples=f.store.initialize([f.map.manifest.worldLife!]);
@@ -138,7 +138,7 @@ it('SQLite independently enforces the one-slot invariant and immutable seed IDs'
 });
 
 it('movement pushes a RAM pot, reconnect preserves it, and a new world resets it',()=>{
-  const f=domain();const world=new World(f.maps,[],undefined,f.life);world.add(player('p1',-4,0));
+  const f=domain();const world=new World(f.maps,[],undefined,{},f.life);world.add(player('p1',-4,0));
   for(let i=1;i<=6;i++){world.setIntent('p1',i,{x:0,z:1},['0_0'],i*50);world.step(.05,i*50);}
   const moved=f.life.snapshot('test',1400)!.pots[0]!.position;expect(moved.z).toBeGreaterThan(1);
   world.resetInput('p1');expect(f.life.snapshot('test',1500)!.pots[0]!.position).toEqual(moved);
@@ -173,19 +173,45 @@ it('reserves reset footprints for durable apples and restores an overlapping pla
   const p=player('pusher',-4,.4);
   expect(f.life.tryPush(p,pos(-4,.7),[p],new Set(['0_0']),true)).toBe(true);
   expect(f.act(player(id,-4,.1),place('reset-footprint'))).toMatchObject({code:'BLOCKED'});
-  const restarted=domain();const world=new World(restarted.maps,[],undefined,restarted.life);
+  const restarted=domain();const world=new World(restarted.maps,[],undefined,{},restarted.life);
   world.add(player(id,-4,1));expect(world.locate(id)?.position).toEqual(restarted.map.spawn);
   const corrupted=sceneFixture.apples.map(a=>a.id==='apple-1'?{...a,state:'world' as const,position:pos(-4,1)}:a);
   expect(()=>restarted.life.setApples(corrupted)).toThrow('Unsafe durable apple');
 });
 
-it('migrates an actual v2 DB to v3 without losing account, position or NPC history; future/failed migration rolls back',()=>{
+it('upgrades the pre-merge world-life v3 database, preserving held apples, receipts and migration timestamps across restart', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'legacy-world-life-')); dirs.push(dir);
+  const path = join(dir, 'old.sqlite'); const old = new DatabaseSync(path); dbs.push(old);
+  const migrations = loadMigrations();
+  transaction(old, () => applyMigrations(old, [...migrations.slice(0, 2), { version: 3, sql: migrations[3]!.sql }], 10));
+  old.exec("INSERT INTO accounts VALUES('a','Old','old',1); INSERT INTO players(id,account_id,updated_at) VALUES('p','a',1)");
+  const store = sqliteWorldLife(old); store.initialize([sceneFixture.definition]);
+  const result = store.execute('p', 'test', pickup(), () => ({ v: 1, type: 'hand-result', requestId: 'pick', ok: true, action: 'pickup', apple: { id: 'apple-1', mapId: 'test', state: 'held', holderId: 'p' } }));
+  old.close();
+  for (let restart = 0; restart < 2; restart++) {
+    const db = openDatabase(path, 20 + restart); dbs.push(db);
+    expect(db.prepare('SELECT version, applied_at FROM schema_migrations ORDER BY version').all()).toEqual([
+      { version: 1, applied_at: 10 }, { version: 2, applied_at: 10 }, { version: 3, applied_at: 20 }, { version: 4, applied_at: 10 },
+    ]);
+    expect(db.prepare('SELECT password_hash FROM accounts').get()!.password_hash).toBeNull();
+    expect(sqliteWorldLife(db).execute('p', 'test', pickup(), () => { throw new Error('Receipt must be replayed'); })).toEqual({ ...result, changed: false });
+    expect(db.prepare('PRAGMA integrity_check').get()!.integrity_check).toBe('ok');
+    db.close();
+  }
+});
+
+it.each([2, 3])('migrates an actual v%i DB to v4 without losing account, position or NPC history; future/failed migration rolls back',(version)=>{
   const dir=mkdtempSync(join(tmpdir(),'life-v2-'));dirs.push(dir);const path=join(dir,'old.sqlite');const old=new DatabaseSync(path);dbs.push(old);
-  old.exec('PRAGMA foreign_keys=ON');transaction(old,()=>applyMigrations(old,loadMigrations().slice(0,2),1));
-  const stores=sqliteStores(old),p=stores.accounts.findOrCreate('Old','old',1);stores.players.save([{id:p.playerId,mapId:'test',position:pos(2,3),rotationY:1}]);stores.dialogue.append(p.playerId,'npc','Q','A',2);old.close();
-  const upgraded=openDatabase(path);dbs.push(upgraded);expect(upgraded.prepare('SELECT max(version) AS v FROM schema_migrations').get()!.v).toBe(3);
+  old.exec('PRAGMA foreign_keys=ON');transaction(old,()=>applyMigrations(old,loadMigrations().slice(0,version),1));
+  const p={accountId:'old-account',playerId:'old-player',displayName:'Old'};
+  old.exec("INSERT INTO accounts(id,name,name_key,created_at) VALUES('old-account','Old','old',1); INSERT INTO players(id,account_id,map_id,x,y,z,rotation_y,updated_at) VALUES('old-player','old-account','test',2,0,3,1,1); INSERT INTO npc_dialogue(player_id,npc_id,question,answer,created_at) VALUES('old-player','npc','Q','A',2)");
+  if (version === 3) old.prepare('UPDATE accounts SET password_hash = ? WHERE id = ?').run('preserved-password-hash',p.accountId);
+  old.close();
+  const upgraded=openDatabase(path);dbs.push(upgraded);expect(upgraded.prepare('SELECT max(version) AS v FROM schema_migrations').get()!.v).toBe(4);
+  if (version === 3) expect(upgraded.prepare('SELECT password_hash FROM accounts WHERE id = ?').get(p.accountId)!.password_hash).toBe('preserved-password-hash');
+  expect(upgraded.prepare('SELECT count(*) AS n FROM world_apples').get()!.n).toBe(0);
   const restored=sqliteStores(upgraded);expect(restored.accounts.findOrCreate('Old','old',3)).toEqual(p);expect(restored.players.load(p.playerId)?.position).toEqual(pos(2,3));expect(restored.dialogue.history(p.playerId,'npc')).toEqual([{question:'Q',answer:'A'}]);
-  expect(()=>transaction(upgraded,()=>applyMigrations(upgraded,[...loadMigrations(),{version:4,sql:'CREATE TABLE transient(id INTEGER); INSERT INTO missing VALUES(1)'}],4))).toThrow();
+  expect(()=>transaction(upgraded,()=>applyMigrations(upgraded,[...loadMigrations(),{version:5,sql:'CREATE TABLE transient(id INTEGER); INSERT INTO missing VALUES(1)'}],4))).toThrow();
   expect(upgraded.prepare("SELECT name FROM sqlite_master WHERE name='transient'").get()).toBeUndefined();
-  upgraded.prepare('INSERT INTO schema_migrations VALUES(4,4)').run();upgraded.close();expect(()=>openDatabase(path)).toThrow('Не удалось открыть БД');
+  upgraded.prepare('INSERT INTO schema_migrations VALUES(5,4)').run();upgraded.close();expect(()=>openDatabase(path)).toThrow('Не удалось открыть БД');
 });

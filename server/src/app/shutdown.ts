@@ -5,8 +5,9 @@ export function shutdownOnSignals(app: { stop(): Promise<void> }, logger: Logger
   const stop = () => {
     if (stopping) return;
     stopping = true;
-    const deadline = setTimeout(() => { logger.error('Остановка превысила 10 с'); process.exit(1); }, 10000);
-    void app.stop().then(() => { clearTimeout(deadline); process.exitCode = 0; }, () => { logger.error('Ошибка остановки'); process.exit(1); });
+    logger.info('app.signal', 'Получен сигнал остановки');
+    const deadline = setTimeout(() => { logger.fatal('app.stop.timeout', 'Остановка превысила 10 с'); process.exit(1); }, 10000);
+    void app.stop().then(() => { clearTimeout(deadline); process.exitCode = 0; }, () => { logger.error('app.stop.failed', 'Ошибка остановки'); process.exit(1); });
   };
   process.on('SIGINT', stop); process.on('SIGTERM', stop);
 }

@@ -561,5 +561,73 @@
         ]
       }
     }
+  },
+  {
+    "direction": "client",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "npc-question",
+      "requestId": "c1_5",
+      "targetId": "shepherd",
+      "text": "Что ест козлёнок?",
+      "stream": true
+    }
+  },
+  {
+    "direction": "client",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "npc-question",
+      "requestId": "c1_5",
+      "targetId": "shepherd",
+      "text": "Что ест козлёнок?",
+      "stream": "yes"
+    }
+  },
+  {
+    "direction": "client",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "npc-cancel",
+      "requestId": "c1_6",
+      "questionId": "c1_5"
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "npc-partial",
+      "requestId": "c1_5",
+      "targetId": "shepherd",
+      "seq": 1,
+      "text": "Серому козлёнку"
+    }
+  },
+  {
+    "direction": "server",
+    "valid": false,
+    "packet": {
+      "v": 3,
+      "type": "npc-partial",
+      "requestId": "c1_5",
+      "targetId": "shepherd",
+      "seq": 0,
+      "text": "Серому козлёнку"
+    }
+  },
+  {
+    "direction": "server",
+    "valid": true,
+    "packet": {
+      "v": 3,
+      "type": "npc-cancelled",
+      "requestId": "c1_6",
+      "questionId": "c1_5"
+    }
   }
 ]

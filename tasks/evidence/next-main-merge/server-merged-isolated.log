@@ -1,0 +1,52 @@
+{"startupMs":113.80116600000001}
+{
+  "baseRevision": "09fd771",
+  "node": "v24.15.0",
+  "players": 4,
+  "durationMs": 61000,
+  "startupMs": 113.80116600000001,
+  "backend": "real generated world and temporary SQLite; explicit test LLM",
+  "steps": [
+    {
+      "p50": 0.405,
+      "p95": 1.236,
+      "max": 4.443,
+      "broadcastP95": 101.198,
+      "players": 4
+    }
+  ],
+  "deltas": 2439,
+  "scenePackets": 244,
+  "scenes": [
+    {
+      "sceneId": "scene_hbgaod8zu4nt2dep",
+      "epochMs": 1793525415576,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    },
+    {
+      "sceneId": "scene_hbgaod8zu4nt2dep",
+      "epochMs": 1793525415576,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    },
+    {
+      "sceneId": "scene_hbgaod8zu4nt2dep",
+      "epochMs": 1793525415576,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    },
+    {
+      "sceneId": "scene_hbgaod8zu4nt2dep",
+      "epochMs": 1793525415576,
+      "cats": 3,
+      "pots": 4,
+      "apples": 5
+    }
+  ],
+  "errors": [],
+  "targetHardware": "darwin/arm64; browser GPU measured separately"
+}

@@ -12,7 +12,7 @@ related:
   - spec: ../specs/protocol.md
     requirements: [PROTO-007]
 depends_on: [TASK-011, TASK-014, TASK-017, TASK-025]
-scheduling_note: требует утверждённого PROTO v2 и изменения клиента; до этого модель подключается адаптером NpcResponder v1
+scheduling_note: выполняет владелец LLM-части; серверные порты NpcResponder (с потоком onPartial) и LanguagePort готовы в TASK-040, поток PROTO-007 на сервере реализован и ждёт клиента
 ---
 
 # Сервер: локальные NPC

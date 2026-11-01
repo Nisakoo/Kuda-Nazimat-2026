@@ -1,5 +1,5 @@
 ---
-id: TASK-042
+id: TASK-057
 type: implementation-task
 status: in-progress
 spec: ../specs/world-next-stage.md

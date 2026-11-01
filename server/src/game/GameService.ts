@@ -1,14 +1,16 @@
-import type { ServerMessage } from '../../../shared/protocol/types.ts';
+import { LIMITS, type ServerMessage } from '../../../shared/protocol/types.ts';
 import type { Direction } from '../../../shared/world/types.ts';
 import type { HandRequest, HandResultMessage, SceneStateMessage } from '../../../shared/world-life/types.ts';
 import { handFailure } from '../../../shared/world-life/validate.ts';
 import type { WorldLifeStore } from './worldLifePorts.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
-import type { PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
+import { MetricsRegistry, type Counter, type Histogram, type Metrics } from '../common/metrics.ts';
+import type { PlayerIdentity, PlayerPresence, PlayerStore, SavedPosition } from '../contracts.ts';
 import type { PlayerLocation } from '../world/access.ts';
 import type { NpcDefinition } from '../world/npcContent.ts';
 import { AoiStream } from './AoiStream.ts';
+import { chooseSpawn, isFree } from './spawn.ts';
 import type { Channel } from './ports.ts';
 import type { PlacedPlayer, World } from './World.ts';
 
@@ -19,8 +21,12 @@ interface Seat {
   channel: Channel | null;
   stream: AoiStream | null;
   grace: TimerHandle | null;
+  releaseAt: number | null;
   lifeRevision: number;
   lifeSentAt: number;
+  readonly seatedAt: number;
+  /** Attach times within the last 10 minutes, for the unstable-connection warning (OBS-010). */
+  attaches: number[];
 }
 
 export type JoinResult =
@@ -42,11 +48,23 @@ export class GameService {
   private readonly settings: GameSettings;
   private readonly log: Logger;
   private readonly lifeStore?: WorldLifeStore;
+  private readonly seatEvents: Counter;
+  private readonly spawnFallbacks: Counter;
+  private readonly deltaBytes: Histogram;
+  private readonly packets: Counter;
 
-  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger, lifeStore?: WorldLifeStore) {
+  constructor(world: World, players: PlayerStore, clock: Clock, scheduler: Scheduler, settings: GameSettings, log: Logger, metrics: Metrics = new MetricsRegistry(), lifeStore?: WorldLifeStore) {
     this.lifeStore = lifeStore;
     this.world = world; this.players = players; this.clock = clock; this.scheduler = scheduler; this.settings = settings; this.log = log;
     this.startedAt = clock.now().toString(36);
+    this.seatEvents = metrics.counter('game_seat_events_total', 'События мест: attach, detach, release, takeover');
+    this.spawnFallbacks = metrics.counter('game_spawn_fallback_total', 'Появления в базовой точке без свободного места');
+    this.deltaBytes = metrics.histogram('game_delta_bytes', 'Оценка размера delta на соединение', [512, 2048, 8192, 32768, 65536, 131072, 196608, 262144]);
+    this.packets = metrics.counter('game_packets_out_total', 'Игровые пакеты сервера по типу');
+    metrics.gauge('game_players', 'Игроки по состоянию места', () => {
+      const connected = [...this.seats.values()].filter((seat) => seat.channel).length;
+      return [{ labels: { state: 'connected' }, value: connected }, { labels: { state: 'grace' }, value: this.seats.size - connected }];
+    });
   }
 
   /** SERVER-006: an account that already has a seat may always reconnect; a new one needs a free slot. */
@@ -57,15 +75,19 @@ export class GameService {
   /** AUTH-005: the newest connection takes control; the previous one is closed. False when no slot is free. */
   attach(identity: PlayerIdentity, channel: Channel): boolean {
     if (!this.canAdmit(identity.accountId)) return false;
+    const now = this.clock.now();
     let seat = this.seats.get(identity.accountId);
-    if (!seat) { seat = { identity, channel: null, stream: null, grace: null, lifeRevision: -1, lifeSentAt: -Infinity }; this.seats.set(identity.accountId, seat); }
-    if (seat.grace) { this.scheduler.clearTimeout(seat.grace); seat.grace = null; }
+    if (!seat) { seat = { identity, channel: null, stream: null, grace: null, releaseAt: null, seatedAt: now, attaches: [], lifeRevision: -1, lifeSentAt: -Infinity }; this.seats.set(identity.accountId, seat); }
+    seat.attaches = [...seat.attaches.filter((time) => now - time < 600_000), now];
+    if (seat.grace) { this.scheduler.clearTimeout(seat.grace); seat.grace = null; seat.releaseAt = null; }
     const previous = seat.channel;
     seat.channel = channel;
     seat.stream = null;
     seat.lifeRevision = -1;
     seat.lifeSentAt = -Infinity;
     this.world.resetInput(identity.playerId);
+    this.seatEvents.inc({ event: previous ? 'takeover' : 'attach' });
+    this.log.info('game.seat.attach', previous ? 'Управление перехвачено новым соединением' : 'Игрок занял место', { playerId: identity.playerId, connectionId: channel.id, takeover: previous !== null, reconnects: seat.attaches.length - 1 });
     if (previous) previous.close(TAKEOVER_REASON);
     return true;
   }
@@ -81,16 +103,21 @@ export class GameService {
     seat.channel = null;
     seat.stream = null;
     this.world.resetInput(seat.identity.playerId);
+    seat.releaseAt = this.clock.now() + this.settings.disconnectGraceMs;
     seat.grace = this.scheduler.setTimeout(() => this.release(seat), this.settings.disconnectGraceMs);
+    this.seatEvents.inc({ event: 'detach' });
+    this.log.info('game.seat.detach', 'Соединение потеряно, место удерживается', { playerId: seat.identity.playerId, connectionId: channel.id, graceMs: this.settings.disconnectGraceMs });
   }
 
   private release(seat: Seat): void {
-    seat.grace = null;
+    seat.grace = null; seat.releaseAt = null;
     if (seat.channel) return;
     const placed = this.world.locate(seat.identity.playerId);
     if (placed) this.persist([placed]);
     this.world.remove(seat.identity.playerId);
     this.seats.delete(seat.identity.accountId);
+    this.seatEvents.inc({ event: 'release' });
+    this.log.info('game.seat.release', 'Место освобождено', { playerId: seat.identity.playerId });
   }
 
   join(channel: Channel, mapId: string): JoinResult {
@@ -108,7 +135,13 @@ export class GameService {
       const saved = this.loadSaved(playerId);
       const usable = !force && saved !== null && saved.mapId === mapId && this.world.isSafeSupport(mapId, saved.position);
       const spawn = initial?.mapId === mapId && this.world.isSafeSupport(mapId, initial.position) ? initial.position : map.spawn;
-      this.world.add({ id: playerId, name: displayName, mapId, position: usable ? saved.position : spawn, rotationY: usable ? saved.rotationY : Math.PI });
+      // REALTIME-010: never stack players; a free saved position is kept with its rotation.
+      const others = this.world.playerPositions(mapId);
+      const placement = usable && isFree(saved.position, others) ? { position: saved.position, rotationY: saved.rotationY }
+        : chooseSpawn(usable ? saved.position : spawn, (x, z) => this.world.isSafeSupport(mapId, { x, y: map.heightAt(x, z), z }), others);
+      if ('fallback' in placement) { this.spawnFallbacks.inc(); this.log.warn('game.spawn.fallback', 'Нет свободной точки появления, использована базовая', { playerId, mapId }); }
+      this.world.add({ id: playerId, name: displayName, mapId, position: placement.position, rotationY: placement.rotationY });
+      this.log.debug('game.spawn', 'Точка появления выбрана', { playerId, mapId, position: placement.position, saved: usable });
     }
     if (force) {
       // Save the role spawn before acknowledging it, so a reconnect never restores an old demo position.
@@ -150,7 +183,7 @@ export class GameService {
       life.setApples(apples, changed);
       return result;
     } catch (error) {
-      this.log.error('Не удалось сохранить переносимый предмет', { error: error instanceof Error ? error.message : String(error) });
+      this.log.error('world.hand.persist_failed', 'Не удалось сохранить переносимый предмет', { error: error instanceof Error ? error.message : String(error) });
       return handFailure(request.requestId, 'UNAVAILABLE', 'Не удалось сохранить действие. Повторите с тем же requestId.');
     }
   }
@@ -205,8 +238,20 @@ export class GameService {
       const channel = seat.channel;
       this.syncLife(channel, true, scenes, now);
       if (seat.channel !== channel || !seat.stream) continue;
-      const delta = seat.stream.diff(this.world.aoi(seat.identity.playerId));
-      if (delta) channel.send({ v: 3, type: 'delta', tick: this.world.tick, ...delta });
+      const entities = this.world.aoi(seat.identity.playerId);
+      if (new Set(entities.map((entity) => entity.id)).size !== entities.length) this.log.error('invariant.violated', 'Повтор ID сущности в AOI', { invariant: 'aoi.unique-ids', playerId: seat.identity.playerId });
+      const delta = seat.stream.diff(entities);
+      if (!delta) continue;
+      this.deltaBytes.observe(delta.bytes);
+      const { bytes, ...body } = delta;
+      if (bytes > LIMITS.packetBytes - 4096) {
+        // OBS-003: an oversized delta would be rejected by the client; the revision gap makes it resync.
+        this.log.error('game.packet.oversize', 'Delta больше лимита пакета, не отправлена', { playerId: seat.identity.playerId, bytes, entities: entities.length });
+        continue;
+      }
+      if (bytes > LIMITS.packetBytes * 0.75) this.log.warn('game.delta.large', 'Delta близка к лимиту пакета', { playerId: seat.identity.playerId, bytes, entities: entities.length });
+      this.packets.inc({ type: 'delta' });
+      seat.channel.send({ v: 3, type: 'delta', tick: this.world.tick, ...body });
     }
   }
 
@@ -228,15 +273,35 @@ export class GameService {
 
   get activePlayers(): number { return this.seats.size; }
 
+  presence(): PlayerPresence[] {
+    const now = this.clock.now();
+    return [...this.seats.values()].map((seat) => ({
+      name: seat.identity.displayName, mapId: this.world.locate(seat.identity.playerId)?.mapId ?? null,
+      connected: seat.channel !== null, releaseInMs: seat.releaseAt === null ? null : Math.max(0, seat.releaseAt - now),
+      rttMs: seat.channel?.rttMs?.() ?? null, reconnects: Math.max(0, seat.attaches.filter((time) => now - time < 600_000).length - 1),
+      seatedSeconds: Math.floor((now - seat.seatedAt) / 1000),
+    }));
+  }
+
+  /** AUTH-012: every connection of a revoked session is closed with the reason; the seat follows the normal grace. */
+  closeSessions(sessionKeys: ReadonlySet<string>, message: string): void {
+    for (const seat of this.seats.values()) if (seat.channel?.sessionKey && sessionKeys.has(seat.channel.sessionKey)) seat.channel.close(message);
+  }
+
+  /** OBS-004 dump state: counts and IDs only. */
+  state(): Record<string, unknown> {
+    return { tick: this.world.tick, seats: [...this.seats.values()].map((seat) => ({ playerId: seat.identity.playerId, connected: seat.channel !== null, joined: seat.stream !== null, revision: seat.stream?.revision ?? null, releaseAt: seat.releaseAt })) };
+  }
+
   private loadSaved(playerId: string): SavedPosition | null {
     try { return this.players.load(playerId); }
-    catch (error) { this.log.error('Не удалось прочитать позицию игрока', { playerId, error: error instanceof Error ? error.message : String(error) }); return null; }
+    catch (error) { this.log.error('db.transaction.failed', 'Не удалось прочитать позицию игрока', { operation: 'players.load', playerId, error }); return null; }
   }
 
   private persist(placed: readonly PlacedPlayer[]): void {
     if (placed.length === 0) return;
     try { this.players.save(placed.map((entry) => this.world.savedLocation(entry.id) ?? entry).map(({ id, mapId, position, rotationY }) => ({ id, mapId, position, rotationY }))); }
-    catch (error) { this.log.error('Не удалось сохранить позиции игроков', { count: placed.length, error: error instanceof Error ? error.message : String(error) }); }
+    catch (error) { this.log.error('db.transaction.failed', 'Не удалось сохранить позиции игроков', { operation: 'players.save', count: placed.length, error }); }
   }
 
   private seatOf(channel: Channel): Seat | undefined {

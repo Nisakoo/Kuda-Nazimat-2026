@@ -5,7 +5,7 @@ status: todo
 spec: ../specs/server-llm-runtime.md
 requirements: [LLM-001–014]
 depends_on: [TASK-010]
-scheduling_note: сервер в server/; функциональная основа до интеграции NPC, квалификация после неё в TASK-018
+scheduling_note: выполняет владелец LLM-части; адаптер подключается к портам NPC-005/NPC-009 (TASK-040) через реестры и config.json; квалификация после неё в TASK-018
 ---
 
 # Локальный runtime MLX и Ollama

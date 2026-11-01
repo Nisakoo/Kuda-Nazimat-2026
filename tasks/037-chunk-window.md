@@ -19,8 +19,8 @@ related:
     requirements: [NEXT-006]
   - spec: ../specs/server-world.md
     requirements: [SERVER-WORLD-004]
-  - spec: ../specs/server-demo.md
-    requirements: [SERVER-DEMO-004]
+  - spec: ../specs/offline-multiplayer.md
+    requirements: [OFFLINE-016]
 depends_on: [TASK-036]
 ---
 

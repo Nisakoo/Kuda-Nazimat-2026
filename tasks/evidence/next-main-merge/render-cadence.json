@@ -1,0 +1,66 @@
+[
+  {
+    "case": "render-MOVE-poses-four-player-poses-at-60-FPS-from-front",
+    "requestedFps": 60,
+    "simulatedFrames": 241,
+    "seconds": 4.0316000000238414,
+    "actualFps": 59.77775572938159,
+    "completed": true
+  },
+  {
+    "case": "render-MOVE-poses-four-pla-5cae6--place-at-30-FPS-from-front",
+    "requestedFps": 30,
+    "simulatedFrames": 121,
+    "seconds": 4.048299999952317,
+    "actualFps": 29.889089247690443,
+    "completed": true
+  },
+  {
+    "case": "render-MOVE-poses-four-pla-161ad-y-place-at-60-FPS-from-side",
+    "requestedFps": 60,
+    "simulatedFrames": 241,
+    "seconds": 4.031200000047684,
+    "actualFps": 59.78368723882449,
+    "completed": true
+  },
+  {
+    "case": "render-MOVE-poses-four-player-poses-at-30-FPS-from-side",
+    "requestedFps": 30,
+    "simulatedFrames": 121,
+    "seconds": 4.048799999952316,
+    "actualFps": 29.88539814301152,
+    "completed": true
+  },
+  {
+    "case": "render-MOVE-poses-four-player-poses-at-60-FPS-from-side",
+    "requestedFps": 60,
+    "simulatedFrames": 241,
+    "seconds": 4.047899999976158,
+    "actualFps": 59.53704389965648,
+    "completed": true
+  },
+  {
+    "case": "render-MOVE-poses-four-pla-b748f-y-place-at-30-FPS-from-side",
+    "requestedFps": 30,
+    "simulatedFrames": 121,
+    "seconds": 4.0495,
+    "actualFps": 29.880232127423138,
+    "completed": true
+  },
+  {
+    "case": "render-MOVE-poses-four-player-poses-at-30-FPS-from-front",
+    "requestedFps": 30,
+    "simulatedFrames": 121,
+    "seconds": 4.043200000047683,
+    "actualFps": 29.92679066050974,
+    "completed": true
+  },
+  {
+    "case": "render-MOVE-poses-four-pla-b6b77--place-at-60-FPS-from-front",
+    "requestedFps": 60,
+    "simulatedFrames": 241,
+    "seconds": 4.0325,
+    "actualFps": 59.764414135151895,
+    "completed": true
+  }
+]

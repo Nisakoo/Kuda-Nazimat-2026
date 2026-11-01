@@ -119,8 +119,9 @@ async function start() {
     const timeout = setTimeout(() => reject(new Error(output || 'Server startup timeout')), 60000);
     child.once('exit', code => { clearTimeout(timeout); if (!expectedServerStop) console.error('NEXT unexpected backend exit', code, output); reject(new Error(`Server exited ${code}: ${output}`)); });
     const record = (data: Buffer) => { const text = data.toString(); output += text; serverOutput = (serverOutput + text).slice(-200000); console.log('NEXT backend', text.trim()); };
-    child.stderr!.on('data', record);
-    child.stdout!.on('data', data => { record(data); if (output.includes('Сервер доступен')) { serverReady = true; clearTimeout(timeout); done(); } });
+    const ready = (data: Buffer) => { record(data); if (output.includes('(app.ready)')) { serverReady = true; clearTimeout(timeout); done(); } };
+    child.stderr!.on('data', ready);
+    child.stdout!.on('data', ready);
   });
 }
 async function stop() {
@@ -326,7 +327,8 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   await page.getByLabel('Сообщение группе').fill('Прогрев');
   await activate(page.getByRole('button', { name: 'Отправить', exact: true }));
   await (await mumbleLoaded).finished();
-  await page.waitForTimeout(400);
+  // Respect the server's one-second chat interval after the warm-up chat.
+  await page.waitForTimeout(1100);
   const oldMumbles = await countMumbles();
   await page.getByLabel('Сообщение группе').fill('Привет');
   await activate(page.getByRole('button', { name: 'Отправить', exact: true }));
@@ -355,7 +357,8 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
     return { sources: Number(values[1]), buffers: Number(values[2]), pending: Number(values[3]), bytes: Number(values[4]) };
   };
   // A new shown question/answer pair and a remote jump produce distinct causal sources.
-  await walk(page, 'z', .5); await walk(page, 'x', -2);
+  // Stay inside the interaction radius even with the route's 0.35 m arrival tolerance.
+  await walk(page, 'z', .5); await walk(page, 'x', -2.5);
   await page.keyboard.press('e');
   await expect(page.getByRole('dialog', { name: 'Торговец фруктами', exact: true })).toBeVisible();
   await page.waitForTimeout(400); const beforeReply = await countMumbles();
@@ -364,13 +367,21 @@ test('NEXT audio: real WebAudio unlock, volume persistence, no repeated jump, an
   await expect(page.locator('.dialog-history')).toContainText('test merchant reply');
   await expect.poll(countMumbles).toBe(beforeReply + 2);
   await activate(page.getByRole('button', { name: 'Закрыть', exact: true })); await resume(page);
-  const remote = await context.newPage(); await login(remote, 'NEXT audio remote', '1', 0);
-  await page.waitForTimeout(1000); const beforeRemote = await countJumps();
-  await remote.keyboard.press('Space');
-  await expect.poll(countJumps).toBe(beforeRemote + 1);
-  await remote.close(); await resume(page);
-  // A real backend restart must restore history silently through automatic reconnect.
+  // A second browser window keeps the listener visible; a background tab suspends
+  // its game loop and intentionally does not replay a missed jump on returning.
+  const remoteContext = await context.browser()!.newContext();
+  try {
+    const remote = await remoteContext.newPage(); await login(remote, 'NEXT audio remote', '1', 0);
+    await page.waitForTimeout(1000); const beforeRemote = await countJumps();
+    await remote.keyboard.press('Space');
+    await expect.poll(countJumps).toBe(beforeRemote + 1);
+  } finally { await remoteContext.close(); }
+  await resume(page);
+  // Main's graceful shutdown returns to login; re-entry must restore history silently.
   const beforeReconnect = await countMumbles(); await stop(); await start();
+  await expect(page.getByLabel('Имя игрока')).toBeVisible();
+  await page.getByLabel('Имя игрока').fill('NEXT audio');
+  await activate(page.getByRole('button', { name: 'Войти', exact: true }));
   await expect(page.getByLabel('Состояние связи')).toContainText('Подключён', { timeout: 30000 });
   await page.waitForTimeout(1400); expect(await countMumbles()).toBe(beforeReconnect);
   await expect(page.getByRole('button', { name: 'Начать прогулку' })).toBeEnabled();
