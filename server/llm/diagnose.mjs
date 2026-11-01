@@ -25,11 +25,13 @@ async function productionFactory(options, deps) {
  * This is a preflight, not a lock. The worker retains its own port/ownership checks.
  */
 async function requireFreePort(port) {
-  for (const host of ['0.0.0.0', '::']) {
+  // macOS may allow a wildcard bind beside an existing specific-address
+  // listener. Probe the loopback endpoints used by the game/worker as well.
+  for (const host of ['127.0.0.1', '0.0.0.0', '::1', '::']) {
     await new Promise((yes, no) => {
       const server = createServer((socket) => socket.destroy());
       server.once('error', (error) => {
-        if (host === '::' && ['EAFNOSUPPORT', 'EADDRNOTAVAIL'].includes(error.code)) yes();
+        if (host.includes(':') && ['EAFNOSUPPORT', 'EADDRNOTAVAIL'].includes(error.code)) yes();
         else no(new Error('port_unavailable'));
       });
       server.listen({ port, host, exclusive: true, ipv6Only: true }, () => server.close((error) => error ? no(error) : yes()));

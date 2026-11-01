@@ -22,12 +22,13 @@ cd Kuda-Nazimat-2026
 ```sh
 sw_vers -productVersion
 uname -m
-command -v node npm python3.12 ollama
+command -v node npm uv ollama
 node --version
-python3.12 --version
+uv --version
+uv python find --no-python-downloads 3.12
 ```
 
-**Не начинать с `brew install node@24 python@3.12 ollama` на Intel.** На пользовательском macOS15.7.3 Homebrew сообщил об отсутствии поддержки/bottles, начал длительную сборку и обновление глобальных зависимостей; Ollama formula завершилась ошибкой. Уже установленный Python3.12.8 подошёл без обновления. Если Python3.12 отсутствует, отдельно подготовить совместимый официальный runtime, не запускать цепочку глобальных upgrade вслепую.
+**Не начинать с `brew install node@24 python@3.12 ollama` на Intel.** На пользовательском macOS15.7.3 Homebrew сообщил об отсутствии поддержки/bottles, начал длительную сборку и обновление глобальных зависимостей; Ollama formula завершилась ошибкой. Исторически Python3.12.8 подошёл без обновления. Новая установка использует uv; legacy-окружение не пересоздавать. Если Python3.12 отсутствует, отдельно подготовить совместимый официальный runtime, не запускать цепочку глобальных upgrade вслепую.
 
 Готовые официальные архивы Node24.22.2 x64 и Ollama0.40.13 universal с проверкой SHA-256 (ссылки/хеши закреплены, не latest):
 
@@ -65,8 +66,8 @@ npm --prefix server ci
 npm --prefix client ci
 npm --prefix client run build
 mkdir -p "$HOME/kuda-llm"
-python3.12 -m venv "$HOME/kuda-llm/venv"
-"$HOME/kuda-llm/venv/bin/python3" -m pip install -r server/llm/requirements-ollama.txt
+uv python install 3.12
+make llm-prepare BACKEND=ollama
 ```
 
 ## 3. Веса (2 терминала)

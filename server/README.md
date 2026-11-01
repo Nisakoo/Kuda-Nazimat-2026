@@ -2,6 +2,8 @@
 
 Авторитетный мир/Socket.IO v3, HTTP, SQLite, AUTH и OBS объединены. NPC/BABEL используют одну GenerationQueue. В NpcResponder зарегистрированы scripted и локальные Ollama/MLX; LanguagePort BABEL по умолчанию использует test; явный local заимствует тот же локальный responder и общую очередь. Клиент поддерживает парольную регистрацию и вход, загружает мир с Bearer, обменивается чатом и получает финальные NPC-ответы с историей. Development также допускает вход по имени. Полная приёмка TASK-044 остаётся отдельной.
 
+**Python через uv:** `uv python install 3.12` → `make llm-prepare BACKEND=mlx` или `BACKEND=ollama`; зависимости фиксируются в `llm/envs/*/uv.lock`. [Установочный скилл](../.agents/skills/install-local-ai/SKILL.md).
+
 **LLM с нуля:** [SETUP](llm/SETUP.md). Уже подготовленная машина: `make server NPC_TIMEOUT=60`; явный профиль: `make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=120`. [Профили](llm/PROFILES.md), [timeout](llm/TIMEOUT.md), [границы runtime](llm/README.md). Не запускать `make llm-import` как универсальный установщик: это однократный перенос существующих 0.8B/2B конфигов.
 
 ## Подготовка и команды

@@ -100,7 +100,8 @@ async function catalog(f: Fixture) {
 it('keeps map routing, runtime boundaries, and legacy migration warnings explicit', () => {
   expect(ollamaBody).toContain("defaultMap='demo'");
   expect(mlxBody).toContain("defaultMap='demo'");
-  expect(guide).toContain('BabylonLanguagePort');
+  expect(guide).toContain('"adapter": "local"');
+  expect(guide).toContain('ту же модель и очередь');
   expect(guide).toContain('Лее или Марку');
   expect(guide).toContain('изменить только поле «Карта» на `demo`');
   expect(guide).toContain('не требует правки существующего config');
