@@ -19,13 +19,13 @@ depends_on: [TASK-079]
 
 - [x] Command seam проверяет macOS 1500 мс и Linux 500 мс, прежние аргументы/буфер/парсер/охват процессов.
 - [x] Медленный допустимый замер на macOS не даёт ready до результата; зависший замер по-прежнему приводит к отказу. Превышение RAM и ошибочные значения не принимаются.
-- [ ] Серверные type/import checks и focused regression выполнены; полный прогон отмечен фактическим результатом.
+- [x] Серверные type/import checks и focused regression выполнены; полный прогон отмечен фактическим результатом.
 - [ ] Повторная пользовательская проверка на Mac без `memory_sample_ps_timeout` при последовательных вопросах.
 
 ## Evidence
 
 Кандидат исправления реализован. Focused `npm --prefix server test -- server/test/llm-memory.test.ts server/test/localLlm.test.ts -t "memory|measurement|RSS|macOS"`: 27 passed, 131 вне фильтра, 2 files; `/tmp/npc080-focused.log`. `npm --prefix server run check`: PASS, server/shared TypeScript, 97 modules / 334 dependencies.
 
-`make server-test` запущен в фоне, результат на момент публикации ещё ожидается: `/tmp/npc080-server-tests.log`. По просьбе пользователя не задерживать выдачу патч публикуется до конца полного прогона. Проверка на Mac остаётся открытой; статус in-progress.
+`make server-test` завершился: 679 passed / 15 skipped / 45 files, `/tmp/npc080-server-tests.log`. При первоначальной публикации d45cd52 он ещё шёл в фоне; результат добавлен после завершения. Проверка на Mac остаётся открытой; статус in-progress.
 
 Настоящие Ollama/MLX, diagnose, модели и downloads на этой машине не запускались. Предыдущий общий Python-прогон TASK-079 с 1 failure не объявляется исправленным. Клиент, модельные профили, база и main не менялись.
