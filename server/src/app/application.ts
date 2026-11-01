@@ -76,7 +76,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   dbLog.info('db.opened', 'База данных открыта', { path: config.dbPath, schema });
   metrics.gauge('db_size_bytes', 'Размер файла БД и WAL', () => databaseBytes(config.dbPath));
   const stores = sqliteStores(db, Date.now, observe);
-  const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: systemClock, ttlMs: config.sessionTtlMs, canAdmit: accountId => game?.canAdmit ? game.canAdmit(accountId ?? '') : !game || game.activePlayers() < config.maxPlayers, maxSessions: config.auth.maxSessions, passwordless: config.auth.passwordless, logger: logger.child('auth'), metrics });
+  const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: systemClock, ttlMs: config.sessionTtlMs, canAdmit: accountId => game?.canAdmit ? game.canAdmit(accountId ?? '') : !game || game.activePlayers() < config.maxPlayers, maxSessions: config.auth.maxSessions, adminTtlMs: config.admin.sessionTtlMs, passwordless: config.auth.passwordless, logger: logger.child('auth'), metrics });
   if (config.auth.passwordless) log.warn('auth.passwordless.enabled', `Вход без пароля включён (${config.env}); в production он запрещён`);
   let npc: ReturnType<typeof createNpcDialogueService> | undefined;
   let language: LanguagePort | undefined;

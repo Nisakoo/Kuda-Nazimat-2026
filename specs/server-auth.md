@@ -2,7 +2,7 @@
 id: server-auth
 type: module-design
 status: ready
-implementation: partial
+implementation: complete
 parent: architecture
 summary: Вход по паролю (production) и по имени/автовход (development), роль администратора с отдельными сессиями,  серверные сессии с отзывом, лимиты попыток, выход, управление аккаунтами ведущим; проверка токена в handshake и HTTP, одно управляющее соединение на игрока.
 related:
@@ -21,7 +21,7 @@ related:
 
 Дать браузеру серверную сессию `{token, expiresAt}` и защитить аккаунт игрока от входа под его именем другим человеком. Сессии хранятся на сервере, поэтому их можно отозвать в любой момент: выход, сброс пароля ведущим, перехват. Способ передачи токена (handshake `auth.token`, `Authorization: Bearer`) и формат ответа входа не меняются, поэтому realtime, world и BABEL от способа входа не зависят.
 
-AUTH-017–020 (роль администратора, [ADMIN](server-admin.md)) — черновик, не реализованы. Остальная редакция 2026-11-01 реализована на сервере ([TASK-042](../tasks/042-server-auth-sessions.md)); поддержка в клиенте — [TASK-044](../tasks/044-client-auth-observability-handoff.md).
+AUTH-017–020 (роль администратора, [ADMIN](server-admin.md)) реализованы в [TASK-067](../tasks/067-server-admin-role.md). Остальная редакция 2026-11-01 реализована на сервере ([TASK-042](../tasks/042-server-auth-sessions.md)); поддержка в клиенте — [TASK-044](../tasks/044-client-auth-observability-handoff.md).
 
 ## Требования
 

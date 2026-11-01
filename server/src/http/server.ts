@@ -14,6 +14,7 @@ import { parseEquipmentState } from '../../../shared/equipment/validate.ts';
 import { parseBabylonRequest } from '../../../shared/babylon/validate.ts';
 import { BabylonError, type BabylonService } from '../babylon/BabylonService.ts';
 import { handleAuth } from './authRoutes.ts';
+import { handleAdmin } from './adminRoutes.ts';
 import { handleOperator, type OperatorDeps } from './operatorRoutes.ts';
 import { telemetryHandler } from './telemetry.ts';
 import { bearer, body, clientIp, error, json, type RequestContext } from './util.ts';
@@ -171,6 +172,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
       json(res, 200, selection); return;
     }
     if (await handleAuth(req, res, path, deps.auth, log, context)) return;
+    if (await handleAdmin(req, res, path, deps.auth, log, context)) return;
     if (await handleOperator(req, res, path, operator, context)) return;
     if (req.method === 'POST' && path === '/api/babylon' && deps.babylon) { context.route = '/api/babylon'; await babel(req, res, deps.babylon, context); return; }
     if (req.method === 'POST' && path === '/api/telemetry/client') { await telemetry(req, res, context); return; }

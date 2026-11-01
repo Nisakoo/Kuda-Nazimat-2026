@@ -8,7 +8,7 @@ import { openDatabase, sqliteStores } from '../persistence/database.ts';
  * Live sockets of a running server are closed by its own operator screen; the CLI changes the database,
  * so revoked sessions are refused at their next request. `unlock` affects only a server started afterwards.
  */
-const USAGE = 'Использование: npm --prefix server run auth -- list | reset-password <имя> | revoke <имя> | unlock <имя> [--env production]';
+const USAGE = 'Использование: npm --prefix server run auth -- list | reset-password <имя> | revoke <имя> | unlock <имя> | create-admin <имя> | grant-admin <имя> | revoke-admin <имя> [--env production]';
 try {
   const { config, args } = await loadServerConfig();
   const [command, name, ...extra] = args.rest;
@@ -17,9 +17,13 @@ try {
   try {
     const stores = sqliteStores(db);
     const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: systemClock, ttlMs: config.sessionTtlMs, passwordless: config.auth.passwordless });
-    if (command === 'list') console.table(auth.operator.list().map((a) => ({ имя: a.name, пароль: a.hasPassword, сменить: a.mustChangePassword, сессий: a.activeSessions, вход: a.lastLoginAt ? new Date(a.lastLoginAt).toLocaleString() : '—' })));
+    if (command === 'list') console.table(auth.operator.list().map((a) => ({ имя: a.name, роль: a.role, пароль: a.hasPassword, сменить: a.mustChangePassword, сессий: a.activeSessions, вход: a.lastLoginAt ? new Date(a.lastLoginAt).toLocaleString() : '—' })));
     else if (command === 'reset-password') { const reset = await auth.operator.resetPassword(name); console.log(`Временный пароль для «${reset.name}»: ${reset.temporaryPassword}\nДействует до ${new Date(reset.expiresAt).toLocaleString()}. Игрок войдёт с ним и сразу задаст свой.`); }
     else if (command === 'revoke') console.log(`Завершено сессий: ${auth.operator.revoke(name)}`);
+    else if (command === 'create-admin') { const admin = await auth.operator.createAdmin(name); console.log(`Администратор «${admin.name}» создан. Временный пароль: ${admin.temporaryPassword}
+Действует до ${new Date(admin.expiresAt).toLocaleString()}. При первом входе в /admin задайте свой пароль.`); }
+    else if (command === 'grant-admin') { auth.operator.grantAdmin(name); console.log(`«${name}» теперь администратор.`); }
+    else if (command === 'revoke-admin') console.log(`Роль снята, завершено административных сессий: ${auth.operator.revokeAdmin(name)}`);
     else if (command === 'unlock') console.log('Блокировка хранится в памяти работающего сервера: снимите её на экране ведущего /operator.');
     else throw new AuthError('INVALID', USAGE);
   } finally { db.close(); }
