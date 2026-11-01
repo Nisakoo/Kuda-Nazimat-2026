@@ -1,7 +1,7 @@
-.avatar-backdrop { position: fixed; inset: 0; z-index: 25; background: url('/assets/ui/city-gates.png') center / cover; }
+.avatar-backdrop { position: fixed; inset: 0; z-index: 25; background: var(--entry-background); }
 .avatar-dialog { position: fixed; inset: 0; box-sizing: border-box; width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; }
 .avatar-dialog-body { position: absolute; inset: var(--entry-header) 0 var(--entry-footer); display: grid; align-items: center; overflow-y: auto; overscroll-behavior: contain; padding: 12px 24px; }
-.avatar-dialog::backdrop { background: #49331b28; }
+.avatar-dialog::backdrop { background: transparent; }
 .avatar-tablet { box-sizing: border-box; width: min(1080px, 100%); margin: auto; padding: 24px 38px 16px; background: linear-gradient(120deg, #fff5de, #f1dfc0); border: 9px solid #e8d0a8; box-shadow: 0 18px 60px #57311655, inset 0 0 0 3px #fff6df; color: #063b44; }
 .avatar-ornament { display: grid; grid-template-columns: auto 1fr 1fr auto; align-items: center; gap: 14px; color: #008887; height: 16px; font-size: 27px; }
 .avatar-ornament i { color: #dbc09a; font-style: normal; letter-spacing: -.15em; font-size: 35px; }
@@ -9,8 +9,8 @@
 .avatar-tablet h1 { font-size: clamp(27px, 3vw, 43px); letter-spacing: -.035em; text-align: center; margin: 4px 0 10px; }
 .avatar-subtitle { color: #6c7e7a; text-align: center; margin: 0 auto 22px; font-size: 18px; }
 .avatar-layout { display: grid; grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr); min-width: 0; min-height: 0; }
-.avatar-stage { position: relative; min-width: 0; border-right: 1px solid #d9b98e; min-height: 330px; }
-.avatar-preview { height: clamp(320px, 54svh, 560px); width: 100%; min-width: 0; max-width: 100%; touch-action: none; cursor: grab; }
+.avatar-stage { position: relative; min-width: 0; border-right: 1px solid #d9b98e; min-height: 250px; }
+.avatar-preview { height: clamp(250px, calc(100svh - 470px), 480px); width: 100%; min-width: 0; max-width: 100%; touch-action: none; cursor: grab; }
 .avatar-preview:active { cursor: grabbing; }
 .avatar-preview:focus-visible { outline: 3px solid #086e70; outline-offset: 2px; }
 .avatar-preview canvas { display: block; width: 100%; height: 100%; }
@@ -19,7 +19,7 @@
 .avatar-turn.left { left: 2%; }.avatar-turn.right { right: 2%; }
 .avatar-loading { position: absolute; left: 15px; right: 15px; top: 45%; text-align: center; color: #526d6d; }
 .avatar-options { min-width: 0; padding-left: 34px; display: flex; flex-direction: column; justify-content: center; }
-.avatar-options fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; border: 0; width: 100%; max-width: min(100%, 44svh); margin: 0 auto; padding: 0; min-inline-size: 0; }
+.avatar-options fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; border: 0; width: 100%; max-width: min(100%, calc(100svh - 480px)); margin: 0 auto; padding: 0; min-inline-size: 0; }
 .avatar-card { position: relative; display: grid; place-items: center; min-width: 0; min-height: 44px; aspect-ratio: 1.07; background: #f4e6cd; border: 2px solid #ddc3a1; border-radius: 3px; cursor: pointer; }
 .avatar-card.selected { background: #d8e5d5; border: 3px solid #086e70; box-shadow: inset 0 0 0 3px #eff5e6; }
 .avatar-card:has(input:focus-visible) { outline: 3px solid #086e70; outline-offset: 3px; }
@@ -35,3 +35,6 @@
 .avatar-status { text-align: center; font-size: 13px; }
 @media (max-width: 700px) { .avatar-dialog-body { padding: 12px; } .avatar-tablet { width: 100%; padding: 16px; border-width: 6px; } .avatar-tablet h1 { font-size: 26px; } .avatar-subtitle { font-size: 14px; margin-bottom: 12px; } .avatar-layout { grid-template-columns: minmax(0, 1fr); } .avatar-stage { min-height: 250px; border: 0; }.avatar-preview { height: 270px; } .avatar-options { padding: 12px 0 0; }.avatar-options fieldset { gap: 8px; max-width: none; }.avatar-card { aspect-ratio: 1.2; }.avatar-options > p { font-size: 12px; margin-top: 10px; }.avatar-bottom { margin-top: 16px; padding-top: 12px; gap: 8px; }.avatar-bottom button { font-size: 16px; padding: 10px 14px; } }
 @media (max-height: 650px) and (min-width: 701px) { .avatar-tablet { padding-block: 12px; }.avatar-preview { height: 280px; }.avatar-stage { min-height: 280px; }.avatar-options fieldset { max-width: 310px; margin-inline: auto; }.avatar-subtitle { margin-bottom: 12px; }.avatar-bottom { margin-top: 12px; padding-top: 10px; } }
+
+.avatar-tablet { border-width: 1px; border-color: #d6c6aa; border-radius: 14px; box-shadow: 0 12px 32px #49331b30; background: #fbf1df; }
+.avatar-ornament { display: none; }

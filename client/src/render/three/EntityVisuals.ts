@@ -108,7 +108,8 @@ export class EntityVisuals {
       visual.elapsed += dt;
       visual.rig?.pose(visual.phase,visual.weight,visual.elapsed,turn, { sprint: visual.sprintWeight, air: visual.airWeight, falling: visual.fallWeight,
         takeoff: Math.sin(Math.PI*visual.takeoff/.1), landing: Math.sin(Math.PI*visual.landing/.14) });
-      const name = visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
+      const name = visual.motion && !visual.motion.grounded ? 'jump'
+        : visual.weight>.1 ? 'walk' : visual.animation==='walk' ? 'idle' : visual.animation;
       // Avatar stride metadata includes source normalization; legacy models keep speed/3.
       const pace = name === 'walk'
         ? visual.model?.walkPace?.(speed) ?? Math.max(.2, visual.speed / 3)

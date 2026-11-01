@@ -6,13 +6,15 @@
   import { modal } from './modal';
   import EntryChrome from './EntryChrome.svelte';
   import './avatar-selection.css';
-  const { game, view, first }: { game: GameApp; view: AvatarView | null; first: boolean } = $props();
+  const { game, view }: { game: GameApp; view: AvatarView | null; first: boolean } = $props();
   let host: HTMLDivElement;
   let dialog: HTMLDialogElement;
   let initialFocusDone = false;
   let interacted = false;
   let preview: AvatarPreview | undefined;
   let selected = $state<AvatarId>('lukas');
+  let selectionInitialized = false;
+  $effect(() => { if (view?.state && !selectionInitialized) { selectionInitialized = true; selected = view.state.avatarId ?? 'lukas'; } });
   let loading = $state(true), previewError = $state<string | null>(null);
   let portraits = $state<Partial<Record<AvatarId, string>>>({});
   let dragX: number | null = null;
@@ -64,7 +66,7 @@
       {#if previewError}<button type="button" class="secondary" disabled={view?.busy} onclick={startPreview}>Повторить загрузку моделей</button>{/if}
       {#if view?.error}<p class="capture-error" role="alert">{view.error}</p><button type="button" class="secondary" disabled={view.busy} onclick={() => game.openAvatar()}>Повторить загрузку</button>{/if}
       {#if view?.busy}<p class="avatar-status" role="status">Ожидаем подтверждения сервера…</p>{/if}
-      <div class="avatar-bottom"><button type="button" class="avatar-back" onclick={() => game.closeAvatar()}>← Назад</button><button class="avatar-confirm" disabled={!view?.state || view.busy || loading || !!previewError}>{first ? 'Продолжить →' : 'Подтвердить →'}</button></div>
+      <div class="avatar-bottom"><button type="button" class="avatar-back" onclick={() => game.closeAvatar()}>← Назад</button><button class="avatar-confirm" disabled={!view?.state || view.busy || loading || !!previewError}>Подтвердить →</button></div>
     </form>
     </div></div>
   </dialog>

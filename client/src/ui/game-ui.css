@@ -89,3 +89,60 @@ dialog.babel-panel { max-height: calc(100svh - 190px); margin: auto auto 108px; 
   .hud-dock { bottom: 16px; min-height: 56px; }
   .map-dialog .world-map { height: 180px; }
 }
+
+.entry-chrome .entry-settings:hover { background: #fff8e9; color: #006b68; }
+.entry-chrome .entry-settings svg { display: block; flex: none; overflow: visible; }
+
+/* Passive gameplay chrome; commands live on the keyboard. */
+header { justify-content: flex-end; }
+.game-screen .hud-top { top: 22px; right: auto; max-width: calc(100vw - 420px); }
+.game-screen .task-chip { max-width: 100%; font-size: 14px; padding: 10px 14px; }
+.game-screen .task-gem { display: none; }
+.game-screen .parchment, .game-screen .panel, .game-screen .dialog-panel { border: 1px solid #d6c6aa; box-shadow: 0 5px 18px #44341f20; border-radius: 10px; }
+.game-screen .hud-dock, .game-screen dialog.babel-panel, .game-screen dialog.map-dialog { background-image: none; background-color: #fbf1df; }
+.hud-dock { width: min(620px, calc(100vw - 24px)); bottom: 16px; padding: 4px 8px; }
+.game-screen .hud-dock button { border-right: 0; border-radius: 6px; }
+.game-screen .hud-dock .chosen::after { display: none; }
+.game-screen .panel-top h2 { font-size: 25px; }
+.game-screen .stamina-label, .game-screen .stamina-number { display: none; }
+.advanced-settings { margin: 16px 0; }
+.advanced-settings summary { cursor: pointer; padding: 12px 0; color: var(--ui-teal); }
+.advanced-settings label { margin-top: 12px; }
+.resident-layout { display: grid; grid-template-columns: 100px minmax(0, 1fr) 90px; gap: 16px; margin-top: 16px; }
+.resident-portrait { display: flex; flex-direction: column; gap: 10px; text-align: center; font-size: 13px; }
+.resident-portrait svg, .resident-portrait img { width: 100%; height: 110px; object-fit: contain; border-radius: 12px; background: #e3e9da; }
+.resident-center { min-width: 0; }
+.resident-history { max-height: 38svh; min-height: 120px; overflow: auto; padding: 8px; }
+.resident-message { max-width: 92%; margin: 0 0 16px; }
+.resident-message small { display: flex; justify-content: space-between; gap: 16px; color: #66736b; margin-bottom: 5px; }
+.resident-message p, .resident-bubble { margin: 0; background: #efe3cc; padding: 12px 14px; border-radius: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.resident-message.outgoing { margin-left: auto; }
+.resident-message.outgoing p { background: #dce8dc; }
+.babel-panel .resident-compose { display: flex; gap: 8px; align-items: end; margin-top: 12px; }
+.babel-panel .resident-compose textarea { min-height: 48px; height: 52px; flex: 1; min-width: 0; }
+.resident-word-wrap { display: inline; }
+.game-screen .babel-panel button.resident-word { display: inline; color: inherit; padding: 0; min-height: 0; background: none; box-shadow: none; border-radius: 2px; font-weight: inherit; }
+.resident-word:hover, .resident-word.selected { background: #c9ddcc; }
+.resident-word.known { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #397d76; }
+.resident-word-card { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; padding: 12px; background: #fffaf0; border: 1px solid #b9cdbb; border-radius: 8px; text-align: left; }
+.resident-word-card input { width: 100%; min-width: 0; }
+.resident-word-help { display: block; font-size: 11px; color: #68766e; margin-top: 8px; }
+.language-display { display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 14px; }
+.game-screen .hud-top { max-width: calc(100vw - 300px); }
+.game-screen .task-chip, .game-screen .language-display, .game-screen .interaction { pointer-events: none; cursor: default; }
+.controls-hint { position: fixed; z-index: 12; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); padding: 16px 20px; max-width: calc(100vw - 32px); max-height: calc(100svh - 32px); overflow: auto; pointer-events: none; color: var(--ui-ink); }
+.controls-hint h2 { margin: 0 0 12px; font-size: 17px; }
+.controls-hint dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 0; font-size: 13px; }
+.controls-hint dt { font-weight: 700; }
+.controls-hint dd { margin: 0; }
+.game-screen .map-dialog, .game-screen dialog.babel-panel { margin: auto; max-height: calc(100svh - 32px); }
+.game-screen .world-actions { margin-bottom: 36px; }
+@media(max-width:700px) {
+  .game-screen .hud-top { top: 74px; left: 16px; max-width: calc(100vw - 32px); }
+  .resident-layout { grid-template-columns: 1fr; gap: 10px; }
+  .resident-portrait { flex-direction: row; align-items: center; text-align: left; }
+  .resident-portrait svg { width: 44px; height: 48px; }
+  .resident-portrait.player-portrait { display: none; }
+  .babel-panel .resident-compose { flex-wrap: wrap; }
+  .resident-history { max-height: 32svh; padding: 2px; }
+}

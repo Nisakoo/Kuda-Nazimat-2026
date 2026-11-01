@@ -70,9 +70,9 @@ export function createCharacter(assets: SceneAssets, color: string, market: bool
       torso.rotation.z = Math.sin(phase)*weight*.025 - Math.max(-.07,Math.min(.07,turn*.035));
       head.rotation.y = Math.sin(elapsed*.7+seed)*.035*(1-weight);
       for (const { shoulder, elbow, side } of arms) {
-        shoulder.rotation.x = Math.sin(phase+(side<0?0:Math.PI))*(.42+sprint*.28)*weight - air*(.65-falling*.25) - takeoff*.5;
-        shoulder.rotation.z = side*(.10+Math.sin(elapsed*1.8+seed)*.012*(1-weight)+air*.2);
-        elbow.rotation.x = -.12 - weight*(.20+sprint*.45) - air*.35;
+        shoulder.rotation.x = Math.sin(phase+(side<0?0:Math.PI))*(.42+sprint*.28)*weight - air*2.85 - takeoff*.1;
+        shoulder.rotation.z = side*(.10+Math.sin(elapsed*1.8+seed)*.012*(1-weight)+air*.4);
+        elbow.rotation.x = -.12 - weight*(.20+sprint*.45) - air*.08;
       }
       for (const { hip, knee, ankle, side } of legs) {
         const foot = footTarget(phase+(side<0?0:Math.PI),weight,sprint);

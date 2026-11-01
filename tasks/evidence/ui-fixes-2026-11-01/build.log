@@ -1,0 +1,28 @@
+
+> educational-world-client@0.1.0 prebuild
+> node scripts/generate-demo-world.mjs
+
+Prepared 1024 chunks; 1024 unique collision resources; world 22068778 bytes.
+market: 808632 bytes; 28 collision rectangles; 223 ceiling volumes
+pasture: 409960 bytes; 58 collision rectangles; 81 ceiling volumes
+main-building: 453240 bytes; 29 collision rectangles; 187 ceiling volumes
+Market world 23648595 bytes.
+
+> educational-world-client@0.1.0 build
+> vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 227 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.49 kB │ gzip:   0.32 kB
+dist/assets/index-D4yHpR1E.css   42.84 kB │ gzip:  10.28 kB
+dist/assets/index-DMgeOY9Y.js   994.98 kB │ gzip: 273.13 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.38s

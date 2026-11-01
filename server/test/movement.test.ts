@@ -165,3 +165,17 @@ describe('MOVE stamina and authority', () => {
     for (const extra of [{ v: 1 }, { v: 2 }, { stamina: 100 }, { speed: 50 }, { jumpId: Infinity }, { jumpId: -1 }, { sprint: undefined }]) expect(() => parseClientMessage({ ...input, ...extra })).toThrow();
   });
 });
+
+it('holds the initial spawn against movement and jump until its collision window is prepared', () => {
+  const { map } = fixture(); const world = new World(new Map([['test', map]]), []);
+  world.add({ id: 'p', name: 'P', mapId: 'test', position: { x: 0, y: 50, z: 0 }, rotationY: 0 });
+  for (let i = 1; i <= 40; i++) {
+    world.setIntent('p', i, { x: 1, z: 0 }, i % 2 ? [] : ['unknown'], i * 50, true, i);
+    world.step(.05, i * 50);
+    expect(world.locate('p')!.position).toEqual(manifest.spawn);
+  }
+  world.setIntent('p', 41, { x: 0, z: 0 }, ['c'], 2050, false, 0); world.step(.05, 2050);
+  expect(world.locate('p')!.position).toEqual(manifest.spawn);
+  world.setIntent('p', 42, { x: 1, z: 0 }, ['c'], 2100); world.step(.05, 2100);
+  expect(world.locate('p')!.position.x).toBeGreaterThan(0);
+});

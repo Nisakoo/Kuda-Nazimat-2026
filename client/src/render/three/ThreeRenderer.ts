@@ -84,12 +84,13 @@ export class ThreeRenderer implements RenderAdapter {
       throw error;
     }
   }
+  revealChunks(): void { this.chunks?.reveal(); }
   unloadChunk(id: string): void { this.chunks?.unload(id); this.errors.delete(`chunk:${id}`); }
   retryFailedModels(): void { this.errors.clear(); this.visuals?.retryFailed(); }
   getDiagnostics(): RenderDiagnostics {
     const stats = this.library?.stats;
     return { chunks: this.chunks?.ids ?? [], entities: this.visuals?.ids ?? [], models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
-      pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
+      appearing: this.chunks?.appearing ?? 0, pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
   }
 
   resize(width: number, height: number, pixelRatio: number): void {

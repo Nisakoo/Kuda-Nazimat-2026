@@ -15,6 +15,7 @@ export interface RenderDiagnostics {
   readonly textures: number;
   readonly drawCalls: number;
   readonly pending: number;
+  readonly appearing?: number;
   readonly errors: readonly string[];
 }
 
@@ -28,6 +29,7 @@ export interface RenderAdapter {
   registerModels(models: Readonly<Record<string, string>>): void;
   loadChunk(chunk: VisualChunk): Promise<void>;
   unloadChunk(id: string): void;
+  revealChunks?(): void;
   getDiagnostics(): RenderDiagnostics;
   retryFailedModels(): void;
   render(elapsedSeconds: number, alpha: number): void;

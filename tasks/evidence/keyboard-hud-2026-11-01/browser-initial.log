@@ -1,0 +1,90 @@
+
+Running 21 tests using 1 worker
+
+(node:76333) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/babylon.spec.ts:52:1 › two real players enroll, translate, share stones and restore a private dictionary after restart (9.0s)
+  ✘   2 e2e/babylon.spec.ts:107:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task (1.2m)
+(node:76442) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   3 e2e/babylon.spec.ts:150:1 › real server authorizes the default 25-chunk window at the market and tower (21.8s)
+  ✓   4 e2e/hub.spec.ts:54:1 › hub saves preferences, selects modes, loads automatically and preserves the saved game (7.4s)
+  ✓   5 e2e/hub.spec.ts:112:1 › manual IP validates input, reports unreachable server, cancels late navigation and reauthenticates on another server (2.9s)
+  ✓   6 e2e/hub.spec.ts:161:1 › delayed world stays frozen; cancel ignores late resources and retry enters without creating twice (2.6s)
+  ✓   7 e2e/hub.spec.ts:193:1 › resource failure retries and Escape during loading requires an explicit capture gesture (2.0s)
+  ✓   8 e2e/hub.spec.ts:209:1 › reduced motion and a browser capture rejection leave a recoverable ready world (1.3s)
+  ✓   9 e2e/hub.spec.ts:224:1 › entry errors persist across polling and retry never submits a changed destination (6.3s)
+  ✓  10 e2e/hub.spec.ts:263:1 › an existing waiting party offers a direct join before a rejected create (2.3s)
+  ✓  11 e2e/hub.spec.ts:279:1 › keyboard-only HUD keeps tasks and language, supports digits and shows help only while Alt is held (2.8s)
+  ✓  12 e2e/server-auth.spec.ts:61:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token (1.0s)
+  ✓  13 e2e/server-auth.spec.ts:81:1 › real players exchange chat and NPC memory survives a server restart (5.0s)
+  ✓  14 e2e/server-auth.spec.ts:101:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits (519ms)
+  ✓  15 e2e/server-auth.spec.ts:121:1 › a world 401 and client session expiry return to login without automatically posting again (657ms)
+  ✓  16 e2e/server-auth.spec.ts:132:1 › switching to the server market enrolls BABEL and opens tasks without inventory controls (1.8s)
+  ✘  17 e2e/ui-hud.spec.ts:53:1 › confirmed appearance enters the real world, changes live and keeps the held jug (3.1s)
+(node:76544) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 e2e/ui-hud.spec.ts:58:1 › real guest entry preserves only the connection address and returns from mode with Escape (878ms)
+  ✓  19 e2e/ui-hud.spec.ts:103:1 › real registration resumes mandatory appearance and uses password authentication (2.9s)
+  ✓  20 e2e/ui-hud.spec.ts:108:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (8.4s)
+  ✓  21 e2e/ui-hud.spec.ts:177:1 › connection errors allow retry and disappear after entry polling recovers (1.6s)
+
+
+  1) e2e/babylon.spec.ts:107:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task 
+
+    Error: Blocked at {"x":-2.1,"z":0.8}, x=-2.5
+
+      100 |     await page.keyboard.up(key); await page.waitForTimeout(150);
+      101 |   }
+    > 102 |   throw new Error(`Blocked at ${JSON.stringify(await position(page))}, ${axis}=${target}`);
+          |         ^
+      103 | }
+      104 | async function interact(page: Page, name: string) { await page.keyboard.press('e'); await expect(page.getByRole('dialog', { name: ['Торговец фруктами', 'Гончар'].includes(name) ? 'Разговор с жителем' : name, exact: true })).toBeVisible(); await expectCapture(page, false); }
+      105 | async function resume(page: Page) { await close(page); await page.getByRole('button', { name: 'Продолжить', exact: true }).click(); await expectCapture(page, true); }
+        at walk (/Users/nisakoo/Documents/competition-2026/client/e2e/babylon.spec.ts:102:9)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/babylon.spec.ts:110:30
+
+    Error Context: test-results/hub/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/error-context.md
+
+    Error Context: test-results/hub/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/babylon-solo-buys-and-feed-5a7bc-restores-the-completed-task/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/ui-hud.spec.ts:53:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+
+    ReferenceError: Cannot access 'storedTool' before initialization
+
+       at avatar-world-scenario.ts:39
+
+      37 |     await page.screenshot({ path: join(evidence, 'avatar-world-dan-1280.png') });
+      38 |
+    > 39 |     expect(await storedTool(page, 'jug')).toEqual({ tool: 'jug' });
+         |                  ^
+      40 |     await page.keyboard.press('Escape');
+      41 |     await expectCapture(page, false);
+      42 |     await page.getByRole('dialog', { name: 'Пауза', exact: true }).getByRole('button', { name: 'Настройки', exact: true }).click();
+        at avatarWorldScenario (/Users/nisakoo/Documents/competition-2026/client/e2e/avatar-world-scenario.ts:39:18)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/ui-hud.spec.ts:55:3
+
+    Error Context: test-results/hub/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    Error Context: test-results/hub/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    e2e/babylon.spec.ts:107:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task 
+    e2e/ui-hud.spec.ts:53:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+  19 passed (2.8m)

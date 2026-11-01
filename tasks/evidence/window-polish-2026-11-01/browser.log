@@ -1,0 +1,69 @@
+
+Running 23 tests using 1 worker
+
+(node:80803) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/babylon.spec.ts:52:1 › two real players enroll, translate, share stones and restore a private dictionary after restart (9.2s)
+  ✓   2 e2e/babylon.spec.ts:107:1 › solo buys and feeds through the real server, rejects wrong food and restores the completed task (43.1s)
+  ✓   3 e2e/babylon.spec.ts:150:1 › real server authorizes the default 25-chunk window at the market and tower (22.5s)
+  ✓   4 e2e/hub.spec.ts:54:1 › hub saves preferences, selects modes, loads automatically and preserves the saved game (7.4s)
+  ✓   5 e2e/hub.spec.ts:114:1 › manual IP validates input, reports unreachable server, cancels late navigation and reauthenticates on another server (2.9s)
+  ✓   6 e2e/hub.spec.ts:163:1 › delayed world stays frozen; cancel ignores late resources and retry enters without creating twice (2.6s)
+  ✓   7 e2e/hub.spec.ts:195:1 › resource failure retries and Escape during loading requires an explicit capture gesture (2.0s)
+  ✓   8 e2e/hub.spec.ts:211:1 › reduced motion and a browser capture rejection leave a recoverable ready world (1.3s)
+  ✓   9 e2e/hub.spec.ts:226:1 › entry errors persist across polling and retry never submits a changed destination (6.3s)
+  ✓  10 e2e/hub.spec.ts:265:1 › an existing waiting party offers a direct join before a rejected create (2.4s)
+  ✓  11 e2e/hub.spec.ts:281:1 › keyboard-only HUD keeps tasks and language, supports digits and shows help only while Alt is held (2.8s)
+  ✓  12 e2e/hub.spec.ts:338:1 › replacing a saved game asks first, preserves cancellation and creates either mode without losing the dictionary (6.6s)
+  ✓  13 e2e/server-auth.spec.ts:61:1 › real guest login authorizes world, takeover returns the form, logout and reload forget the token (1.1s)
+  ✓  14 e2e/server-auth.spec.ts:81:1 › real players exchange chat and NPC memory survives a server restart (5.0s)
+  ✓  15 e2e/server-auth.spec.ts:101:1 › login errors remain text, pending login is cancelled by settings, and small-screen form fits (522ms)
+  ✓  16 e2e/server-auth.spec.ts:121:1 › a world 401 and client session expiry return to login without automatically posting again (645ms)
+  ✓  17 e2e/server-auth.spec.ts:132:1 › switching to the server market enrolls BABEL and opens tasks without inventory controls (1.8s)
+  ✓  18 e2e/ui-hud.spec.ts:53:1 › confirmed appearance enters the real world, changes live and keeps the held jug (4.9s)
+  ✓  19 e2e/ui-hud.spec.ts:58:1 › real guest entry preserves only the connection address and returns from mode with Escape (734ms)
+  ✓  20 e2e/ui-hud.spec.ts:103:1 › real registration resumes mandatory appearance and uses password authentication (3.4s)
+  ✓  21 e2e/ui-hud.spec.ts:108:1 › real server HUD switches one modal, blocks gameplay, preserves words and closes without pause (8.3s)
+  ✘  22 e2e/ui-hud.spec.ts:176:1 › windows close without pause and keep actions aligned at desktop and compact sizes (9.4s)
+(node:81027) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  23 e2e/ui-hud.spec.ts:214:1 › connection errors allow retry and disappear after entry polling recovers (1.7s)
+
+
+  1) e2e/ui-hud.spec.ts:176:1 › windows close without pause and keep actions aligned at desktop and compact sizes 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at helpers.ts:5
+
+      3 |
+      4 | export async function expectCapture(page: Page, captured: boolean) {
+    > 5 |   await expect.poll(() => page.evaluate(() => document.pointerLockElement !== null)).toBe(captured);
+        |                                                                                      ^
+      6 | }
+      7 |
+      8 | export async function resume(page: Page) {
+        at expectCapture (/Users/nisakoo/Documents/competition-2026/client/e2e/helpers.ts:5:86)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/ui-hud.spec.ts:201:68
+
+    Error Context: test-results/hub/ui-hud-windows-close-witho-bc376-t-desktop-and-compact-sizes/error-context.md
+
+    Error Context: test-results/hub/ui-hud-windows-close-witho-bc376-t-desktop-and-compact-sizes/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/hub/ui-hud-windows-close-witho-bc376-t-desktop-and-compact-sizes/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/hub/ui-hud-windows-close-witho-bc376-t-desktop-and-compact-sizes/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/ui-hud.spec.ts:176:1 › windows close without pause and keep actions aligned at desktop and compact sizes 
+  22 passed (2.5m)

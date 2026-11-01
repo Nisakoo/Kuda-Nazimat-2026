@@ -1,4 +1,4 @@
-import { AmbientLight, Box3, Color, CylinderGeometry, DirectionalLight, Group, Mesh, MeshStandardMaterial, OrthographicCamera, PCFShadowMap, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three';
+import { AmbientLight, Box3, Color, CylinderGeometry, DirectionalLight, Group, Mesh, MeshStandardMaterial, Object3D, OrthographicCamera, PCFShadowMap, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three';
 import type { AvatarId } from '../../../../shared/avatar/types';
 import { AVATAR_IDS } from '../../../../shared/avatar/types';
 import type { AssetManager } from '../../map/AssetManager';
@@ -8,10 +8,18 @@ import { GltfLibrary, type ModelInstance } from './GltfLibrary';
 /** Frame the entire pedestal even when the preview becomes unusually narrow. */
 export function configureAvatarCamera(camera: OrthographicCamera, width: number, height: number): void {
   const aspect = Math.max(1, width) / Math.max(1, height);
-  const halfHeight = Math.max(1.10, .78 / aspect);
+  const halfHeight = Math.max(1.18, .78 / aspect);
   camera.left = -halfHeight * aspect; camera.right = halfHeight * aspect;
   camera.top = halfHeight; camera.bottom = -halfHeight;
-  camera.position.set(0, 1.5, 5); camera.lookAt(0, .86, 0); camera.updateProjectionMatrix();
+  camera.position.set(0, 1.6, 5); camera.lookAt(0, .94, 0); camera.updateProjectionMatrix();
+}
+
+/** Keep the authored height differences visible, including the taller Lukas. */
+export function placeAvatarPreview(root: Object3D): void {
+  const bounds = new Box3().setFromObject(root);
+  if (!(bounds.getSize(new Vector3()).y > 0)) throw new Error('Empty avatar model');
+  const scale = 1.85 / 1.8;
+  root.scale.multiplyScalar(scale); root.position.y = -bounds.min.y * scale;
 }
 
 /** A bounded preview renderer. It shares the production GLB parser and resource lifecycle. */
@@ -63,10 +71,7 @@ export class ThreeAvatarPreview implements AvatarPreview {
     configureAvatarCamera(this.camera, width, height);
   };
   private normalize(model: ModelInstance): void {
-    // Normalize visual geometry only. Gameplay dimensions are not read from the mesh.
-    const bounds = new Box3().setFromObject(model.root); const size = bounds.getSize(new Vector3());
-    if (!(size.y > 0)) throw new Error('Empty avatar model');
-    model.root.scale.multiplyScalar(1.85 / size.y); model.root.position.y = -bounds.min.y * (1.85 / size.y);
+    placeAvatarPreview(model.root);
   }
   private pump(): void {
     if (this.disposed || this.working) return;
@@ -112,7 +117,8 @@ export class ThreeAvatarPreview implements AvatarPreview {
     const yaw = this.group.rotation.y;
     this.group.rotation.y = -.12;
     const camera = new OrthographicCamera(-.55, .55, .55, -.55, .1, 20);
-    camera.position.set(0, 1.56, 5); camera.lookAt(0, 1.47, 0);
+    const faceHeight = new Box3().setFromObject(this.group).max.y * .795;
+    camera.position.set(0, faceHeight + .09, 5); camera.lookAt(0, faceHeight, 0);
     this.renderer.setPixelRatio(1); this.renderer.setSize(320, 320, false); this.renderer.render(this.scene, camera);
     this.events.portrait(id, this.renderer.domElement.toDataURL('image/png'));
     this.pedestal.visible = true; this.group.rotation.y = yaw; this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); this.resize();

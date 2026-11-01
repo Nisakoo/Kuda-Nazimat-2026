@@ -1,0 +1,2906 @@
+{
+  "lukas": {
+    "candidateGlbSha256": "09053cce8607ae6a01a50b413906df2f687d7bf4b44a4833f9808059fd5123bb",
+    "geometrySha256": "27f0adb5649654e6c838569560c8a338ea6a0fd3122f39cca54b421fb6ca0565",
+    "neutralNodes": [
+      {
+        "name": "AuxScene",
+        "type": "Group",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "avatar",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1.3102679127121797,
+          0.9481349486115309,
+          0.9489679881763339
+        ]
+      },
+      {
+        "name": "torso",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.95,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.365,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.67,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.84,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.94,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left",
+        "type": "Object3D",
+        "position": [
+          -0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          -0.0026082433611026032,
+          -0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right",
+        "type": "Object3D",
+        "position": [
+          0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          0.0026082433611026032,
+          0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "torso-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left",
+        "type": "Object3D",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right",
+        "type": "Object3D",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "nic": {
+    "candidateGlbSha256": "22a1b4b9b0f6dd125a3350277589c5c5752604c72f4c0b59de67a7d8ecd93cda",
+    "geometrySha256": "0df946e300352c145217528cacfb3f7fe98156b79eecef19350deb4a70e8a041",
+    "neutralNodes": [
+      {
+        "name": "AuxScene",
+        "type": "Group",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "avatar",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1.0330958542538338,
+          0.911392411664594,
+          0.9489679881763339
+        ]
+      },
+      {
+        "name": "torso",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.95,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.365,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.67,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.84,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.94,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left",
+        "type": "Object3D",
+        "position": [
+          -0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          -0.0026082433611026032,
+          -0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right",
+        "type": "Object3D",
+        "position": [
+          0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          0.0026082433611026032,
+          0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "torso-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left",
+        "type": "Object3D",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right",
+        "type": "Object3D",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "dan": {
+    "candidateGlbSha256": "9c54c822db8aedec682c046069e2c41f27f51bdac8675499d42bed160aa8f3ae",
+    "geometrySha256": "e4516266963405e4bbe58263649f7ecc2b9a5d2e009ede6cacd98b55a4b8745a",
+    "neutralNodes": [
+      {
+        "name": "AuxScene",
+        "type": "Group",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "avatar",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1.0330958542538338,
+          0.8860017705090936,
+          0.9489679881763339
+        ]
+      },
+      {
+        "name": "torso",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.95,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.365,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.67,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.84,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.94,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left",
+        "type": "Object3D",
+        "position": [
+          -0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          -0.0026082433611026032,
+          -0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right",
+        "type": "Object3D",
+        "position": [
+          0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          0.0026082433611026032,
+          0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "torso-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left",
+        "type": "Object3D",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right",
+        "type": "Object3D",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "ksu": {
+    "candidateGlbSha256": "4349447304788aae069fe5701a28c1779bcab861d8f94c9ebc5d8fc8749059ab",
+    "geometrySha256": "bf531281ab1b80a1b7913209f80f6cfb81e10cbb22c463d59aeb28cdaf745689",
+    "neutralNodes": [
+      {
+        "name": "AuxScene",
+        "type": "Group",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "avatar",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1.0330958542538338,
+          0.911392411664594,
+          0.9469487900305531
+        ]
+      },
+      {
+        "name": "torso",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.95,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.365,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "neck-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head",
+        "type": "Object3D",
+        "position": [
+          0,
+          0.67,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.84,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          0.94,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "face-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair",
+        "type": "Object3D",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hair-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "head-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left",
+        "type": "Object3D",
+        "position": [
+          -0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          -0.0026082433611026032,
+          -0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right",
+        "type": "Object3D",
+        "position": [
+          0.235,
+          0.305,
+          0
+        ],
+        "quaternion": [
+          -0.02737254916462951,
+          0.0026082433611026032,
+          0.09482130302803324,
+          0.9951144964831259
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.215,
+          0
+        ],
+        "quaternion": [
+          -0.034992854604336196,
+          0,
+          0,
+          0.9993875625234886
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.195,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "wrist-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "elbow-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "shoulder-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "torso-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left",
+        "type": "Object3D",
+        "position": [
+          -0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-left-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right",
+        "type": "Object3D",
+        "position": [
+          0.126,
+          0.78,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.32,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.3,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "ankle-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "knee-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "hip-right-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      }
+    ]
+  }
+}

@@ -33,7 +33,11 @@ export function parseBabylonRequest(value: unknown): BabylonRequest {
   const requestId = id(packet.requestId), a = record(packet.action);
   let action: BabylonAction;
   switch (a.type) {
-    case 'state': case 'intro-seen': keys(a, ['type']); action = { type: a.type }; break;
+    case 'state': case 'intro-seen': case 'join': keys(a, ['type']); action = { type: a.type }; break;
+    case 'create':
+      keys(a, ['type', 'size', 'replacePartyId']);
+      if (![1, 2, 3, 4].includes(a.size as number)) throw new Error('Неверный режим');
+      action = { type: 'create', size: a.size as PartySize, ...(a.replacePartyId === undefined ? {} : { replacePartyId: id(a.replacePartyId) }) }; break;
     case 'enroll':
       keys(a, ['type', 'size', 'native', 'learning']);
       if (![1, 2, 3, 4].includes(a.size as number)) throw new Error('Неверный режим');

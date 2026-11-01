@@ -4,10 +4,14 @@ import type { VisualChunk } from '../RenderAdapter';
 import type { GltfLibrary, ModelInstance } from './GltfLibrary';
 import { abortError } from '../../shared/AsyncLeaseCache';
 
-interface ChunkState { readonly controller: AbortController; readonly root: Group; readonly models: ModelInstance[] }
+interface ChunkState { readonly controller: AbortController; readonly root: Group; readonly models: ModelInstance[]; loaded: boolean; progress: number }
 
 export class VisualChunks {
   private symbolsVisible = true;
+  private revealed = false;
+  private readonly reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  reveal(): void { this.revealed = true; }
+  get appearing(): number { return [...this.chunks.values()].filter(state => state.progress < 1).length; }
   setBuildingSymbols(visible: boolean): void {
     this.symbolsVisible = visible;
     for (const state of this.chunks.values()) for (const model of state.models) {
@@ -22,7 +26,9 @@ export class VisualChunks {
   async load(chunk: VisualChunk): Promise<void> {
     if (new Set(chunk.objects.map((object) => object.id)).size !== chunk.objects.length) throw new Error('Duplicate visual object');
     this.unload(chunk.id);
-    const state: ChunkState = { controller: new AbortController(), root: new Group(), models: [] };
+    const state: ChunkState = { controller: new AbortController(), root: new Group(), models: [], loaded: false, progress: 0 };
+    state.root.visible = false;
+    state.root.position.y = this.reduced ? 0 : -3;
     state.root.name = `chunk:${chunk.id}`;
     this.chunks.set(chunk.id, state);
     this.scene.add(state.root);
@@ -42,6 +48,7 @@ export class VisualChunks {
         root.userData.animation = object.animation ?? 'idle';
         state.root.add(root);
       }));
+      state.loaded = true;
     } catch (error) {
       if (this.chunks.get(chunk.id) === state) this.unload(chunk.id);
       throw error;
@@ -49,7 +56,14 @@ export class VisualChunks {
   }
 
   animate(delta: number): void {
-    for (const state of this.chunks.values()) state.models.forEach((model, index) => model.animate(String(state.root.children[index]?.userData.animation ?? 'idle'), delta));
+    for (const state of this.chunks.values()) {
+      if (this.revealed && state.loaded) {
+        state.root.visible = true;
+        state.progress = Math.min(1, state.progress + delta / (this.reduced ? .1 : .6));
+        state.root.position.y = this.reduced || state.progress === 1 ? 0 : -3 * Math.pow(1 - state.progress, 3);
+      }
+      state.models.forEach((model, index) => model.animate(String(state.root.children[index]?.userData.animation ?? 'idle'), delta));
+    }
   }
 
   unload(id: string): void {

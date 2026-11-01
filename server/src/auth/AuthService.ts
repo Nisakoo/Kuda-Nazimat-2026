@@ -17,7 +17,7 @@ const TOKEN = /^[A-Za-z0-9_-]{43}$/;
 const TEMP_PASSWORD_MS = 24 * 3_600_000;
 
 /** AUTH-006 error codes with their HTTP status; `message` is ready to show to the player. */
-export const AUTH_STATUS = { INVALID: 400, CREDENTIALS: 401, NAME_TAKEN: 409, PASSWORD_REQUIRED: 403, PASSWORD_CHANGE_REQUIRED: 403, DISABLED: 403, RATE_LIMIT: 429, UNAVAILABLE: 503 } as const;
+export const AUTH_STATUS = { INVALID: 400, CREDENTIALS: 401, NAME_TAKEN: 409, PASSWORD_REQUIRED: 403, PASSWORD_CHANGE_REQUIRED: 403, DISABLED: 403, RATE_LIMIT: 429, UNAVAILABLE: 503, FULL: 503 } as const;
 export type AuthErrorCode = keyof typeof AUTH_STATUS;
 export class AuthError extends Error {
   readonly code: AuthErrorCode;
@@ -38,6 +38,7 @@ export interface ServerSession { readonly token: string; readonly expiresAt: num
 export interface AuthDeps {
   readonly accounts: AccountStore; readonly sessions: SessionStore; readonly clock: Clock; readonly ttlMs: number;
   readonly maxSessions?: number;
+  readonly canAdmit?: (accountId: string | null) => boolean;
   /** AUTH-001: guest and dev login; false in production. */
   readonly passwordless?: boolean;
   readonly hasher?: PasswordHasher; readonly logger?: Logger; readonly metrics?: Metrics;
@@ -89,7 +90,9 @@ export function createAuthService(deps: AuthDeps) {
     try { return await work(); }
     catch (error) { if (error instanceof HashQueueFullError) throw new AuthError('UNAVAILABLE', 'Сервер занят. Попробуйте войти через несколько секунд.'); throw error; }
   };
+  const admit = (accountId: string | null): void => { if (deps.canAdmit && !deps.canAdmit(accountId)) throw new AuthError('FULL', 'Сервер заполнен: в мире уже 4 игрока.'); };
   const issue = (identity: { accountId: string; playerId: string; displayName: string }, ip: string, method: string): ServerSession => {
+    admit(identity.accountId);
     const now = clock.now();
     const token = randomBytes(32).toString('base64url');
     const sessionId = randomBytes(9).toString('base64url');
@@ -107,10 +110,12 @@ export function createAuthService(deps: AuthDeps) {
     const key = name.toLowerCase();
     const existing = accounts.find(key);
     if (existing?.passwordHash) { attempts.inc({ method, outcome: 'password_required' }); throw new AuthError('PASSWORD_REQUIRED', 'У этого имени есть пароль. Войдите с паролем.'); }
+    admit(existing?.identity.accountId ?? null);
     return issue(existing?.identity ?? accounts.findOrCreate(name, key, clock.now()), ip, method);
   };
 
   const service = {
+    state(identity: { accountId: string }) { return { requiresAvatar: accounts.requiresAvatar?.(identity.accountId) ?? false }; },
     /** AUTH-006 `GET /api/auth/mode`. */
     mode: () => ({ password: true, guest: passwordless, dev: passwordless }),
     onRevoked(listener: (tokenHashes: readonly string[], reason: RevokeReason) => void): void { revoked = listener; },
@@ -130,7 +135,9 @@ export function createAuthService(deps: AuthDeps) {
       const wait = registrations.hit(ip);
       if (wait) { attempts.inc({ method: 'register', outcome: 'rate_limited' }); throw new AuthError('RATE_LIMIT', 'Слишком много регистраций с этого устройства. Подождите.', wait); }
       if (accounts.find(name.toLowerCase())) { attempts.inc({ method: 'register', outcome: 'name_taken' }); throw new AuthError('NAME_TAKEN', 'Это имя уже занято. Выберите другое.'); }
+      admit(null);
       const hash = await hashing(() => hasher.hash(password));
+      admit(null);
       try { return issue(accounts.create(name, name.toLowerCase(), hash, clock.now()), ip, 'register'); }
       catch (error) { if (error instanceof NameTakenError) throw new AuthError('NAME_TAKEN', 'Это имя уже занято. Выберите другое.'); throw error; }
     },
@@ -140,7 +147,7 @@ export function createAuthService(deps: AuthDeps) {
       if (typeof rawPassword !== 'string' || !rawPassword) throw new AuthError('INVALID', 'Введите пароль.');
       locked(key, 'login');
       const record = accounts.find(key);
-      const result = await hashing(() => hasher.verify(rawPassword.normalize('NFC'), record?.passwordHash ?? null));
+      const result = await hashing(() => hasher.verify(rawPassword, record?.passwordHash ?? null));
       if (!record || !result.ok) return failed(key, ip, 'login', record ? 'credentials' : 'unknown', true);
       if (record.mustChangePassword) {
         if ((record.tempPasswordExpiresAt ?? 0) <= clock.now()) return failed(key, ip, 'login', 'temp_expired', false);
@@ -159,7 +166,7 @@ export function createAuthService(deps: AuthDeps) {
       const next = passwordOf(rawNew, name, 'Новый пароль');
       locked(key, 'password');
       const record = accounts.find(key);
-      const result = await hashing(() => hasher.verify(rawPassword.normalize('NFC'), record?.passwordHash ?? null));
+      const result = await hashing(() => hasher.verify(rawPassword, record?.passwordHash ?? null));
       if (!record || !result.ok) return failed(key, ip, 'password', record ? 'credentials' : 'unknown', true);
       if (record.mustChangePassword && (record.tempPasswordExpiresAt ?? 0) <= clock.now()) return failed(key, ip, 'password', 'temp_expired', false);
       lockout.succeed(key);

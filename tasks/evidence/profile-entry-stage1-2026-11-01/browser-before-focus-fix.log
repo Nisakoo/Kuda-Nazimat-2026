@@ -1,0 +1,56 @@
+
+Running 5 tests using 1 worker
+
+(node:65490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug (7.9s)
+(node:65522) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/ui-hud.spec.ts:63:1 › real guest entry preserves only the connection address and returns from mode with Escape (1.1s)
+  ✓  3 e2e/ui-hud.spec.ts:106:1 › real registration resumes mandatory appearance and uses password authentication (4.1s)
+  ✓  4 e2e/ui-hud.spec.ts:111:1 › real server HUD switches one modal, blocks gameplay, preserves words and requires explicit capture (7.5s)
+  ✓  5 e2e/ui-hud.spec.ts:197:1 › connection errors allow retry and disappear after entry polling recovers (1.8s)
+
+
+  1) e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('dialog', { name: 'Пауза' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('dialog', { name: 'Пауза' }) with timeout 5000ms
+      - waiting for getByRole('dialog', { name: 'Пауза' })
+
+
+       at helpers.ts:9
+
+       7 |
+       8 | export async function resume(page: Page) {
+    >  9 |   await expect(page.getByRole('dialog', { name: 'Пауза' })).toBeVisible();
+         |                                                             ^
+      10 |   await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
+      11 |   await expectCapture(page, true);
+      12 | }
+        at resume (/Users/nisakoo/Documents/competition-2026/client/e2e/helpers.ts:9:61)
+        at avatarWorldScenario (/Users/nisakoo/Documents/competition-2026/client/e2e/avatar-world-scenario.ts:53:11)
+        at /Users/nisakoo/Documents/competition-2026/client/e2e/ui-hud.spec.ts:60:3
+
+    Error Context: test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    Error Context: test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-hud/ui-hud-confirmed-appearanc-d85d4-live-and-keeps-the-held-jug/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/ui-hud.spec.ts:58:1 › confirmed appearance enters the real world, changes live and keeps the held jug 
+  4 passed (27.0s)

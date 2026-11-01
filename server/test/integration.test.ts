@@ -30,7 +30,7 @@ it('password registration restores pending state after restart, gates join, save
   expect(Object.keys(session).sort()).toEqual(['expiresAt', 'token']);
   expect((await authPost(origin, 'login', { name: 'protected', password: 'wrong password' })).status).toBe(401);
   expect((await authPost(origin, 'register', { name: 'PROTECTED', password: authPassword })).status).toBe(409);
-  expect((await authPost(origin, 'guest', { name: 'Protected' })).status).toBe(401);
+  expect((await authPost(origin, 'guest', { name: 'Protected' })).status).toBe(403);
   const loginResponse = await authPost(origin, 'login', { name: 'protected', password: authPassword }); expect(loginResponse.status).toBe(200);
   const login = await loginResponse.json() as typeof session;
   const headers = { Authorization: `Bearer ${login.token}` };
@@ -336,4 +336,17 @@ it('a LanguagePort that fails to start makes only BABEL language actions unavail
   expect((await post({ type: 'suggest', word: 'коза' }, 'suggest')).status).toBe(503);
   expect((await post({ type: 'word-save', word: 'goat', translation: 'коза', note: '' }, 'word')).status).toBe(200);
   await app.stop(); expect(stopped).toBe(1);
+});
+
+it('exposes only public health to other origins while authenticated APIs keep their CORS restrictions', async () => {
+  const { origin } = await setup();
+  const headers = { Origin: 'http://192.168.1.20:8080' };
+  const health = await fetch(`${origin}/api/health`, { headers });
+  expect(health.status).toBe(200);
+  expect(health.headers.get('Access-Control-Allow-Origin')).toBe('*');
+  expect(health.headers.get('Access-Control-Allow-Credentials')).toBeNull();
+  expect(await health.json()).toMatchObject({ status: 'ok', protocol: 3 });
+  const auth = await fetch(`${origin}/api/auth/state`, { headers });
+  expect(auth.status).toBe(401);
+  expect(auth.headers.get('Access-Control-Allow-Origin')).toBeNull();
 });

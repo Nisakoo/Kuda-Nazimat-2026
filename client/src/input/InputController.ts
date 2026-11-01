@@ -10,7 +10,8 @@ export interface InputActions {
   look(dx: number, dy: number): void;
   zoom(delta: number): void;
   interact(): void;
-  inventory?(): void;
+  controlsHint?(visible: boolean): void;
+  shortcut?(code: string): boolean;
   menu(): void;
   captured(): void;
   interrupted(): void;
@@ -21,11 +22,12 @@ const movementKeys = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowL
 function textEntry(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
 }
-const captureError = 'Не удалось захватить мышь. Разрешите захват в браузере и нажмите «Повторить захват» или вернитесь в меню.';
+const captureError = 'Не удалось захватить мышь. Разрешите захват в браузере и нажмите кнопку восстановления управления или вернитесь в меню.';
 
 /** DOM/pointer-lock adapter. Gameplay listeners exist only while capture is confirmed. */
 export class InputController {
   private readonly keys = new Set<string>();
+  private readonly hintKeys = new Set<string>();
   private readonly ownerAbort = new AbortController();
   private playAbort: AbortController | null = null;
   private last: Direction = { x: 0, z: 0 };
@@ -47,6 +49,21 @@ export class InputController {
     // belong to legacy void APIs; a stale global error must not cancel a new grant.
     document.addEventListener('pointerlockerror', () => { if (this.legacyPending) this.captureFailure(); }, options);
     window.addEventListener('blur', this.interrupt, options);
+    window.addEventListener('keydown', (event) => {
+      if ((event.code === 'AltLeft' || event.code === 'AltRight') && !event.ctrlKey && !event.metaKey && !event.isComposing && !textEntry(event.target) && this.hasCapture && this.actions.canControl()) {
+        event.preventDefault();
+        this.hintKeys.add(event.code);
+        this.actions.controlsHint?.(true);
+        return;
+      }
+      if (event.defaultPrevented || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || textEntry(event.target)) return;
+      // Enter must still activate a focused control, including form buttons.
+      if (!this.hasCapture && event.code === 'Enter' && event.target instanceof Element && event.target.closest('button, a, summary')) return;
+      if (this.actions.shortcut?.(event.code)) event.preventDefault();
+    }, options);
+    window.addEventListener('keyup', (event) => {
+      if (this.hintKeys.delete(event.code)) this.actions.controlsHint?.(this.hintKeys.size > 0);
+    }, options);
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.interrupt(); }, options);
     document.addEventListener('focusin', (event) => {
       if (textEntry(event.target) && (this.held || this.desired)) this.interrupt();
@@ -105,6 +122,7 @@ export class InputController {
   }
 
   readonly reset = (): void => {
+    if (this.hintKeys.size) { this.hintKeys.clear(); this.actions.controlsHint?.(false); }
     this.keys.clear();
     this.sprintHeld = false;
     if (this.dirty) this.actions.clearInput();
@@ -186,6 +204,7 @@ export class InputController {
   }
 
   private readonly keyDown = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || event.isComposing) return;
     if (event.code === 'Escape') {
       event.preventDefault();
       if (!event.repeat) this.actions.menu();
@@ -196,7 +215,6 @@ export class InputController {
     if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') { event.preventDefault(); this.keys.add(event.code); this.dirty = true; }
     if (event.code === 'Space') { event.preventDefault(); if (!event.repeat && !this.keys.has('Space')) this.actions.jump(); this.keys.add('Space'); this.dirty = true; }
     if (event.code === 'KeyE' && !event.repeat) { event.preventDefault(); this.actions.interact(); }
-    if (event.code === 'KeyI' && !event.repeat) { event.preventDefault(); this.actions.inventory?.(); }
   };
 
   private readonly keyUp = (event: KeyboardEvent): void => { this.keys.delete(event.code); };

@@ -9,6 +9,7 @@ export interface AccountRecord {
   readonly lastLoginAt: number | null;
 }
 export interface AccountStore {
+  requiresAvatar?(accountId: string): boolean;
   /** Passwordless login (AUTH-001 guest/dev): one name key — one account and player. */
   findOrCreate(name: string, nameKey: string, now: number): PlayerIdentity;
   find(nameKey: string): AccountRecord | null;

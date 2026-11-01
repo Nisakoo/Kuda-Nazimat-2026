@@ -28,15 +28,18 @@ related:
 
   | Таблица | Поля | Ограничения |
   |---|---|---|
-  | accounts | id, name, name_key, created_at | `name_key` = имя в нижнем регистре, UNIQUE (mock-вход AUTH-001) |
-  | sessions | token_hash, account_id, created_at, expires_at | PK token_hash; FK accounts; logout удаляет только текущий hash |
-  | account_credentials | account_id, algorithm, salt, password_hash | PK/FK account_id; scrypt-v1; соль 16 байт и hash 64 байта в hex, CHECK длины/алфавита |
+  | accounts | id, name, name_key, created_at, password_hash, password_set_at, must_change_password, temp_password_expires_at | UNIQUE name_key; пароль хранится как scrypt с параметрами (AUTH-008) |
+  | sessions | token_hash, account_id, created_at, expires_at, id, created_ip, revoked_at, revoke_reason | PK token_hash; FK accounts; публичный id для журналов; logout отмечает отзыв текущей сессии |
+  | account_credentials | account_id, algorithm, salt, password_hash | Исторические scrypt-v1 записи ветки клиента; миграция переносит их в accounts без удаления исходных данных |
   | players | id, account_id, map_id, x, y, z, rotation_y, updated_at | PK id (формат ID PROTO, `p_` + 16 base36); account_id UNIQUE |
   | npc_dialogue | id, player_id, npc_id, question, answer, created_at | индекс (player_id, npc_id, created_at); FK players |
   | schema_migrations | version, applied_at | — |
 
-  Аккаунт и его игрок создаются одной транзакцией при первом guest-входе под новым именем. Password-регистрация создаёт account/player/credential одной транзакцией, только для свободного имени; guest не превращается в password account. Миграция 004 добавляет account_credentials без изменения старых guest. Отсутствие credential означает guest; наличие credential вместе с `players.avatar_id IS NULL` — устойчивый pending-avatar marker (AUTH-003). Позиция `NULL` означает «ещё не входил», при join используется spawn.
+  Аккаунт и его игрок создаются одной транзакцией при первом разрешённом guest-входе под новым именем. Password-регистрация создаёт account с хешем и player одной транзакцией для свободного имени. Парольный аккаунт с `players.avatar_id IS NULL` требует выбора облика до join. Позиция `NULL` означает «ещё не входил», при join используется spawn.
 - **STORE-002:** Схема создаётся и меняется нумерованными SQL-миграциями из `server/src/persistence/migrations/`, применяемыми при старте в транзакции. Неизвестная (более новая) версия БД — ошибка запуска. Включены `foreign_keys = ON` и `journal_mode = WAL`. Связанные изменения фиксируются одной транзакцией; некорректные данные не создают частичную запись.
+  Для известных старых dev-баз с пересекающимися номерами миграций дополнительно проверяется фактическое наличие avatar_id, equipped_tool и account_credentials, а также nullable party_id в babel_profiles. Недостающие части восстанавливаются в той же транзакции без удаления игроков, предметов и данных чужих расширений. История с пропусками/неизвестной версией по-прежнему отклоняется; SQL-причина ошибки запуска видна оператору. Миграция 006 разрешает профиль языков с party_id = NULL до создания/присоединения к игре.
+  Миграция 007 объединяет поля паролей/отзыва сессий из main, проверяя каждую колонку отдельно. Старые account_credentials переносятся с прежними scrypt-параметрами и без изменения Unicode-семантики пароля; облики, экипировка, позиции и игровой прогресс сохраняются. Базы обеих веток допускают повторный запуск без повторного ALTER.
+
 - **STORE-003:** Позиция и карта игрока сохраняются:
   - каждые `saveIntervalMs` (10 с), если изменились;
   - при удалении сущности из мира после grace;

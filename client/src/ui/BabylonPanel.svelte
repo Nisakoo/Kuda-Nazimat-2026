@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { requestId } from '../shared/requestId';
   import { tick, untrack, type Snippet } from 'svelte';
   import './babylon-panels.css';
   import type { GameApp, BabylonPanel, BabylonView, EquipmentView } from '../app/GameApp';
@@ -7,19 +8,21 @@
   import Icon from './Icon.svelte';
   import type { ItemId, Language, PartySize, Word } from '../../../shared/babylon/types';
   import { MARKET_ITEMS, MARKET_PEOPLE, MARKET_GOATS } from '../session/MarketSession';
+  import ResidentChat from './ResidentChat.svelte';
   import LearningText from './LearningText.svelte';
   import { modal } from './modal';
   import { inventoryShortcut } from './inventoryShortcut';
-  const { game, view, panel, target, wordSeed, navigation, equipment }: { game: GameApp; view: BabylonView; panel: BabylonPanel | null; target: string | null; wordSeed: string; navigation?: Snippet; equipment?: EquipmentView | null } = $props();
+  const { game, view, panel, target, wordSeed, navigation, equipment, avatarId = null }: { game: GameApp; view: BabylonView; panel: BabylonPanel | null; target: string | null; wordSeed: string; navigation?: Snippet; equipment?: EquipmentView | null; avatarId?: import('../../../shared/avatar/types').AvatarId | null } = $props();
   const gameState = $derived(view.state);
   const suggestion = $derived(view.suggestion);
+  const gameAvatar = $derived(view.state ? avatarId : null);
   const actor = $derived([...MARKET_PEOPLE, ...MARKET_GOATS].find(a => a.id === target));
   const goat = $derived(MARKET_GOATS.find(a => a.id === target));
   const titles = { setup: 'Подготовка путешествия', languages: 'Ваши языки', intro: 'Добро пожаловать в Вавилон', task: 'Козы пастуха', inventory: 'Инвентарь', stone: 'Высечь камень', words: 'Мой словарь', interaction: 'Взаимодействие', chat: 'Чат с напарниками' };
   const labels: Record<Language, string> = { ru: 'Русский', en: 'English', es: 'Español' };
   const statuses = { sent: 'Отправлено', translating: 'Переводится', delivered: 'Доставлено', error: 'Ошибка доставки' };
   let stage = $state(1), size = $state<PartySize>(1), native = $state<Language>('ru'), learning = $state<Language>('en');
-  let selected = $state<ItemId>('dates'), question = $state(''), message = $state('');
+  let selected = $state<ItemId>('dates'), message = $state('');
   let word = $state(''), translation = $state(''), note = $state(''), example = $state(''), exampleTranslation = $state(''), editId = $state<string | undefined>();
   let search = $state(''), selectedWordId = $state<string | undefined>(), wordForm = $state(false), learnedFilter = $state(false);
   let selectedTool = $state<ToolId>('bag');
@@ -33,10 +36,19 @@
   const chatEntries = $derived([...(gameState?.messages ?? []).map(message => ({ kind: 'message' as const, createdAt: message.createdAt, message })), ...(gameState?.stones ?? []).map(stone => ({ kind: 'stone' as const, createdAt: stone.createdAt, stone }))].sort((a, b) => a.createdAt - b.createdAt));
   let draft = $state<[number, number][][]>([]), drawing = $state(false), pendingStone = $state(false);
   let stoneRequestId: string | undefined;
+  let appliedWordSeed = '';
   $effect(() => { if (gameState?.availableParty) size = gameState.availableParty.size; });
   $effect(() => { const current = panel; if (current === 'languages') { const pair = untrack(() => gameState?.profile); if (pair) { native = pair.native; learning = pair.learning; } } });
-  $effect(() => { if (wordSeed) { word = wordSeed; translation = ''; note = ''; example = ''; exampleTranslation = ''; editId = undefined; wordForm = true; } });
-  $effect(() => { if (suggestion) translation = suggestion; });
+  $effect(() => {
+    const seed = wordSeed;
+    if (panel !== 'words' || !seed) { appliedWordSeed = ''; return; }
+    if (seed === appliedWordSeed) return;
+    appliedWordSeed = seed;
+    const existing = untrack(() => gameState?.words.find(entry => entry.word.normalize('NFC').toLocaleLowerCase() === seed.normalize('NFC').toLocaleLowerCase()));
+    if (existing) { selectedWordId = existing.id; learnedFilter = existing.learned; search = ''; wordForm = false; return; }
+    word = seed; translation = ''; note = ''; example = ''; exampleTranslation = ''; editId = undefined; wordForm = true;
+  });
+  $effect(() => { if (suggestion && !untrack(() => translation.trim())) translation = suggestion; });
   $effect(() => {
     const id = selectedDetailId;
     untrack(() => {
@@ -47,7 +59,7 @@
   function point(event: PointerEvent): [number, number] { const r = (event.currentTarget as SVGSVGElement).getBoundingClientRect(); return [Math.round(Math.max(0, Math.min(320, (event.clientX - r.left) / r.width * 320)) * 100) / 100, Math.round(Math.max(0, Math.min(320, (event.clientY - r.top) / r.height * 320)) * 100) / 100]; }
   function begin(event: PointerEvent) { if (event.button !== 0 || view.busy || pendingStone || draft.length >= 64 || draft.reduce((n, s) => n + s.length, 0) >= 4096) return; drawing = true; (event.currentTarget as SVGSVGElement).setPointerCapture(event.pointerId); draft = [...draft, [point(event)]]; }
   function move(event: PointerEvent) { if (!drawing || draft.at(-1)!.length >= 256 || draft.reduce((n, s) => n + s.length, 0) >= 4096) return; draft = [...draft.slice(0, -1), [...draft.at(-1)!, point(event)]]; }
-  async function carve() { drawing = false; pendingStone = true; stoneRequestId ??= crypto.randomUUID(); if (await game.babylonAction({ type: 'carve', drawing: draft }, stoneRequestId)) { draft = []; pendingStone = false; stoneRequestId = undefined; } }
+  async function carve() { drawing = false; pendingStone = true; stoneRequestId ??= requestId(); if (await game.babylonAction({ type: 'carve', drawing: draft }, stoneRequestId)) { draft = []; pendingStone = false; stoneRequestId = undefined; } }
   function edit(entry: Word) { word = entry.word; translation = entry.translation; note = entry.note; example = entry.example; exampleTranslation = entry.exampleTranslation; editId = entry.id; wordForm = true; }
   function addWord() { word = ''; translation = ''; note = ''; example = ''; exampleTranslation = ''; editId = undefined; wordForm = true; }
   async function saveWord() {
@@ -76,8 +88,7 @@
 {#if panel}
 <div class="modal-backdrop">
   <dialog use:modal class="panel market-panel babel-panel" aria-labelledby="babel-title" oncancel={event => { event.preventDefault(); void close(); }} onkeydown={event => inventoryShortcut(event, panel, () => { void close(); })}>
-    <div class="babel-content"><div class="panel-top"><h2 id="babel-title">{panel === 'interaction' ? actor?.name ?? titles.interaction : titles[panel]}</h2>{#if panel !== 'setup'}<button class="icon-button" aria-label="Закрыть окно" onclick={() => void close()}>✕</button>{/if}</div>
-    {#if gameState?.backend === 'test'}<p class="small capture-error">Тестовый переводчик и NPC. Сохранения и игровые действия выполняет настоящий сервер. Для чата доступны, например, «Привет», «Купи финики», «Дай воду серому козлёнку»; остальные фразы могут вернуть ошибку.</p>{/if}
+    <div class="babel-content"><div class="panel-top"><h2 id="babel-title">{panel === 'interaction' ? goat ? actor?.name ?? titles.interaction : 'Разговор с жителем' : titles[panel]}</h2>{#if panel !== 'setup'}<button class="icon-button" aria-label="Закрыть окно" onclick={() => void close()}>✕</button>{/if}</div>
     {#if !gameState}<p>Загружаем данные с сервера…</p>
     {:else if panel === 'setup' || panel === 'languages'}
       {#if panel === 'setup' && stage === 1}
@@ -96,7 +107,7 @@
     {:else if panel === 'intro'}
       <p>Вавилон — город смешавшихся языков. Жители учатся снова понимать друг друга. Вы пишете на родном языке, а сообщения напарников и ответы NPC читаете на изучаемом.</p>
       <p>Когда слов не хватает, нарисуйте камень: штрихи нельзя стереть, высеченный рисунок увидит вся группа. Личный словарь поможет сохранить слова и свои заметки.</p>
-      <p>WASD — идти, мышь — обзор, E — взаимодействовать, Escape — меню. Покупки и кормление выполняются кнопками; текст собеседника не выдаёт предметы.</p>
+
       <p>Ваше задание и прогресс сохраняются на сервере. До начала ждём заполнения группы.</p>
     {:else if panel === 'task'}
       <p><LearningText text={gameState.task} learn={word => game.learnWord(word)} /></p>
@@ -125,8 +136,7 @@
       {#if goat}<p>{goat.feature}. {gameState.fed.includes(goat.id) ? 'Уже накормлена.' : 'Выберите корм из сумки.'}</p><button disabled={view.busy || !gameState.inventory[selected] || gameState.fed.includes(goat.id)} onclick={() => void game.babylonAction({ type: 'feed', targetId: goat.id, item: selected })}>Дать выбранный корм</button>
       {:else}
         <div class="market-items">{#each MARKET_ITEMS.filter(item => item.seller === target) as item}<button disabled={view.busy} onclick={() => void game.babylonAction({ type: 'buy', targetId: target!, item: item.id })}>Купить: {item.name}</button>{/each}</div>
-        <div class="dialog-history">{#each gameState.replies.filter(r => r.npcId === target) as r (r.id)}<p><strong>Вы:</strong> {r.question}</p><p><LearningText text={r.text} enabled={r.language === gameState.profile?.learning} learn={word => game.learnWord(word)} /></p>{/each}</div>
-        <form onsubmit={event => { event.preventDefault(); void game.babylonAction({ type: 'npc', targetId: target!, text: question }).then(ok => { if (ok) question = ''; }); }}><label>Вопрос собеседнику <textarea aria-label="Вопрос NPC" bind:value={question} maxlength="500" required></textarea></label><button disabled={view.busy || !question.trim()}>Спросить</button></form>
+        {#key target}<ResidentChat {game} {view} target={target!} name={actor?.name ?? 'Житель'} avatar={gameAvatar} />{/key}
       {/if}
     {:else if panel === 'stone'}
       <p>Штрихи нельзя стереть или отменить. Закрытие окна сохраняет черновик. После «Высечь» рисунок неизменен.</p>
@@ -160,9 +170,8 @@
     {#if view.error}<p class="capture-error" role="alert">{view.error}</p>{/if}
     {#if view.canRetry}<button class="secondary" disabled={view.busy} onclick={() => void game.retryBabylon()}>Повторить запрос</button>{/if}
     {#if panel === 'setup'}<button class="secondary" onclick={() => game.logout()}>Выйти из сессии</button>{/if}
-    {#if panel !== 'setup'}<button class="secondary" disabled={panel === 'intro' && view.busy} onclick={() => void close()}>Закрыть</button>{/if}
-    {#if panel === 'chat'}<p class="window-hint">Пишите на родном — читайте на изучаемом</p>{:else if panel !== 'setup'}<p class="window-hint">{panel === 'inventory' ? 'I / Esc' : 'Esc'} — закрыть</p>{/if}
     </div>
+    {#if panel !== 'setup'}<div class="babel-footer"><button class="secondary" disabled={panel === 'intro' && view.busy} onclick={() => void close()}>Закрыть</button></div>{/if}
     {#if navigation && panel !== 'setup'}<div class="babel-navigation">{@render navigation()}</div>{/if}
   </dialog>
 </div>

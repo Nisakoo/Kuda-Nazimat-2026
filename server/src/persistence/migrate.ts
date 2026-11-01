@@ -3,6 +3,41 @@ import { readdirSync, readFileSync } from 'node:fs';
 
 export interface Migration { version: number; sql: string }
 
+/** Older development branches used versions 3–5 for hand items. Preserve their
+ * data while reconciling the additive account fields required by this client. */
+export function applyApplicationMigrations(db: DatabaseSync, now: number): void {
+  const migrations = loadMigrations();
+  // Upstream used version 3 for auth; this branch used it for appearance.
+  // Reconcile each auth column independently, even on partially upgraded DBs.
+  const authSql = migrations.find(m => m.version === 7)!.sql;
+  function reconcileAuth(): void {
+    for (const statement of authSql.split(';').map(s => s.trim()).filter(Boolean)) {
+      const alter = /ALTER TABLE (\w+) ADD COLUMN (\w+)/.exec(statement);
+      if (alter && db.prepare(`PRAGMA table_info(${alter[1]})`).all().some(row => row.name === alter[2])) continue;
+      db.exec(statement.replace('CREATE UNIQUE INDEX ', 'CREATE UNIQUE INDEX IF NOT EXISTS ').replace('CREATE INDEX ', 'CREATE INDEX IF NOT EXISTS '));
+    }
+  }
+  const exists = (version: number): boolean => {
+    if (version === 6) return db.prepare('PRAGMA table_info(babel_profiles)').all().some(row => row.name === 'party_id' && row.notnull === 0);
+    if (version === 4) return !!db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'account_credentials'").get();
+    const column = version === 3 ? 'avatar_id' : 'equipped_tool';
+    return db.prepare('PRAGMA table_info(players)').all().some(row => row.name === column);
+  };
+  const additive = [3, 4, 5, 6];
+  applyMigrations(db, migrations.map(migration => migration.version === 7 || additive.includes(migration.version) && exists(migration.version)
+    ? { ...migration, sql: 'SELECT 1;' } : migration), now);
+  // Version numbers alone do not prove the schema of an old development DB.
+  for (const version of additive) if (!exists(version)) db.exec(migrations[version - 1]!.sql);
+  reconcileAuth();
+  // Preserve the old scrypt parameters and raw password semantics. No plaintext needed.
+  for (const row of db.prepare('SELECT account_id, salt, password_hash FROM account_credentials').all()) {
+    const salt = Buffer.from(String(row.salt), 'hex').toString('base64url');
+    const key = Buffer.from(String(row.password_hash), 'hex').subarray(0, 32).toString('base64url');
+    db.prepare('UPDATE accounts SET password_hash = ? WHERE id = ? AND password_hash IS NULL')
+      .run(`scrypt-legacy$32768$8$1$${salt}$${key}`, String(row.account_id));
+  }
+}
+
 export function loadMigrations(directory = new URL('./migrations/', import.meta.url)): Migration[] {
   return readdirSync(directory).filter((name) => name.endsWith('.sql')).map((name) => {
     if (!/^[0-9]{3}\.sql$/.test(name)) throw new Error(`Неверное имя миграции: ${name}`);

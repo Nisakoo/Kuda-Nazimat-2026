@@ -266,3 +266,96 @@ it('bounds the dictionary, keeps editing possible at capacity and acknowledges t
   expect(parseBabylonResult(result).state.words).toHaveLength(64);
   expect(() => parseBabylonResult({ ...result, state: { ...result.state, inventory: { ...result.state.inventory, dates: -1 } } })).toThrow();
 });
+
+it('persists hub preferences before enrollment and separates create from join without losing progress', async () => {
+  const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
+  await expect(f.call(a, { type: 'create', size: 2 })).rejects.toThrow('профиле');
+  await f.call(a, { type: 'languages', native: 'ru', learning: 'es' });
+  expect(f.service.enrolled(a.playerId)).toBe(false);
+  f.restart();
+  expect(f.service.state(a).profile).toEqual({ native: 'ru', learning: 'es' });
+  expect(f.service.state(a).party).toBeNull();
+  await expect(f.call(a, { type: 'join' })).rejects.toThrow('Нет игры');
+  const created = await f.call(a, { type: 'create', size: 2 }, 'create-once');
+  expect((await f.call(a, { type: 'create', size: 2 }, 'create-once')).state.party?.id).toBe(created.state.party?.id);
+  await f.call(b, { type: 'languages', native: 'ru', learning: 'en' });
+  await expect(f.call(b, { type: 'create', size: 1 })).rejects.toThrow('ждёт группа');
+  const joined = await f.call(b, { type: 'join' });
+  expect(joined.state.party).toMatchObject({ id: created.state.party?.id, size: 2, count: 2 });
+  await expect(f.call(a, { type: 'create', size: 1 })).rejects.toThrow('уже есть игра');
+  expect((await f.call(a, { type: 'join' })).state.party?.count).toBe(2);
+  f.restart();
+  expect(f.service.state(a).party?.id).toBe(created.state.party?.id);
+});
+
+it('atomically replaces solo with multiplayer and back, preserving personal words and deduplicating retries', async () => {
+  const f = fixture(), a = f.people[0]!;
+  const initial = await f.call(a, { type: 'enroll', size: 1, native: 'ru', learning: 'es' });
+  const oldId = initial.state.party!.id;
+  await f.call(a, { type: 'word-save', word: 'goat', translation: 'коза', note: 'личное' });
+  f.positions.set(a.accountId, { mapId: 'market', position: { x: -4.5, y: 0, z: .5 } });
+  await f.call(a, { type: 'buy', item: 'dates', targetId: 'fruit-seller' });
+  const action = { type: 'create' as const, size: 2 as const, replacePartyId: oldId };
+  const next = await f.call(a, action, 'replace-once');
+  expect(next.state.party).toMatchObject({ size: 2, count: 1, started: false });
+  expect(next.state.party!.id).not.toBe(oldId);
+  expect(next.state.profile).toEqual(initial.state.profile);
+  expect(next.state.words[0]).toMatchObject({ word: 'goat', note: 'личное' });
+  expect(next.state.inventory.dates).toBe(0);
+  expect(sqliteBabylon(f.db).party(oldId)).toBeNull();
+  f.restart();
+  expect((await f.call(a, action, 'replace-once')).state.party!.id).toBe(next.state.party!.id);
+  await expect(f.call(a, action)).rejects.toMatchObject({ code: 'CONFLICT' });
+  const solo = await f.call(a, { type: 'create', size: 1, replacePartyId: next.state.party!.id });
+  expect(solo.state.party).toMatchObject({ size: 1, started: true });
+  expect(sqliteBabylon(f.db).party(next.state.party!.id)).toBeNull();
+  expect(f.db.prepare('PRAGMA foreign_key_check').all()).toEqual([]);
+  expect(f.service.spawn(a.playerId)?.force).toBe(true);
+});
+
+it('keeps the old game on a creation conflict, stale confirmation or failed SQLite commit', async () => {
+  const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
+  const initial = await f.call(a, { type: 'enroll', size: 1, native: 'ru', learning: 'en' });
+  const oldId = initial.state.party!.id;
+  await expect(f.call(a, { type: 'create', size: 2, replacePartyId: 'foreign-id' })).rejects.toMatchObject({ code: 'CONFLICT' });
+  f.db.exec("CREATE TRIGGER reject_replace BEFORE INSERT ON babel_operations BEGIN SELECT RAISE(ABORT, 'replacement failed'); END");
+  const action = { type: 'create' as const, size: 2 as const, replacePartyId: oldId };
+  await expect(f.call(a, action)).rejects.toThrow('replacement failed');
+  f.db.exec('DROP TRIGGER reject_replace');
+  expect(f.service.state(a).party!.id).toBe(oldId);
+  expect(f.db.prepare('SELECT count(*) AS n FROM babel_parties').get()!.n).toBe(1);
+  const waiting = await f.call(b, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
+  await expect(f.call(a, action)).rejects.toMatchObject({ code: 'CONFLICT' });
+  expect(f.service.state(a).party!.id).toBe(oldId);
+  expect(f.service.state(b).party!.id).toBe(waiting.state.party!.id);
+  expect(() => parseBabylonRequest({ v: 2, requestId: 'invalid', action: { ...action, replacePartyId: true } })).toThrow();
+});
+
+it('replacing a shared game preserves the remaining player and their stored progress', async () => {
+  const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
+  for (const person of [a, b]) await f.call(person, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
+  const old = f.service.state(b);
+  f.positions.set(b.accountId, { mapId: 'market', position: { x: -4.5, y: 0, z: .5 } });
+  await f.call(b, { type: 'buy', item: 'dates', targetId: 'fruit-seller' });
+  await f.call(a, { type: 'create', size: 1, replacePartyId: old.party!.id });
+  f.restart();
+  expect(f.service.state(b).party).toMatchObject({ id: old.party!.id, count: 1, role: 2, started: true });
+  expect(f.service.state(b).inventory.dates).toBe(1);
+  expect(f.service.state(b).party!.members.map(member => member.id)).toEqual([b.playerId]);
+});
+
+it('ignores an NPC answer that finishes after replacing its game', async () => {
+  let release!: (answer: string) => void, started!: () => void;
+  const entered = new Promise<void>(resolve => { started = resolve; });
+  const language = { ...testLanguagePort, answer: () => { started(); return new Promise<string>(resolve => { release = resolve; }); } };
+  const f = fixture(language), a = f.people[0]!;
+  const initial = await f.call(a, { type: 'enroll', size: 1, native: 'ru', learning: 'en' });
+  f.positions.set(a.accountId, { mapId: 'market', position: { x: -4.5, y: 0, z: .5 } });
+  const pending = f.call(a, { type: 'npc', targetId: 'fruit-seller', text: 'Hello' }).then(() => null, error => error);
+  await entered;
+  await f.call(a, { type: 'create', size: 1, replacePartyId: initial.state.party!.id });
+  release('old answer');
+  expect(await pending).toBeInstanceOf(Error);
+  expect(f.service.state(a).replies).toEqual([]);
+  expect(f.db.prepare('PRAGMA foreign_key_check').all()).toEqual([]);
+});

@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { AnimationMixer, Box3, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { AVATAR_IDS, AVATAR_PROFILE, createAvatarModel, generateAvatarModels } from './generate-avatar-models.mjs';
+import { AVATAR_IDS, AVATAR_PROPORTIONS, createAvatarModel, generateAvatarModels } from './generate-avatar-models.mjs';
 
 const temporary=[];
 afterEach(async()=>{await Promise.all(temporary.splice(0).map(path=>rm(path,{recursive:true,force:true})));});
@@ -30,7 +30,7 @@ describe('TASK-043 original local avatar models',()=>{
       const {root}=createAvatarModel(id),b=bounds(root),size=b.getSize(new Vector3());
       expect(hierarchy(root)).toEqual(reference);
       expect(root.name).toBe('avatar');expect(root.userData.forward).toBe('+Z');
-      expect(size.x).toBeCloseTo(AVATAR_PROFILE.width,6);expect(size.y).toBeCloseTo(1.8,6);expect(size.z).toBeCloseTo(.56,6);
+      expect(size.x).toBeCloseTo(AVATAR_PROPORTIONS[id].width,6);expect(size.y).toBeCloseTo(AVATAR_PROPORTIONS[id].height,6);expect(size.z).toBeCloseTo(.56,6);
       expect(b.min.y).toBeCloseTo(0,6);expect(root.position.toArray()).toEqual([0,0,0]);
       for(const side of ['left','right']){
         expect(root.getObjectByName('elbow-'+side).parent.name).toBe('shoulder-'+side);
@@ -54,23 +54,23 @@ describe('TASK-043 original local avatar models',()=>{
     expect(signature('ksu','torso')).not.toEqual(signature('lukas','torso'));
   });
 
-  it('ships valid GLB 2.0 with embedded geometry, no runtime URLs, and the two clips',async()=>{
+  it('ships valid GLB 2.0 with embedded geometry, no runtime URLs, and idle/walk/jump clips',async()=>{
     for(const id of AVATAR_IDS){
       const bytes=await readFile(file(id)),json=glbDocument(bytes);
       expect(bytes.toString('utf8',0,4)).toBe('glTF');expect(bytes.readUInt32LE(4)).toBe(2);expect(bytes.readUInt32LE(8)).toBe(bytes.length);
       expect(json.buffers).toHaveLength(1);expect(json.buffers[0].uri).toBeUndefined();
       expect(json.images??[]).toHaveLength(0);expect(json.textures??[]).toHaveLength(0);
-      expect(json.animations.map(a=>a.name)).toEqual(['idle','walk']);
-      const loaded=await parse(id);expect(loaded.animations.map(c=>c.name)).toEqual(['idle','walk']);
-      const b=bounds(loaded.scene),s=b.getSize(new Vector3());expect(b.min.y).toBeCloseTo(0,6);expect(s.y).toBeCloseTo(1.8,6);
+      expect(json.animations.map(a=>a.name)).toEqual(['idle','walk','jump']);
+      const loaded=await parse(id);expect(loaded.animations.map(c=>c.name)).toEqual(['idle','walk','jump']);
+      const b=bounds(loaded.scene),s=b.getSize(new Vector3());expect(b.min.y).toBeCloseTo(0,6);expect(s.y).toBeCloseTo(AVATAR_PROPORTIONS[id].height,6);
       const png=await readFile(new URL('../public/assets/models/avatars/'+id+'-portrait.png',import.meta.url));
       expect(png.subarray(1,4).toString()).toBe('PNG');expect(png.readUInt32BE(16)).toBe(512);expect(png.readUInt32BE(20)).toBe(512);
     }
   });
 
-  it('matches the independently approved V4 GLB, full geometry and exact neutral transforms',async()=>{
+  it('matches the reviewed sculpture GLB, full geometry and exact neutral transforms',async()=>{
     // geometry-neutral-before.json remains unchanged as the historical pre-correction fixture.
-    const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-models-2026-07-02/geometry-neutral-approved-v4.json',import.meta.url),'utf8'));
+    const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-sculpture-2026-11-01/geometry-neutral.json',import.meta.url),'utf8'));
     for(const id of AVATAR_IDS){
       const bytes=await readFile(file(id));
       expect(createHash('sha256').update(bytes).digest('hex')).toBe(baseline[id].candidateGlbSha256);
@@ -88,7 +88,7 @@ describe('TASK-043 original local avatar models',()=>{
     }
   });
 
-  it('preserves the original lower-body geometry, node transforms and avatar normalization exactly',async()=>{
+  it('preserves original lower-body geometry and local transforms with the requested visual proportions',async()=>{
     const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-models-2026-07-02/visual-v2-candidate/lowerbody-baseline.json',import.meta.url),'utf8'));
     for(const id of AVATAR_IDS){
       const loaded=await parse(id),nodes=[];
@@ -100,7 +100,8 @@ describe('TASK-043 original local avatar models',()=>{
         }if(node.geometry.index){const array=node.geometry.index.array;hash.update(Buffer.from(array.buffer,array.byteOffset,array.byteLength));}item.geometrySha256=hash.digest('hex');}
         nodes.push(item);
       });
-      expect(loaded.scene.getObjectByName('avatar').scale.toArray()).toEqual(baseline[id].avatarScale);
+      const actual=loaded.scene.getObjectByName('avatar').scale.toArray(), ratios=[AVATAR_PROPORTIONS[id].width/.96,AVATAR_PROPORTIONS[id].height/1.8,1];
+      for(let axis=0;axis<3;axis++)expect(actual[axis]).toBeCloseTo(baseline[id].avatarScale[axis]*ratios[axis],6);
       expect(nodes).toEqual(baseline[id].nodes);
     }
   });
@@ -173,7 +174,8 @@ describe('TASK-043 original local avatar models',()=>{
   },30000);
 
   it('keeps the shared trouser surfaces inside the closed tunic throughout the gait',()=>{
-    const {root,animations}=createAvatarModel('lukas'),mixer=new AnimationMixer(root);
+    for(const id of AVATAR_IDS){
+    const {root,animations}=createAvatarModel(id),mixer=new AnimationMixer(root);
     mixer.clipAction(animations.find(c=>c.name==='walk')).play();
     const torso=root.getObjectByName('torso'),point=new Vector3();
     for(let sample=0;sample<512;sample++){
@@ -186,7 +188,8 @@ describe('TASK-043 original local avatar models',()=>{
           point.fromBufferAttribute(positions,vertex).applyMatrix4(matrix);
           if(point.y<=-.419||point.y>=0)continue;
           const lower=point.y<-.23,t=lower?(point.y+.42)/.19:(point.y+.23)/.23;
-          const rx=lower?.305+(.265-.305)*t:.265+(.205-.265)*t;
+          const waist=id==='lukas'?.205:.177;
+          const rx=lower?.305+(.265-.305)*t:.265+(waist-.265)*t;
           const rz=lower?.290+(.220-.290)*t:.220+(.137-.220)*t;
           const angle=(Math.atan2(point.x/rx,point.z/rz)+Math.PI*2)%(Math.PI*2),step=Math.PI/8;
           const radialLimit=Math.cos(step/2)/Math.cos(angle-(Math.floor(angle/step)+.5)*step);
@@ -195,6 +198,7 @@ describe('TASK-043 original local avatar models',()=>{
       }
     }
     mixer.stopAllAction();mixer.uncacheRoot(root);
+    }
   },30000);
 
   it('rebuilds the checked-in GLBs byte for byte',async()=>{

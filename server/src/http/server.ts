@@ -175,7 +175,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
     if (req.method === 'POST' && path === '/api/babylon' && deps.babylon) { context.route = '/api/babylon'; await babel(req, res, deps.babylon, context); return; }
     if (req.method === 'POST' && path === '/api/telemetry/client') { await telemetry(req, res, context); return; }
     if (!['GET', 'HEAD'].includes(req.method ?? '')) { req.resume(); res.writeHead(404); res.end(); return; }
-    if (path === '/api/health') { context.route = path; json(res, 200, { status: 'ok', protocol: 3, npc: deps.npcReady() ? 'ready' : 'unavailable' }); return; }
+    if (path === '/api/health') { res.setHeader('Access-Control-Allow-Origin', '*'); context.route = path; json(res, 200, { status: 'ok', protocol: 3, npc: deps.npcReady() ? 'ready' : 'unavailable' }); return; }
     if (path === '/config.json') { context.route = path; json(res, 200, { session: 'online', serverUrl: null, mapId: config.defaultMap, chunkRadius: null, debug: config.clientDebug }); return; }
     if (path.startsWith('/world/')) { context.route = '/world/*'; await world(req, res, path, context); return; }
     if (/^\/(?:maps|assets\/models|api)(?:\/|$)/.test(path)) { res.writeHead(404); res.end(); return; }
