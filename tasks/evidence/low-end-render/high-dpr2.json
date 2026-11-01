@@ -1,0 +1,22 @@
+{
+  "url": "http://127.0.0.1:4200",
+  "quality": "high",
+  "seconds": 10.0205,
+  "submitted": 570,
+  "fps": 56.883389052442496,
+  "p95": 30,
+  "maxInterval": 36.799999952316284,
+  "maxDraw": 543,
+  "averageDraw": 494.0421052631579,
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "dpr": 2,
+  "drawingBuffer": [
+    2560,
+    1600
+  ],
+  "antialias": true,
+  "hud": "FPS 57.2 · Кадр 17.5 ms · P95 21.8 ms · CPU 2.6 ms · Цикл 60.0 FPS · GPU-пропуски 28",
+  "resources": "Draw 539 · Геометрии 140 · Текстуры 7 · Ресурсы 63 · Память 60382208 / 67108864 · Пик 3634403",
+  "errors": []
+}

@@ -1,3 +1,4 @@
+import { GRAPHICS_PROFILES, type GraphicsQuality } from '../GraphicsQuality';
 import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFShadowMap } from 'three';
 import type { CameraView, RenderAdapter, VisualChunk, RenderDiagnostics } from '../RenderAdapter';
 import type { EntityId, WorldSnapshot } from '../../core/types';
@@ -36,11 +37,11 @@ export class ThreeRenderer implements RenderAdapter {
   private readonly contextLost = (): void => { this.frameFence?.contextLost(); this.errors.set('gpu', 'Графический контекст потерян.'); };
   private readonly contextRestored = (): void => { this.frameFence?.contextRestored(); this.errors.delete('gpu'); };
 
-  constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true, private readonly marketStyle = false) {}
+  constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true, private readonly marketStyle = false, private readonly quality: GraphicsQuality = 'balanced') {}
 
   mount(container: HTMLElement): void {
     if (this.renderer) throw new Error('Сцена уже создана.');
-    this.renderer = new WebGLRenderer({ antialias: true });
+    this.renderer = new WebGLRenderer({ antialias: GRAPHICS_PROFILES[this.quality].antialias });
     const gl = this.renderer.getContext();
     if (!('fenceSync' in gl)) throw new Error('Требуется WebGL2 для управления очередью кадров.');
     this.frameFence = new FrameFence(gl);
@@ -49,6 +50,7 @@ export class ThreeRenderer implements RenderAdapter {
     this.renderer.domElement.setAttribute('aria-label', 'Трёхмерная сцена');
     this.renderer.domElement.setAttribute('role', 'img');
     this.scene = new Scene();
+    this.scene.matrixAutoUpdate = false;
     this.scene.background = new Color(this.marketStyle ? '#edc5a4' : '#e8d9ba');
     this.scene.fog = new Fog(this.marketStyle ? '#edc5a4' : '#e8d9ba', 38, 80);
     this.camera = new PerspectiveCamera(48, 1, 0.1, 120);
@@ -56,8 +58,9 @@ export class ThreeRenderer implements RenderAdapter {
     sun.position.set(this.marketStyle ? 18 : -8, this.marketStyle ? 12 : 18, this.marketStyle ? -12 : 10);
     if (this.marketStyle) {
       this.renderer.toneMapping = ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.05;
-      this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = PCFShadowMap;
-      sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+      this.renderer.shadowMap.enabled = this.quality !== 'low'; this.renderer.shadowMap.type = PCFShadowMap;
+      sun.castShadow = this.quality !== 'low';
+      const shadowSize = GRAPHICS_PROFILES[this.quality].shadowSize; sun.shadow.mapSize.set(shadowSize, shadowSize);
       Object.assign(sun.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24, near: 1, far: 85 });
       sun.shadow.normalBias = .035; sun.shadow.bias = -.0001;
       this.sun = sun; this.scene.add(sun.target);
@@ -65,8 +68,8 @@ export class ThreeRenderer implements RenderAdapter {
     this.scene.add(new HemisphereLight(this.marketStyle ? '#ffe5cd' : '#f3f4ec', this.marketStyle ? '#aa8164' : '#b5a17b', this.marketStyle ? 1.8 : 2), sun);
     this.assets = new SceneAssets();
     if (this.proceduralDemo) this.scene.add(createDemoScenery(this.assets));
-    this.library = new GltfLibrary(this.modelAssets);
-    this.chunks = new VisualChunks(this.scene, this.library);
+    this.library = new GltfLibrary(this.modelAssets, this.quality);
+    this.chunks = new VisualChunks(this.scene, this.library, GRAPHICS_PROFILES[this.quality].farWindInterval);
     this.visuals = new EntityVisuals(this.scene, this.assets, this.library, (id, error) => { if (error) this.errors.set(`entity:${id}`, error); else this.errors.delete(`entity:${id}`); }, this.marketStyle);
     this.life = new WorldLifeVisuals(this.scene,this.library,this.visuals,(id,error)=>{if(error)this.errors.set(`life:${id}`,error);else this.errors.delete(`life:${id}`);});
     container.append(this.renderer.domElement);
@@ -104,18 +107,23 @@ export class ThreeRenderer implements RenderAdapter {
     this.camera.aspect = width / height;
     this.camera.fov = width < height ? 62 : 48;
     this.camera.updateProjectionMatrix();
-    this.renderer.setPixelRatio(pixelRatio);
+    this.renderer.setPixelRatio(Math.min(pixelRatio, GRAPHICS_PROFILES[this.quality].pixelRatio));
     this.renderer.setSize(width, height, false);
   }
 
-  render(elapsedSeconds: number, alpha: number): void {
-    if (!this.renderer || !this.scene || !this.camera || !this.visuals) return;
+  render(elapsedSeconds: number, alpha: number): boolean {
+    if (!this.renderer || !this.scene || !this.camera || !this.visuals) return false;
+    // Loads must progress even under GPU backpressure. Presentation can wait.
+    this.library?.flush();
+    if (!this.frameFence?.canSubmit()) {
+      if (this.frameFence?.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
+      return false;
+    }
     const delta = Math.max(0, elapsedSeconds - this.lastElapsed);
     this.lastElapsed = elapsedSeconds;
-    this.library?.flush();
     this.visuals.animate(alpha, elapsedSeconds, delta);
     this.life?.animate(elapsedSeconds,delta,this.chunks?.readyIds ?? []);
-    this.chunks?.animate(delta,this.life?.sceneTime(elapsedSeconds) ?? elapsedSeconds*1000,this.sceneState?.definition.wind);
+    this.chunks?.animate(delta,this.life?.sceneTime(elapsedSeconds) ?? elapsedSeconds*1000,this.sceneState?.definition.wind, this.visuals.position(this.playerId) ?? undefined);
     const position = this.visuals.position(this.playerId);
     if (position) this.target.copy(position);
     else this.target.set(0, 0, 0);
@@ -131,21 +139,18 @@ export class ThreeRenderer implements RenderAdapter {
       this.target.z + Math.cos(yaw) * Math.cos(pitch) * distance,
     );
     // Update before camera probes; suppress only the renderer's duplicate scene traversal.
-    this.scene.updateMatrixWorld(true);
+    this.scene.updateMatrixWorld();
     this.cameraDirection.copy(this.camera.position).sub(this.target).normalize();
     const halfHeight = Math.tan(this.camera.fov*Math.PI/360)*this.camera.near+.08;
     const allowed = this.obstruction.resolve(this.target,this.cameraDirection,distance,
       halfHeight*this.camera.aspect,halfHeight,this.scene.children.filter(child=>child.name.startsWith('chunk:')),delta);
     this.camera.position.copy(this.target).addScaledVector(this.cameraDirection,allowed);
     this.camera.lookAt(this.target);
-    if (!this.frameFence?.canSubmit()) {
-      if (this.frameFence?.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
-      return;
-    }
     this.scene.matrixWorldAutoUpdate = false;
     try { this.renderer.render(this.scene, this.camera); this.frameFence.submitted(); }
     finally { this.scene.matrixWorldAutoUpdate = true; }
     if (this.frameFence.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
+    return true;
   }
 
   dispose(): void {

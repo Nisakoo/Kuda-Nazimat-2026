@@ -27,6 +27,9 @@ it('preserves animated world transforms, camera hits, shadows and shared resourc
       const matrix = new Matrix4(); mesh.getMatrixAt(index, matrix); matrix.premultiply(mesh.matrixWorld);
       matrix.elements.forEach((value, component) => expect(value).toBeCloseTo(source.matrixWorld.elements[component]!, 5));
       expect(mesh.boundingSphere!.containsPoint(source.position.clone().applyMatrix4(new Matrix4().copy(root.matrixWorld).invert().multiply(source.matrixWorld)))).toBe(true);
+      const local = new Matrix4().copy(root.matrixWorld).invert().multiply(source.matrixWorld);
+      const vertices = geometry.getAttribute('position');
+      for (let i = 0; i < vertices.count; i++) expect(mesh.boundingSphere!.containsPoint(new Vector3().fromBufferAttribute(vertices, i).applyMatrix4(local))).toBe(true);
     });
   }
   const dispose = vi.spyOn(mesh, 'dispose'), disposeGeometry = vi.spyOn(geometry, 'dispose'), disposeMaterial = vi.spyOn(material, 'dispose');
@@ -34,6 +37,20 @@ it('preserves animated world transforms, camera hits, shadows and shared resourc
   expect(dispose).toHaveBeenCalledOnce(); expect(disposeGeometry).not.toHaveBeenCalled(); expect(disposeMaterial).not.toHaveBeenCalled();
   expect(sources.every(source => source.visible)).toBe(true); expect(root.children).toHaveLength(3);
   geometry.dispose(); material.dispose();
+});
+
+it('bounds a distant wind cluster around its pivots without including the model origin', () => {
+  const root = new Group(), offset = new Group(), geometry = new BoxGeometry(), material = new MeshStandardMaterial();
+  offset.position.x = 100; offset.updateMatrix(); offset.matrixAutoUpdate = false; root.add(offset);
+  for (let i = 0; i < 2; i++) {
+    const pivot = new Group(); pivot.position.x = i; offset.add(pivot);
+    const source = new Mesh(geometry, material); source.name = `wind-leaf-${i}`; pivot.add(source);
+  }
+  const batches = new WindInstances(root);
+  const mesh = root.children.find(node => node instanceof InstancedMesh) as InstancedMesh;
+  expect(mesh.boundingSphere!.center.x).toBeCloseTo(100.5);
+  expect(mesh.boundingSphere!.radius).toBeLessThan(2);
+  batches.dispose(); geometry.dispose(); material.dispose();
 });
 
 it('leaves unique, hidden and transparent surfaces on their original render path', () => {
