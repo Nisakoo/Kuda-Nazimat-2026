@@ -49,7 +49,7 @@ it.each(['captured socket', 'range', 'role'] as const)('actual HTTP rechecks %s 
         if (loss === 'captured socket') controlId = 'replacement-socket';
         if (loss === 'range') location = { mapId: 'market', position: { x: 100, y: 0, z: 100 } };
         if (loss === 'role') {
-          const profile = store.profile(verified.identity.playerId)!, party = store.party(profile.groupId)!;
+          const profile = store.profile(verified.identity.playerId)!, party = store.party(profile.groupId!)!;
           party.members.find(m => m.id === verified.identity.playerId)!.role = 2; store.saveParty(party);
         }
       }

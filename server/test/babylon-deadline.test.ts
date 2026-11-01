@@ -125,7 +125,7 @@ for (const action of actions) it(`BABEL ${action.type}: admission authorization 
 
 for (const phase of ['dispatch', 'terminal'] as const) it(`no-translation chat keeps a monotonic budget across ${phase} authorization without an LLM slot`, async () => {
   const f = await fixture(), authorized = deferred<boolean>(), entered = deferred<void>();
-  const profile = f.store.profile(f.sender.playerId)!, party = f.store.party(profile.groupId)!;
+  const profile = f.store.profile(f.sender.playerId)!, party = f.store.party(profile.groupId!)!;
   party.size = 1; party.members = party.members.filter(m => m.id === f.sender.playerId); f.store.saveParty(party);
   const translate = vi.spyOn(f.language, 'translate'); let checks = 0;
   const pending = f.call({ type: 'chat', text: 'solo' }, async () => {

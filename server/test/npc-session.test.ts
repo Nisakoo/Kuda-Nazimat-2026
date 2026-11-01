@@ -147,7 +147,7 @@ it('queued NPC role loss prevents LanguagePort execution', async () => {
   const held = deferred<string>(), running = f.npc.generate(f.other.identity.playerId, 'blocker', async () => held.promise);
   const pending = f.call(f.first, { type: 'npc', targetId: 'shepherd', text: 'queued' });
   const failure = expect(pending).rejects.toMatchObject({ code: 'UNAVAILABLE' });
-  const store = sqliteBabylon(f.db), profile = store.profile(f.first.identity.playerId)!, party = store.party(profile.groupId)!;
+  const store = sqliteBabylon(f.db), profile = store.profile(f.first.identity.playerId)!, party = store.party(profile.groupId!)!;
   party.members.find(m => m.id === f.first.identity.playerId)!.role = 2; store.saveParty(party);
   held.resolve('done'); await running; await failure; expect(f.language.answer).not.toHaveBeenCalled();
 });
