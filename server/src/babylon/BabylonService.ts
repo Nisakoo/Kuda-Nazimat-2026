@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { EMPTY_INVENTORY } from '../../../shared/babylon/types.ts';
 import type { BabylonRequest, BabylonResult, BabylonState, BabylonErrorCode, ChatEntry, Language } from '../../../shared/babylon/types.ts';
-import type { PlayerIdentity } from '../contracts.ts';
+import type { NpcProfile, PlayerIdentity } from '../contracts.ts';
 import type { BabylonStore, Generate, LanguagePort, Profile, Party, BabylonLocation, Message, NpcSessionScope, LanguageCallContext } from './ports.ts';
 import { GOATS, GUIDE, ITEMS, NPCS, TASK_TITLE, task } from './content.ts';
 
@@ -19,6 +19,8 @@ export interface BabylonDeps {
   location(accountId: string): BabylonLocation | null;
   peerLocation?(playerId: string): BabylonLocation | null;
   measure?(kind: 'chat' | 'npc' | 'suggest', durationMs: number, success: boolean): void;
+  /** ADMIN-SRV-007: the live NPC (administrator edits applied); null when disabled or deleted, undefined when unknown. */
+  npc?(npcId: string): { readonly profile: NpcProfile; readonly mapId: string; readonly x: number; readonly z: number } | null | undefined;
 }
 export class BabylonService {
   private readonly deps: BabylonDeps;
@@ -120,8 +122,17 @@ export class BabylonService {
   checkNpcAccess(identity: PlayerIdentity, targetId: string): void {
     const { party, role } = this.player(identity);
     if (party.size > 1 && role !== 1 && targetId === 'shepherd') fail('FORBIDDEN', 'Список пастуха доступен игроку 1.');
-    const npc = NPCS[targetId]; if (!npc) fail('INVALID', 'Неизвестный собеседник');
-    this.near(identity, npc!);
+    this.near(identity, this.target(targetId));
+  }
+  /** Quest NPCs keep their task positions; the administrator's profile and on/off state apply (ADMIN-SRV-007). */
+  private target(targetId: string): NpcProfile & { x: number; z: number } {
+    const base = NPCS[targetId];
+    const live = this.deps.npc?.(targetId);
+    if (live === undefined) return base ?? fail('INVALID', 'Неизвестный собеседник');
+    if (live === null) return fail(base ? 'FORBIDDEN' : 'INVALID', base ? 'Собеседник сейчас недоступен.' : 'Неизвестный собеседник');
+    if (!base && live.mapId !== 'market') fail('INVALID', 'Неизвестный собеседник');
+    const { id, name, topic, persona, greeting } = live.profile;
+    return { id, name, topic, persona, greeting, x: base?.x ?? live.x, z: base?.z ?? live.z };
   }
   private async execute(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, fingerprint: string, authorize: () => Promise<boolean>, scope?: NpcSessionScope): Promise<BabylonResult> {
     const { store, id, now } = this.deps, a = packet.action, pid = identity.playerId;
@@ -197,7 +208,7 @@ export class BabylonService {
             const inventory = g.inventory[pid]!;
             if (a.type === 'buy') {
               if (ITEMS[a.item] !== a.targetId || !NPCS[a.targetId]) fail('INVALID', 'У торговца нет такого предмета');
-              this.near(identity, NPCS[a.targetId]!);
+              this.near(identity, this.target(a.targetId));
               if (inventory[a.item] >= 8) fail('INVALID', 'Можно носить до 8 одинаковых предметов');
               inventory[a.item]++; notice = 'Предмет добавлен в сумку.';
             } else {
@@ -228,6 +239,7 @@ export class BabylonService {
       this.checkNpcAccess(identity, a.targetId);
     };
     let message: Message | undefined;
+    let speaker: (NpcProfile & { x: number; z: number }) | undefined;
     if (a.type === 'chat') {
       message = party.messages.find(m => m.id === packet.requestId && m.authorId === pid);
       if (!message) {
@@ -244,7 +256,7 @@ export class BabylonService {
       }
     } else if (a.type === 'npc') {
       if (party.size > 1 && role !== 1 && a.targetId === 'shepherd') fail('FORBIDDEN', 'Список пастуха доступен игроку 1. Свяжитесь с ним.');
-      const npc = NPCS[a.targetId]; if (!npc) fail('INVALID', 'Неизвестный собеседник'); this.near(identity, npc!);
+      speaker = this.target(a.targetId); this.near(identity, speaker);
     }
     const captured = message;
     const work = async (signal: AbortSignal, deadline: number, budget?: { expired(): boolean; deadlineAt?(): number }): Promise<string> => {
@@ -296,7 +308,7 @@ export class BabylonService {
       else if (a.type === 'npc') {
         const history = store.npcReplies(pid, scope!.sessionId, a.targetId).slice(-6);
         checkBudget(); checkNpcSession();
-        output = clean(await language.answer(NPCS[a.targetId]!, a.text, profile.learning, history, signal, context));
+        output = clean(await language.answer(speaker!, a.text, profile.learning, history, signal, context));
       }
       if (signal.aborted || now() >= deadline || !await authorize()) fail('UNAUTHORIZED', 'Запрос отменён или сессия истекла');
       // Authorization is asynchronous. Recheck the queue's monotonic budget immediately before the terminal transaction.

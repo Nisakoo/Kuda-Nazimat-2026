@@ -30,7 +30,7 @@ export interface HttpDeps {
   npcReady(): boolean;
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
-  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump'>;
+  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump'> & Partial<Pick<OperatorDeps, 'content'>>;
 }
 
 /** AUTH-014: per-session token buckets; the map is cleared when it grows past any realistic session count. */

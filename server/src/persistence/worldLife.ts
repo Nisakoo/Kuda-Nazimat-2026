@@ -30,6 +30,13 @@ export function sqliteWorldLife(db: DatabaseSync, now: () => number = Date.now):
         return saved;
       });
     },
+    resetApples(mapId, apples) {
+      return transaction(db, () => {
+        const update = db.prepare('UPDATE world_apples SET state = \'world\', x = ?, y = ?, z = ?, holder_id = NULL WHERE id = ? AND map_id = ?');
+        for (const apple of apples) if (update.run(apple.position.x, apple.position.y, apple.position.z, apple.id, mapId).changes !== 1) throw new Error('Unknown durable apple');
+        return read();
+      });
+    },
     execute(playerId, mapId, request, decide) {
       const fingerprint = createHash('sha256').update(JSON.stringify({ mapId, action: request.action, ...(request.action === 'pickup' && { targetId: request.targetId }) })).digest('hex');
       return transaction(db, () => {

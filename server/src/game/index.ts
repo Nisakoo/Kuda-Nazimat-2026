@@ -104,6 +104,17 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
       running = true;
       startLoop();
     },
+    content: {
+      baseNpcs: loaded.npcs,
+      maps: () => [...loaded.maps.values()].map((map) => ({ mapId: map.id, chunks: map.manifest.chunks.length, npcs: world.npcCount(map.id) })),
+      surface(mapId, x, z) {
+        const map = loaded.maps.get(mapId);
+        return map && Number.isFinite(x) && Number.isFinite(z) && map.footprintChunkIds(x, z) ? map.heightAt(x, z) : null;
+      },
+      setNpcs: (npcs) => world.setNpcs(npcs),
+      scene: (mapId) => game.sceneView(mapId),
+      resetScene: (mapId) => game.resetScene(mapId),
+    },
     activePlayers: () => game.activePlayers,
     presence: () => game.presence(),
     closeSessions: (tokenHashes, message) => game.closeSessions(new Set(tokenHashes), message),

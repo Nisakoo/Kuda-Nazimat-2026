@@ -72,6 +72,7 @@ npm --prefix server start -- --config /absolute/path/config.json
 - `GET /api/health` — публичный статус готовности; ready не доказывает качество/скорость реальной модели.
 - `GET /api/game-config` — только `{npcTimeoutMs}` из эффективной конфигурации, no-store/обычный CORS; без model paths/options/pins.
 - `GET /operator`, `GET /api/operator/status` — экран администратора, только с loopback.
+- `/api/operator/npcs`, `/api/operator/world`, `/api/operator/journal(.csv)`, `/api/operator/accounts`, `/api/operator/account` — правка, создание и удаление NPC на ходу поверх `content/npcs.json` (правки в SQLite, «сбросить» возвращает файл), сброс живой сцены, журнал изменений с CSV и карточка аккаунта; только loopback, изменения — с `Origin` сервера и `X-Operator: 1`. Контракт — [ADMIN-SRV](../specs/server-admin-content.md). У NPC рынка без `assetId` фигура нарисована в чанке: их можно переименовать, сменить тему, характер и приветствие или выключить, но не переместить.
 - `POST /api/auth/guest`, JSON `{name}` — совместимость development/test; production требует парольного login. Регистрация/login/logout/password/dev и ограничения описаны в [AUTH](../specs/server-auth.md).
 - `GET /world/*` — только Bearer действующей сессии и решение `GameRuntime.worldFile` набора A; 401 без сессии, 404 без доступа к ресурсу.
 

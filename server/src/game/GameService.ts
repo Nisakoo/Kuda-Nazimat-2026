@@ -5,7 +5,7 @@ import { handFailure } from '../../../shared/world-life/validate.ts';
 import type { WorldLifeStore } from './worldLifePorts.ts';
 import type { Clock, Scheduler, TimerHandle } from '../common/time.ts';
 import type { Logger } from '../common/logger.ts';
-import type { AvatarStore, EquipmentStore, PlayerPresence, PlayerIdentity, PlayerStore, SavedPosition } from '../contracts.ts';
+import type { AvatarStore, EquipmentStore, PlayerPresence, PlayerIdentity, PlayerStore, SavedPosition, SceneReset, SceneView } from '../contracts.ts';
 import type { ToolId } from '../../../shared/equipment/types.ts';
 import type { AvatarId } from '../../../shared/avatar/types.ts';
 import { MetricsRegistry, type Counter, type Histogram, type Metrics } from '../common/metrics.ts';
@@ -200,6 +200,22 @@ export class GameService {
       this.log.error('world.hand.persist_failed', 'Не удалось сохранить переносимый предмет', { error: error instanceof Error ? error.message : String(error) });
       return handFailure(request.requestId, 'UNAVAILABLE', 'Не удалось сохранить действие. Повторите с тем же requestId.');
     }
+  }
+
+  /** ADMIN-SRV-005: the NPC is in the live set (enabled and not deleted). */
+  hasNpc(npcId: string): boolean { return this.world.hasNpc(npcId); }
+
+  sceneView(mapId: string): SceneView | null { return this.world.life?.view(mapId) ?? null; }
+
+  /** ADMIN-SRV-008: pots and apples of the map back home; players get the next scene-state as usual. */
+  resetScene(mapId: string): SceneReset | null {
+    const life = this.world.life; const store = this.lifeStore;
+    if (!life || !store?.resetApples) return null;
+    const plan = life.resetPots(mapId, this.world.placedPlayers());
+    if (!plan) return null;
+    const apples = store.resetApples(mapId, plan.apples);
+    life.setApples(apples, true);
+    return { revision: life.currentRevision(), reset: { pots: plan.reset, apples: plan.apples.length }, skipped: { pots: plan.skipped, apples: plan.skippedApples } };
   }
 
   input(channel: Channel, sequence: number, direction: Direction, preparedChunks: readonly string[], sprint = false, jumpId = 0): void {

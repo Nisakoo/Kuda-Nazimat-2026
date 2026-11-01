@@ -49,7 +49,7 @@ export type InteractionCheck = { readonly ok: true; readonly npc: NpcDefinition 
 export class World {
   private readonly players = new Map<string, Player>();
   private readonly resting = new Map<string, Pick<MotionState, 'stamina' | 'recoveryWait' | 'sprintBlocked' | 'releasedAfterExhaustion'>>();
-  private readonly npcs: ReadonlyMap<string, NpcDefinition>;
+  private npcs: ReadonlyMap<string, NpcDefinition>;
   private ticks = 0;
   private readonly maps: ReadonlyMap<string, GameMap>;
   private readonly settings: WorldSettings;
@@ -66,6 +66,11 @@ export class World {
   }
 
   get tick(): number { return this.ticks; }
+
+  /** ADMIN-SRV-005: the administrator's live NPC set; AOI picks the change up at the next broadcast. */
+  setNpcs(npcs: readonly NpcDefinition[]): void { this.npcs = new Map(npcs.map((npc) => [npc.id, npc])); }
+  hasNpc(npcId: string): boolean { return this.npcs.has(npcId); }
+  npcCount(mapId: string): number { let count = 0; for (const npc of this.npcs.values()) if (npc.mapId === mapId) count++; return count; }
 
   map(mapId: string): GameMap | undefined { return this.maps.get(mapId); }
   isSafeSupport(mapId: string, position: Vector3): boolean {

@@ -7,6 +7,8 @@ import { connectionInfo, isLoopback, lanAddresses } from '../common/network.ts';
 import type { GameRuntime } from '../contracts.ts';
 import type { Health } from '../obs/health.ts';
 import { OPERATOR_PAGE } from './operatorPage.ts';
+import type { ContentAdmin } from '../content/ContentAdmin.ts';
+import { handleAdminContent } from './adminContentRoutes.ts';
 import { BodyError, body, error, fields, json, type RequestContext } from './util.ts';
 
 export interface OperatorDeps {
@@ -18,12 +20,14 @@ export interface OperatorDeps {
   readonly dump: (reason: string) => string | null;
   /** OBS-008: bearer for `/metrics` from the network; null keeps it loopback-only. */
   readonly monitoringToken: string | null;
+  /** ADMIN-SRV: NPC, world, journal and account routes; absent in tests that do not need them. */
+  readonly content?: ContentAdmin;
 }
 
 const startedAt = Date.now();
 
 /** AUTH-010 CSRF guard: same loopback origin as the server and the custom header a cross-site form cannot set. */
-function trustedAction(req: IncomingMessage): boolean {
+export function trustedAction(req: IncomingMessage): boolean {
   const port = req.socket.localPort;
   const origins = ['localhost', '127.0.0.1', '[::1]'].map((host) => `http://${host}:${port}`);
   return req.headers['x-operator'] === '1' && origins.includes(req.headers.origin ?? '');
@@ -43,6 +47,7 @@ export async function handleOperator(req: IncomingMessage, res: ServerResponse, 
   if (path !== '/operator' && !path.startsWith('/api/operator/')) return false;
   context.route = path.startsWith('/api/operator/actions/') ? '/api/operator/actions' : path;
   if (!isLoopback(req.socket.remoteAddress)) { req.resume(); res.writeHead(404); res.end(); return true; }
+  if (deps.content && await handleAdminContent(req, res, path, deps.content, () => trustedAction(req), deps.logger, context)) return true;
   if (req.method === 'GET' && path === '/operator') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'" });
     res.end(OPERATOR_PAGE); return true;

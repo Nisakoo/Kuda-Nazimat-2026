@@ -174,7 +174,7 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     expect((await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: 'http://evil.test', 'X-Operator': '1' })).status).toBe(403);
     expect(other.packets.some((p) => p.type === 'error')).toBe(false);
     expect(await post('/api/operator/actions/revoke', { name: 'Борис' }, { Origin: self, 'X-Operator': '1' })).toMatchObject({ status: 200, body: { revoked: 1 } });
-    expect(await other.wait((p) => p.type === 'error' && p.requestId === 'server')).toMatchObject({ message: 'Ведущий завершил сессию.' });
+    expect(await other.wait((p) => p.type === 'error' && p.requestId === 'server')).toMatchObject({ message: 'Администратор завершил сессию.' });
     const reset = await post('/api/operator/actions/reset-password', { name: 'Борис' }, { Origin: self, 'X-Operator': '1' });
     expect(reset.body).toMatchObject({ name: 'Борис', temporaryPassword: expect.stringMatching(/^\w{10}$/) });
     expect(await post('/api/auth/login', { name: 'Борис', password: reset.body!.temporaryPassword })).toMatchObject({ status: 403, body: { error: { code: 'PASSWORD_CHANGE_REQUIRED' } } });

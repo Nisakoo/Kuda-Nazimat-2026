@@ -31,7 +31,7 @@ it('upgrades main v8 and NPC branch v4 without exposing legacy history or losing
     expect(stores.dialogue.history('p', 'n', 'session')).toEqual(branch === 'npc' ? [{ question: 'scoped', answer: 'kept' }] : []);
     expect(db.prepare('SELECT count(*) AS n FROM npc_dialogue WHERE session_id IS NULL').get()!.n).toBe(1);
     expect(db.prepare('PRAGMA foreign_key_check').all()).toEqual([]);
-    expect(db.prepare('SELECT max(version) AS n FROM schema_migrations').get()!.n).toBe(9);
+    expect(db.prepare('SELECT max(version) AS n FROM schema_migrations').get()!.n).toBe(10);
   }
 });
 

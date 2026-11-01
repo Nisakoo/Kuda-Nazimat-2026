@@ -54,6 +54,6 @@ export function connectionBlock(info: Connection): string {
   const lan = info.lan.length
     ? info.lan.map((entry) => `    ${entry.url.padEnd(30)} ${entry.name}${entry.kind === 'link-local' ? ' (нет сети)' : ''}`)
     : ['    —'];
-  return [line, '  ВАВИЛОН ЗАПУЩЕН', '', `  Этот компьютер:     ${info.local}`, '  Другие устройства:', ...lan, `  Экран ведущего:     ${info.operator}`,
+  return [line, '  ВАВИЛОН ЗАПУЩЕН', '', `  Этот компьютер:     ${info.local}`, '  Другие устройства:', ...lan, `  Администратор:      ${info.operator}`,
     ...(info.warnings.length ? ['', ...info.warnings.map((warning) => `  ! ${warning}`)] : []), line].join('\n');
 }

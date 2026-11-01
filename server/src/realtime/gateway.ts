@@ -377,7 +377,11 @@ class Connection implements Channel {
   /** Terminal message of a question: a pending partial is dropped so it can never arrive after the answer. */
   private deliver(requestId: string, targetId: string, answer: NpcAnswer): void {
     this.endStream(requestId);
-    if (!this.npcAccess(targetId)) return;
+    if (!this.npcAccess(targetId)) {
+      // ADMIN-SRV-005: the administrator withdrew the NPC; the player still waits for this answer.
+      if (!this.closed && this.deps.game.hasNpc?.(targetId) === false && this.deps.game.isControlling(this) && this.deps.sessions.isActive?.(this.sessionId, this.identity.playerId) === true) this.error(requestId, 'UNAVAILABLE', 'Собеседник сейчас недоступен.');
+      return;
+    }
     if (answer.ok) { this.send({ v: 3, type: 'npc-answer', requestId, targetId, text: answer.text }); return; }
     switch (answer.reason) {
       case 'cancelled': return;

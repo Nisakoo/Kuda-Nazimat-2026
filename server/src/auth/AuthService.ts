@@ -29,8 +29,8 @@ export class AuthError extends Error {
 export const REVOKE_MESSAGES: Readonly<Record<RevokeReason, string>> = {
   logout: 'Вы вышли из игры.',
   'password-changed': 'Пароль изменён. Войдите снова.',
-  'password-reset': 'Ведущий выдал новый пароль. Войдите снова.',
-  operator: 'Ведущий завершил сессию.',
+  'password-reset': 'Администратор выдал новый пароль. Войдите снова.',
+  operator: 'Администратор завершил сессию.',
   limit: 'Слишком много входов в этот аккаунт: старая сессия завершена.',
 };
 
@@ -42,6 +42,8 @@ export interface AuthDeps {
   /** AUTH-001: guest and dev login; false in production. */
   readonly passwordless?: boolean;
   readonly hasher?: PasswordHasher; readonly logger?: Logger; readonly metrics?: Metrics;
+  /** ADMIN-SRV-009: journal of operator actions; never receives the temporary password. */
+  readonly audit?: (entry: { readonly action: 'reset-password' | 'revoke' | 'unlock'; readonly accountId: string | null; readonly name: string; readonly result: Record<string, number | boolean> }) => void;
 }
 export type AuthService = ReturnType<typeof createAuthService>;
 
@@ -84,7 +86,7 @@ export function createAuthService(deps: AuthDeps) {
   };
   const locked = (key: string, method: string): void => {
     const wait = lockout.retryAfter(key);
-    if (wait) { attempts.inc({ method, outcome: 'locked' }); throw new AuthError('RATE_LIMIT', 'Слишком много неудачных попыток. Попробуйте позже или попросите ведущего.', wait); }
+    if (wait) { attempts.inc({ method, outcome: 'locked' }); throw new AuthError('RATE_LIMIT', 'Слишком много неудачных попыток. Попробуйте позже или попросите администратора.', wait); }
   };
   const hashing = async <T>(work: () => Promise<T>): Promise<T> => {
     try { return await work(); }
@@ -202,24 +204,30 @@ export function createAuthService(deps: AuthDeps) {
         const password = temporaryPassword(); const now = clock.now();
         accounts.setPassword(record.identity.accountId, await hashing(() => hasher.hash(password)), { mustChange: true, tempExpiresAt: now + TEMP_PASSWORD_MS }, now);
         lockout.unlock(record.identity.displayName.toLowerCase());
-        log?.info('auth.operator.action', 'Ведущий выдал временный пароль', { action: 'reset-password', name: record.identity.displayName, accountId: record.identity.accountId });
-        notify(sessions.revoke({ accountId: record.identity.accountId }, 'password-reset', now), 'password-reset', { accountId: record.identity.accountId });
+        log?.info('auth.operator.action', 'Администратор выдал временный пароль', { action: 'reset-password', name: record.identity.displayName, accountId: record.identity.accountId });
+        const revoked = sessions.revoke({ accountId: record.identity.accountId }, 'password-reset', now);
+        deps.audit?.({ action: 'reset-password', accountId: record.identity.accountId, name: record.identity.displayName, result: { revoked: revoked.length } });
+        notify(revoked, 'password-reset', { accountId: record.identity.accountId });
         return { name: record.identity.displayName, temporaryPassword: password, expiresAt: now + TEMP_PASSWORD_MS };
       },
       revoke(rawName: unknown): number {
         const record = accounts.find(nameOf(rawName).toLowerCase());
         if (!record) throw new AuthError('INVALID', 'Аккаунт не найден.');
         const hashes = sessions.revoke({ accountId: record.identity.accountId }, 'operator', clock.now());
-        log?.info('auth.operator.action', 'Ведущий завершил сессии', { action: 'revoke', name: record.identity.displayName, accountId: record.identity.accountId, count: hashes.length });
+        log?.info('auth.operator.action', 'Администратор завершил сессии', { action: 'revoke', name: record.identity.displayName, accountId: record.identity.accountId, count: hashes.length });
+        deps.audit?.({ action: 'revoke', accountId: record.identity.accountId, name: record.identity.displayName, result: { revoked: hashes.length } });
         notify(hashes, 'operator', { accountId: record.identity.accountId });
         return hashes.length;
       },
       unlock(rawName: unknown): boolean {
         const name = nameOf(rawName);
         const unlocked = lockout.unlock(name.toLowerCase());
-        log?.info('auth.operator.action', 'Ведущий снял блокировку входа', { action: 'unlock', name, unlocked });
+        log?.info('auth.operator.action', 'Администратор снял блокировку входа', { action: 'unlock', name, unlocked });
+        deps.audit?.({ action: 'unlock', accountId: accounts.find(name.toLowerCase())?.identity.accountId ?? null, name, result: { unlocked } });
         return unlocked;
       },
+      /** ADMIN-SRV-010: when the name may try to log in again, null when not locked. */
+      lockedUntil(name: string): number | null { const wait = lockout.retryAfter(name.toLowerCase()); return wait ? clock.now() + wait * 1000 : null; },
       list: () => accounts.list(clock.now()),
     },
   };
