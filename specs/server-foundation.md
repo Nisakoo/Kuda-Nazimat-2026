@@ -33,7 +33,7 @@ related:
   Домен (`game`, модель карты в `world`) не импортирует `node:*`, Socket.IO, SQLite и адаптеры; сервисы не импортируют адаптеры. Транспорт не содержит игровых правил, хранилище не управляет сокетами. Проверка импортов автоматизирована (dependency-cruiser): запрещает циклы и импорт IO/адаптеров в домен. Абстракции без второй реализации или реальной границы не вводятся. Сервисы и домен покрываются unit-тестами с in-memory реализациями портов.
 - **SERVER-003:** Сервер раздаёт по HTTP:
   - готовую сборку клиента из `clientDir` по `/`, публично;
-  - `GET /config.json` — публичную конфигурацию клиента `{session: "online", serverUrl: null, mapId: <defaultMap>, chunkRadius: null, debug: false}`, сформированную из конфигурации сервера; файл `config.json` из сборки клиента не отдаётся;
+  - `GET /config.json` — публичную конфигурацию клиента `{session: "online", serverUrl: null, mapId: <defaultMap>, chunkRadius: null, debug: <clientDebug>}`, сформированную из конфигурации сервера; файл `config.json` из сборки клиента не отдаётся;
   - `/api/*` — [AUTH](server-auth.md), `GET /api/health` и HTTP BABEL (PROTO-009);
   - `GET /operator` и `GET /api/operator/status` — экран ведущего, только с loopback ([OFFLINE](offline-multiplayer.md) OFFLINE-010);
   - `/world/*` — данные мира только с проверками [SERVER-WORLD](server-world.md).
@@ -59,6 +59,10 @@ related:
   | saveIntervalMs | `10000` | периодическое сохранение позиций |
   | corsOrigins | `[]` | origin dev-клиента, например `http://localhost:5173` |
   | logWorldAccess | `false` | лог выдачи `/world/*` (OFFLINE-016) |
+  | auth | `{maxSessions: 5, passwordless}` | сессии, [AUTH](server-auth.md); `passwordless` задаёт окружение (SERVER-009) |
+  | logs | `{consoleLevel: "info", fileLevel: "debug", dir: "data/logs", maxFileMb: 20, maxTotalMb: 200, retentionDays: 14}` | логи, [OBS](server-observability.md) |
+  | monitoring | `{token: null, pingIntervalMs: 5000, validateOutgoing: false}` | `/metrics` из сети, RTT, проверка исходящих пакетов (OBS-005/008/010) |
+  | clientDebug | `false` | поле `debug` в `/config.json` |
   | npc | `{adapter: "scripted", maxConcurrent: 1, maxUnfinished: 4, timeoutMs: 8000, streamTimeoutMs: 30000, options: {}}` | [NPC](server-npc-dialogue.md) NPC-002, 005, 008 |
   | language | `{adapter: "test", options: {}}` | переводчик BABEL, [NPC](server-npc-dialogue.md) NPC-009 |
 
@@ -74,6 +78,17 @@ related:
 - **SERVER-006:** Не более `maxPlayers` (4) активных игроков. Активный игрок — аккаунт, чья сущность находится в мире: подключён или в grace после разрыва. Новое соединение аккаунта, не являющегося активным, при занятых слотах получает отказ handshake `UNAVAILABLE` без создания сущности. Дополнительная вкладка или устройство того же аккаунта не занимает второй слот и не расширяет квоты: управление переходит по AUTH-005. Число слотов не подменяется числом TCP-соединений.
 - **SERVER-007:** `GET /api/health` публичен и возвращает `{status: "ok", protocol: 3, npc: "ready" | "unavailable"}` без данных игроков. Логи — строки в stdout с уровнем, временем и модулем. В логи не попадают токены и их хеши, тексты чата и NPC-диалогов; допустимы ID, коды ошибок и длительности. Для dev-клиента на другом origin CORS разрешён только для `corsOrigins` (включая preflight для `Authorization`); по умолчанию — same-origin.
 - **SERVER-008:** Команды из корня: `make server` — запуск, `make server-test` — тесты без watch; в `server/` — `npm run check` (типы `server` и `shared`, импорты) и `npm test`. Тестовые клиенты в интеграционных тестах используют `socket.io-client` и `shared/protocol`, без браузера и кода `client/`.
+- **SERVER-009 (окружения):** окружение выбирается `--env <имя>` или переменной `APP_ENV` (аргумент важнее), допустимы `development` (по умолчанию), `production`, `test`; неизвестное имя — ошибка запуска. Итоговая конфигурация собирается слоями, каждый следующий важнее: значения по умолчанию → пресет окружения → файл конфигурации → переменные `PORT`/`HOST` → аргументы `--port`. Пресеты:
+
+  | Ключ | development | production | test |
+  |---|---|---|---|
+  | вход без пароля (`guest`, `dev`) | включён, предупреждение в логе | запрещён, включить нельзя | включён |
+  | dbPath | `data/dev.sqlite` | `data/game.sqlite` | `data/test.sqlite` |
+  | logs.consoleLevel / fileLevel | `debug` / `debug` | `info` / `debug` | `warn` / выключен |
+  | corsOrigins | `["http://localhost:5173"]` (Vite) | `[]` | `[]` |
+  | /config.json `debug` | `true` | `false` | `false` |
+
+  Отдельные БД не дают тестовым аккаунтам development попасть в production. При старте событие `app.start` называет окружение и источники значений; `lan:check`, `inspect` и `backup` принимают те же `--env` и `--config`. `make start` запускает production, `make server` и `npm start` — development (`make server ENV=production` — production).
 
 ## Сценарии
 

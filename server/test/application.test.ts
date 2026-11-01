@@ -25,7 +25,7 @@ it('assembles exclusively through the frozen contract, restarts with memory and 
   const { config } = fixture(); let deps!: GameDeps; let savedId = '';
   const createGame: CreateGame = async (_config, injected) => {
     deps = injected;
-    return { maps: [{ mapId: 'demo', chunks: 1, worldBytes: 1000 }], worldFile: () => ({ ok: false }), attach() {}, activePlayers: () => 1, presence: () => [],
+    return { maps: [{ mapId: 'demo', chunks: 1, worldBytes: 1000 }], worldFile: () => ({ ok: false }), attach() {}, activePlayers: () => 1, presence: () => [], closeSessions() {}, state: () => ({}), stats: () => null,
       async stop() { if (savedId) deps.players.save([{ id: savedId, mapId: 'demo', position: { x: 2, y: 0, z: 3 }, rotationY: 1 }]); } };
   };
   const app = await startApplication(config, createGame, silentLogger);
@@ -75,7 +75,7 @@ it('SIGTERM closes the process within ten seconds after saving through PlayerSto
   const shutdown = new URL('../src/app/shutdown.ts', import.meta.url).href;
   const logger = new URL('../src/common/logger.ts', import.meta.url).href;
   const script = `import {startApplication} from ${JSON.stringify(application)}; import {shutdownOnSignals} from ${JSON.stringify(shutdown)}; import {silentLogger} from ${JSON.stringify(logger)};
-    const config=${JSON.stringify(config)}; const app=await startApplication(config, async (_config,deps)=>({maps:[],attach(){},worldFile(){return {ok:false}},activePlayers(){return 1},presence(){return []},async stop(){deps.players.save([{id:${JSON.stringify(player.playerId)},mapId:'demo',position:{x:7,y:0,z:8},rotationY:0}])}}),silentLogger);
+    const config=${JSON.stringify(config)}; const app=await startApplication(config, async (_config,deps)=>({maps:[],attach(){},worldFile(){return {ok:false}},activePlayers(){return 1},presence(){return []},closeSessions(){},state(){return {}},stats(){return null},async stop(){deps.players.save([{id:${JSON.stringify(player.playerId)},mapId:'demo',position:{x:7,y:0,z:8},rotationY:0}])}}),silentLogger);
     shutdownOnSignals(app,silentLogger); process.stdin.once('data',()=>process.emit('SIGTERM')); process.stdin.unref(); console.log('ready');`;
   const file = join(root, 'signal.mjs'); writeFileSync(file, script);
   const child = spawn(process.execPath, [file], { stdio: ['pipe', 'pipe', 'pipe'] });

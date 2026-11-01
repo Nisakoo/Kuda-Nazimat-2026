@@ -12,7 +12,7 @@ import { parseConfig } from '../src/app/config.ts';
 import { createHttpServer } from '../src/http/server.ts';
 import { createNpcDialogueService } from '../src/npc/NpcDialogueService.ts';
 import { systemClock, systemScheduler } from '../src/common/time.ts';
-import { silentLogger } from '../src/common/logger.ts';
+import { memoryLogger, silentLogger } from '../src/common/logger.ts';
 import { memoryStores } from './memory.ts';
 import type { GameRuntime } from '../src/contracts.ts';
 
@@ -78,11 +78,12 @@ describe('SQLite v1', () => {
 
 it('auth creates opaque hash-only sessions, preserves identity and expires at boundary', async () => {
   const stores = memoryStores(); let now = 100;
-  const auth = createAuthService(stores.accounts, stores.sessions, { now: () => now }, 1000);
-  const a = auth.guest(' Аня '); const b = auth.guest('аня');
+  const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: { now: () => now }, ttlMs: 1000 });
+  const a = await auth.guest(' Аня '); const b = await auth.guest('аня');
   expect(Object.keys(a)).toEqual(['token', 'expiresAt']); expect(a.token).toMatch(/^[A-Za-z0-9_-]{43}$/); expect(b.token).not.toBe(a.token);
-  expect((await auth.verify(a.token))).toEqual(await auth.verify(b.token));
-  expect(JSON.stringify([...stores.tokens])).not.toContain(a.token); expect(stores.tokens.has(hashToken(a.token))).toBe(true);
+  const [first, second] = [await auth.verify(a.token), await auth.verify(b.token)];
+  expect(first.ok && second.ok && first.identity).toEqual(second.ok && second.identity);
+  expect(JSON.stringify(stores.tokenHashes())).not.toContain(a.token); expect(stores.tokenHashes()).toContain(hashToken(a.token));
   now = a.expiresAt; expect(await auth.verify(a.token)).toEqual({ ok: false }); expect(await auth.verify('bad')).toEqual({ ok: false });
 });
 
@@ -95,11 +96,11 @@ it('validates configuration keys, types, paths and scheduler bounds', () => {
 
 it('serves public UI/config, strict guest login, protected world and allowlisted CORS without secrets', async () => {
   const root = directory(); mkdirSync(join(root, 'maps')); writeFileSync(join(root, 'index.html'), 'UI'); writeFileSync(join(root, 'config.json'), 'secret'); writeFileSync(join(root, 'maps/private.json'), 'world'); linkIfPermitted(join(root, 'maps/private.json'), join(root, 'alias'));
-  const stores = memoryStores(); const auth = createAuthService(stores.accounts, stores.sessions, { now: () => 100 }, 1000);
-  const logs: unknown[] = [];
-  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, presence: () => [{ name: 'Аня', mapId: 'market', connected: false, releaseInMs: 4000 }], async stop() {}, worldFile(path) { return path === 'near' ? { ok: true, file: { absolutePath: join(root, 'maps/private.json'), bytes: 5, contentType: 'application/json' } } : { ok: false }; } };
-  const config = parseConfig({ clientDir: root, corsOrigins: ['http://localhost:5173'], logWorldAccess: true }, join(root, 'config.json'));
-  const { server } = createHttpServer(config, { auth, game, npcReady: () => true, logger: { ...silentLogger, info: (message, fields) => logs.push({ message, fields }) } });
+  const stores = memoryStores(); const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: { now: () => 100 }, ttlMs: 1000 });
+  const logger = memoryLogger(); const logs = logger.records;
+  const game: GameRuntime = { maps: [], attach() {}, activePlayers: () => 0, presence: () => [{ name: 'Аня', mapId: 'market', connected: false, releaseInMs: 4000, rttMs: null, reconnects: 0, seatedSeconds: 1 }], closeSessions() {}, state: () => ({}), stats: () => null, async stop() {}, worldFile(path) { return path === 'near' ? { ok: true, file: { absolutePath: join(root, 'maps/private.json'), bytes: 5, contentType: 'application/json' } } : { ok: false }; } };
+  const config = parseConfig({ clientDir: root, corsOrigins: ['http://localhost:5173'], logWorldAccess: true }, join(root, 'config.json'), 'test');
+  const { server } = createHttpServer(config, { auth, game, npcReady: () => true, logger, clock: { now: () => 100 } });
   server.listen(0, '127.0.0.1'); await once(server, 'listening'); const address = server.address(); const url = `http://127.0.0.1:${typeof address === 'object' && address ? address.port : 0}`;
   try {
     expect(await (await fetch(url)).text()).toBe('UI');
@@ -122,7 +123,7 @@ it('serves public UI/config, strict guest login, protected world and allowlisted
     expect(preflight.status).toBe(204); expect(preflight.headers.get('Access-Control-Allow-Headers')).toContain('Authorization');
     expect((await fetch(url, { headers: { Origin: 'http://evil.test' } })).headers.get('Access-Control-Allow-Origin')).toBeNull();
     expect(JSON.stringify(logs)).not.toContain(session.token); expect(JSON.stringify(logs)).not.toContain(hashToken(session.token));
-    expect(logs).toHaveLength(2);
+    expect(logs.filter((record) => record.event === 'world.access')).toHaveLength(2);
   } finally { server.closeAllConnections(); await new Promise<void>((resolve) => server.close(() => resolve())); }
 });
 

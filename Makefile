@@ -7,7 +7,7 @@ CLIENT_TEST_CMD ?= npm --prefix client test
 .PHONY: help client client-test
 
 help:
-	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the LAN server' 'make server-test  Run server/shared tests' 'make demo         Prepare client/world and start server' 'See README.md for installation, type checks, build and browser checks.'
+	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the server in development (ENV=production to override)' 'make server-test  Run server/shared tests' 'make prepare      Once, with internet: install, build client/world, self-check' 'make start        Offline delivery: build and start in production (alias: make demo)' 'See README.md for installation, type checks, build and browser checks.'
 
 client:
 ifeq ($(strip $(CLIENT_RUN_CMD)),)
@@ -26,9 +26,10 @@ else
 endif
 
 .PHONY: server server-test prepare start demo
-# PORT=9000 overrides the configured port (OFFLINE-003).
+# PORT=9000 overrides the configured port (OFFLINE-003); ENV picks the environment (SERVER-009), development by default.
+ENV ?= development
 server:
-	npm --prefix server start$(if $(PORT), -- --port $(PORT))
+	npm --prefix server start -- --env $(ENV)$(if $(PORT), --port $(PORT))
 
 server-test:
 	npm --prefix server test
@@ -39,13 +40,13 @@ prepare:
 	npm --prefix client ci
 	npm --prefix server ci
 	npm --prefix client run build
-	npm --prefix server run lan:check$(if $(PORT), -- --port $(PORT))
+	npm --prefix server run lan:check -- --env production$(if $(PORT), --port $(PORT))
 
 # OFFLINE-002: works offline once prepared; dependencies are installed only when missing.
 start:
 	@test -d client/node_modules || npm --prefix client ci
 	@test -d server/node_modules || npm --prefix server ci
 	npm --prefix client run build
-	$(MAKE) server
+	$(MAKE) server ENV=production
 
 demo: start

@@ -1,0 +1,12 @@
+# OBS-009: scrape the game server every 5 s, keep 7 days (pass --storage.tsdb.retention.time=7d).
+global:
+  scrape_interval: 5s
+scrape_configs:
+  - job_name: babylon
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['localhost:8080']   # the server's address; from another laptop use its LAN IP
+    # From the network /metrics needs the server's monitoring.token (config.json):
+    # authorization:
+    #   type: Bearer
+    #   credentials: <monitoring.token>

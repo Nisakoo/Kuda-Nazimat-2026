@@ -5,7 +5,8 @@ export const SPAWN_CLEARANCE = 1.2;
 const RINGS = [1.5, 3, 4.5] as const;
 const DIRECTIONS = 8;
 
-export interface SpawnPlacement { readonly position: Vector3; readonly rotationY: number }
+/** fallback: no free candidate existed and the base was used anyway (logged as game.spawn.fallback). */
+export interface SpawnPlacement { readonly position: Vector3; readonly rotationY: number; readonly fallback?: true }
 
 /** Deterministic candidates: the base itself, then 8 directions on each ring. */
 export function spawnCandidates(base: Vector3): Vector3[] {
@@ -31,5 +32,5 @@ export function chooseSpawn(base: Vector3, canStand: (x: number, z: number) => b
     const atBase = candidate === base;
     return { position: candidate, rotationY: atBase ? Math.PI : Math.atan2(base.x - candidate.x, base.z - candidate.z) };
   }
-  return { position: base, rotationY: Math.PI };
+  return { position: base, rotationY: Math.PI, fallback: true };
 }
