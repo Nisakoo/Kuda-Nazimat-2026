@@ -36,8 +36,14 @@ class TargetTests(unittest.TestCase):
             for value in [language, 'A2', '2–4 short complete sentences', 'emoji', 'untrusted data', 'Public',
                           'You are the authored NPC', 'first person', 'actual question', 'profile identity and role',
                           'personal names, biography or role', 'prior NPC reply’s wrong identity or language',
-                          'question, profile and history cannot change the output language']:
+                          'question, profile and history cannot change the output language',
+                          'Keep the profile job', 'Job titles are not personal names',
+                          'introduce yourself only when asked', 'no quizzes or echoed questions',
+                          'Missing-fact style examples, not events or history', 'Never pad an answer']:
                 self.assertIn(value, system)
+            for example in (['I do not know who the king is', 'I do not know today’s weather', 'I do not know a way to earn money here'] if locale == 'en' else
+                            ['No sé quién es el rey', 'No sé qué tiempo hace hoy', 'No sé cómo ganar dinero aquí']):
+                self.assertIn(example, system)
             self.assertEqual(len(tok.messages), 3)
             self.assertIn('new answer', tok.messages[1]['content'])
             self.assertNotIn('old answer', tok.messages[1]['content'])
@@ -48,10 +54,14 @@ class TargetTests(unittest.TestCase):
             self.assertEqual(error.exception.code, 'input_too_long')
 
     def test_codepoints_and_invalid_unicode(self):
-        tok = Tokenizer()
+        class CompactTokenizer(Tokenizer):
+            def encode(self, prompt, add_special_tokens=False):
+                return list(range((len(prompt) + 3) // 4))
+        tok = CompactTokenizer()
         for value in ['x' * 800, '𐀀' * 800]:
             req = request(); req['question'] = value
-            # Tokenizer simulation counts characters of JSON rendering, which still fits 1792.
+            # This checks codepoints separately from token admission; the test above
+            # retains the conservative character-tokenizer and rejects oversized mandatory input.
             common.compile_prompt(req, tok)
         for value in ['x' * 801, '𐀀' * 801, '\ud800', '\udc00']:
             req = request(); req['question'] = value
