@@ -21,7 +21,7 @@ function taskState(): BabylonState {
     party: { id: 'map-task', size: 3, count: 3, role: 1, members: [
       { id: playerId, name: 'Me', role: 1 }, { id: nearId, name: 'Near peer', role: 2 }, { id: farId, name: 'Far peer', role: 3 },
     ], started: true, completed: false, seconds: 10 },
-    availableParty: null,
+    availableParties: [], availablePartiesTruncated: false, availableParty: null,
     partyPositions: [{ id: nearId, name: 'Near peer', x: 10, z: 11 }, { id: farId, name: 'Far peer', x: -100, z: -80 }],
     task: 'Task map unit fixture', taskTitle: 'Task', taskTarget: { x: 0, z: -34 }, goatGuide: null,
     inventory: { ...EMPTY_INVENTORY }, fed: [], stones: [], words: [], messages: [], replies: [],

@@ -8,6 +8,8 @@ export interface Word extends Languages { id: string; word: string; translation:
 export interface Tablet { id: string; authorId: string; authorName: string; drawing: Stone; createdAt: number }
 export interface ChatEntry { id: string; authorId: string; authorName: string; text: string; language: Language; translated: boolean; status: 'sent' | 'translating' | 'delivered' | 'error'; createdAt: number; error?: string }
 export interface NpcReply { id: string; npcId: string; question: string; text: string; language: Language }
+export const MAX_AVAILABLE_PARTIES = 64;
+export interface AvailableParty { id: string; hostName: string; size: PartySize; count: number }
 export interface BabylonState {
   v: 2;
   city?: CityState;
@@ -18,6 +20,8 @@ export interface BabylonState {
   introSeen: boolean;
   party: { id: string; size: PartySize; count: number; role: number; members: readonly { id: string; name: string; role: number }[]; started: boolean; completed: boolean; seconds: number } | null;
   availableParty: { size: PartySize; count: number } | null;
+  availableParties: readonly AvailableParty[];
+  availablePartiesTruncated: boolean;
   partyPositions: readonly { readonly id: string; readonly name: string; readonly x: number; readonly z: number }[];
   task: string;
   taskTitle: string;
@@ -35,7 +39,7 @@ export type BabylonAction =
   | { type: 'city-start'; questId: string }
   | { type: 'city-step'; questId: string; step: number; choice: string; targetId: string }
   | { type: 'create'; size: PartySize; replacePartyId?: string }
-  | { type: 'join' }
+  | { type: 'join'; partyId?: string }
   | { type: 'enroll'; size: PartySize; native: Language; learning: Language }
   | { type: 'languages'; native: Language; learning: Language }
   | { type: 'intro-seen' }

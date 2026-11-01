@@ -27,7 +27,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   const recoveries = metrics.counter('game_motion_recovered_total', 'Восстановления движения по причине (MOVE)');
   const life = new WorldLife(loaded.maps, deps.clock.now(), randomId('scene'));
   if (life.catalogue().length && !deps.worldLife) throw new Error('World-life requires a durable store');
-  life.setApples(deps.worldLife?.initialize(life.catalogue()) ?? []);
+  life.setApples(deps.worldLife?.initialize(life.catalogue(), apples => life.restoreApples(apples)) ?? []);
   life.validateSnapshots(deps.clock.now());
   const world = new World(loaded.maps, loaded.npcs, { ...DEFAULT_WORLD_SETTINGS, aoiRadius: config.aoiRadius }, {
     invariant: (name, fields) => log.error('invariant.violated', 'Нарушен инвариант мира', { invariant: name, ...fields }),

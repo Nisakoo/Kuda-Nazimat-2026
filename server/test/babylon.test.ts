@@ -279,13 +279,122 @@ it('persists hub preferences before enrollment and separates create from join wi
   const created = await f.call(a, { type: 'create', size: 2 }, 'create-once');
   expect((await f.call(a, { type: 'create', size: 2 }, 'create-once')).state.party?.id).toBe(created.state.party?.id);
   await f.call(b, { type: 'languages', native: 'ru', learning: 'en' });
-  await expect(f.call(b, { type: 'create', size: 1 })).rejects.toThrow('ждёт группа');
   const joined = await f.call(b, { type: 'join' });
   expect(joined.state.party).toMatchObject({ id: created.state.party?.id, size: 2, count: 2 });
   await expect(f.call(a, { type: 'create', size: 1 })).rejects.toThrow('уже есть игра');
   expect((await f.call(a, { type: 'join' })).state.party?.count).toBe(2);
   f.restart();
   expect(f.service.state(a).party?.id).toBe(created.state.party?.id);
+});
+
+it('creates an independent solo beside a foreign waiting group and durably deduplicates it', async () => {
+  const f = fixture(), [a, b, c] = f.people as [PlayerIdentity, PlayerIdentity, PlayerIdentity];
+  for (const person of [a, b, c]) await f.call(person, { type: 'languages', native: 'ru', learning: 'en' });
+  const waiting = (await f.call(a, { type: 'create', size: 3 })).state.party!;
+  const foreign = sqliteBabylon(f.db).party(waiting.id);
+  const action = { type: 'create' as const, size: 1 as const };
+  const solo = (await f.call(b, action, 'independent-solo')).state;
+  expect(solo.party).toMatchObject({ size: 1, count: 1, started: true });
+  expect(solo.party!.id).not.toBe(waiting.id);
+  expect(solo.availableParty).toEqual({ size: 3, count: 1 });
+  expect(sqliteBabylon(f.db).party(waiting.id)).toEqual(foreign);
+  f.restart();
+  expect((await f.call(b, action, 'independent-solo')).state.party!.id).toBe(solo.party!.id);
+  expect(sqliteBabylon(f.db).party(waiting.id)).toEqual(foreign);
+  expect(f.db.prepare('SELECT count(*) AS n FROM babel_parties').get()!.n).toBe(2);
+  expect((await f.call(c, { type: 'join' })).state.party).toMatchObject({ id: waiting.id, count: 2, started: false });
+});
+
+it.each([1, 2] as const)('replaces an own shared waiting group with size %s without losing remaining members or progress', async size => {
+  const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
+  for (const person of [a, b]) await f.call(person, { type: 'languages', native: 'ru', learning: 'en' });
+  const waiting = (await f.call(a, { type: 'create', size: 3 })).state.party!;
+  await f.call(b, { type: 'join' });
+  for (const person of [a, b]) await f.call(person, { type: 'word-save', word: 'goat', translation: 'коза', note: person.displayName });
+  const old = sqliteBabylon(f.db).party(waiting.id)!;
+  const action = { type: 'create' as const, size, replacePartyId: waiting.id };
+  const solo = (await f.call(a, action, 'leave-waiting')).state;
+  expect(solo.party).toMatchObject({ size, count: 1, started: size === 1 });
+  expect(solo.words[0]).toMatchObject({ word: 'goat', note: a.displayName });
+  f.restart();
+  expect((await f.call(a, action, 'leave-waiting')).state.party!.id).toBe(solo.party!.id);
+  const remaining = f.service.state(b);
+  expect(remaining.party).toMatchObject({ id: waiting.id, size: 3, count: 1, role: 2, started: false });
+  expect(remaining.words[0]).toMatchObject({ word: 'goat', note: b.displayName });
+  expect(sqliteBabylon(f.db).party(waiting.id)).toEqual({ ...old, members: old.members.filter(member => member.id === b.playerId), inventory: { [b.playerId]: old.inventory[b.playerId] } });
+  expect(f.db.prepare('PRAGMA foreign_key_check').all()).toEqual([]);
+});
+
+it.each([{ replacing: false, size: 1 }, { replacing: true, size: 1 }, { replacing: false, size: 3 }, { replacing: true, size: 3 }] as const)('rolls back independent creation and permits durable retry (replacement=$replacing,size=$size)', async ({ replacing, size }) => {
+  const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
+  for (const person of [a, b]) await f.call(person, { type: 'languages', native: 'ru', learning: 'en' });
+  await f.call(a, { type: 'create', size: 3 });
+  const previous = replacing ? (await f.call(b, { type: 'create', size: 1 })).state.party! : null;
+  const profiles = f.db.prepare('SELECT * FROM babel_profiles ORDER BY player_id').all();
+  const parties = f.db.prepare('SELECT * FROM babel_parties ORDER BY id').all();
+  const action = { type: 'create' as const, size, ...(previous ? { replacePartyId: previous.id } : {}) };
+  f.db.exec("CREATE TRIGGER reject_solo BEFORE INSERT ON babel_operations BEGIN SELECT RAISE(ABORT, 'solo commit failed'); END");
+  await expect(f.call(b, action, 'solo-rollback')).rejects.toThrow('solo commit failed');
+  expect(f.db.prepare('SELECT * FROM babel_profiles ORDER BY player_id').all()).toEqual(profiles);
+  expect(f.db.prepare('SELECT * FROM babel_parties ORDER BY id').all()).toEqual(parties);
+  f.db.exec('DROP TRIGGER reject_solo');
+  f.restart();
+  const solo = (await f.call(b, action, 'solo-rollback')).state.party!;
+  expect(solo).toMatchObject({ size, started: size === 1 });
+  f.restart();
+  expect((await f.call(b, action, 'solo-rollback')).state.party!.id).toBe(solo.id);
+  expect(f.db.prepare('SELECT count(*) AS n FROM babel_parties').get()!.n).toBe(2);
+  expect(f.db.prepare('PRAGMA foreign_key_check').all()).toEqual([]);
+});
+
+it('lists independent waiting groups, rejects ambiguous enrollment and joins only the selected group', async () => {
+  const f = fixture(), [a, b, c, d] = f.people as [PlayerIdentity, PlayerIdentity, PlayerIdentity, PlayerIdentity];
+  for (const person of f.people) await f.call(person, { type: 'languages', native: 'ru', learning: 'en' });
+  const first = (await f.call(a, { type: 'create', size: 3 })).state.party!;
+  const second = (await f.call(b, { type: 'create', size: 2 })).state.party!;
+  const initial = f.service.state(c);
+  expect(initial.availableParty).toBeNull();
+  expect(initial.availableParties).toEqual([
+    { id: second.id, hostName: b.displayName, size: 2, count: 1 },
+    { id: first.id, hostName: a.displayName, size: 3, count: 1 },
+  ]);
+  expect(parseBabylonResult({ v: 2, requestId: 'available', state: initial }).state.availableParties).toEqual(initial.availableParties);
+  await expect(f.call(c, { type: 'join' })).rejects.toMatchObject({ code: 'CONFLICT', message: 'Выберите группу для подключения.' });
+  await expect(f.call(c, { type: 'enroll', size: 3, native: 'ru', learning: 'en' })).rejects.toMatchObject({ code: 'CONFLICT' });
+  expect(f.service.state(c).party).toBeNull();
+  expect((await f.call(a, { type: 'join' })).state.party!.id).toBe(first.id);
+  await expect(f.call(a, { type: 'join', partyId: second.id })).rejects.toMatchObject({ code: 'CONFLICT' });
+  expect(f.service.state(a).party!.id).toBe(first.id);
+  const action = { type: 'join' as const, partyId: second.id };
+  expect((await f.call(c, action, 'selected-join')).state.party).toMatchObject({ id: second.id, role: 2, started: true });
+  f.restart();
+  expect((await f.call(c, action, 'selected-join')).state.party!.id).toBe(second.id);
+  await expect(f.call(c, { type: 'join', partyId: first.id }, 'selected-join')).rejects.toMatchObject({ code: 'CONFLICT' });
+  await expect(f.call(d, action)).rejects.toMatchObject({ code: 'CONFLICT' });
+  await expect(f.call(d, { type: 'join', partyId: 'missing-party' })).rejects.toMatchObject({ code: 'CONFLICT' });
+  expect(f.service.state(d).party).toBeNull();
+  expect((await f.call(d, { type: 'join' })).state.party).toMatchObject({ id: first.id, size: 3, count: 2, role: 2 });
+  expect(f.service.state(b).party!.members.map(member => member.id)).toEqual([b.playerId, c.playerId]);
+});
+
+it('bounds available groups and rejects malformed or ambiguous discovery packets', async () => {
+  const f = fixture(), a = f.people[0]!;
+  await f.call(a, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
+  const initial = f.service.state(a), candidate = initial.availableParties[0]!;
+  const parse = (availableParties: unknown, availableParty: unknown = null) => parseBabylonResult({ v: 2, requestId: 'validate', state: { ...initial, availableParties, availableParty } });
+  for (const available of [undefined, null, {}, [candidate, candidate], Array(65).fill(candidate), [{ ...candidate, id: '' }], [{ ...candidate, hostName: '' }], [{ ...candidate, size: 1 }], [{ ...candidate, count: 0 }], [{ ...candidate, count: 2 }], [{ ...candidate, password: 'secret' }]]) expect(() => parse(available)).toThrow();
+  expect(() => parse([candidate])).toThrow();
+  expect(() => parse([], initial.availableParty)).toThrow();
+  for (const partyId of ['', null, 7, 'bad id']) expect(() => parseBabylonRequest({ v: 2, requestId: 'join', action: { type: 'join', partyId } })).toThrow();
+  const store = sqliteBabylon(f.db), original = store.party(candidate.id)!;
+  for (let index = 0; index < 70; index++) store.saveParty({ ...original, id: `waiting-${index}` });
+  const bounded = f.service.state(a);
+  expect(bounded.availableParties).toHaveLength(64);
+  expect(bounded.availableParties[0]!.id).toBe('waiting-69');
+  expect(bounded.availableParties.at(-1)!.id).toBe('waiting-6');
+  expect(bounded.availableParty).toBeNull();
+  expect(bounded.availablePartiesTruncated).toBe(true);
+  expect(parseBabylonResult({ v: 2, requestId: 'bounded', state: bounded }).state.availableParties).toHaveLength(64);
 });
 
 it('atomically replaces solo with multiplayer and back, preserving personal words and deduplicating retries', async () => {
@@ -313,7 +422,7 @@ it('atomically replaces solo with multiplayer and back, preserving personal word
   expect(f.service.spawn(a.playerId)?.force).toBe(true);
 });
 
-it('keeps the old game on a creation conflict, stale confirmation or failed SQLite commit', async () => {
+it('keeps the old game on a stale confirmation or failed SQLite commit and permits independent multiplayer replacement', async () => {
   const f = fixture(), [a, b] = f.people as [PlayerIdentity, PlayerIdentity];
   const initial = await f.call(a, { type: 'enroll', size: 1, native: 'ru', learning: 'en' });
   const oldId = initial.state.party!.id;
@@ -325,8 +434,8 @@ it('keeps the old game on a creation conflict, stale confirmation or failed SQLi
   expect(f.service.state(a).party!.id).toBe(oldId);
   expect(f.db.prepare('SELECT count(*) AS n FROM babel_parties').get()!.n).toBe(1);
   const waiting = await f.call(b, { type: 'enroll', size: 2, native: 'ru', learning: 'en' });
-  await expect(f.call(a, action)).rejects.toMatchObject({ code: 'CONFLICT' });
-  expect(f.service.state(a).party!.id).toBe(oldId);
+  expect((await f.call(a, action)).state.party).toMatchObject({ size: 2, started: false });
+  expect(f.service.state(a).party!.id).not.toBe(oldId);
   expect(f.service.state(b).party!.id).toBe(waiting.state.party!.id);
   expect(() => parseBabylonRequest({ v: 2, requestId: 'invalid', action: { ...action, replacePartyId: true } })).toThrow();
 });

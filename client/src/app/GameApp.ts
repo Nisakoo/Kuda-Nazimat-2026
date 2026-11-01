@@ -1006,7 +1006,7 @@ export class GameApp {
     this.entryAction = 'create';
     return this.finishEntry(await this.babylonAction({ type: 'create', size, ...(replacePartyId === undefined ? {} : { replacePartyId }) }));
   }
-  async connectEntryGame(serverUrl: string): Promise<boolean> {
+  async connectEntryGame(serverUrl: string, partyId?: string): Promise<boolean> {
     if (serverUrl !== this.config.serverUrl) {
       if (this.connectionRequest) return false;
       const request = new AbortController(); this.connectionRequest = request;
@@ -1031,8 +1031,10 @@ export class GameApp {
       return false;
     }
     if (this.requiresAvatar || !this.snapshot.babylon?.state?.profile) throw new Error('Вернитесь в профиль: подтвердите персонажа и сохраните языки.');
+    const state = this.snapshot.babylon.state;
+    if (!state.party && partyId === undefined && (state.availableParties.length > 1 || state.availablePartiesTruncated)) throw new Error('Выберите группу для подключения.');
     this.entryAction = 'join';
-    return this.finishEntry(await this.babylonAction({ type: 'join' }));
+    return this.finishEntry(await this.babylonAction({ type: 'join', ...(partyId === undefined ? {} : { partyId }) }));
   }
   async retryEntryAction(): Promise<boolean> {
     const saved = await this.retryBabylon();

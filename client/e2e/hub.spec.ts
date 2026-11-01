@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, type APIRequestContext } from '@playwright/test';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -9,6 +9,7 @@ import { expectCapture, finishLoading, joinFromHub, createFromHub, storedTool } 
 
 let directory: string, origin: string, targetOrigin: string;
 const children: ChildProcess[] = [];
+if (process.env.HUB_CAPTURE === 'off') test.use({ screenshot: 'off', trace: 'off', video: 'off' });
 const evidence = resolve(process.env.UI_EVIDENCE_DIR ?? '../tasks/evidence/hub-2026-11-01');
 test.beforeAll(async () => {
   directory = await mkdtemp(join(tmpdir(), 'ui-hud-real-'));
@@ -69,7 +70,7 @@ test('hub saves preferences, selects modes, loads automatically and preserves th
     expect(new Set(bounds.map(r => r.height)).size).toBe(1);
     expect(bounds.every(r => r.right <= width)).toBe(true);
     await actions.last().scrollIntoViewIfNeeded();
-    await page.screenshot({ path: join(evidence, `profile-${width}.png`) });
+    if (process.env.HUB_CAPTURE !== 'off') await page.screenshot({ path: join(evidence, `profile-${width}.png`) });
   }
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.getByRole('button', { name: 'Создать игру', exact: true }).click();
@@ -98,7 +99,7 @@ test('hub saves preferences, selects modes, loads automatically and preserves th
   await expect(page.getByRole('button', { name: 'Повторить запрос', exact: true })).toHaveCount(0);
   await expect(page.getByRole('region', { name: 'Сохранённая игра' })).toContainText('Одиночная игра');
   await page.getByRole('button', { name: 'Продолжить игру', exact: true }).scrollIntoViewIfNeeded();
-  await page.screenshot({ path: join(evidence, 'saved-game-mode.png') });
+  if (process.env.HUB_CAPTURE !== 'off') await page.screenshot({ path: join(evidence, 'saved-game-mode.png') });
   await page.getByRole('button', { name: 'Продолжить игру', exact: true }).click();
   await play(page);
   expect(await storedTool(page)).toEqual({ tool: 'jug' });
@@ -181,7 +182,7 @@ test('delayed world stays frozen; cancel ignores late resources and retry enters
   await page.keyboard.down('w'); await page.keyboard.down('Space');
   await expect(page.getByRole('region', { name: 'Загрузка мира' })).toBeVisible();
   await expectCapture(page, false);
-  await page.screenshot({ path: join(evidence, 'loading-delayed.png') });
+  if (process.env.HUB_CAPTURE !== 'off') await page.screenshot({ path: join(evidence, 'loading-delayed.png') });
   await page.keyboard.up('w'); await page.keyboard.up('Space');
   await page.getByRole('button', { name: 'Вернуться в кабинет', exact: true }).click(); release();
   await page.unroute('**/world/**/*.bin');
@@ -204,7 +205,7 @@ test('resource failure retries and Escape during loading requires an explicit ca
   await page.getByRole('button', { name: 'Повторить загрузку', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Вернуть управление', exact: true })).toBeVisible({ timeout: 30000 });
   await expectCapture(page, false);
-  await page.screenshot({ path: join(evidence, 'loading-capture-recovery.png') });
+  if (process.env.HUB_CAPTURE !== 'off') await page.screenshot({ path: join(evidence, 'loading-capture-recovery.png') });
   await finishLoading(page);
 });
 
@@ -262,20 +263,62 @@ test('entry errors persist across polling and retry never submits a changed dest
   expect(packets).toHaveLength(2); expect(packets[1]).toEqual(packets[0]); expect(probes).toBe(0);
 });
 
-test('an existing waiting party offers a direct join before a rejected create', async ({ page, request }) => {
-  const owner = await (await request.post(`${origin}/api/auth/guest`, { data: { name: 'Waiting owner' } })).json();
+async function waitingGroup(request: APIRequestContext, name: string, size: number) {
+  const owner = await (await request.post(`${origin}/api/auth/guest`, { data: { name } })).json();
   const headers = { Authorization: `Bearer ${owner.token}` };
-  for (const action of [{ type: 'languages', native: 'ru', learning: 'en' }, { type: 'create', size: 2 }]) {
-    const reply = await request.post(`${origin}/api/babylon`, { headers, data: { v: 2, requestId: crypto.randomUUID(), action } }); expect(reply.ok()).toBe(true);
+  let id = '';
+  for (const action of [{ type: 'languages', native: 'ru', learning: 'en' }, { type: 'create', size }]) {
+    const reply = await request.post(`${origin}/api/babylon`, { headers, data: { v: 2, requestId: crypto.randomUUID(), action } });
+    expect(reply.ok()).toBe(true); id = (await reply.json()).state.party?.id ?? '';
   }
-  let creates = 0;
-  page.on('request', request => { if (request.url().endsWith('/api/babylon') && request.postDataJSON()?.action?.type === 'create') creates++; });
-  await profile(page, 'Waiting peer');
+  return { id, headers };
+}
+
+test('waiting groups do not block creating solo or multiplayer games', async ({ page, request }) => {
+  test.setTimeout(60000);
+  const waiting = await waitingGroup(request, 'Independent host', 2);
+  await profile(page, 'Independent creator');
+  await createFromHub(page);
+  await page.keyboard.press('Escape'); await page.getByRole('button', { name: 'На главный экран', exact: true }).click();
   await page.getByRole('button', { name: 'Создать игру', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Доступная игра' })).toContainText('1 из 2');
-  await expect(page.getByRole('button', { name: 'Далее →', exact: true })).toBeDisabled();
-  await page.getByRole('button', { name: 'Присоединиться к игре', exact: true }).click();
-  await finishLoading(page); expect(creates).toBe(0);
+  await page.getByRole('radio', { name: /С друзьями/ }).check();
+  await expect(page.getByRole('button', { name: 'Далее →', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: 'Далее →', exact: true }).click();
+  const confirmation = page.getByRole('dialog', { name: 'Удалить текущую игру и создать новую?' });
+  await expect(confirmation).toBeVisible();
+  await confirmation.getByRole('button', { name: 'Удалить и создать новую', exact: true }).click();
+  await finishLoading(page);
+  const response = await request.post(`${origin}/api/babylon`, { headers: waiting.headers, data: { v: 2, requestId: crypto.randomUUID(), action: { type: 'state' } } });
+  expect(response.ok()).toBe(true);
+  expect((await response.json()).state.party).toMatchObject({ id: waiting.id, size: 2, count: 1 });
+});
+
+test('waiting groups require an explicit choice and preserve the saved game', async ({ page, request }) => {
+  test.setTimeout(60000);
+  const a = await waitingGroup(request, 'Choice host A', 3), b = await waitingGroup(request, 'Choice host B', 4);
+  const joins: { type: string; partyId?: string }[] = [];
+  page.on('request', request => { if (request.url().endsWith('/api/babylon')) { const body = request.postDataJSON(); if (body.action?.type === 'join') joins.push(body.action); } });
+  await profile(page, 'Choice visitor');
+  await page.getByRole('button', { name: 'Подключиться', exact: true }).click();
+  await expect(page.getByRole('group', { name: 'Выберите игру', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Подключиться', exact: true })).toBeDisabled();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('.hub-party-list')).toContainText('Choice host A');
+  await expect(page.locator('.hub-party-list')).toContainText('Choice host B');
+  await expect(page.locator('.hub-party-list')).not.toContainText(a.id);
+  await expect(page.locator('.hub-party-list')).not.toContainText(b.id);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('radio', { name: /Choice host B/ }).check();
+  await page.getByRole('button', { name: 'Подключиться', exact: true }).click();
+  await finishLoading(page); expect(joins).toEqual([{ type: 'join', partyId: b.id }]);
+  await page.keyboard.press('Escape'); await page.getByRole('button', { name: 'На главный экран', exact: true }).click();
+  await page.getByRole('button', { name: 'Подключиться', exact: true }).click();
+  await expect(page.getByText('Будет продолжена ваша сохранённая игра.', { exact: false })).toBeVisible();
+  await expect(page.locator('.hub-party-list')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Подключиться', exact: true }).click();
+  await finishLoading(page); expect(joins.at(-1)).toEqual({ type: 'join' });
+  const response = await request.post(`${origin}/api/babylon`, { headers: b.headers, data: { v: 2, requestId: crypto.randomUUID(), action: { type: 'state' } } });
+  expect((await response.json()).state.party).toMatchObject({ id: b.id, count: 2, size: 4 });
 });
 
 test('keyboard-only HUD keeps tasks and language, supports digits and shows help only while Alt is held', async ({ page }) => {
@@ -292,7 +335,7 @@ test('keyboard-only HUD keeps tasks and language, supports digits and shows help
   await page.keyboard.down('AltLeft');
   await expect(hint).toBeVisible(); await expect(hint).toContainText('Tab');
   await expectCapture(page, true);
-  await page.screenshot({ path: join(evidence, 'controls-alt-1280.png') });
+  if (process.env.HUB_CAPTURE !== 'off') await page.screenshot({ path: join(evidence, 'controls-alt-1280.png') });
   await page.keyboard.up('AltLeft'); await expect(hint).toHaveCount(0);
   await page.keyboard.press('Tab');
   await expect(page.getByRole('dialog', { name: 'Козы пастуха' })).toBeVisible(); await expectCapture(page, false);
@@ -317,14 +360,14 @@ test('keyboard-only HUD keeps tasks and language, supports digits and shows help
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Пауза' })).toHaveCount(0);
   await expectCapture(page, true);
-  await page.screenshot({ path: join(evidence, 'keyboard-hud-1280.png') });
+  if (process.env.HUB_CAPTURE !== 'off') await page.screenshot({ path: join(evidence, 'keyboard-hud-1280.png') });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.keyboard.down('AltRight'); await expect(hint).toBeVisible();
   const bounds = await hint.boundingBox(); expect(bounds).not.toBeNull();
   expect(bounds!.x).toBeGreaterThanOrEqual(0); expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(390);
   expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(844);
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  await page.screenshot({ path: join(evidence, 'controls-alt-390.png') });
+  if (process.env.HUB_CAPTURE !== 'off') await page.screenshot({ path: join(evidence, 'controls-alt-390.png') });
   await page.evaluate(() => window.dispatchEvent(new Event('blur')));
   await expect(hint).toHaveCount(0); await expectCapture(page, false);
   await page.keyboard.up('AltRight');
@@ -362,7 +405,7 @@ test('replacing a saved game asks first, preserves cancellation and creates eith
   expect(creates).toHaveLength(1); expect((await state()).party.id).toBe(initial.party.id);
   await page.getByRole('button', { name: 'Далее →', exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
-  await confirmation.screenshot({ path: join(evidence, 'replace-game-confirmation.png') });
+  if (process.env.HUB_CAPTURE !== 'off') await confirmation.screenshot({ path: join(evidence, 'replace-game-confirmation.png') });
   await confirmation.getByRole('button', { name: 'Удалить и создать новую', exact: true }).click();
   await finishLoading(page);
   const multiplayer = await state();

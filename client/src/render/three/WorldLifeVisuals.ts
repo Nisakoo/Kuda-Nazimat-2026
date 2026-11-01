@@ -1,7 +1,8 @@
+import { birdPose } from '../../../../shared/world-life/birds.ts';
 import { Group } from 'three';
 import type { Object3D, Scene } from 'three';
-import type { SceneStateMessage, CatDefinition } from '../../../../shared/world-life/types.ts';
-import { catPosition, routePosition, schedulePhase } from '../../../../shared/world-life/phase.ts';
+import type { SceneStateMessage, CatDefinition, PackAnimalDefinition } from '../../../../shared/world-life/types.ts';
+import { packAnimalPosition, catPosition, routePosition, schedulePhase } from '../../../../shared/world-life/phase.ts';
 import type { Vector3 } from '../../../../shared/world/types.ts';
 import type { GltfLibrary, ModelInstance } from './GltfLibrary';
 import type { EntityVisuals } from './EntityVisuals';
@@ -33,13 +34,14 @@ export class WorldLifeVisuals {
     const time = this.sceneTime(elapsed); const loaded = new Set(chunks); const live = new Set<string>();
     const templates = new Map(state.definition.templates.map(template => [template.id,template]));
     const cats = new Map(state.definition.cats.map(cat => [cat.instanceId,cat]));
+    const animals=new Map((state.definition.packAnimals??[]).map(animal=>[animal.instanceId,animal]));
     const pots = new Map(state.pots.map(pot => [pot.id,pot])); const apples = new Map(state.apples.map(apple => [apple.id,apple]));
     for (const instance of state.definition.instances) {
       const template = templates.get(instance.templateId); if (!template) continue;
-      const cat = cats.get(instance.id); const apple = apples.get(instance.id);
+      const cat = cats.get(instance.id); const animal=animals.get(instance.id); const apple = apples.get(instance.id);
       // Missing dynamic state must never respawn a saved item from the initial placement.
       if (template.behavior === 'pickup' && !apple || template.behavior === 'pushable' && !pots.has(instance.id)) continue;
-      const position = cat ? catPosition(cat,time) : apple?.state === 'world' ? apple.position : pots.get(instance.id)?.position ?? instance.position;
+      const position = animal ? packAnimalPosition(animal,time) : cat ? catPosition(cat,time) : apple?.state === 'world' ? apple.position : pots.get(instance.id)?.position ?? instance.position;
       const hand = apple?.state === 'held' ? this.characters.handAnchor(apple.holderId) : undefined;
       if (apple?.state === 'held' ? !hand : !loaded.has(lifeChunk(position))) continue;
       live.add(instance.id);
@@ -55,9 +57,20 @@ export class WorldLifeVisuals {
         visual.group.rotation.set(0,instance.rotationY,0); visual.group.scale.setScalar(1);
       }
       visual.positioned = true;
-      if (cat && visual.model) this.poseCat(visual,cat,time,instance.rotationY);
+      if (animal && visual.model) this.posePackAnimal(visual,animal,time,instance.rotationY);
+      else if (cat && visual.model) this.poseCat(visual,cat,time,instance.rotationY);
       else visual.model?.animate(template.animation,delta);
       visual.wind?.animate(time,state.definition.wind);
+    }
+    for(const bird of state.definition.perches??[]){
+      const status=state.birds?.find(b=>b.id===bird.id);if(!status)continue;
+      const pose=birdPose(bird,status,time);if(!loaded.has(lifeChunk(pose.position)))continue;
+      live.add(bird.id);const visual=this.ensure(bird.id,state.definition.flock.assetId);if(!visual)continue;
+      visual.group.position.set(pose.position.x,pose.position.y,pose.position.z);visual.group.rotation.y=pose.yaw;
+      const flap=pose.flying?Math.sin(time*.022+bird.rotationY)*.8:1.15;
+      const left=visual.model?.root.getObjectByName('bird-wing-left'),right=visual.model?.root.getObjectByName('bird-wing-right');
+      if(left){left.rotation.z=pose.flying?-flap:.12;left.rotation.y=pose.flying?0:-1.05;}if(right){right.rotation.z=pose.flying?flap:-.12;right.rotation.y=pose.flying?0:1.05;}
+      visual.group.rotation.x=pose.flying?-.10:Math.sin(time*.003+bird.rotationY)*.035;
     }
     const flock = state.definition.flock; const flight = schedulePhase(time,flock.schedule);
     if (flight.active) {
@@ -75,6 +88,23 @@ export class WorldLifeVisuals {
       }
     }
     for (const id of this.visuals.keys()) if (!live.has(id)) this.remove(id);
+  }
+  private posePackAnimal(visual:LifeVisual, animal:PackAnimalDefinition, time:number, yaw:number):void {
+    const root=visual.model!.root,phase=time/animal.cycleMs*Math.PI*2;
+    const head=root.getObjectByName('pack-head'),neck=root.getObjectByName('pack-neck'),tail=root.getObjectByName('pack-tail');
+    if(animal.behavior==='walk'){
+      const p=packAnimalPosition(animal,time),ahead=packAnimalPosition(animal,time+70);
+      visual.group.rotation.y=Math.atan2(ahead.x-p.x,ahead.z-p.z);
+      visual.group.position.y+=Math.abs(Math.sin(time*.006))*.025;
+      for(const side of [-1,1])for(const end of [-1,1]){const leg=root.getObjectByName(`pack-leg-${side}-${end}`);if(leg)leg.rotation.x=Math.sin(time*.006+(side===end?0:Math.PI))*.32;}
+      if(head)head.rotation.x=Math.sin(time*.003)*.04;
+    }else{
+      visual.group.rotation.y=yaw;
+      const feeding=.5+.5*Math.sin(phase);
+      if(neck)neck.rotation.x=1.06+feeding*.09;
+      if(head)head.rotation.x=.22+Math.sin(time*.008)*.035;
+    }
+    if(tail)tail.rotation.z=Math.sin(time*.0018+animal.route[0]!.x)*.12;
   }
   private poseCat(visual: LifeVisual, cat: CatDefinition, time: number, yaw: number): void {
     const root=visual.model!.root; const body=root.getObjectByName('cat-body'); const head=root.getObjectByName('cat-head'); const tail=root.getObjectByName('cat-tail');

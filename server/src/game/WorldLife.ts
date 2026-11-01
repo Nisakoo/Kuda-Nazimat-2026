@@ -1,3 +1,6 @@
+import { packAnimalPosition } from '../../../shared/world-life/phase.ts';
+import { restingBird, updateBird } from '../../../shared/world-life/birds.ts';
+import type { BirdState } from '../../../shared/world-life/types.ts';
 import type { Vector3 } from '../../../shared/world/types.ts';
 import { WORLD_LIFE_LIMITS as L } from '../../../shared/world-life/types.ts';
 import type { AppleState, HandRequest, HandResultMessage, ObjectInstance, SceneStateMessage, WorldLifeDefinition } from '../../../shared/world-life/types.ts';
@@ -24,6 +27,7 @@ function overlapsPath(p: Vector3, a: Vector3, b: Vector3, half: number): boolean
 export class WorldLife {
   private apples: readonly AppleState[] = [];
   private revision = 0;
+  private readonly birds = new Map<string, readonly BirdState[]>();
   private readonly definitions = new Map<string, WorldLifeDefinition>();
   private readonly pots = new Map<string, { id: string; position: Vector3 }[]>();
   private readonly maps: ReadonlyMap<string, GameMap>;
@@ -36,6 +40,7 @@ export class WorldLife {
     for (const map of maps.values()) {
       const d = map.manifest.worldLife; if (!d) continue;
       this.definitions.set(map.id, d);
+      this.birds.set(map.id,(d.perches??[]).map(restingBird));
       for (const i of d.instances) { if (globalIds.has(i.id)) throw new Error(`Duplicate scene instance ${i.id}`); globalIds.add(i.id); }
       const pots = this.instances(d, 'pushable').map(i => ({ id: i.id, position: { ...i.position } }));
       this.pots.set(map.id, pots);
@@ -52,6 +57,13 @@ export class WorldLife {
         const a = cat.route[i]!; const b = cat.route[(i+1)%cat.route.length]!;
         if (!this.clearStatic(map,a,b)) throw new Error(`Blocked cat route ${cat.instanceId}`);
       }
+      for(const animal of d.packAnimals??[]){
+        for(let i=0;i<64;i++){
+          const a=packAnimalPosition(animal,i*animal.cycleMs/64),b=packAnimalPosition(animal,(i+1)*animal.cycleMs/64);
+          if(!this.clearStatic(map,a,b))throw new Error(`Blocked animal route ${animal.instanceId}`);
+        }
+      }
+      for(const bird of d.perches??[])if(!this.support(map,bird.position))throw new Error(`Unsafe bird perch ${bird.id}`);
       // Check the complete route, not just endpoints. Bitmap has no height: ceiling metadata supplies roofs.
       for (let i = 0; i < d.flock.route.length-1; i++) {
         const a = d.flock.route[i]!; const b = d.flock.route[i+1]!;
@@ -83,19 +95,46 @@ export class WorldLife {
     }
     return true;
   }
+  /** Reconcile old ground positions against changed authored geometry; never change held ownership. */
+  restoreApples(apples: readonly AppleState[]): readonly AppleState[] {
+    const placed: AppleState[]=[];
+    const offsets:{x:number;z:number}[]=[];for(let x=-8;x<=8;x+=.5)for(let z=-8;z<=8;z+=.5)offsets.push({x,z});offsets.sort((a,b)=>Math.hypot(a.x,a.z)-Math.hypot(b.x,b.z));
+    for(const item of apples){
+      if(item.state==='held'){placed.push(item);continue;}
+      const map=this.maps.get(item.mapId),definition=this.definitions.get(item.mapId),home=definition?.instances.find(i=>i.id===item.id);
+      if(!map||!home)throw new Error('Unknown saved scene item');
+      const free=(p:Vector3)=>this.support(map,p)&&this.clearStatic(map,p,p)&&this.clearPots(item.mapId,p,p)&&!placed.some(other=>other.state==='world'&&other.mapId===item.mapId&&overlapsPath(other.position,p,p,2*L.appleRadius));
+      let position:Vector3|undefined=free(item.position)?item.position:undefined;
+      for(const origin of [item.position,home.position,map.spawn]){
+        if(position)break;
+        for(const offset of offsets){const x=origin.x+offset.x,z=origin.z+offset.z,p={x,y:map.heightAt(x,z),z};if(free(p)){position=p;break;}}
+      }
+      if(!position)throw new Error('No safe place to restore scene item');
+      placed.push({...item,position});
+    }
+    return placed;
+  }
   setApples(apples: readonly AppleState[], changed = false): void {
     for (const d of this.definitions.values()) {
       const local = apples.filter(a => a.mapId === d.mapId);
-      if (local.length !== L.apples) throw new Error('Invalid durable apple count');
+      if (local.length !== this.instances(d,'pickup').length) throw new Error('Invalid durable apple count');
       for (const apple of local) if (apple.state === 'world') {
         if (!this.support(this.maps.get(d.mapId)!,apple.position) || this.instances(d,'pushable').some(p => overlapsPath(p.position,apple.position,apple.position,L.potRadius+L.appleRadius))) throw new Error(`Unsafe durable apple ${apple.id}`);
       }
     }
     this.apples = apples; if (changed) this.revision++;
   }
+  updateBirds(players: readonly PlacedPlayer[], now: number): void {
+    const time=Math.max(0,now-this.epochMs);
+    for(const [mapId,definition] of this.definitions){
+      const positions=players.filter(p=>p.mapId===mapId).map(p=>p.position), previous=this.birds.get(mapId)!;
+      const next=(definition.perches??[]).map((bird,index)=>updateBird(bird,previous[index]!,positions,time));
+      if(next.some((bird,index)=>bird!==previous[index])){this.birds.set(mapId,next);this.revision++;}
+    }
+  }
   snapshot(mapId: string, now: number): SceneStateMessage | null {
     const definition = this.definitions.get(mapId); if (!definition) return null;
-    const packet: SceneStateMessage = { v:1, type:'scene-state', sceneId:this.sceneId, revision:this.revision, serverTimeMs:now, epochMs:this.epochMs, definition, pots:this.pots.get(mapId)!.map(p => ({ ...p,position:{...p.position} })), apples:this.apples.filter(a => a.mapId === mapId) };
+    const packet: SceneStateMessage = { v:1, type:'scene-state', sceneId:this.sceneId, revision:this.revision, serverTimeMs:now, epochMs:this.epochMs, definition, birds:this.birds.get(mapId) ?? [], pots:this.pots.get(mapId)!.map(p => ({ ...p,position:{...p.position} })), apples:this.apples.filter(a => a.mapId === mapId) };
     return packet;
   }
   validateSnapshots(now: number): void {
