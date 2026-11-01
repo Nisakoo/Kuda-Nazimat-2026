@@ -220,7 +220,9 @@ export function createAuthService(deps: AuthDeps) {
         log?.info('auth.operator.action', 'Ведущий снял блокировку входа', { action: 'unlock', name, unlocked });
         return unlocked;
       },
-      list: () => accounts.list(clock.now()),
+      list: () => accounts.list(clock.now()).map(account => ({
+        ...account, loginBlockedSeconds: lockout.retryAfter(account.name.toLowerCase()),
+      })),
     },
   };
   return service satisfies SessionVerifier;

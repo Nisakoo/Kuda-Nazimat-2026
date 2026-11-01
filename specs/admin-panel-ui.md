@@ -2,7 +2,7 @@
 id: admin-panel-ui
 type: module-design
 status: draft
-implementation: not-started
+implementation: partial
 parent: architecture
 summary: Интерфейс панели администратора — разделы «Обзор», «Сервер», «Клиенты», «NPC», «Журнал», «Аккаунты» по макетам.
 related:

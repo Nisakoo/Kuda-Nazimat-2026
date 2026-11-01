@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вавилон — панель администратора</title>
+<style>/* OPERATOR_STYLE */</style>
+</head>
+<body>
+<a class="skip" href="#main">К содержимому</a>
+<aside id="sidebar">
+  <div class="brand"><span class="diamond" aria-hidden="true">◆</span><div><strong>Вавилон</strong><small>Администратор</small></div></div>
+  <p class="nav-label">УПРАВЛЕНИЕ</p>
+  <nav aria-label="Разделы панели">
+    <a href="#overview" data-section="overview"><span aria-hidden="true">▦</span><span class="nav-text">Обзор</span></a>
+    <a href="#server" data-section="server"><span aria-hidden="true">▤</span><span class="nav-text">Сервер</span></a>
+    <a href="#clients" data-section="clients"><span aria-hidden="true">♧</span><span class="nav-text">Клиенты</span></a>
+    <a href="#npc" data-section="npc"><span aria-hidden="true">♙</span><span class="nav-text">NPC</span></a>
+    <a href="#journal" data-section="journal"><span aria-hidden="true">▧</span><span class="nav-text">Журнал</span></a>
+    <a href="#accounts" data-section="accounts"><span aria-hidden="true">♧</span><span class="nav-text">Аккаунты</span></a>
+  </nav>
+  <div class="sidebar-foot"><span class="local-icon" aria-hidden="true">В</span><div><strong>Локальная панель</strong><small>На компьютере сервера</small></div></div>
+</aside>
+<div class="workspace">
+  <header class="topbar">
+    <button class="icon-button" id="toggle-sidebar" aria-label="Свернуть боковую панель" aria-controls="sidebar" aria-expanded="true">☰</button>
+    <div class="breadcrumb">Панель администратора <span>/</span> <strong id="breadcrumb">Обзор</strong></div>
+    <label class="global-search"><span class="sr-only">Поиск раздела</span><input id="section-search" type="search" placeholder="Поиск раздела…" autocomplete="off"></label>
+    <span id="connection" class="badge neutral" role="status">Подключение…</span>
+  </header>
+  <main id="main" tabindex="-1">
+    <div class="page-heading"><div><h1 id="title">Обзор</h1><p id="subtitle">Состояние мира и подключённых игроков</p></div><button id="refresh" class="primary">↻ Обновить</button></div>
+    <div id="connection-error" class="notice danger" role="alert" hidden></div>
+    <section id="view-overview" aria-label="Обзор">
+      <div id="overview-cards" class="cards"></div>
+      <section class="panel addresses"><h2>Подключение к игре</h2><p>Откройте этот адрес в браузере на устройстве игрока в вашей сети.</p><ul id="urls"></ul></section>
+      <div class="columns"><section class="panel"><h2>Подключённые игроки</h2><div class="table-scroll"><table><thead><tr><th>Игрок</th><th>Карта</th><th>Ping</th><th>FPS</th><th>В игре</th></tr></thead><tbody id="overview-players"></tbody></table></div></section><section class="panel"><h2>Последние предупреждения</h2><div id="overview-events"></div></section></div>
+      <div class="columns"><section class="panel"><h2>Игроки онлайн</h2><p class="empty">История подключений пока недоступна.</p></section><section class="panel"><h2>Время ответа NPC</h2><p class="empty">История ответов пока недоступна.</p></section></div>
+    </section>
+    <section id="view-server" aria-label="Сервер" hidden>
+      <div class="panel status-line"><strong id="health" class="badge neutral">Нет данных</strong><span id="environment">—</span><span class="version">Версия —</span><span id="uptime">—</span><span id="seats">—</span><span id="npc-state">—</span><span id="language">—</span></div>
+      <ul id="reasons" class="reasons"></ul>
+      <div id="server-cards" class="cards"></div>
+      <div class="columns"><section class="panel"><h2>Производительность сервера</h2><p class="empty">История производительности пока недоступна.</p></section><section class="panel"><h2>Память</h2><p class="empty">Текущие значения — в карточке выше. История пока недоступна.</p></section></div>
+      <div class="columns"><section class="panel"><h2>Очередь NPC</h2><dl id="queue"></dl><p class="muted" id="metrics-state">Загрузка показателей…</p></section><section class="panel"><h2>Диагностика</h2><p>Сохраните отчёт с недавними событиями для разбора проблемы.</p><button id="dump" class="secondary">Сохранить отчёт</button></section></div>
+      <section class="panel"><h2>Последние предупреждения</h2><div class="table-scroll"><table><thead><tr><th>Время</th><th>Уровень</th><th>Событие</th><th>Пояснение</th></tr></thead><tbody id="warnings"></tbody></table></div></section>
+    </section>
+    <section id="view-clients" aria-label="Клиенты" hidden>
+      <div id="client-cards" class="cards"></div>
+      <section class="panel"><div class="panel-heading"><h2>Подключённые игроки</h2><div class="filters"><label><span class="sr-only">Поиск игрока</span><input id="player-search" type="search" placeholder="Поиск игрока…"></label><label><span class="sr-only">Карта</span><select id="map-filter"><option value="">Все карты</option></select></label></div></div>
+        <div class="table-scroll"><table><thead><tr><th>Игрок</th><th>Карта</th><th>Состояние</th><th>Ping, мс</th><th>FPS</th><th>Кадр, мс</th><th>Draw calls</th><th>Отчёт, с</th><th>Переподкл.</th><th>В игре, мин</th><th>Действия</th></tr></thead><tbody id="players"></tbody></table></div>
+        <p class="muted">Выделены: ping выше 150 мс или 3+ переподключения за 10 минут.</p><p class="muted">FPS, время кадра и draw calls: нет данных. Отчёты клиентов пока недоступны.</p><p id="player-count" class="muted"></p>
+      </section>
+      <div class="columns"><section class="panel"><h2>Ping, мс</h2><p class="empty">История ping пока недоступна.</p></section><section class="panel"><h2>FPS</h2><p class="empty">История FPS пока недоступна.</p></section></div>
+    </section>
+    <section id="view-npc" class="panel" aria-label="NPC" hidden><h2>Редактирование персонажей пока недоступно</h2><p>В этой версии панели можно проверить готовность NPC и очередь ответов в разделе «Сервер».</p><a href="#server">Открыть состояние сервера →</a></section>
+    <section id="view-journal" class="panel" aria-label="Журнал" hidden><h2>Журнал изменений пока недоступен</h2><p>Предупреждения сервера и сохранение диагностического отчёта доступны в разделе «Сервер».</p><a href="#server">Открыть диагностику →</a></section>
+    <section id="view-accounts" aria-label="Аккаунты" hidden>
+      <section class="panel"><h2>Найти игрока</h2><form id="account-search"><label for="account-name">Имя игрока</label><div class="search-row"><input id="account-name" type="search" placeholder="Точное имя игрока" required maxlength="32" autocomplete="off"><button class="primary" id="find-account" type="submit">Найти</button></div></form><p id="account-message" role="status"></p></section>
+      <div id="account-details" hidden>
+        <section class="panel account-profile"><span id="account-avatar" class="avatar" aria-hidden="true"></span><div><h2 id="account-title"></h2><span class="muted">Участник</span></div><span id="account-access" class="badge"></span><span id="account-last-login" class="muted"></span></section>
+        <div class="columns three action-cards">
+          <section class="panel"><h2>Временный пароль</h2><p>Восстановите доступ игроку. Текущие сессии завершатся; при входе потребуется задать новый пароль.</p><button data-action="reset-password" class="primary">Выдать временный пароль</button></section>
+          <section class="panel"><h2>Активные сессии</h2><strong id="account-sessions"></strong><p>Завершите все сессии, чтобы игрок вошёл заново.</p><button data-action="revoke" class="secondary">Завершить все сессии</button></section>
+          <section class="panel"><h2>Блокировка входа</h2><p id="account-lock"></p><button data-action="unlock" class="secondary">Снять блокировку входа</button></section>
+        </div>
+        <section class="panel"><h2>Последние действия с аккаунтом</h2><p class="empty">История действий пока недоступна. Результат текущего действия появится в уведомлении.</p></section>
+      </div>
+    </section>
+    <footer><span class="version">Версия —</span><span id="updated">Данные ещё не получены</span></footer>
+  </main>
+</div>
+<div id="toast" class="toast" role="status" hidden><span id="toast-text"></span><button id="close-toast" class="icon-button" aria-label="Закрыть уведомление">×</button></div>
+<dialog id="password-dialog" aria-labelledby="password-title"><h2 id="password-title">Временный пароль</h2><p id="password-for"></p><output id="temporary-password"></output><p>Покажите пароль игроку сейчас. После закрытия он больше не отобразится. Пароль действует 24 часа; игроку потребуется задать свой.</p><button id="close-password" class="primary">Готово, скрыть пароль</button></dialog>
+<noscript><p class="notice">Для панели администратора включите JavaScript в браузере.</p></noscript>
+<script>/* OPERATOR_SCRIPT */</script>
+</body>
+</html>

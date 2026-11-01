@@ -30,7 +30,7 @@ export interface HttpDeps {
   npcReady(): boolean;
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
-  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump'>;
+  readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump' | 'version'>;
 }
 
 /** AUTH-014: per-session token buckets; the map is cleared when it grows past any realistic session count. */
@@ -56,7 +56,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   const telemetry = telemetryHandler({ sessions: deps.auth, clock: deps.clock, logger: deps.logger });
   const operator: OperatorDeps = {
     auth: deps.auth, game: deps.game, metrics, logger: log, host: config.host, configPort: config.port, maxPlayers: config.maxPlayers,
-    npcReady: deps.npcReady, monitoringToken: config.monitoring.token,
+    npcReady: deps.npcReady, monitoringToken: config.monitoring.token, environment: config.env,
     languageReady: () => true, health: () => ({ level: 'green', reasons: [] }), warnings: () => [], dump: () => null,
     ...deps.operator,
   };

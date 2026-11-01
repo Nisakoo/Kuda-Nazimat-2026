@@ -1,0 +1,2 @@
+PASS: real HTTP/SQLite/Socket.IO; offline assets; navigation, filters, 1024 px, confirmations, revoke, lock/unlock, one-time password, dump, API failure/recovery, XSS and thresholds.
+Thresholds and HTTP failures used controlled API fixtures. Physical LAN and client FPS were not measured.

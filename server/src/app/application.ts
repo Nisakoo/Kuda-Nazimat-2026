@@ -54,7 +54,8 @@ function startFields(config: Config): Record<string, unknown> {
 export async function startApplication(config: Config, createGame: CreateGame, logger: Logger, languagePort?: LanguagePort, obs: AppObservability = { metrics: new MetricsRegistry() }) {
   const log = logger.child('app');
   const { metrics } = obs;
-  log.info('app.start', 'Запуск сервера', startFields(config));
+  const startup = startFields(config);
+  log.info('app.start', 'Запуск сервера', startup);
   try { if (!(await stat(join(config.clientDir, 'index.html'))).isFile()) throw new Error(); }
   catch { throw new Error(`Нет сборки ${config.clientDir}/index.html. Выполните npm --prefix client run build`); }
   try { if (!(await stat(config.worldDir)).isDirectory()) throw new Error(); }
@@ -130,7 +131,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     };
     http = createHttpServer(config, {
       auth, game, avatars: stores.avatars, equipment: stores.equipment, logger, clock: systemClock, metrics, npcReady: () => npcService.ready(), babylon, cancelBabylon: npc.cancelConnection,
-      operator: { languageReady: () => language?.ready?.() ?? languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
+      operator: { version: typeof startup.version === 'string' ? startup.version : undefined, languageReady: () => language?.ready?.() ?? languageReady, health, warnings: () => obs.recorder?.warnings() ?? [], dump: (reason) => obs.recorder?.dump(reason) ?? null },
     });
     obs.setSnapshot?.(() => ({ game: runtime.state(), npc: npcService.state() }));
     game.attach(http.server);

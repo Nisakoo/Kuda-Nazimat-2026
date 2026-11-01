@@ -67,7 +67,7 @@ it.skipIf(!lan)(`two players over a non-loopback IPv4 (${lan?.address ?? 'нет
 
 it.skipIf(!lan)('operator screen and status are 404 from a non-loopback address', async () => {
   const { port } = await setup({ host: '0.0.0.0' });
-  for (const path of ['/operator', '/api/operator/status']) expect((await fetch(`http://${lan!.address}:${port}${path}`)).status).toBe(404);
+  for (const path of ['/operator', '/api/operator/status', '/api/operator/metrics', '/api/operator/accounts']) expect((await fetch(`http://${lan!.address}:${port}${path}`)).status).toBe(404);
 });
 
 it('operator screen shows seats, presence and NPC state without secrets; logs carry IP but no tokens or texts (OFFLINE-010, 016)', async () => {
@@ -81,6 +81,7 @@ it('operator screen shows seats, presence and NPC state without secrets; logs ca
   const status = await (await fetch(`${origin}/api/operator/status`)).json() as { addresses: string[]; players: unknown[]; seats: unknown; npc: string; uptimeSeconds: number };
   expect(status.addresses[0]).toMatch(/^http:\/\/localhost:\d+\/$/);
   expect(status).toMatchObject({ players: [{ name: 'Аня', mapId: 'test', connected: true, releaseInMs: null }], seats: { used: 1, max: 4 }, npc: 'ready' });
+  expect(status).toMatchObject({ environment: 'test', version: '0.1.0', performance: { rssBytes: expect.any(Number), heapBytes: expect.any(Number) } });
   const takeover = await connect((await guest('аня')).token);
   await client.wait((p) => p.type === 'error' && p.code === 'UNAUTHORIZED');
   takeover.socket.disconnect();
