@@ -103,6 +103,10 @@
     <div class="hud-top"><aside class="location"><div class="task-chip parchment" aria-label="Текущее задание"><span>{cityTask?.title ?? (profile ? snapshot.babylon?.state?.taskTitle : snapshot.market ? 'Козы пастуха' : snapshot.region)}{#if cityTask}<span class="task-count"> · {cityTask.step + 1} / {cityTask.total}</span>{:else if profile || snapshot.market}<span class="task-count"> · {snapshot.babylon?.state?.fed.length ?? snapshot.market?.fed.length ?? 0} / 4</span>{/if}</span></div></aside>
     {#if snapshot.debug}<div class="debug glass"><output aria-label="Область мира">{snapshot.region}</output><output aria-label="Состояние связи">{snapshot.networkStatus === 'connected' ? 'Подключён' : snapshot.networkStatus}</output><output aria-label="Положение игрока">{snapshot.coordinates}</output><p aria-label="Ресурсы оформления">{snapshot.modelStats}</p><p aria-label="Кеш мира">{snapshot.cacheStats}</p><p aria-label="Производительность">{snapshot.performance}</p><p aria-label="Ресурсы сцены">{snapshot.renderStats}</p><p aria-label="Звук">{snapshot.audioStats}</p></div>{/if}
     </div>
+    {#if !overlayOpen && snapshot.phase === 'running' && snapshot.capture === 'locked'}
+      <div class="shotgun-reticle" aria-label="Прицел" aria-hidden="true">·</div>
+      <aside class="shotgun-hud glass" aria-label="Дробовик"><strong>{snapshot.shotgunReloading ? 'Перезарядка…' : `${snapshot.shotgunAmmo ?? 6} / 6`}</strong><span>ЛКМ · выстрел　 R · перезарядка</span><span aria-label="Вид камеры">{snapshot.firstPerson ? 'Первое лицо' : 'Третье лицо'} · V</span></aside>
+    {/if}
     {#if snapshot.worldWaiting}<p class="asset-warning glass">Соседний участок ещё загружается. Движение продолжится после подготовки.</p>{/if}
     <div class="world-actions">
     {#if snapshot.phase === 'running' && !snapshot.dialog && !snapshot.chatOpen && !snapshot.settingsOpen && !snapshot.marketPanel && !snapshot.babylonPanel && !snapshot.mapOpen && !snapshot.avatarOpen}
@@ -118,7 +122,7 @@
     {#if snapshot.controlsHint && !overlayOpen && snapshot.phase === 'running'}
       <aside class="controls-hint parchment" aria-label="Управление">
         <h2>Управление</h2>
-        <dl><dt>W A S D / ↑ ← ↓ →</dt><dd>Движение</dd><dt>Мышь / колесо</dt><dd>Камера / приближение</dd><dt>Shift / Пробел</dt><dd>Бег / прыжок</dd><dt>E</dt><dd>Взаимодействие</dd><dt>F</dt><dd>Взять / положить предмет</dd><dt>Tab</dt><dd>Задачи</dd><dt>1</dt><dd>Чат</dd><dt>2</dt><dd>Словарь</dd><dt>3</dt><dd>Карта</dd><dt>4</dt><dd>Язык</dd><dt>Esc</dt><dd>Меню</dd></dl>
+        <dl><dt>W A S D / ↑ ← ↓ →</dt><dd>Движение</dd><dt>Мышь / колесо</dt><dd>Камера / приближение</dd><dt>Shift / Пробел</dt><dd>Бег / прыжок</dd><dt>V</dt><dd>Сменить вид</dd><dt>ЛКМ / R</dt><dd>Выстрел / перезарядка</dd><dt>E</dt><dd>Взаимодействие</dd><dt>F</dt><dd>Взять / положить предмет</dd><dt>Tab</dt><dd>Задачи</dd><dt>1</dt><dd>Чат</dd><dt>2</dt><dd>Словарь</dd><dt>3</dt><dd>Карта</dd><dt>4</dt><dd>Язык</dd><dt>Esc</dt><dd>Меню</dd></dl>
       </aside>
     {/if}
     {#if snapshot.visualError && snapshot.phase === 'running' && !snapshot.dialog}<p class="asset-warning glass" role="alert">{snapshot.visualError}</p>{/if}

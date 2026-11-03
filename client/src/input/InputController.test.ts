@@ -72,6 +72,21 @@ describe('confirmed pointer lock and input intentions', () => {
     expect(actions.move).toHaveBeenCalledTimes(count);
   });
 
+  it('switches V and reloads R once per edge; shoots only with captured primary mouse input', () => {
+    actions.toggleView=vi.fn();actions.reload=vi.fn();actions.fire=vi.fn();
+    const key=(code:string,repeat=false)=>window.dispatchEvent(new KeyboardEvent('keydown',{code,repeat}));
+    const click=()=>document.dispatchEvent(new MouseEvent('mousedown',{button:0}));
+    key('KeyV');click();expect(actions.toggleView).not.toHaveBeenCalled();expect(actions.fire).not.toHaveBeenCalled();
+    input.requestCapture();key('KeyV');key('KeyV');key('KeyV',true);key('KeyR');key('KeyR',true);click();
+    expect(actions.toggleView).toHaveBeenCalledTimes(1);expect(actions.reload).toHaveBeenCalledTimes(1);expect(actions.fire).toHaveBeenCalledTimes(1);
+    document.dispatchEvent(new MouseEvent('mousedown',{button:2}));allowed=false;click();key('KeyR');
+    expect(actions.fire).toHaveBeenCalledTimes(1);allowed=true;
+    window.dispatchEvent(new Event('blur'));key('KeyV');key('KeyR');click();
+    expect(actions.toggleView).toHaveBeenCalledTimes(1);expect(actions.reload).toHaveBeenCalledTimes(1);expect(actions.fire).toHaveBeenCalledTimes(1);
+    input.requestCapture();key('KeyV');expect(actions.toggleView).toHaveBeenCalledTimes(2);
+    const field=document.createElement('input');document.body.append(field);field.focus();key('KeyR');click();expect(actions.reload).toHaveBeenCalledTimes(1);
+  });
+
   it('consumes repeated relative movement without buttons or cursor coordinates', () => {
     input.requestCapture();
     for (let index = 0; index < 20; index++) moveMouse(100, -10);

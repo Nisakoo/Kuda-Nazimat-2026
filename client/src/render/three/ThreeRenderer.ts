@@ -1,3 +1,5 @@
+import { ShotgunVisuals } from './ShotgunVisuals';
+import type { ShotgunState } from '../../../../shared/shotgun/types.ts';
 import { GRAPHICS_PROFILES, type GraphicsQuality } from '../GraphicsQuality';
 import { Color, DirectionalLight, Fog, HemisphereLight, PerspectiveCamera, Scene, Vector3, WebGLRenderer, ACESFilmicToneMapping, PCFShadowMap } from 'three';
 import type { CameraView, RenderAdapter, VisualChunk, RenderDiagnostics } from '../RenderAdapter';
@@ -15,6 +17,7 @@ import type { SceneStateMessage } from '../../../../shared/world-life/types.ts';
 import { WorldLifeVisuals } from './WorldLifeVisuals';
 
 export class ThreeRenderer implements RenderAdapter {
+  private shotgun: ShotgunVisuals | null = null;
   private renderer: WebGLRenderer | null = null;
   private scene: Scene | null = null;
   private camera: PerspectiveCamera | null = null;
@@ -72,6 +75,7 @@ export class ThreeRenderer implements RenderAdapter {
     this.chunks = new VisualChunks(this.scene, this.library, GRAPHICS_PROFILES[this.quality].farWindInterval);
     this.visuals = new EntityVisuals(this.scene, this.assets, this.library, (id, error) => { if (error) this.errors.set(`entity:${id}`, error); else this.errors.delete(`entity:${id}`); }, this.marketStyle);
     this.life = new WorldLifeVisuals(this.scene,this.library,this.visuals,(id,error)=>{if(error)this.errors.set(`life:${id}`,error);else this.errors.delete(`life:${id}`);});
+    this.shotgun=new ShotgunVisuals(this.scene,this.camera,this.visuals);
     container.append(this.renderer.domElement);
   }
 
@@ -80,6 +84,8 @@ export class ThreeRenderer implements RenderAdapter {
     this.visuals?.sync(previous, current, playerId);
   }
 
+  shotgunAim(): {yaw:number;pitch:number} | null { const position=this.visuals?.position(this.playerId);return position && this.shotgun ? this.shotgun.aim(position.clone().add(new Vector3(0,1.45,0))) : null; }
+  setShotgun(state: ShotgunState, playerId: string): void { this.shotgun?.setState(state,playerId); }
   setCamera(view: CameraView): void { this.view = { ...view }; }
   setBuildingSymbols(visible: boolean): void { this.chunks?.setBuildingSymbols(visible); }
   setSceneState(state: SceneStateMessage | null): void { this.sceneState = state; this.life?.setState(state,this.lastElapsed); }
@@ -129,8 +135,10 @@ export class ThreeRenderer implements RenderAdapter {
     else this.target.set(0, 0, 0);
     if (this.sun) { this.sun.position.set(this.target.x + 18, 12, this.target.z - 12); this.sun.target.position.set(this.target.x, 0, this.target.z); }
     this.focusHeight = damp(this.focusHeight, this.view.focusHeight ?? .8, 5, Math.min(delta, .1));
-    this.target.y += this.focusHeight;
-    const fov = this.view.fieldOfView ?? (this.camera.aspect < 1 ? 62 : 48);
+    const firstPerson=this.view.firstPerson===true;
+    this.visuals.setVisible(this.playerId,!firstPerson);
+    this.target.y += firstPerson ? 1.45 : this.focusHeight;
+    const fov = firstPerson ? 76 : this.view.fieldOfView ?? (this.camera.aspect < 1 ? 62 : 48);
     if (Math.abs(this.camera.fov - fov) > .01) { this.camera.fov = damp(this.camera.fov, fov, 5, Math.min(delta, .1)); this.camera.updateProjectionMatrix(); }
     const { yaw, pitch, distance } = this.view;
     this.camera.position.set(
@@ -138,14 +146,21 @@ export class ThreeRenderer implements RenderAdapter {
       this.target.y + Math.sin(pitch) * distance,
       this.target.z + Math.cos(yaw) * Math.cos(pitch) * distance,
     );
+    this.shotgun?.animate(Math.min(delta,.1),firstPerson);
     // Update before camera probes; suppress only the renderer's duplicate scene traversal.
     this.scene.updateMatrixWorld();
+    if(firstPerson) {
+      this.camera.position.copy(this.target);this.camera.rotation.set(-pitch,yaw,0,'YXZ');
+    } else {
     this.cameraDirection.copy(this.camera.position).sub(this.target).normalize();
     const halfHeight = Math.tan(this.camera.fov*Math.PI/360)*this.camera.near+.08;
     const allowed = this.obstruction.resolve(this.target,this.cameraDirection,distance,
       halfHeight*this.camera.aspect,halfHeight,this.scene.children.filter(child=>child.name.startsWith('chunk:')),delta);
     this.camera.position.copy(this.target).addScaledVector(this.cameraDirection,allowed);
     this.camera.lookAt(this.target);
+    }
+    this.camera.updateMatrixWorld();
+    this.shotgun?.flushShots();
     this.scene.matrixWorldAutoUpdate = false;
     try { this.renderer.render(this.scene, this.camera); this.frameFence.submitted(); }
     finally { this.scene.matrixWorldAutoUpdate = true; }
@@ -154,6 +169,7 @@ export class ThreeRenderer implements RenderAdapter {
   }
 
   dispose(): void {
+    this.shotgun?.dispose();this.shotgun=null;
     this.life?.dispose(); this.life = null; this.sceneState = null;
     this.chunks?.dispose();
     this.visuals?.dispose();

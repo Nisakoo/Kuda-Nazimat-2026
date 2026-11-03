@@ -1,3 +1,5 @@
+import { ShotgunSimulation } from '../../../shared/shotgun/Simulation.ts';
+import type { ShotgunAction } from '../../../shared/shotgun/types.ts';
 import { LIMITS, type ServerMessage } from '../../../shared/protocol/types.ts';
 import type { Direction } from '../../../shared/world/types.ts';
 import type { HandRequest, HandResultMessage, SceneStateMessage } from '../../../shared/world-life/types.ts';
@@ -40,6 +42,8 @@ export const TAKEOVER_REASON = 'Игра открыта в другом окне
 
 /** Use cases of the shared world: seats, join, input, interaction, chat, AOI broadcast and presence. */
 export class GameService {
+  private readonly shotguns = new Map<string, ShotgunSimulation>();
+  private readonly shotRequests = new Map<string, string[]>();
   private readonly seats = new Map<string, Seat>();
   private readonly startedAt: string;
   private chatCounter = 0;
@@ -124,6 +128,8 @@ export class GameService {
     if (seat.channel) return;
     const placed = this.world.locate(seat.identity.playerId);
     if (placed) this.persist([placed]);
+    for (const simulation of this.shotguns.values()) simulation.removePlayer(seat.identity.playerId);
+    this.shotRequests.delete(seat.identity.playerId);
     this.world.remove(seat.identity.playerId);
     this.seats.delete(seat.identity.accountId);
     this.seatEvents.inc({ event: 'release' });
@@ -137,6 +143,7 @@ export class GameService {
     const map = this.world.map(mapId);
     if (!map) return { ok: false, reason: 'unknown-map' };
     const { playerId, displayName } = seat.identity;
+    for(const [id,simulation] of this.shotguns) if(id!==mapId)simulation.removePlayer(playerId);
     const current = this.world.locate(playerId);
     const initial = this.settings.initialSpawn?.(playerId);
     const force = initial?.mapId === mapId && initial.force === true;
@@ -169,9 +176,45 @@ export class GameService {
     return { ok: true, message: (requestId) => ({ v: 3, type: 'joined', requestId, playerId, revision: stream.revision, snapshot, world: map.bootstrap }) };
   }
 
+  private shotgunWorld(mapId: string): ShotgunSimulation {
+    let simulation=this.shotguns.get(mapId);
+    if (simulation) return simulation;
+    const map=this.world.map(mapId)!;
+    const positions: {x:number;y:number;z:number}[]=[];
+    // Place temporary props only on safe ground, away from the spawn and each other.
+    for (let radius=4;radius<=12 && positions.length<9;radius+=3) for(let i=0;i<12 && positions.length<9;i++) {
+      const angle=i*Math.PI/6,x=map.spawn.x+Math.sin(angle)*radius,z=map.spawn.z-Math.cos(angle)*radius;
+      const p={x,y:map.heightAt(x,z),z};
+      if (map.isSafeSupport(x,z) && [-.4,.4].every(dx=>[-.4,.4].every(dz=>map.isSafeSupport(x+dx,z+dz))) && positions.every(other=>Math.hypot(other.x-x,other.z-z)>1.5) && this.world.life?.clearPots(mapId,p,p)!==false) positions.push(p);
+    }
+    simulation=new ShotgunSimulation(`shotgun-${this.startedAt}`,mapId,positions,{
+      height:(x,z)=>map.heightAt(x,z),
+      clear:(a,b)=>map.canTraverse(a,b) && map.isSafeSupport(b.x,b.z),
+      rayClear:(a,b)=>map.canTraverse(a,b) && !map.ceilingsFor(a,b).some(v=>b.x>=v.minX && b.x<=v.maxX && b.z>=v.minZ && b.z<=v.maxZ && b.y>=v.bottomY && b.y<=v.topY),
+    });
+    this.shotguns.set(mapId,simulation); return simulation;
+  }
+  shotgun(channel: Channel, request: ShotgunAction): void {
+    const seat=this.joinedSeat(channel),player=seat && this.world.locate(seat.identity.playerId);
+    if(!player) return;
+    const seen=this.shotRequests.get(player.id) ?? [];
+    if(seen.includes(request.requestId)) return;
+    this.shotRequests.set(player.id,[...seen,request.requestId].slice(-64));
+    const simulation=this.shotgunWorld(player.mapId); simulation.addPlayer(player.id);
+    simulation.act(player.id,player.position,request.action,request.yaw,request.pitch);
+    this.syncShotgun(channel);
+  }
+  private syncShotgun(channel: Channel): void {
+    const seat=this.joinedSeat(channel),player=seat && this.world.locate(seat.identity.playerId);
+    if(!player) return;
+    const simulation=this.shotgunWorld(player.mapId); simulation.addPlayer(player.id);
+    channel.sendLife?.(simulation.snapshot());
+  }
+
   setAvatar(playerId: string, avatarId: AvatarId): void { this.world.setAvatar(playerId, avatarId); }
   setEquipment(playerId: string, tool: ToolId | null): void { this.world.setEquipment(playerId, tool); }
   syncLife(channel: Channel, periodic = false, cache?: Map<string, SceneStateMessage>, now = this.clock.now()): void {
+    if(!periodic)this.syncShotgun(channel);
     const seat = this.joinedSeat(channel); const life = this.world.life;
     if (!seat || !life) return;
     const changed = seat.lifeRevision !== life.currentRevision();
@@ -266,6 +309,7 @@ export class GameService {
   /** One simulation step; every `broadcastEvery` steps the AOI deltas go out. */
   tick(deltaSeconds: number): void {
     this.world.step(deltaSeconds, this.clock.now());
+    for (const simulation of this.shotguns.values()) simulation.step(deltaSeconds);
     this.world.life?.updateBirds(this.world.placedPlayers(), this.clock.now());
     if (this.world.tick % this.settings.broadcastEvery !== 0) return;
     const scenes = new Map<string,SceneStateMessage>(); const now = this.clock.now();
@@ -273,6 +317,7 @@ export class GameService {
       if (!seat.channel || !seat.stream) continue;
       const channel = seat.channel;
       this.syncLife(channel, true, scenes, now);
+      this.syncShotgun(channel);
       if (seat.channel !== channel || !seat.stream) continue;
       const entities = this.world.aoi(seat.identity.playerId);
       if (new Set(entities.map((entity) => entity.id)).size !== entities.length) this.log.error('invariant.violated', 'Повтор ID сущности в AOI', { invariant: 'aoi.unique-ids', playerId: seat.identity.playerId });

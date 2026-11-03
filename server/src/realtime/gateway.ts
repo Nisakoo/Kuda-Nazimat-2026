@@ -232,6 +232,7 @@ class Connection implements Channel {
       this.countInvalid(); return;
     }
     if (!this.deps.game.identityOf(this)) { this.sendLife(handFailure(request.requestId, 'NOT_READY', 'Сначала войдите в мир.')); return; }
+    if (request.type === 'shotgun') this.deps.game.shotgun(this,request);
     if (request.type === 'hand') this.sendLife(this.deps.game.hand(this, request));
     this.deps.game.syncLife(this);
   }

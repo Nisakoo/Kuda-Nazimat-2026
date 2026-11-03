@@ -1,6 +1,8 @@
 import { isGraphicsQuality, type GraphicsQuality } from '../render/GraphicsQuality';
 import { readGraphicsQuality, rememberGraphicsQuality } from './graphicsPreference';
 import { CITY_BOUNDS } from '../../../shared/city/catalogue';
+import { ShotgunSimulation } from '../../../shared/shotgun/Simulation.ts';
+import type { ShotgunState } from '../../../shared/shotgun/types.ts';
 import type { CameraView, RenderAdapter } from '../render/RenderAdapter';
 import { ThreeRenderer } from '../render/three/ThreeRenderer';
 import type { Entity, GameCommand, WorldEvent, WorldSnapshot } from '../core/types';
@@ -84,6 +86,9 @@ const localEntities: readonly Entity[] = [
 
 interface Nearby { readonly id: string; readonly name: string }
 export interface AppSnapshot {
+  readonly firstPerson?: boolean;
+  readonly shotgunAmmo?: number;
+  readonly shotgunReloading?: boolean;
   readonly pauseOpen: boolean;
   readonly helpOpen: boolean;
   readonly controlsHint: boolean;
@@ -194,6 +199,9 @@ export class GameApp {
   private unsubscribeSession: (() => void) | null = null;
   private previous: WorldSnapshot | null = null;
   private current: WorldSnapshot | null = null;
+  private localShotgun: ShotgunSimulation | null = null;
+  private shotgunState: ShotgunState | null = null;
+  private thirdPitch = .5;
   private camera: CameraView = { yaw: 0, pitch: 0.7, distance: 15 };
   private host: HTMLElement | null = null;
   private observer: ResizeObserver | null = null;
@@ -226,13 +234,54 @@ export class GameApp {
       mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null,
       performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
+      firstPerson:false, shotgunAmmo:6, shotgunReloading:false,
       carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: this.audio.volume, graphicsQuality: this.graphicsQuality, audioStats: this.audioDiagnostics(),
     });
   }
 
   private presentCamera(): void {
-    const courtyard = this.snapshot.region === 'Двор Вавилонской башни';
+    const courtyard = !this.camera.firstPerson && this.snapshot.region === 'Двор Вавилонской башни';
     this.renderer?.setCamera(courtyard ? { ...this.camera, distance: this.camera.distance + 9, focusHeight: 4.5, fieldOfView: 60 } : this.camera);
+  }
+
+  private toggleView(): void {
+    const firstPerson=!this.camera.firstPerson;
+    if(firstPerson)this.thirdPitch=this.camera.pitch;
+    this.camera={...this.camera,firstPerson,pitch:firstPerson?0:this.thirdPitch};
+    this.patch({firstPerson});this.presentCamera();
+  }
+  private acceptShotgun(state: ShotgunState): void {
+    if(this.shotgunState?.sceneId===state.sceneId && state.revision<this.shotgunState.revision)return;
+    this.shotgunState=state;
+    const id=this.session?.playerId;if(!id)return;
+    this.renderer?.setShotgun?.(state,id);
+    const weapon=state.weapons.find(w=>w.playerId===id);
+    const ammo=weapon?.ammo ?? 6,reloading=!!weapon?.reloadLeft;
+    if(ammo!==this.snapshot.shotgunAmmo || reloading!==this.snapshot.shotgunReloading)this.patch({shotgunAmmo:ammo,shotgunReloading:reloading});
+  }
+  private weaponAction(action: 'fire'|'reload'): void {
+    if(!this.canControl())return;
+    const aim=this.renderer?.shotgunAim?.();
+    const yaw=aim?.yaw ?? Math.atan2(Math.sin(this.camera.yaw),Math.cos(this.camera.yaw));
+    const pitch=aim?.pitch ?? this.camera.pitch;
+    if(this.session instanceof OnlineSession)this.session.shotgun(action,yaw,pitch);
+    else {
+      const player=this.current?.entities.find(e=>e.id===this.session?.playerId);
+      if(player?.transform && this.localShotgun) {this.localShotgun.act(player.id,player.transform.position,action,yaw,pitch);this.acceptShotgun(this.localShotgun.snapshot());}
+    }
+  }
+  private updateLocalShotgun(delta: number): void {
+    if(this.session instanceof OnlineSession)return;
+    const player=this.current?.entities.find(e=>e.id===this.session?.playerId);if(!player?.transform || !this.snapshot.worldReady)return;
+    if(!this.localShotgun) {
+      const origin=player.transform.position;
+      const height=(x:number,z:number)=>surfaceHeight(this.world?.manifest?.heightSurfaces,x,z);
+      const positions: {x:number;y:number;z:number}[]=[];
+      for(let i=0;i<12&&positions.length<9;i++) {const angle=i*Math.PI/6,x=origin.x+Math.sin(angle)*4,z=origin.z-Math.cos(angle)*4;const p={x,y:height(x,z),z};if(!this.world||this.world.canWalk(p))positions.push(p);}
+      this.localShotgun=new ShotgunSimulation('local-shotgun',this.config.mapId,positions,{height,clear:(a,b)=>this.world?.canTraverse(a,b)??true,rayClear:(a,b)=>this.world?.canTraverse(a,b)??true});
+      this.localShotgun.addPlayer(player.id);
+    }
+    this.localShotgun.step(delta);this.acceptShotgun(this.localShotgun.snapshot());
   }
 
   setBuildingSymbols(visible: boolean): void { this.renderer?.setBuildingSymbols(visible); this.patch({ buildingSymbols: visible }); }
@@ -331,6 +380,9 @@ export class GameApp {
           shortcut: code => this.handleShortcut(code),
           controlsHint: visible => this.patch({ controlsHint: visible }),
           carry: () => this.carry(),
+          toggleView: () => this.toggleView(),
+          fire: () => this.weaponAction('fire'),
+          reload: () => this.weaponAction('reload'),
           menu: () => this.toggleMenu(),
           captured: () => {
             if (this.session instanceof MarketSession) this.session.beginTour();
@@ -344,10 +396,11 @@ export class GameApp {
           },
           captureFailed: (captureError) => this.patch({ capture: 'error', captureError }),
           look: (dx, dy) => {
-            this.camera = { ...this.camera, yaw: this.camera.yaw - dx * 0.004, pitch: Math.max(this.config.mapId === 'market' ? .15 : .5, Math.min(1.05, this.camera.pitch + dy * 0.003)) };
+            this.camera = { ...this.camera, yaw: this.camera.yaw - dx * 0.004, pitch: Math.max(this.camera.firstPerson ? -1.45 : this.config.mapId === 'market' ? .15 : .5, Math.min(this.camera.firstPerson ? 1.45 : 1.05, this.camera.pitch + dy * 0.003)) };
             this.presentCamera();
           },
           zoom: (delta) => {
+            if(this.camera.firstPerson)return;
             this.camera = { ...this.camera, distance: Math.max(3.5, Math.min(22, this.camera.distance + delta * 0.01)) };
             this.presentCamera();
           },
@@ -375,6 +428,7 @@ export class GameApp {
             if (this.session instanceof OnlineSession) this.session.setPreparedChunks(this.snapshot.entryStage === 'loading' ? [] : this.world?.preparedChunks ?? []);
             this.session?.update(delta);
             this.current = this.session?.getSnapshot() ?? null;
+            this.updateLocalShotgun(delta);
             if (!(this.session instanceof OnlineSession) && this.current) this.feedAudioMovement(this.current, 'live');
             if (this.previous && this.current) this.renderer?.syncWorld(this.previous, this.current, this.session?.playerId ?? null);
             this.updateHud();
@@ -484,7 +538,7 @@ export class GameApp {
     this.detach();
     this.releaseResources();
     this.camera = { yaw: 0, pitch: this.config.mapId === 'market' ? .5 : .7, distance: this.config.mapId === 'market' ? 18 : 15 };
-    this.patch({ screen, pauseOpen: false, mapOpen: false, mapPlayer: null, mapPeers: [], dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null, market: null, marketPanel: null, marketTarget: null });
+    this.patch({ screen, firstPerson:false, pauseOpen: false, mapOpen: false, mapPlayer: null, mapPeers: [], dialog: null, nearby: null, coordinates: '', capture: 'idle', captureError: null, worldReady: this.createMap === null, chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null, market: null, marketPanel: null, marketTarget: null });
     this.setState('idle');
     this.start(host);
   }
@@ -707,6 +761,8 @@ export class GameApp {
       this.setState('idle'); if (host) this.start(host);
     } else if (notice.type === 'world') {
       this.feedAudioMovement(notice.snapshot, notice.origin);
+    } else if (notice.type === 'shotgun') {
+      this.acceptShotgun(notice.state);
     } else if (notice.type === 'scene') {
       this.renderer?.setSceneState(notice.state);
     } else if (notice.type === 'carry') {
@@ -1186,6 +1242,8 @@ export class GameApp {
   }
 
   private releaseScene(): void {
+    this.localShotgun=null;this.shotgunState=null;
+    this.patch({shotgunAmmo:6,shotgunReloading:false,firstPerson:this.camera.firstPerson ?? false});
     this.audio?.dispose(); this.audio = null; this.audioPrevious = null;
     if (this.snapshot.debug) this.patch({ audioStats: this.audioDiagnostics() });
     this.loop?.dispose();

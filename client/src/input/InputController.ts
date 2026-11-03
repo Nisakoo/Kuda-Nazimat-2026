@@ -13,6 +13,9 @@ export interface InputActions {
   controlsHint?(visible: boolean): void;
   shortcut?(code: string): boolean;
   carry(): void;
+  toggleView?(): void;
+  fire?(): void;
+  reload?(): void;
   menu(): void;
   captured(): void;
   interrupted(): void;
@@ -196,6 +199,9 @@ export class InputController {
     document.addEventListener('mousemove', (event) => {
       if (this.hasCapture && this.actions.canControl()) this.actions.look(event.movementX, event.movementY);
     }, options);
+    document.addEventListener('mousedown', (event) => {
+      if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.altKey && !textEntry(event.target) && this.hasCapture && this.actions.canControl()) { event.preventDefault(); this.actions.fire?.(); }
+    }, options);
     this.target.addEventListener('contextmenu', (event) => event.preventDefault(), options);
     this.target.addEventListener('wheel', (event) => {
       if (!this.hasCapture || !this.actions.canControl()) return;
@@ -215,6 +221,11 @@ export class InputController {
     if (movementKeys.has(event.code)) { event.preventDefault(); this.keys.add(event.code); this.dirty = true; }
     if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') { event.preventDefault(); this.keys.add(event.code); this.dirty = true; }
     if (event.code === 'Space') { event.preventDefault(); if (!event.repeat && !this.keys.has('Space')) this.actions.jump(); this.keys.add('Space'); this.dirty = true; }
+    if (event.code === 'KeyV' || event.code === 'KeyR') {
+      event.preventDefault();
+      if (!event.repeat && !this.keys.has(event.code)) { if (event.code === 'KeyV') this.actions.toggleView?.(); else this.actions.reload?.(); }
+      this.keys.add(event.code);
+    }
     if (event.code === 'KeyE' && !event.repeat) { event.preventDefault(); this.actions.interact(); }
     if (event.code === 'KeyF') {
       event.preventDefault();

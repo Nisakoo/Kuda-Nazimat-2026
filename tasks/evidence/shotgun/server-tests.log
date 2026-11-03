@@ -1,0 +1,279 @@
+npm --prefix server test
+
+> educational-world-server@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /Users/nisakoo/Documents/competition-2026
+
+ ❯ server/test/llm-diagnostic.test.ts (39 tests | 12 failed) 568ms
+     × refuses an occupied game port before constructing or starting a responder 10ms
+     × refuses an occupied native port before constructing or starting a responder 5ms
+     × refuses invalid adapter/config with a fixed error ({"npc":{"adapter":"mlx","options":{}}}) 4ms
+     × refuses invalid adapter/config with a fixed error ({"npc":{"adapter":"scripted","options":{}}}) 5ms
+     × refuses invalid adapter/config with a fixed error ({"npc":{"adapter":"ollama","options":{"port":"secret-path"}}}) 5ms
+     × validates the trusted fabric profile (missing) 4ms
+     × validates the trusted fabric profile (invalid) 4ms
+     × asks exactly once with the existing profile, empty history and a separate 30s deadline even with 60s game config; stops and leaves config unchanged 5ms
+     × stops after startup failure and masks factory validation details 14ms
+     × does not start when already cancelled 3ms
+     × contains a real asynchronous Writable EPIPE during starting in a fake-only Node fixture 112ms
+     × contains a real asynchronous Writable EPIPE during answering in a fake-only Node fixture 119ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > refuses an occupied game port before constructing or starting a responder
+AssertionError: expected [ { event: 'selection', …(3) }, …(1) ] to deeply equal [ { event: 'failure', …(1) } ]
+
+- Expected
++ Received
+
+  [
+    {
++     "backend": "ollama",
++     "event": "selection",
++     "model": "2b",
++     "timeoutMs": 8000,
++   },
++   {
+      "code": "game_port_unavailable",
+      "event": "failure",
+    },
+  ]
+
+ ❯ server/test/llm-diagnostic.test.ts:121:24
+    119|     await new Promise<void>((yes, no) => { occupied.once('error', no);…
+    120|     expect(await runDiagnostic({ ...h, configPath: f.configPath })).to…
+    121|     expect(h.events()).toEqual([{ event: 'failure', code: 'game_port_u…
+       |                        ^
+    122|     expect(h.factory).not.toHaveBeenCalled();
+    123|     expect(h.responder.start).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > refuses an occupied native port before constructing or starting a responder
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ server/test/llm-diagnostic.test.ts:131:69
+    129|     const occupied = createServer(); servers.push(occupied);
+    130|     await new Promise<void>((yes, no) => { occupied.once('error', no);…
+    131|     expect(await runDiagnostic({ ...h, configPath: f.configPath })).to…
+       |                                                                     ^
+    132|     expect(h.events()).toEqual([{ event: 'failure', code: 'native_port…
+    133|     expect(h.factory).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > refuses invalid adapter/config with a fixed error ({"npc":{"adapter":"mlx","options":{}}})
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > refuses invalid adapter/config with a fixed error ({"npc":{"adapter":"scripted","options":{}}})
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > refuses invalid adapter/config with a fixed error ({"npc":{"adapter":"ollama","options":{"port":"secret-path"}}})
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ server/test/llm-diagnostic.test.ts:145:69
+    143|   ])('refuses invalid adapter/config with a fixed error (%j)', async (…
+    144|     const f = await fixture(overrides); const h = harness();
+    145|     expect(await runDiagnostic({ ...h, configPath: f.configPath })).to…
+       |                                                                     ^
+    146|     expect(h.events()).toEqual([{ event: 'failure', code }]);
+    147|     expect(h.factory).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > validates the trusted fabric profile (missing)
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > validates the trusted fabric profile (invalid)
+AssertionError: expected [ { event: 'selection', …(3) }, …(1) ] to deeply equal [ { event: 'failure', …(1) } ]
+
+- Expected
++ Received
+
+  [
+    {
++     "backend": "ollama",
++     "event": "selection",
++     "model": "2b",
++     "timeoutMs": 30000,
++   },
++   {
+      "code": "content_invalid",
+      "event": "failure",
+    },
+  ]
+
+ ❯ server/test/llm-diagnostic.test.ts:170:24
+    168|     await writeFile(f.configPath, JSON.stringify({ port: f.gamePort, c…
+    169|     expect(await runDiagnostic({ ...h, configPath: f.configPath })).to…
+    170|     expect(h.events()).toEqual([{ event: 'failure', code: 'content_inv…
+       |                        ^
+    171|     expect(h.factory).not.toHaveBeenCalled();
+    172|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > asks exactly once with the existing profile, empty history and a separate 30s deadline even with 60s game config; stops and leaves config unchanged
+AssertionError: expected { …(12) } to deeply equal { port: 54322 }
+
+- Expected
++ Received
+
+  {
+-   "port": 54322,
++   "executable": "/Users/nisakoo/kuda-llm/tools/ollama-0.40.13/ollama",
++   "model": "qwen3.5:2b-q4_K_M",
++   "modelDigest": "1e2d21a4f03ab9e4a9c1976a4b7e88f21de61d65f2c5485d8fde8942be73f1e7",
++   "modelsDir": "/Users/nisakoo/kuda-llm/models",
++   "numGpu": 99,
++   "port": 11501,
++   "python": "/Users/nisakoo/kuda-llm/venv/bin/python3",
++   "runnerVersion": "0.40.13",
++   "startupTimeoutMs": 120000,
++   "threads": 2,
++   "tokenizerDir": "/Users/nisakoo/kuda-llm/tokenizer",
++   "tokenizerManifest": "/Users/nisakoo/kuda-llm/tokenizer-sha256.json",
+  }
+
+ ❯ server/test/llm-diagnostic.test.ts:190:41
+    188|     expect(Object.keys(request.npc).sort()).toEqual(['greeting', 'id',…
+    189|     expect(signal).toBeInstanceOf(AbortSignal);
+    190|     expect(h.factory.mock.calls[0]![0]).toEqual({ port: f.nativePort }…
+       |                                         ^
+    191|     expect(h.factory.mock.calls[0]![1].clock.now()).toBeGreaterThan(0);
+    192|     expect(h.responder.stop).toHaveBeenCalledTimes(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > stops after startup failure and masks factory validation details
+AssertionError: expected [ { event: 'selection', …(3) }, …(1) ] to deeply equal [ { event: 'failure', …(1) } ]
+
+- Expected
++ Received
+
+  [
+    {
++     "backend": "ollama",
++     "event": "selection",
++     "model": "2b",
++     "timeoutMs": 8000,
++   },
++   {
+      "code": "config_invalid",
+      "event": "failure",
+    },
+  ]
+
+ ❯ server/test/llm-diagnostic.test.ts:233:28
+    231|     other.factory.mockImplementation(() => { throw new Error('private …
+    232|     expect(await runDiagnostic({ ...other, configPath: f.configPath })…
+    233|     expect(other.events()).toEqual([{ event: 'failure', code: 'config_…
+       |                            ^
+    234|     expect(other.lines.join()).not.toContain('private');
+    235|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > does not start when already cancelled
+AssertionError: expected [ { event: 'selection', …(3) }, …(1) ] to deeply equal [ { event: 'failure', …(1) } ]
+
+- Expected
++ Received
+
+  [
+    {
++     "backend": "ollama",
++     "event": "selection",
++     "model": "2b",
++     "timeoutMs": 8000,
++   },
++   {
+      "code": "aborted",
+      "event": "failure",
+    },
+  ]
+
+ ❯ server/test/llm-diagnostic.test.ts:242:24
+    240|     expect(await runDiagnostic({ ...h, configPath: f.configPath, signa…
+    241|     expect(h.factory).not.toHaveBeenCalled();
+    242|     expect(h.events()).toEqual([{ event: 'failure', code: 'aborted' }]…
+       |                        ^
+    243|   });
+    244|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > contains a real asynchronous Writable EPIPE during starting in a fake-only Node fixture
+AssertionError: expected { code: 1, starts: +0, …(5) } to deeply equal { code: 1, starts: 1, …(5) }
+
+- Expected
++ Received
+
+  {
+    "answers": 0,
+    "closeListeners": 0,
+    "code": 1,
+    "errorListeners": 0,
+-   "starts": 1,
+-   "stopFinished": true,
+-   "stops": 1,
++   "starts": 0,
++   "stopFinished": false,
++   "stops": 0,
+  }
+
+ ❯ server/test/llm-diagnostic.test.ts:430:32
+    428|     `;
+    429|     const output = execFileSync(process.execPath, ['--input-type=modul…
+    430|     expect(JSON.parse(output)).toEqual({ code: 1, starts: 1, answers: …
+       |                                ^
+    431|     expect(output).not.toContain('secret EPIPE fixture exception');
+    432|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  server/test/llm-diagnostic.test.ts > operator diagnostic (fake responders only; no models or worker processes) > contains a real asynchronous Writable EPIPE during answering in a fake-only Node fixture
+AssertionError: expected { code: 1, starts: +0, …(5) } to deeply equal { Object (code, starts, ...) }
+
+- Expected
++ Received
+
+  {
+-   "answers": 1,
++   "answers": 0,
+    "closeListeners": 0,
+    "code": 1,
+    "errorListeners": 0,
+-   "starts": 1,
+-   "stopFinished": true,
+-   "stops": 1,
++   "starts": 0,
++   "stopFinished": false,
++   "stops": 0,
+  }
+
+ ❯ server/test/llm-diagnostic.test.ts:430:32
+    428|     `;
+    429|     const output = execFileSync(process.execPath, ['--input-type=modul…
+    430|     expect(JSON.parse(output)).toEqual({ code: 1, starts: 1, answers: …
+       |                                ^
+    431|     expect(output).not.toContain('secret EPIPE fixture exception');
+    432|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+
+ Test Files  1 failed | 54 passed (55)
+      Tests  12 failed | 827 passed | 15 skipped (854)
+   Start at  19:33:14
+   Duration  28.08s (transform 3.24s, setup 0ms, import 9.25s, tests 112.39s, environment 11ms)
+
+make: *** [server-test] Error 1

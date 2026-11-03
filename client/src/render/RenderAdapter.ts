@@ -1,7 +1,7 @@
 import type { EntityId, Transform, WorldSnapshot } from '../core/types';
 import type { SceneStateMessage } from '../../../shared/world-life/types.ts';
 
-export interface CameraView { readonly yaw: number; readonly pitch: number; readonly distance: number; readonly focusHeight?: number; readonly fieldOfView?: number }
+export interface CameraView { readonly firstPerson?: boolean; readonly yaw: number; readonly pitch: number; readonly distance: number; readonly focusHeight?: number; readonly fieldOfView?: number }
 export interface VisualChunk {
   readonly id: string;
   readonly objects: readonly { readonly id: string; readonly assetId: string; readonly transform: Transform; readonly animation?: string }[];
@@ -25,6 +25,8 @@ export interface RenderAdapter {
   mount(container: HTMLElement): void;
   resize(width: number, height: number, pixelRatio: number): void;
   syncWorld(previous: WorldSnapshot, current: WorldSnapshot, playerId: EntityId | null): void;
+  shotgunAim?(): { readonly yaw: number; readonly pitch: number } | null;
+  setShotgun?(state: import('../../../shared/shotgun/types.ts').ShotgunState, playerId: string): void;
   setCamera(view: CameraView): void;
   setBuildingSymbols(visible: boolean): void;
   /** Validated, authoritative market scene. Null releases all world-life visuals and hand attachments. */

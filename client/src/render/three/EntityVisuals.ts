@@ -153,6 +153,7 @@ export class EntityVisuals {
     }
   }
 
+  setVisible(id: EntityId | null, visible: boolean): void { if(id) { const v=this.visuals.get(id); if(v) v.group.visible=visible; } }
   position(id: EntityId | null) { return id ? this.visuals.get(id)?.group.position : undefined; }
   dispose(): void { for (const id of this.visuals.keys()) this.remove(id); this.held.clear(); }
 

@@ -1,3 +1,4 @@
+import type { ShotgunAction, ShotgunState } from '../shotgun/types.ts';
 import type { Vector3 } from '../world/types.ts';
 
 export const WORLD_LIFE_VERSION = 1 as const;
@@ -53,7 +54,7 @@ export type HandRequest = { readonly v: 1; readonly type: 'hand'; readonly reque
   | { readonly action: 'place' }
 );
 export interface SceneSyncRequest { readonly v: 1; readonly type: 'scene-sync'; readonly requestId: string }
-export type WorldLifeClientMessage = HandRequest | SceneSyncRequest;
+export type WorldLifeClientMessage = HandRequest | SceneSyncRequest | ShotgunAction;
 export type HandErrorCode = 'INVALID' | 'VERSION' | 'UNAUTHORIZED' | 'NOT_READY' | 'FORBIDDEN' | 'NOT_FOUND' | 'TOO_FAR' | 'BLOCKED' | 'HANDS_FULL' | 'HANDS_EMPTY' | 'CONFLICT' | 'RATE_LIMIT' | 'UNAVAILABLE';
 export type HandResultMessage = { readonly v: 1; readonly type: 'hand-result'; readonly requestId: string } & (
   | { readonly ok: true; readonly action: 'pickup' | 'place'; readonly apple: AppleState }
@@ -73,4 +74,4 @@ export interface SceneStateMessage {
   readonly birds?: readonly BirdState[];
   readonly apples: readonly AppleState[];
 }
-export type WorldLifeServerMessage = SceneStateMessage | HandResultMessage;
+export type WorldLifeServerMessage = SceneStateMessage | HandResultMessage | ShotgunState;

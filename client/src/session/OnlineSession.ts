@@ -1,3 +1,4 @@
+import type { ShotgunState } from '../../../shared/shotgun/types.ts';
 import { GameWorld } from '../core/GameWorld';
 import type { Direction, GameCommand, Vector3, WorldEvent, WorldSnapshot } from '../core/types';
 import type { GameSession } from './GameSession';
@@ -21,6 +22,7 @@ export type OnlineNotice =
   | { readonly type: 'joined'; readonly world: WorldDescriptor }
   | { readonly type: 'chat'; readonly message: ChatMessage }
   | { readonly type: 'carry'; readonly state: CarryState }
+  | { readonly type: 'shotgun'; readonly state: ShotgunState }
   | { readonly type: 'scene'; readonly state: SceneStateMessage }
   | { readonly type: 'world'; readonly snapshot: WorldSnapshot; readonly origin: 'live' | 'snapshot' }
   | { readonly type: 'npc-partial'; readonly targetId: string; readonly requestId: string; readonly text: string }
@@ -169,8 +171,13 @@ export class OnlineSession implements GameSession {
     if (this.disposed || this.value.status !== 'connected') return;
     try { this.network.sendWorldLife({ v: 1, type: 'scene-sync', requestId: `${this.handPrefix}_${this.nextId()}` }); } catch { /* transport reports invalid packets */ }
   }
+  shotgun(action: 'fire'|'reload', yaw: number, pitch: number): void {
+    if (this.disposed || this.value.status!=='connected' || !this.id || this.resyncId) return;
+    this.network.sendWorldLife({v:1,type:'shotgun',requestId:`${this.handPrefix}_${this.nextId()}`,action,yaw,pitch});
+  }
   private readonly receiveWorldLife = (message: WorldLifeServerMessage): void => {
     if (this.disposed || this.value.status !== 'connected' || !this.id) return;
+    if (message.type === 'shotgun-state') { if(message.mapId===this.mapId) this.publish({type:'shotgun',state:message}); return; }
     if (message.type === 'scene-state') {
       if (message.definition.mapId !== this.mapId) return;
       if (this.scene?.sceneId === message.sceneId && (message.revision < this.scene.revision || message.serverTimeMs < this.scene.serverTimeMs)) return;

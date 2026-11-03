@@ -1,3 +1,4 @@
+import { SHOTGUN } from '../shotgun/types.ts';
 import type { Vector3 } from '../world/types.ts';
 import { WORLD_LIFE_LIMITS as L } from './types.ts';
 import type { AppleState, CatDefinition, HandErrorCode, HandResultMessage, ObjectInstance, SceneSchedule, WorldLifeClientMessage, WorldLifeDefinition, WorldLifeServerMessage } from './types.ts';
@@ -75,6 +76,7 @@ export function parseWorldLifeDefinition(raw: unknown, models?: Readonly<Record<
 }
 export function parseWorldLifeClientMessage(raw: unknown): WorldLifeClientMessage {
   const o = packet(raw); const requestId = id(o.requestId);
+  if (o.type === 'shotgun') { keys(o,['v','type','requestId','action','yaw','pitch']); return {v:1,type:'shotgun',requestId,action:choice(o.action,['fire','reload']),yaw:num(o.yaw,-Math.PI,Math.PI),pitch:num(o.pitch,-1.5,1.5)}; }
   if (o.type === 'scene-sync') { keys(o, ['v','type','requestId']); return { v: 1, type: 'scene-sync', requestId }; }
   if (o.type !== 'hand') fail();
   if (o.action === 'pickup') { keys(o, ['v','type','requestId','action','targetId']); return { v: 1, type: 'hand', requestId, action: 'pickup', targetId: id(o.targetId) }; }
@@ -89,6 +91,14 @@ export function parseAppleState(raw: unknown): AppleState {
 const CODES: readonly HandErrorCode[] = ['INVALID','VERSION','UNAUTHORIZED','NOT_READY','FORBIDDEN','NOT_FOUND','TOO_FAR','BLOCKED','HANDS_FULL','HANDS_EMPTY','CONFLICT','RATE_LIMIT','UNAVAILABLE'];
 export function parseWorldLifeServerMessage(raw: unknown): WorldLifeServerMessage {
   const o = packet(raw);
+  if (o.type === 'shotgun-state') {
+    keys(o,['v','type','sceneId','mapId','revision','props','weapons','shots']);
+    const props=arr(o.props,SHOTGUN.maxProps,v=>{const p=obj(v);keys(p,['id','kind','position','rotation']);return {id:id(p.id),kind:choice(p.kind,['crate','barrel','jar']),position:vector(p.position),rotation:num(p.rotation)};});
+    const weapons=arr(o.weapons,4,v=>{const w=obj(v);keys(w,['playerId','ammo','reloadLeft','shotId']);return {playerId:id(w.playerId),ammo:integer(w.ammo,0,6),reloadLeft:num(w.reloadLeft,0,2.4),shotId:integer(w.shotId)};});
+    const shots=arr(o.shots,SHOTGUN.maxShots,v=>{const s=obj(v);keys(s,['id','playerId','origin','yaw','pitch']);return {id:integer(s.id,1),playerId:id(s.playerId),origin:vector(s.origin),yaw:num(s.yaw,-Math.PI,Math.PI),pitch:num(s.pitch,-1.5,1.5)};});
+    unique(props,p=>p.id);unique(weapons,w=>w.playerId);unique(shots,s=>String(s.id));
+    return {v:1,type:'shotgun-state',sceneId:id(o.sceneId),mapId:id(o.mapId),revision:integer(o.revision),props,weapons,shots};
+  }
   if (o.type === 'hand-result') {
     const requestId = id(o.requestId);
     if (o.ok === true) {
