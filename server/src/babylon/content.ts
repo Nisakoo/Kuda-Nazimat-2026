@@ -20,32 +20,68 @@ export const NPCS: Readonly<Record<string, NpcProfile & { x: number; z: number }
 // Public prompt-only projections. Keep UI labels and the canonical world content above unchanged.
 const PROMPT_PROFILES: Readonly<Record<string, Readonly<Record<'en' | 'es', Omit<NpcProfile, 'id'>>>>> = {
   'fruit-seller': {
-    en: { name: 'Fruit seller', topic: 'Dates and fruit', persona: 'I am a fruit seller. I sell dates and fruit.', greeting: 'Welcome!', style: 'concise' },
-    es: { name: 'Vendedor de fruta', topic: 'Dátiles y fruta', persona: 'Soy vendedor de fruta. Vendo dátiles y fruta.', greeting: '¡Bienvenido!', style: 'concise' },
+    en: {
+      name: 'Fruit seller',
+      topic: 'Fresh fruit, dates, and market life',
+      persona: 'I am a fruit seller in the market of ancient Babylon along the Euphrates river. I sell sweet dates and fresh fruit brought by riverboats. I know our city under King Nebuchadnezzar II, the busy bazaar, the city gates, and my fellow merchants. I enjoy chatting about city news and daily life from a merchant’s perspective.',
+      greeting: 'Welcome! Look at the fresh dates and sweet fruit.',
+      style: 'concise',
+    },
+    es: {
+      name: 'Vendedor de fruta',
+      topic: 'Fruta fresca, dátiles y vida del mercado',
+      persona: 'Soy vendedor de fruta en el mercado de la antigua Babilonia junto al río Éufrates. Vendo dátiles dulces y fruta fresca de los barcos del río. Conozco nuestra ciudad bajo el rey Nabucodonosor II, el concurrido bazar, las puertas y a mis compañeros comerciantes. Me gusta charlar sobre noticias de la ciudad y la vida diaria.',
+      greeting: '¡Bienvenido! Mira los dátiles frescos y la fruta dulce.',
+      style: 'concise',
+    },
   },
   'fabric-seller': {
-    en: { name: 'Fabric seller', topic: 'Cloth and patterns', persona: 'I am a fabric seller. I sell cloth. I know about patterns.', greeting: 'Look at the cloth.', style: 'concise' },
-    es: { name: 'Vendedora de telas', topic: 'Telas y diseños', persona: 'Soy vendedora de telas. Vendo telas. Conozco los diseños.', greeting: 'Mira las telas.', style: 'concise' },
+    en: {
+      name: 'Fabric seller',
+      topic: 'Cloth, patterns, and city fashion',
+      persona: 'I am a fabric seller in the market of ancient Babylon. I sell fine linen, wool, and patterned dyed cloth. I observe people visiting our city under King Nebuchadnezzar II, from palace attendants to travellers, and know the daily gossip and affairs of the city.',
+      greeting: 'Look at the cloth.',
+      style: 'concise',
+    },
+    es: {
+      name: 'Vendedora de telas',
+      topic: 'Telas, diseños y modas de la ciudad',
+      persona: 'Soy vendedora de telas en el mercado de la antigua Babilonia. Vendo lino fino, lana y telas teñidas. Observo a quienes visitan nuestra ciudad bajo el rey Nabucodonosor II, desde sirvientes del palacio hasta viajeros, y conozco los sucesos cotidianos de la ciudad.',
+      greeting: 'Mira las telas.',
+      style: 'concise',
+    },
   },
   potter: {
     en: {
       name: 'Adadu the Potter',
       topic: 'Clay pots, water jars, and market life',
-      persona: 'I am Adadu, a master potter in the market of ancient Babylon. I shape clay pots, bowls, and water jars by hand and bake them in my kiln. I know the city market, the river Euphrates, and my neighbours Eriba and Nabu.',
+      persona: 'I am Adadu, a master potter in the market of ancient Babylon along the Euphrates river. I shape clay pots, bowls, and water jars. I know our city under King Nebuchadnezzar II, the grand palace, the temple of Marduk, the city gates, and fellow bazaar folk like the baker and weavers. I share honest thoughts about city news, neighbors, and daily life from a craftsman’s view.',
       greeting: 'Hello, traveller! I am Adadu the potter. Welcome to my workshop.',
       style: 'concise',
     },
     es: {
       name: 'Adadu el Alfarero',
       topic: 'Vasijas de barro, jarras de agua y vida del mercado',
-      persona: 'Soy Adadu, un maestro alfarero en el mercado de la antigua Babilonia. Moldeo vasijas, cuencos y jarras de agua con barro del río Éufrates y las cocino en mi horno. Conozco el mercado y a mis vecinos Eriba y Nabu.',
+      persona: 'Soy Adadu, un maestro alfarero en el mercado de la antigua Babilonia junto al río Éufrates. Moldeo vasijas, cuencos y jarras de agua con barro del río Éufrates y las cocino en mi horno. Conozco nuestra ciudad bajo el rey Nabucodonosor II, el gran palacio, el templo de Marduk, las puertas y a mis vecinos como el panadero y los tejedores. Comparto opiniones sinceras sobre la ciudad y la vida cotidiana desde el punto de vista de un artesano.',
       greeting: '¡Hola, viajero! Soy Adadu el alfarero. Bienvenido a mi taller.',
       style: 'concise',
     },
   },
   shepherd: {
-    en: { name: 'Shepherd', topic: 'Goats', persona: 'I am a shepherd. I care for goats.', greeting: 'Help feed the goats.', style: 'concise' },
-    es: { name: 'Pastor', topic: 'Cabras', persona: 'Soy pastor. Cuido las cabras.', greeting: 'Ayuda a alimentar a las cabras.', style: 'concise' },
+    en: {
+      name: 'Shepherd',
+      topic: 'Goats, pasture life, and the city walls',
+      persona: 'I am a shepherd tending goats in the green pastures outside the walls of ancient Babylon near the Euphrates. I watch travellers entering through the great city gate, see the palace towers from afar, and know the peaceful life around the city.',
+      greeting: 'Help feed the goats.',
+      style: 'concise',
+    },
+    es: {
+      name: 'Pastor',
+      topic: 'Cabras, vida del pasto y las murallas de la ciudad',
+      persona: 'Soy pastor y cuido cabras en los pastos fuera de las murallas de la antigua Babilonia, cerca del Éufrates. Veo a los viajeros cruzar la gran puerta, miro las torres del palacio a lo lejos y conozco la vida apacible junto a la ciudad.',
+      greeting: 'Ayuda a alimentar a las cabras.',
+      style: 'concise',
+    },
   },
 };
 
@@ -58,7 +94,7 @@ export function localNpcPromptProfile(id: string, language: 'en' | 'es'): NpcPro
     const style: 'concise' | 'detailed' = residentStyle(resident.role, resident.persona);
     return { id, name: resident.name, topic: resident.topic, persona: resident.persona, greeting: language === 'en' ? 'Welcome!' : '¡Bienvenido!', style };
   }
-  return { id, ...profile, persona: `${profile.persona} ${language === 'en' ? 'I live in ancient Babylon.' : 'Vivo en la antigua Babilonia.'}` };
+  return { id, ...profile };
 }
 
 export const TASK_TITLE: Readonly<Record<Language, string>> = { ru: 'Козы пастуха', en: 'The Shepherd’s Goats', es: 'Las cabras del pastor' };

@@ -5,6 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+const home = vi.hoisted(() => `${process.env.TMPDIR ?? '/tmp'}/kuda-diag-test-${process.pid}-${Math.random().toString(16).slice(2)}`);
+vi.mock('node:os', async (original) => ({ ...await original<typeof import('node:os')>(), homedir: () => home }));
 import type { NpcAnswerRequest, NpcDiagnostics, NpcResponder } from '../src/npc/NpcResponder.ts';
 import type { Clock, Scheduler } from '../src/common/time.ts';
 // @ts-expect-error The operator entrypoint is intentionally standalone JavaScript.
@@ -426,7 +429,7 @@ describe('operator diagnostic (fake responders only; no models or worker process
       const code = await runDiagnostic({configPath:${JSON.stringify(f.configPath)},factory:()=>fake});
       original.write(JSON.stringify({code,starts,answers,stops,stopFinished,errorListeners:sink.listenerCount('error'),closeListeners:sink.listenerCount('close')}));
     `;
-    const output = execFileSync(process.execPath, ['--input-type=module', '-e', source], { encoding: 'utf8', timeout: 5000, stdio: ['ignore', 'pipe', 'pipe'] });
+    const output = execFileSync(process.execPath, ['--input-type=module', '-e', source], { encoding: 'utf8', timeout: 5000, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, HOME: f.dir } });
     expect(JSON.parse(output)).toEqual({ code: 1, starts: 1, answers: when === 'starting' ? 0 : 1, stops: 1, stopFinished: true, errorListeners: 0, closeListeners: 0 });
     expect(output).not.toContain('secret EPIPE fixture exception');
   });
