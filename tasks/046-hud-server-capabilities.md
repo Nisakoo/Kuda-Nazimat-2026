@@ -34,4 +34,6 @@ related:
 - Фонтан/ворота на карте отсутствуют в world. Не создавать фальшивую цель и не менять несвязанные world features.
 
 ## Результат
-HUD-013 backend дополнен обязательным `partyPositions:[{id,name,x,z}]` в shared BABEL state, строгой валидацией membership/уникальности/границ/полей и runtime-портом активных позиций. `BabylonDeps.peerLocation?(playerId)` связан через `GameRuntime.playerLocation?` с `GameService.playerLocation`, который читает только живой World actor без DB/account fallback. Проверки privacy/schema/bounds и настоящий HTTP outside-AOI сценарий добавлены в server tests. Фактические команды и результаты — [evidence/task-046-party-positions.md](evidence/task-046-party-positions.md). Client integration/browser/full suite остаются основному агенту.
+HUD-013 backend дополнен обязательным `partyPositions:[{id,name,x,z}]` в shared BABEL state, строгой валидацией membership/уникальности/границ/полей и runtime-портом активных позиций. `BabylonDeps.peerLocation?(playerId)` связан через `GameRuntime.playerLocation?` с `GameService.playerLocation`, который читает только живой World actor без DB/account fallback. Проверки privacy/schema/bounds и настоящий HTTP outside-AOI сценарий добавлены в server tests. Фактические команды и результаты — evidence/task-046-party-positions.md (артефакт удалён). Client integration/browser/full suite остаются основному агенту.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

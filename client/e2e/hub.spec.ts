@@ -1,3 +1,4 @@
+import { testArtifactsRoot } from '../playwright.settings';
 import { expect, test, type Page, type APIRequestContext } from '@playwright/test';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
@@ -10,7 +11,7 @@ import { expectCapture, finishLoading, joinFromHub, createFromHub, storedTool } 
 let directory: string, origin: string, targetOrigin: string;
 const children: ChildProcess[] = [];
 if (process.env.HUB_CAPTURE === 'off') test.use({ screenshot: 'off', trace: 'off', video: 'off' });
-const evidence = resolve(process.env.UI_EVIDENCE_DIR ?? '../tasks/evidence/hub-2026-11-01');
+const evidence = resolve(process.env.UI_EVIDENCE_DIR ?? join(testArtifactsRoot, 'hub'));
 test.beforeAll(async () => {
   directory = await mkdtemp(join(tmpdir(), 'ui-hud-real-'));
   await mkdir(evidence, { recursive: true });

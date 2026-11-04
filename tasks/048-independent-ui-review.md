@@ -18,7 +18,7 @@ related:
 
 ## Остановка и передача Astra
 
-По указанию пользователя реализация/review/checks остановлены. Разрешён partial handoff commit/push только `impl/client-auth-hud-669eb5`; это не приёмка. [Передача](evidence/ui-independent-review/SHUTDOWN-HANDOFF.md) фиксирует завершённые CPU проверки, прекращённые ресурсы, сохранённый correction report и sanitizer. Сохранённый reviewer report подтверждает R-01–05; открывает R-08/P2 (Spanish HUD390 overlap), R-09/P2 (chat-seeded перевод стирается), V-01b/P3 и cloth dots/P3. Полные corrected browser47/render8 не выполнены; reviewer остановлен до финального ответа/release. Исторические checkbox ниже отражают исходный план, не объявляют дальнейшее выполнение этим исполнителем.
+По указанию пользователя реализация/review/checks остановлены. Разрешён partial handoff commit/push только `impl/client-auth-hud-669eb5`; это не приёмка. Передача (артефакт удалён) фиксирует завершённые CPU проверки, прекращённые ресурсы, сохранённый correction report и sanitizer. Сохранённый reviewer report подтверждает R-01–05; открывает R-08/P2 (Spanish HUD390 overlap), R-09/P2 (chat-seeded перевод стирается), V-01b/P3 и cloth dots/P3. Полные corrected browser47/render8 не выполнены; reviewer остановлен до финального ответа/release. Исторические checkbox ниже отражают исходный план, не объявляют дальнейшее выполнение этим исполнителем.
 
 ## Цель и изменения требований
 По дополнительному поручению пользователя partial push4587fa1 не закрывает работу. После реализации независимый reviewer читает спецификации и все11 референсов, сравнивает реальные экраны и проверяет поведение. Новые игровые правила не вводятся; противоречия не решаются скрыто.
@@ -80,3 +80,5 @@ related:
 - Independent reviewer получил exclusive GPU GO после закрытия portrait browser. Все source/public/build/server заморожены до его release. Повторная actual verification R-01–07/V-01/V-03/V-04/chooser/cloth dots выполняется. Main работает только с docs/CPU read-only audit.
 - Старые browser47=15pass/32fail и render8=4pass/4fail пока не заменены новым canonical запуском и остаются обязательными failures. Shadow A/B не доказал причину cloth dots; speculative bias не опубликован. Hardware/LAN/Wi-Fi-off/real-LLM/all-pose tools не проверены.
 - Полная приёмка не заявляется.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

@@ -44,17 +44,19 @@ related:
 
 | Проверка | Результат |
 | --- | --- |
-| `make client-test` | 470 passed / 1 ошибка окружения Node 25 (`localStorage.removeItem is not a function`) — [полный лог](evidence/city-repair/client-full.log) |
-| `vitest run src/app/GameApp.test.ts` на Node 24 | 46/46 passed, включая единственный упавший сценарий; повторён только затронутый файл — [лог](evidence/city-repair/client-node24-recheck.log) |
-| `PATH=…node24…:$PATH VITEST_MAX_WORKERS=2 make server-test` | 709 passed, 15 skipped, 48 файлов, 39.74 с — [лог](evidence/city-repair/server-full.log). Skipped не засчитаны как пройденные. Первоначальный sandbox-прогон остановлен из-за `EPERM listen 127.0.0.1`; итоговый выполнен с разрешёнными локальными портами |
-| Svelte, TypeScript, Core и импорты клиента | Без ошибок; Svelte 0 warnings — [проверки](evidence/city-repair/client-check.log), [итоговые типы](evidence/city-repair/client-final-types.log) |
-| `npm --prefix server run check` | Типы server/shared и импорты пройдены — [лог](evidence/city-repair/server-check.log) |
-| `vite build` | Успешно; предупреждение о JS-чанке >500 kB сохраняется — [лог](evidence/city-repair/build.log) |
-| `HUB_CAPTURE=off PLAYWRIGHT_CHANNEL=chrome playwright test --config playwright.hub.config.ts hub.spec.ts --grep 'waiting groups'` на Node 24 | 2/2 passed, 11.2 с: создание обоих режимов при других группах, выбор нужной группы и продолжение своей — [лог](evidence/city-repair/entry-browser.log) |
+| `make client-test` | 470 passed / 1 ошибка окружения Node 25 (`localStorage.removeItem is not a function`) — полный лог (артефакт удалён) |
+| `vitest run src/app/GameApp.test.ts` на Node 24 | 46/46 passed, включая единственный упавший сценарий; повторён только затронутый файл — лог (артефакт удалён) |
+| `PATH=…node24…:$PATH VITEST_MAX_WORKERS=2 make server-test` | 709 passed, 15 skipped, 48 файлов, 39.74 с — лог (артефакт удалён). Skipped не засчитаны как пройденные. Первоначальный sandbox-прогон остановлен из-за `EPERM listen 127.0.0.1`; итоговый выполнен с разрешёнными локальными портами |
+| Svelte, TypeScript, Core и импорты клиента | Без ошибок; Svelte 0 warnings — проверки (артефакт удалён), итоговые типы (артефакт удалён) |
+| `npm --prefix server run check` | Типы server/shared и импорты пройдены — лог (артефакт удалён) |
+| `vite build` | Успешно; предупреждение о JS-чанке >500 kB сохраняется — лог (артефакт удалён) |
+| `HUB_CAPTURE=off PLAYWRIGHT_CHANNEL=chrome playwright test --config playwright.hub.config.ts hub.spec.ts --grep 'waiting groups'` на Node 24 | 2/2 passed, 11.2 с: создание обоих режимов при других группах, выбор нужной группы и продолжение своей — лог (артефакт удалён) |
 | `git diff --check` | Без ошибок |
 
 Сервер и клиент используют обновлённый контракт списка групп и обновляются вместе. Проверки используют отдельные временные БД; пользовательские группы и сохранения не удалялись. В браузере screenshots/trace/video отключены.
 
-Дополнительные геометрические проверки: `node --test client/scripts/collision-raster.test.mjs client/scripts/city-collisions.test.mjs client/scripts/city-boat.test.mjs` — **13/13 passed**, около 0.5 с ([лог](evidence/city-repair/geometry.log)). Они проверяют тонкие стойки, точность округлых/повёрнутых контуров, пустоты, высотные балки/ткань, конечность координат лодки, её контур и семь внешних raycast. Полный серверный набор включает regression маршрута мула и тел верблюдов по реальным GLB, достижимость всех жителей, пастбище и ресурсный бюджет.
+Дополнительные геометрические проверки: `node --test client/scripts/collision-raster.test.mjs client/scripts/city-collisions.test.mjs client/scripts/city-boat.test.mjs` — **13/13 passed**, около 0.5 с (лог (артефакт удалён)). Они проверяют тонкие стойки, точность округлых/повёрнутых контуров, пустоты, высотные балки/ткань, конечность координат лодки, её контур и семь внешних raycast. Полный серверный набор включает regression маршрута мула и тел верблюдов по реальным GLB, достижимость всех жителей, пастбище и ресурсный бюджет.
 
-Резервирование с активными моделями сцены, четырьмя аватарами и звуком: **101 638 464 / 134 217 728 байт**, 16 чанков; максимум 118 высотных объёмов при пределе 128 на чанк — [расчёт](evidence/city-repair/budget.json). Это оценка резервирования ресурсов, а не измерение RSS/GPU или FPS на целевом оборудовании. Новых снимков: **0**.
+Резервирование с активными моделями сцены, четырьмя аватарами и звуком: **101 638 464 / 134 217 728 байт**, 16 чанков; максимум 118 высотных объёмов при пределе 128 на чанк — расчёт (артефакт удалён). Это оценка резервирования ресурсов, а не измерение RSS/GPU или FPS на целевом оборудовании. Новых снимков: **0**.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

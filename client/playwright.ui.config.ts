@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { testArtifactsRoot } from './playwright.settings';
 import { defineConfig } from '@playwright/test';
 import base from './playwright.config';
 
@@ -6,5 +8,5 @@ export default defineConfig({
   ...base,
   testMatch: 'ui-hud.spec.ts',
   webServer: [],
-  outputDir: 'test-results/ui-hud',
+  outputDir: join(testArtifactsRoot, 'ui-hud'),
 });

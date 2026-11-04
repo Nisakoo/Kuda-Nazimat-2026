@@ -2,7 +2,7 @@
 id: client-render-frame-pacing
 type: module-design
 status: ready
-implementation: not-started
+implementation: complete
 parent: architecture
 summary: Уменьшение измеренных пиков CPU и загрузки, с условной адаптацией разрешения при перегрузке GPU.
 related:

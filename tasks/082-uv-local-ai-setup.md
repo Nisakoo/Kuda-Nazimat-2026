@@ -46,11 +46,13 @@ Worktree `/private/tmp/competition-2026-uv-local-ai`, ветка `build/uv-local
 - `UV_CACHE_DIR=/private/tmp/competition-2026-uv-cache uv lock --project server/llm/envs/{backend}` — locks разрешены из PyPI. `make llm-lock-check` — PASS для обоих backend.
 - Реальные `prepare.mjs ollama --environment /private/tmp/competition-2026-uv-ollama` и `prepare.mjs mlx --environment /private/tmp/competition-2026-uv-mlx` — PASS. Повтор обоих с `--offline` — PASS; новый MLX env целиком из кеша — PASS. Пустой кеш с `--offline` — ожидаемый exit 1 с явной ошибкой недоступного пакета, без success.
 - Фактические пакеты: Ollama Transformers 4.57.6/Jinja2 3.1.6; MLX-LM 0.32.2, MLX/Metal 0.32.4, Transformers 5.22.1/Jinja2 3.1.6. Проверен `Runtime._check_api` на установленных MLX API без весов/inference — PASS.
-- `VITEST_MAX_WORKERS=2 KUDA_TEST_PYTHON=<uv python find 3.12> make server-test` — **687 passed / 46 files**, без skips; [лог](evidence/uv-setup/server-tests.txt).
-- `make llm-test` — **97 passed, 1 skipped** (98 scenarios): skip относится к Linux-only bound-port semantics, на macOS не считается проверенным; [лог](evidence/uv-setup/python-tests.txt). Новые 5 skill fixtures проходят без пакетов модели/сети/весов.
+- `VITEST_MAX_WORKERS=2 KUDA_TEST_PYTHON=<uv python find 3.12> make server-test` — **687 passed / 46 files**, без skips; лог (артефакт удалён).
+- `make llm-test` — **97 passed, 1 skipped** (98 scenarios): skip относится к Linux-only bound-port semantics, на macOS не считается проверенным; лог (артефакт удалён). Новые 5 skill fixtures проходят без пакетов модели/сети/весов.
 - `npm --prefix server run check` — PASS: TypeScript server/shared, 96 modules / 331 dependencies без нарушений.
 - `skill-creator/scripts/quick_validate.py .agents/skills/install-local-ai` — PASS с Python временного Ollama env (PyYAML из lock). Проверены локальные markdown-ссылки, `node --check` обоих mjs и `git diff --check`.
 
 Первый sandbox-прогон не принят: macOS блокировал loopback bind и системный API uv. Повтор разрешённых fixture-проверок вне sandbox прошёл. Первоначально server suite обнаружил отсутствующий generated world и указанные ошибки; после подготовки/исправлений выполнен полный успешный повтор.
 
 Загрузка весов, конвертация, реальный MLX/Ollama inference, качество/скорость/RAM и физическая offline/LAN-приёмка не входят в эту миграцию и **не проверены**. Установка и API-проверка библиотек не квалифицируют модель. Общая implementation-метка LLM-спеки остаётся partial.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

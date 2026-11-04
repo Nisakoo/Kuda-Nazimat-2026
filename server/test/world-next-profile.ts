@@ -57,7 +57,7 @@ try {
   }
   await new Promise<void>(done => setTimeout(done, durationMs));
   const report = { baseRevision: '09fd771', node: process.version, players: 4, durationMs, startupMs, backend: 'real generated world and temporary SQLite; explicit test LLM', steps, deltas, scenePackets, scenes: scenes.map(scene => ({ sceneId: scene.sceneId, epochMs: scene.epochMs, cats: scene.definition.cats.length, pots: scene.pots.length, apples: scene.apples.length })), errors, targetHardware: `${process.platform}/${process.arch}; browser GPU measured separately` };
-  await writeFile(process.env.PROFILE_OUTPUT ?? 'tasks/evidence/next-main-merge/server-four-player-profile.json', JSON.stringify(report, null, 2) + '\n');
+  await writeFile(process.env.PROFILE_OUTPUT ?? join(tmpdir(), 'competition-2026-server-four-player-profile.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
   if (errors.length || steps.length < 1 || deltas < 100 || scenes.length !== 4 || scenes.some(scene => scene.definition.cats.length !== 3 || scene.pots.length !== 4 || scene.apples.length !== 5) || new Set(scenes.map(scene => scene.sceneId)).size !== 1) throw new Error('Four-player profile failed');
 } finally { for (const timer of timers) clearInterval(timer); for (const socket of sockets) socket.disconnect(); await app.stop(); await rm(directory, { recursive: true, force: true }); }

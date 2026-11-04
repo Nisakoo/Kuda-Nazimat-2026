@@ -20,3 +20,6 @@ server/llm/envs/*/.venv/
 /node_modules/
 
 client/coverage/
+
+# Generated verification artifacts belong outside the checkout.
+/tasks/evidence/

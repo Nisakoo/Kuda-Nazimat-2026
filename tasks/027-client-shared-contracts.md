@@ -21,4 +21,6 @@ depends_on: []
 - [x] make client-test, check, check:imports, build и сценарии карты/сети в браузере.
 
 ## Результат
-Удалены дубли protocol/types, validate, fixtures; Core/map используют общие типы, HttpMapSource — парсеры, ChunkManager — общую проходимость. В shared изменён только профиль типов ESNext/Bundler. 136 unit-тестов, типы/imports/build и 5 браузерных сценариев проходят; 22 сравнения прежнего парсера с shared совпадают. [Evidence](evidence/backend-platform-data-2026-10-31.md).
+Удалены дубли protocol/types, validate, fixtures; Core/map используют общие типы, HttpMapSource — парсеры, ChunkManager — общую проходимость. В shared изменён только профиль типов ESNext/Bundler. 136 unit-тестов, типы/imports/build и 5 браузерных сценариев проходят; 22 сравнения прежнего парсера с shared совпадают. Evidence (артефакт удалён).
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

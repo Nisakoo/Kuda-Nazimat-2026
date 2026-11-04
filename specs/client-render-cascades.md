@@ -2,7 +2,7 @@
 id: client-render-cascades
 type: module-design
 status: ready
-implementation: not-started
+implementation: complete
 parent: architecture
 summary: Оценка качества и стоимости двух каскадов теней в высоком профиле после базовых оптимизаций.
 related:

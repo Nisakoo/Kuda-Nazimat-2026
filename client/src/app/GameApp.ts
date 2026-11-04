@@ -54,6 +54,7 @@ import { AuthError, requestAuthMode } from '../multiplayer/Auth';
 import type { AuthAction } from '../multiplayer/Auth';
 import { requestRuntimeConfig } from '../multiplayer/RuntimeConfig';
 import { FrameMetrics } from './FrameMetrics';
+import type { FrameRatePoint } from './FrameMetrics';
 import { WorldAudio } from '../audio/WorldAudio';
 import type { AudioOrigin } from '../audio/WorldAudio';
 import { babylonAudioChanges, babylonAudioHistory } from './audioPresentation';
@@ -147,6 +148,7 @@ export interface AppSnapshot {
   readonly marketPanel: MarketPanel | null;
   readonly marketTarget: string | null;
   readonly performance: string;
+  readonly fpsHistory: readonly FrameRatePoint[];
   readonly renderStats: string;
   readonly stamina: number;
   readonly sprintBlocked: boolean;
@@ -212,7 +214,7 @@ export class GameApp {
 
   constructor(
     public config: ClientConfig,
-    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false, this.config.mapId === 'market', this.graphicsQuality),
+    private readonly createRenderer: (assets: AssetManager) => RenderAdapter = (assets) => new ThreeRenderer(assets, false, this.config.mapId === 'market', this.graphicsQuality, this.worldBudget),
     private readonly createSession: () => GameSession = () => this.config.mapId === 'market' ? new MarketSession() : new LocalSession('local-player', localEntities),
     private readonly createMap: ((budget: WorldBudget) => MapSource) | null | undefined = undefined,
     private readonly createNetwork: (mock: boolean, url: string, clock: Clock) => NetworkAdapter = (mock, url, clock) => mock ? createMockDemo(clock) : new SocketIOAdapter(url, clock),
@@ -233,7 +235,7 @@ export class GameApp {
       authRequired: config.session === 'online', authPending: false, authError: null, authName: '', authChangeRequired: false, authRevision: 0,
       mapId: config.mapId, mode: config.session, settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
       chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null,
-      performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
+      performance: '', fpsHistory: [], renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
       firstPerson:false, shotgunAmmo:6, shotgunReloading:false,
       carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: this.audio.volume, graphicsQuality: this.graphicsQuality, audioStats: this.audioDiagnostics(),
     });
@@ -460,6 +462,7 @@ export class GameApp {
       window.addEventListener('resize', this.resize);
       this.setState('running');
       this.frameMetrics.reset(); this.lastMetrics = performance.now();
+      if (this.snapshot.fpsHistory.length) this.patch({ fpsHistory: [] });
       this.onVisibilityChange();
       this.loop?.start();
     } catch {
@@ -601,7 +604,7 @@ export class GameApp {
   setDebug(debug: boolean): void {
     this.frameMetrics.reset(); this.lastMetrics = performance.now();
     this.config = Object.freeze({ ...this.config, debug });
-    this.patch({ debug });
+    this.patch({ debug, fpsHistory: [] });
     this.updateHud(true);
   }
 
@@ -854,7 +857,7 @@ export class GameApp {
     if (now - this.lastMetrics < 1000) return;
     this.lastMetrics = now;
     const stats = this.frameMetrics.stats; const render = this.renderer?.getDiagnostics(); const budget = this.worldBudget.stats;
-    this.patch({ performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms · Цикл ${stats.loopFps.toFixed(1)} FPS · GPU-пропуски ${stats.skipped}`,
+    this.patch({ fpsHistory: this.frameMetrics.history, performance: `FPS ${stats.fps.toFixed(1)} · Кадр ${stats.frameMs.toFixed(1)} ms · P95 ${stats.p95.toFixed(1)} ms · CPU ${stats.renderMs.toFixed(1)} ms · Цикл ${stats.loopFps.toFixed(1)} FPS · GPU-пропуски ${stats.skipped}`,
       audioStats: this.audioDiagnostics(),
       renderStats: `Draw ${render?.drawCalls ?? 0} · Геометрии ${render?.geometries ?? 0} · Текстуры ${render?.textures ?? 0} · Ресурсы ${budget.resources} · Память ${budget.memory} / ${budget.memoryLimit} · Пик ${budget.peakBytes}` });
   }
@@ -1214,7 +1217,8 @@ export class GameApp {
   private readonly onEntryKey = (event: KeyboardEvent): void => { if (event.key === 'Escape') this.cancelEntryCapture(); };
 
   private readonly onVisibilityChange = (): void => {
-    this.frameMetrics.reset();
+    this.frameMetrics.reset(); this.lastMetrics = performance.now();
+    if (this.snapshot.fpsHistory.length) this.patch({ fpsHistory: [] });
     if (document.hidden) { this.input?.reset(); this.cancelEntryCapture(); }
     this.loop?.setSuspended(document.hidden);
   };
@@ -1242,6 +1246,8 @@ export class GameApp {
   }
 
   private releaseScene(): void {
+    this.frameMetrics.reset();
+    if (this.snapshot.fpsHistory.length) this.patch({ fpsHistory: [] });
     this.localShotgun=null;this.shotgunState=null;
     this.patch({shotgunAmmo:6,shotgunReloading:false,firstPerson:this.camera.firstPerson ?? false});
     this.audio?.dispose(); this.audio = null; this.audioPrevious = null;

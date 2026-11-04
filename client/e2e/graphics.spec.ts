@@ -59,10 +59,34 @@ test('GPU backpressure lowers reported FPS while loads, controls and submitted f
   const loop = Number(text.match(/Цикл ([\d.]+)/)![1]);
   const skips = Number(text.match(/GPU-пропуски (\d+)/)![1]);
   expect(fps).toBeGreaterThan(0); expect(fps).toBeLessThan(loop / 2); expect(skips).toBeGreaterThan(0);
+  const chart = page.getByRole('img', { name: 'График FPS за последние 60 секунд' });
+  await expect.poll(async () => Number(await chart.getAttribute('data-samples'))).toBeGreaterThan(0);
+  const plottedFps = Number(await chart.getAttribute('data-latest-fps'));
+  expect(plottedFps).toBeGreaterThan(0); expect(plottedFps).toBeLessThan(loop / 2);
   const before = await page.getByLabel('Положение игрока').textContent();
   await page.keyboard.down('s'); await page.waitForTimeout(1000); await page.keyboard.up('s');
   await expect(page.getByLabel('Положение игрока')).not.toHaveText(before!);
   await page.keyboard.press('Escape'); await expect(page.getByRole('dialog', { name: 'Пауза' })).toBeVisible();
+});
+
+test('FPS chart updates, bounds the minute and clears on visibility and diagnostics changes', async ({ page }, testInfo) => {
+  test.setTimeout(120000);
+  await page.route('**/config.json', route => route.fulfill({ json: { mapId: 'market', debug: true } }));
+  await page.goto('/'); await enter(page);
+  const chart = page.getByRole('img', { name: 'График FPS за последние 60 секунд' });
+  await expect(chart).toBeVisible();
+  await expect.poll(async () => Number(await chart.getAttribute('data-samples'))).toBeGreaterThanOrEqual(3);
+  expect(Number(await chart.getAttribute('data-latest-fps'))).toBeGreaterThan(0);
+  await page.screenshot({ path: testInfo.outputPath('fps-chart.png') });
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  await expect(chart).toHaveAttribute('data-samples', '0');
+  await expect.poll(async () => Number(await chart.getAttribute('data-samples'))).toBeGreaterThan(0);
+  await page.keyboard.press('Escape'); await expectCapture(page, false);
+  await page.getByRole('button', { name: 'Настройки', exact: true }).click();
+  await page.getByText('Дополнительно', { exact: true }).click();
+  await page.getByLabel('Диагностика').uncheck();
+  await page.getByRole('button', { name: 'Применить и открыть карту' }).click(); await enter(page);
+  await expect(chart).toHaveCount(0);
 });
 
 test('optimized scenery streams pasture and tower, climbs stairs and keeps the camera and budget', async ({ page }) => {
@@ -89,8 +113,12 @@ test('optimized scenery streams pasture and tower, climbs stairs and keeps the c
   await expect(page.getByRole('dialog', { name: 'Торговец фруктами' })).toBeVisible();
   await page.getByRole('button', { name: 'Взять: Финики', exact: true }).click();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click(); await resume(page);
-  await walk('x', 0); await walk('z', -26); await expect(page.getByLabel('Область мира')).toHaveText('Пастбище у рынка');
-  await walk('z', 9); await walk('x', -32); await expect(page.getByLabel('Область мира')).toHaveText('Двор Вавилонской башни');
+  await walk('x', 0);
+  // Authored city collisions include a sign and a fountain on the centre line.
+  // Follow the existing passages to the actual pasture chunk at z=-64.
+  const north = async () => { await walk('z', -17.5); await walk('x', 3); await walk('z', -22.5); await walk('x', 0); await walk('z', -29); await walk('x', 6.5); await walk('z', -45); await walk('x', 0); await walk('z', -58); };
+  await north(); await expect(page.getByLabel('Область мира')).toHaveText('Пастбище у северной стены');
+  await walk('z', -45); await walk('x', 6.5); await walk('z', -29); await walk('x', 0); await walk('z', -22.5); await walk('x', 3); await walk('z', -17.5); await walk('x', 0); await walk('z', 9); await walk('x', -32); await expect(page.getByLabel('Область мира')).toHaveText('Двор Вавилонской башни');
   await walk('x', -23); await walk('z', -4); expect((await position()).y).toBe(3);
   await walk('z', 9); expect((await position()).y).toBe(0); await walk('x', 0);
   await page.mouse.move(500, 350); await page.clock.runFor(200);

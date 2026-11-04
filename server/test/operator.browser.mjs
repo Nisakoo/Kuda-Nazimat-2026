@@ -4,6 +4,7 @@ import { startTrusted } from './tls-helpers.ts';
  * OPERATOR_BROWSER_PACKAGE may point to another installed package.json in an isolated worktree.
  */
 import assert from 'node:assert/strict';
+import { tmpdir } from 'node:os';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
@@ -15,7 +16,7 @@ import { createGame } from '../src/game/index.ts';
 import { createObservability } from '../src/obs/index.ts';
 
 const { chromium, expect } = createRequire(process.env.OPERATOR_BROWSER_PACKAGE || new URL('../../client/package.json', import.meta.url))('@playwright/test');
-const evidence = resolve('tasks/evidence/admin-panel-sections');
+const evidence = resolve(process.env.OPERATOR_EVIDENCE_DIR ?? join(tmpdir(), 'competition-2026-artifacts', 'admin-panel-sections'));
 await mkdir(evidence, { recursive: true });
 const world = await makeWorld([npc('guide', 0, 6)]);
 const root = dirname(world.worldDir);

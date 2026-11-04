@@ -69,8 +69,8 @@ describe('TASK-043 original local avatar models',()=>{
   });
 
   it('matches the reviewed sculpture GLB, full geometry and exact neutral transforms',async()=>{
-    // geometry-neutral-before.json remains unchanged as the historical pre-correction fixture.
-    const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-sculpture-2026-11-01/geometry-neutral.json',import.meta.url),'utf8'));
+    // Immutable reviewed input; running checks never regenerates this fixture.
+    const baseline=JSON.parse(await readFile(new URL('./fixtures/avatars/approved-neutral.json',import.meta.url),'utf8'));
     for(const id of AVATAR_IDS){
       const bytes=await readFile(file(id));
       expect(createHash('sha256').update(bytes).digest('hex')).toBe(baseline[id].candidateGlbSha256);
@@ -89,7 +89,7 @@ describe('TASK-043 original local avatar models',()=>{
   });
 
   it('preserves original lower-body geometry and local transforms with the requested visual proportions',async()=>{
-    const baseline=JSON.parse(await readFile(new URL('../../tasks/evidence/avatar-models-2026-07-02/visual-v2-candidate/lowerbody-baseline.json',import.meta.url),'utf8'));
+    const baseline=JSON.parse(await readFile(new URL('./fixtures/avatars/lower-body.json',import.meta.url),'utf8'));
     for(const id of AVATAR_IDS){
       const loaded=await parse(id),nodes=[];
       loaded.scene.traverse(node=>{

@@ -2,7 +2,7 @@
 id: client-render-batching
 type: module-design
 status: ready
-implementation: not-started
+implementation: complete
 parent: architecture
 summary: Сокращение команд отрисовки статического декора и следов с сохранением анимаций и владения ресурсами.
 related:

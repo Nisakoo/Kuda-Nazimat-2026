@@ -1,3 +1,4 @@
+import { testArtifactsRoot } from '../playwright.settings';
 import { expect, test, type Page } from '@playwright/test';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, mkdir, writeFile, rm, readdir } from 'node:fs/promises';
@@ -12,7 +13,7 @@ import { CITY_BOUNDS, CITY_OUTLINE, CITY_RESIDENTS } from '../../shared/city/cat
 import { createFromHub, resume, hudWindow } from './helpers';
 
 let child: ChildProcess, directory: string, origin: string, database: DatabaseSync, world: GameMap;
-const evidence = resolve(process.env.CITY_EVIDENCE_DIR ?? '../tasks/evidence/map-ui-completion');
+const evidence = resolve(process.env.CITY_EVIDENCE_DIR ?? join(testArtifactsRoot, 'city'));
 let recordTrail = true;
 let walkerName = 'city inspector';
 const trail: { district: string; x: number; z: number }[] = [];

@@ -40,10 +40,12 @@ related:
 
 Перед слиянием поверх `288b30d` повторены генерация карт, полный server suite, Python fixtures и type/import checks. Ниже и в логах приведены успешные результаты повторного прогона; реальных моделей и скачиваний не было.
 
-- `make llm-test` (uv offline, Python 3.12.11) — **100 passed, 1 skipped** из 101; Linux-only проверка bound-port semantics на macOS пропущена. [Лог](evidence/npc-target-256/python-tests.txt).
-- `KUDA_TEST_PYTHON=<prepared Python 3.12> VITEST_MAX_WORKERS=2 make server-test` (Node 24.22.2) — **724 passed / 48 files**. Включены проверки local BABEL, общей очереди, AUTH, отмены и отказов без повтора. [Лог](evidence/npc-target-256/server-tests.txt).
-- `npm --prefix server run check` — TypeScript server/shared и imports PASS: 104 modules / 355 dependencies. [Лог](evidence/npc-target-256/type-import-check.txt).
+- `make llm-test` (uv offline, Python 3.12.11) — **100 passed, 1 skipped** из 101; Linux-only проверка bound-port semantics на macOS пропущена. Лог (артефакт удалён).
+- `KUDA_TEST_PYTHON=<prepared Python 3.12> VITEST_MAX_WORKERS=2 make server-test` (Node 24.22.2) — **724 passed / 48 files**. Включены проверки local BABEL, общей очереди, AUTH, отмены и отказов без повтора. Лог (артефакт удалён).
+- `npm --prefix server run check` — TypeScript server/shared и imports PASS: 104 modules / 355 dependencies. Лог (артефакт удалён).
 - Первый server-прогон: 9 world-fixture failures из-за оставшихся generated manifests от предыдущего main. Выполнен `npm --prefix client run world:generate`, затем полный успешный повтор. Отслеживаемые файлы `client/` не менялись; client acceptance для этой серверной правки не требуется.
 - `git diff --check` — PASS. Реальные модели, diagnose, downloads и браузерный inference для этой правки не запускались. Аппаратная скорость/качество нового предела остаются непроверенными.
 
 Новые fake-сценарии проверяют MLX stop на 129/256 событиях и отказ на 257, length/unknown на cap, точную передачу token IDs, границу входа 1792/1793; Ollama — фактический `num_predict` в payload для en/es/ru/translation, `num_ctx: 2048`, tokenizer count и отказ length/unknown. Прежние проверки целых пар истории и 800/801 кодовых точек сохранены. Production-изменения ограничены двумя workers; в MLX параметризован существующий helper без новой функции.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

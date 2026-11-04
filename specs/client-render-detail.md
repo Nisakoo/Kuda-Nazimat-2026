@@ -2,7 +2,7 @@
 id: client-render-detail
 type: module-design
 status: ready
-implementation: not-started
+implementation: complete
 parent: architecture
 summary: Управляемая детализация, пространственное отсечение и частота визуальных анимаций дальнего мира.
 related:

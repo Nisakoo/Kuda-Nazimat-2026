@@ -46,6 +46,8 @@ scheduling_note: страница поверх первого этапа TASK-08
 - Проверки (macOS, Node 22.22.2, 2026-11-01):
   - `npm --prefix server test`: 695 пройдено, 4 пропущено, 1 упало — `building-height.test.ts`, в worktree нет сгенерированного мира `client/public/maps/market` (падает так же без изменений этой задачи).
   - `npm --prefix server run check`: без ошибок (108 модулей, нарушений зависимостей нет).
-  - Браузер: `OPERATOR_BROWSER_PACKAGE=<@playwright/test 1.64.1 во временном каталоге> OPERATOR_CHROMIUM_EXECUTABLE="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" node server/test/operator.browser.mjs` — **pass** ([лог](evidence/admin-panel-sections/browser.log), скриншоты в [evidence/admin-panel-sections](evidence/admin-panel-sections/)). Настоящие HTTP, Socket.IO и SQLite; Playwright браузер не скачивал.
+  - Браузер: `OPERATOR_BROWSER_PACKAGE=<@playwright/test 1.64.1 во временном каталоге> OPERATOR_CHROMIUM_EXECUTABLE="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" node server/test/operator.browser.mjs` — **pass** (лог (артефакт удалён), скриншоты в evidence/admin-panel-sections (артефакт удалён)). Настоящие HTTP, Socket.IO и SQLite; Playwright браузер не скачивал.
 - Не проверено: живые ряды истории за длительный прогон (короткий прогон показывает «нет данных» — так и должно быть до первых кадров); реальный FPS клиента (клиент ещё не шлёт `perf`, TASK-081); сброс живой сцены и отмена ответа NPC из браузера; Node 24.15.
 - Отклонения: «Память» — линии RSS и кучи, а не столбцы макета; IP в таблице клиентов не показан (открытый вопрос ADMIN).
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

@@ -37,4 +37,6 @@ related:
 - HTTP без TLS в LAN остаётся принятым риском текущей AUTH-поставки; NEXT HTTPS не реализуется здесь и hardware LAN не подменяется localhost.
 
 ## Результат
-Реализован настоящий password backend: migration004, SQLite credential/session adapter, auth HTTP API, серверный avatar gate, целевой logout transport/NPC/BABEL, capacity preflight до создания нового account с сохранением takeover. Дополнительно подключён закрытый GET/POST equipment API поверх migration005/store другого агента. Сохранён authenticated avatar-model route. Серверные сценарии и оставшиеся проверки описаны в [evidence/task-045-password-auth.md](evidence/task-045-password-auth.md). Browser/client-flow и финальная полная приёмка остаются основному агенту; задача пока не done.
+Реализован настоящий password backend: migration004, SQLite credential/session adapter, auth HTTP API, серверный avatar gate, целевой logout transport/NPC/BABEL, capacity preflight до создания нового account с сохранением takeover. Дополнительно подключён закрытый GET/POST equipment API поверх migration005/store другого агента. Сохранён authenticated avatar-model route. Серверные сценарии и оставшиеся проверки описаны в evidence/task-045-password-auth.md (артефакт удалён). Browser/client-flow и финальная полная приёмка остаются основному агенту; задача пока не done.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

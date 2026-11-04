@@ -15,6 +15,7 @@
   import AvatarSelection from './AvatarSelection.svelte';
   import WorldMap from './WorldMap.svelte';
   import Icon from './Icon.svelte';
+  import FpsChart from './FpsChart.svelte';
   import './game-ui.css';
   import './window-ui.css';
 
@@ -32,7 +33,7 @@
     authRequired: false, authPending: false, authError: null, authName: '', authChangeRequired: false, authRevision: 0,
     mapId: 'demo', mode: 'local', settingsOpen: false, settingsError: null, networkStatus: 'unauthorized', networkError: null,
     chatOpen: false, chatMessages: [], chatError: null, dialogPending: false, dialogPartial: '', dialogError: null,
-    performance: '', renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
+    performance: '', fpsHistory: [], renderStats: '', market: null, marketPanel: null, marketTarget: null, stamina: 100, sprintBlocked: false,
     carryHint: null, carryPending: false, carryError: null, heldItemId: null, volume: .3, graphicsQuality: 'balanced', audioStats: 'Источники: 0 · Буферы: 0 · Загрузки: 0 · Память: 0 байт',
   });
   let avatarMounted = $state(false);
@@ -101,7 +102,7 @@
 
   {#if !error && snapshot.screen === 'playing'}
     <div class="hud-top"><aside class="location"><div class="task-chip parchment" aria-label="Текущее задание"><span>{cityTask?.title ?? (profile ? snapshot.babylon?.state?.taskTitle : snapshot.market ? 'Козы пастуха' : snapshot.region)}{#if cityTask}<span class="task-count"> · {cityTask.step + 1} / {cityTask.total}</span>{:else if profile || snapshot.market}<span class="task-count"> · {snapshot.babylon?.state?.fed.length ?? snapshot.market?.fed.length ?? 0} / 4</span>{/if}</span></div></aside>
-    {#if snapshot.debug}<div class="debug glass"><output aria-label="Область мира">{snapshot.region}</output><output aria-label="Состояние связи">{snapshot.networkStatus === 'connected' ? 'Подключён' : snapshot.networkStatus}</output><output aria-label="Положение игрока">{snapshot.coordinates}</output><p aria-label="Ресурсы оформления">{snapshot.modelStats}</p><p aria-label="Кеш мира">{snapshot.cacheStats}</p><p aria-label="Производительность">{snapshot.performance}</p><p aria-label="Ресурсы сцены">{snapshot.renderStats}</p><p aria-label="Звук">{snapshot.audioStats}</p></div>{/if}
+    {#if snapshot.debug}<div class="debug glass"><output aria-label="Область мира">{snapshot.region}</output><output aria-label="Состояние связи">{snapshot.networkStatus === 'connected' ? 'Подключён' : snapshot.networkStatus}</output><output aria-label="Положение игрока">{snapshot.coordinates}</output><p aria-label="Ресурсы оформления">{snapshot.modelStats}</p><p aria-label="Кеш мира">{snapshot.cacheStats}</p><p aria-label="Производительность">{snapshot.performance}</p><FpsChart history={snapshot.fpsHistory}/><p aria-label="Ресурсы сцены">{snapshot.renderStats}</p><p aria-label="Звук">{snapshot.audioStats}</p></div>{/if}
     </div>
     {#if !overlayOpen && snapshot.phase === 'running' && snapshot.capture === 'locked'}
       <div class="shotgun-reticle" aria-label="Прицел" aria-hidden="true">·</div>

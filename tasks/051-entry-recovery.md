@@ -48,10 +48,12 @@ related:
 
 ## Проверки и evidence
 
-- `make client-test` — 38 файлов, **311/311 тестов** ([лог](evidence/entry-recovery-2026-11-01/client-tests.log)).
-- `npm --prefix client run check` — Svelte 0 ошибок/предупреждений, TypeScript и headless Core проходят ([лог](evidence/entry-recovery-2026-11-01/check.log)).
-- `npm --prefix client run check:imports` — 146 модулей, нарушений зависимостей нет ([лог](evidence/entry-recovery-2026-11-01/imports.log)).
-- `npm --prefix client run build -- --outDir <temporary-directory>` — успешно; сохраняется предупреждение размера JS bundle >500 kB ([лог](evidence/entry-recovery-2026-11-01/build.log)). Финальный результат установлен в `client/dist`.
-- Из `client/`: `PLAYWRIGHT_CHANNEL=chrome UI_EVIDENCE_DIR=../tasks/evidence/entry-recovery-2026-11-01 npx playwright test --config playwright.hub.config.ts` — **20/20 сценариев**, 3,0 мин, реальный сервер и Chrome ([лог](evidence/entry-recovery-2026-11-01/browser-final.log)). Покрыты сохранённая игра, запрет конфликтного create мышью/Enter, прямая ожидающая группа, IP/порт и повтор, отмена позднего подключения, загрузка/повтор ресурсов, авторизация, два игрока, сохранения после перезапуска и словарь.
-- Визуальное evidence: [сохранённая игра на указателе](evidence/entry-recovery-2026-11-01/saved-game-mode.png), [кабинет 390 px](evidence/entry-recovery-2026-11-01/profile-390.png), [загрузка](evidence/entry-recovery-2026-11-01/loading-delayed.png).
+- `make client-test` — 38 файлов, **311/311 тестов** (лог (артефакт удалён)).
+- `npm --prefix client run check` — Svelte 0 ошибок/предупреждений, TypeScript и headless Core проходят (лог (артефакт удалён)).
+- `npm --prefix client run check:imports` — 146 модулей, нарушений зависимостей нет (лог (артефакт удалён)).
+- `npm --prefix client run build -- --outDir <temporary-directory>` — успешно; сохраняется предупреждение размера JS bundle >500 kB (лог (артефакт удалён)). Финальный результат установлен в `client/dist`.
+- Из `client/`: `PLAYWRIGHT_CHANNEL=chrome UI_EVIDENCE_DIR=../tasks/evidence/entry-recovery-2026-11-01 npx playwright test --config playwright.hub.config.ts` — **20/20 сценариев**, 3,0 мин, реальный сервер и Chrome (лог (артефакт удалён)). Покрыты сохранённая игра, запрет конфликтного create мышью/Enter, прямая ожидающая группа, IP/порт и повтор, отмена позднего подключения, загрузка/повтор ресурсов, авторизация, два игрока, сохранения после перезапуска и словарь.
+- Визуальное evidence: сохранённая игра на указателе (артефакт удалён), кабинет 390 px (артефакт удалён), загрузка (артефакт удалён).
 - `git diff --check` — без замечаний. Изменения этой задачи затрагивают клиент и документацию; сервер/shared в этой задаче не менялись. Проверка физических устройств в LAN в этот прогон не входила.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

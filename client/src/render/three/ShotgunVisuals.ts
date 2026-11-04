@@ -4,6 +4,8 @@ import { SHOTGUN, pelletDirection } from '../../../../shared/shotgun/types.ts';
 import type { Shot, ShotgunState } from '../../../../shared/shotgun/types.ts';
 import type { EntityVisuals } from './EntityVisuals';
 import { CameraRaycast } from './CameraRaycast';
+import { PelletMarks } from './PelletMarks';
+import { BudgetExhausted, type WorldBudget } from '../../map/WorldBudget';
 
 /** Owns bounded procedural resources; never changes authoritative scene objects. */
 export class ShotgunVisuals {
@@ -26,11 +28,29 @@ export class ShotgunVisuals {
   private readonly flashMaterial = new MeshBasicMaterial({color:'#ffdc8a',depthTest:false});
   private readonly viewGun: Group;
   private readonly ray = new Raycaster();
-  private readonly raycast = new CameraRaycast();
-  constructor(private readonly scene: Scene, private readonly camera: PerspectiveCamera, private readonly characters: EntityVisuals) {
+  private readonly raycast: CameraRaycast;
+  private readonly batches: PelletMarks | null;
+  get markCount(): number { return this.batches?.count ?? this.marks.length; }
+  constructor(private readonly scene: Scene, private readonly camera: PerspectiveCamera, private readonly characters: EntityVisuals, budget?: WorldBudget, batchedMarks = false, raycast = new CameraRaycast()) {
+    this.raycast = raycast;
+    let batches: PelletMarks | null = null;
+    if (budget && batchedMarks) {
+      try { batches = new PelletMarks(scene, this.geometries[3]!, this.dark, budget); }
+      catch (error) { if (!(error instanceof BudgetExhausted)) throw error; }
+    }
+    this.batches = batches;
     this.viewGun=this.makeGun(); this.viewGun.name='first-person-shotgun'; this.viewGun.visible=false;
     this.viewGun.traverse(node=>{if(node instanceof Mesh){const material=node.material as MeshStandardMaterial;const copy=material.clone();copy.depthTest=false;node.material=copy;node.renderOrder=1000;}});
     camera.add(this.viewGun); scene.add(camera);
+  }
+  pruneDetachedMarks(): void {
+    this.batches?.step(0);
+    for (let index = this.marks.length - 1; index >= 0; index--) {
+      const mark = this.marks[index]!;
+      let root: import('three').Object3D = mark.mesh;
+      while (root.parent) root = root.parent;
+      if (root !== this.scene) { mark.mesh.removeFromParent(); this.marks.splice(index, 1); }
+    }
   }
   private mesh(parent: Group, geometry: number, material: MeshStandardMaterial | MeshBasicMaterial, x:number,y:number,z:number,sx:number,sy:number,sz:number): Mesh {
     const mesh=new Mesh(this.geometries[geometry]!,material); mesh.position.set(x,y,z); mesh.scale.set(sx,sy,sz); mesh.castShadow=true; mesh.receiveShadow=true; parent.add(mesh); return mesh;
@@ -84,6 +104,7 @@ export class ShotgunVisuals {
   }
   animate(dt: number, firstPerson: boolean): void {
     this.time+=Math.min(dt,.1);
+    this.batches?.step(dt);
     for(const prop of this.state?.props ?? []) {
       const group=this.props.get(prop.id)!;
       group.position.lerp(new Vector3(prop.position.x,prop.position.y,prop.position.z),1-Math.exp(-dt*25));
@@ -127,10 +148,11 @@ export class ShotgunVisuals {
         const hits: import('three').Intersection[]=[];
         for(const root of roots)this.raycast.intersect(root,this.ray,hits);
         const hit=hits.sort((a,b)=>a.distance-b.distance)[0];if(!hit?.face)continue;
-        const mark=new Mesh(this.geometries[3],this.dark);mark.userData.cameraIgnore=true;mark.name='pellet-mark';
         const normal=hit.face.normal.clone().applyNormalMatrix(new Matrix3().getNormalMatrix(hit.object.matrixWorld));
         const worldRotation=new Quaternion().setFromUnitVectors(new Vector3(0,0,1),normal);
         const worldMatrix=new Matrix4().compose(hit.point.clone().addScaledVector(normal,.008),worldRotation,new Vector3(1,1,1));
+        if (this.batches) { this.batches.add(hit.object, hit.object.matrixWorld.clone().invert().multiply(worldMatrix)); continue; }
+        const mark=new Mesh(this.geometries[3],this.dark);mark.userData.cameraIgnore=true;mark.name='pellet-mark';
         mark.matrix.copy(hit.object.matrixWorld).invert().multiply(worldMatrix);
         mark.matrix.decompose(mark.position,mark.quaternion,mark.scale);mark.matrixAutoUpdate=false;
         hit.object.add(mark);mark.updateMatrixWorld(true);this.marks.push({mesh:mark,age:0});
@@ -140,9 +162,10 @@ export class ShotgunVisuals {
     this.pending=[];this.historical=false;
   }
   private clearWorld(): void {
+    this.batches?.clear();
     for(const group of this.props.values())group.removeFromParent();this.props.clear();
     for(const gun of this.guns.values())gun.removeFromParent();this.guns.clear();
     for(const mark of this.marks)mark.mesh.removeFromParent();this.marks.length=0;this.pending=[];this.shotAt.clear();
   }
-  dispose(): void {this.clearWorld();this.viewGun.removeFromParent();this.viewGun.traverse(node=>{if(node instanceof Mesh)(node.material as MeshStandardMaterial).dispose();});for(const g of this.geometries)g.dispose();for(const m of [this.wood,this.metal,this.clay,this.skin,this.dark,this.flashMaterial])m.dispose();}
+  dispose(): void {this.clearWorld();this.batches?.dispose();this.viewGun.removeFromParent();this.viewGun.traverse(node=>{if(node instanceof Mesh)(node.material as MeshStandardMaterial).dispose();});for(const g of this.geometries)g.dispose();for(const m of [this.wood,this.metal,this.clay,this.skin,this.dark,this.flashMaterial])m.dispose();}
 }

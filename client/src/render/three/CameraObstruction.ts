@@ -13,7 +13,7 @@ export class CameraObstruction {
   private readonly origin = new Vector3();
   private readonly lastTarget = new Vector3();
   private distance: number | null = null;
-  private readonly geometry = new CameraRaycast();
+  constructor(private readonly geometry = new CameraRaycast()) {}
   private readonly hits: Intersection[] = [];
 
   resolve(target: Vector3, direction: Vector3, desired: number, halfWidth: number, halfHeight: number, obstacles: Object3D[], dt: number): number {

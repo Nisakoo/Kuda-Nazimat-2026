@@ -32,12 +32,14 @@ related:
 
 ## Проверки и evidence
 
-Среда: Node v25.6.0, Google Chrome. Полные журналы и снимки: [evidence](evidence/stone-engraving-2026-11-01/).
+Среда: Node v25.6.0, Google Chrome. Полные журналы и снимки: evidence (артефакт удалён).
 
 - `NODE_OPTIONS=--no-experimental-webstorage VITEST_MAX_WORKERS=2 make client-test` — 50 файлов, **426 тестов прошли**. Флаг устраняет конфликт встроенного localStorage Node 25 с happy-dom.
 - `npm --prefix client run check` — Svelte 0 ошибок / 0 предупреждений, проверка Core TypeScript пройдена.
 - `npm --prefix client run check:imports` — 183 модуля, нарушений нет.
 - `npm --prefix client run build` — успешно; остаётся предупреждение о чанке свыше 500 kB.
 - Из `client/`: `PLAYWRIGHT_CHANNEL=chrome UI_EVIDENCE_DIR=../tasks/evidence/stone-engraving-2026-11-01 npx playwright test --config playwright.hub.config.ts --grep 'stone engraving|two real players enroll'` — **3 сценария прошли**. Реальный сервер: обмен камнем между двумя игроками; сохранение черновика при закрытии; потеря ответа после принятого запроса и идемпотентный повтор; неизменность точек в истории/чате; одиночное касание; ограничение и исчезновение частиц; эффект только после подтверждения; reduced motion; отсутствие ошибок страницы.
-- Снимки просмотрены: [холст 1280×800](evidence/stone-engraving-2026-11-01/stone-draft-1280.png), [история 390×844](evidence/stone-engraving-2026-11-01/stone-history-390.png), [низкое окно 640×480](evidence/stone-engraving-2026-11-01/stone-history-640.png), [чат 390×844](evidence/stone-engraving-2026-11-01/stone-chat-390.png). В низком окне действие доступно через существующую прокрутку диалога.
+- Снимки просмотрены: холст 1280×800 (артефакт удалён), история 390×844 (артефакт удалён), низкое окно 640×480 (артефакт удалён), чат 390×844 (артефакт удалён). В низком окне действие доступно через существующую прокрутку диалога.
 - `git diff --check` — успешно.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

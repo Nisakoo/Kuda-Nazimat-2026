@@ -27,11 +27,13 @@ related:
 
 Приёмка на Node 24.15.0:
 
-- `VITEST_MAX_WORKERS=2 make server-test`: [222/222](evidence/replace-game-2026-11-01/server-tests.log). Добавлены замена в обе стороны, повтор после перезапуска, устаревший ID, конфликт с чужой группой, откат SQLite-транзакции, сохранение напарника и игнорирование позднего NPC-ответа. Первый запуск в sandbox не смог открыть localhost (EPERM); повтор с разрешёнными локальными портами прошёл.
-- `VITEST_MAX_WORKERS=2 make client-test`: [314/314](evidence/replace-game-2026-11-01/client-tests.log).
-- `npm --prefix client run check`, `npm --prefix server run check`, `npm --prefix client run check:imports`: успешно, Svelte без ошибок и предупреждений, нарушений импортов нет ([клиент](evidence/replace-game-2026-11-01/client-check.log), [сервер/shared](evidence/replace-game-2026-11-01/server-check.log), [импорты клиента](evidence/replace-game-2026-11-01/imports.log)).
-- `npm --prefix client run build -- --outDir /tmp/replace-game-dist`: успешно; прежнее предупреждение о bundle >500 kB сохраняется ([лог](evidence/replace-game-2026-11-01/build.log)). Сборка установлена в локальный dist.
-- Из client: `PLAYWRIGHT_CHANNEL=chrome UI_EVIDENCE_DIR=../tasks/evidence/replace-game-2026-11-01 npx playwright test --config playwright.hub.config.ts`: [22/22, 2.3 минуты](evidence/replace-game-2026-11-01/browser-final.log). Реальные HTTP/SQLite: отмена без новой команды, подтверждение solo → multiplayer → solo, сохранение словаря/языков, повтор requestId без повторной замены. Проверены регрессии входа, облика, управления, NPC, подключений и сохранений.
-- Визуально проверено [подтверждение на ширине 390 px](evidence/replace-game-2026-11-01/replace-game-confirmation.png): предупреждение читается, «Отмена» в фокусе, обе кнопки доступны.
+- `VITEST_MAX_WORKERS=2 make server-test`: 222/222 (артефакт удалён). Добавлены замена в обе стороны, повтор после перезапуска, устаревший ID, конфликт с чужой группой, откат SQLite-транзакции, сохранение напарника и игнорирование позднего NPC-ответа. Первый запуск в sandbox не смог открыть localhost (EPERM); повтор с разрешёнными локальными портами прошёл.
+- `VITEST_MAX_WORKERS=2 make client-test`: 314/314 (артефакт удалён).
+- `npm --prefix client run check`, `npm --prefix server run check`, `npm --prefix client run check:imports`: успешно, Svelte без ошибок и предупреждений, нарушений импортов нет (клиент (артефакт удалён), сервер/shared (артефакт удалён), импорты клиента (артефакт удалён)).
+- `npm --prefix client run build -- --outDir /tmp/replace-game-dist`: успешно; прежнее предупреждение о bundle >500 kB сохраняется (лог (артефакт удалён)). Сборка установлена в локальный dist.
+- Из client: `PLAYWRIGHT_CHANNEL=chrome UI_EVIDENCE_DIR=../tasks/evidence/replace-game-2026-11-01 npx playwright test --config playwright.hub.config.ts`: 22/22, 2.3 минуты (артефакт удалён). Реальные HTTP/SQLite: отмена без новой команды, подтверждение solo → multiplayer → solo, сохранение словаря/языков, повтор requestId без повторной замены. Проверены регрессии входа, облика, управления, NPC, подключений и сохранений.
+- Визуально проверено подтверждение на ширине 390 px (артефакт удалён): предупреждение читается, «Отмена» в фокусе, обе кнопки доступны.
 
 Пользовательская база не очищалась и постоянный сервер не запускался; проверки используют временные базы и серверы. Физическая LAN и реальная LLM этой приёмкой не подтверждаются.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

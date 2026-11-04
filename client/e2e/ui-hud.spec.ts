@@ -1,3 +1,4 @@
+import { testArtifactsRoot } from '../playwright.settings';
 import { expect, test, type Page } from '@playwright/test';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
@@ -11,7 +12,7 @@ import { authAvatarScenario } from './auth-avatar-scenario';
 import { avatarWorldScenario } from './avatar-world-scenario';
 
 let child: ChildProcess, directory: string, origin: string;
-const evidence = resolve(process.env.UI_EVIDENCE_DIR ?? '../tasks/evidence/ui-redesign-2026-07-02');
+const evidence = resolve(process.env.UI_EVIDENCE_DIR ?? join(testArtifactsRoot, 'ui-hud'));
 test.beforeAll(async () => {
   directory = await mkdtemp(join(tmpdir(), 'ui-hud-real-'));
   await mkdir(evidence, { recursive: true });

@@ -1,8 +1,10 @@
 import { defineConfig } from '@playwright/test';
-import { browserTestOrigin, browserTestPort } from './playwright.settings';
+import { join } from 'node:path';
+import { browserTestOrigin, browserTestPort, testArtifactsRoot } from './playwright.settings';
 
 export default defineConfig({
   testDir: './e2e',
+  outputDir: join(testArtifactsRoot, 'browser'),
   testIgnore: ['render.spec.ts', 'nameplate-depth.spec.ts'],
   fullyParallel: false,
   workers: 1,

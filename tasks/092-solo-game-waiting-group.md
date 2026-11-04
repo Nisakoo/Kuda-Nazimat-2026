@@ -40,13 +40,15 @@ related:
 
 | Проверка | Результат |
 | --- | --- |
-| `make client-test` | 470 passed / 1 ошибка окружения Node 25 (`localStorage.removeItem is not a function`) — [полный лог](evidence/city-repair/client-full.log) |
-| `vitest run src/app/GameApp.test.ts` на Node 24 | 46/46 passed, включая единственный упавший сценарий; повторён только затронутый файл — [лог](evidence/city-repair/client-node24-recheck.log) |
-| `PATH=…node24…:$PATH VITEST_MAX_WORKERS=2 make server-test` | 709 passed, 15 skipped, 48 файлов, 39.74 с — [лог](evidence/city-repair/server-full.log). Skipped не засчитаны как пройденные. Первоначальный sandbox-прогон остановлен из-за `EPERM listen 127.0.0.1`; итоговый выполнен с разрешёнными локальными портами |
-| Svelte, TypeScript, Core и импорты клиента | Без ошибок; Svelte 0 warnings — [проверки](evidence/city-repair/client-check.log), [итоговые типы](evidence/city-repair/client-final-types.log) |
-| `npm --prefix server run check` | Типы server/shared и импорты пройдены — [лог](evidence/city-repair/server-check.log) |
-| `vite build` | Успешно; предупреждение о JS-чанке >500 kB сохраняется — [лог](evidence/city-repair/build.log) |
-| `HUB_CAPTURE=off PLAYWRIGHT_CHANNEL=chrome playwright test --config playwright.hub.config.ts hub.spec.ts --grep 'waiting groups'` на Node 24 | 2/2 passed, 11.2 с: создание обоих режимов при других группах, выбор нужной группы и продолжение своей — [лог](evidence/city-repair/entry-browser.log) |
+| `make client-test` | 470 passed / 1 ошибка окружения Node 25 (`localStorage.removeItem is not a function`) — полный лог (артефакт удалён) |
+| `vitest run src/app/GameApp.test.ts` на Node 24 | 46/46 passed, включая единственный упавший сценарий; повторён только затронутый файл — лог (артефакт удалён) |
+| `PATH=…node24…:$PATH VITEST_MAX_WORKERS=2 make server-test` | 709 passed, 15 skipped, 48 файлов, 39.74 с — лог (артефакт удалён). Skipped не засчитаны как пройденные. Первоначальный sandbox-прогон остановлен из-за `EPERM listen 127.0.0.1`; итоговый выполнен с разрешёнными локальными портами |
+| Svelte, TypeScript, Core и импорты клиента | Без ошибок; Svelte 0 warnings — проверки (артефакт удалён), итоговые типы (артефакт удалён) |
+| `npm --prefix server run check` | Типы server/shared и импорты пройдены — лог (артефакт удалён) |
+| `vite build` | Успешно; предупреждение о JS-чанке >500 kB сохраняется — лог (артефакт удалён) |
+| `HUB_CAPTURE=off PLAYWRIGHT_CHANNEL=chrome playwright test --config playwright.hub.config.ts hub.spec.ts --grep 'waiting groups'` на Node 24 | 2/2 passed, 11.2 с: создание обоих режимов при других группах, выбор нужной группы и продолжение своей — лог (артефакт удалён) |
 | `git diff --check` | Без ошибок |
 
 Сервер и клиент используют обновлённый контракт списка групп и обновляются вместе. Проверки используют отдельные временные БД; пользовательские группы и сохранения не удалялись. В браузере screenshots/trace/video отключены.
+
+Артефакты проверок удалены по запросу пользователя; исторические результаты и команды выше сохранены. Новые материалы проверок хранятся вне checkout (TASK-119).

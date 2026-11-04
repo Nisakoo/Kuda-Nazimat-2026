@@ -2,7 +2,7 @@
 id: client-render-occlusion
 type: module-design
 status: ready
-implementation: not-started
+implementation: complete
 parent: architecture
 summary: Последовательная оценка отсечения за препятствиями, асинхронных queries и Hi-Z для WebGL2.
 related:

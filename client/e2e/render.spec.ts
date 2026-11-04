@@ -3,6 +3,95 @@ import { writeFile } from 'node:fs/promises';
 
 test.beforeEach(async ({ page }) => { await page.goto('/e2e/render-harness.html'); await page.waitForFunction(() => Boolean(window.renderHarness)); });
 
+test('opt-in market measurements bound queries and release world, instances and targets', async ({ page }) => {
+  test.setTimeout(120000);
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/e2e/measurement-harness.html?quality=balanced');
+  await page.waitForFunction(() => !!window.measurementHarness);
+  const cold = await page.evaluate(() => window.measurementHarness.open(false));
+  expect(cold.queries?.status).toBe('disabled');
+  expect(cold.budget.memory).toBeLessThanOrEqual(128 * 1024 * 1024);
+  expect(cold.render!.chunks.length).toBeLessThanOrEqual(25);
+  await page.evaluate(() => window.measurementHarness.start(true));
+  await page.waitForTimeout(1000);
+  const captured = await page.evaluate(() => window.measurementHarness.stop());
+  expect(captured.measurement!.samples.some(sample => sample.submitted && sample.calls > 0 && sample.triangles > 0)).toBe(true);
+  expect(captured.measurement!.gpu.queries).toBeLessThanOrEqual(4);
+  if (captured.measurement!.gpu.status === 'unavailable') expect(captured.measurement!.samples.every(sample => sample.gpuMs === null)).toBe(true);
+  for (let cycle = 0; cycle < 5; cycle++) {
+    const closed = await page.evaluate(() => window.measurementHarness.close());
+    expect(closed.render!.models).toBe(0); expect(closed.render!.instances).toBe(0);
+    expect(closed.render!.geometries).toBe(0); expect(closed.render!.textures).toBe(0);
+    expect(closed.resources!.instanceBytes).toBe(0); expect(closed.resources!.shadowTargets).toBe(0);
+    expect(closed.releasedBudget.memory).toBe(0); expect(closed.releasedBudget.resources).toBe(0);
+    expect(closed.chunks!.ready).toBe(0); expect(closed.render!.chunks).toEqual([]);
+    if (cycle < 4) await page.evaluate(() => window.measurementHarness.open(true));
+  }
+  expect(errors).toEqual([]);
+});
+
+test('instanced marks use one surface draw without multi-draw and release the shared budget', async ({ page }) => {
+  test.setTimeout(120000);
+  await page.addInitScript(() => {
+    const getExtension = WebGL2RenderingContext.prototype.getExtension;
+    WebGL2RenderingContext.prototype.getExtension = new Proxy(getExtension, { apply(target, context, args) {
+      if (/multi_draw/i.test(String(args[0]))) return null;
+      return Reflect.apply(target, context, args);
+    } });
+  });
+  await page.goto('/e2e/measurement-harness.html?quality=balanced&marks=instanced');
+  await page.waitForFunction(() => !!window.measurementHarness);
+  await page.evaluate(() => window.measurementHarness.open(false));
+  await page.evaluate(() => window.measurementHarness.start(false));
+  await page.waitForTimeout(10000);
+  await page.evaluate(() => { window.measurementHarness.stop(); window.measurementHarness.at(0); });
+  const inventory = await page.evaluate(() => window.measurementHarness.inventory());
+  const batches = inventory.groups.filter(group => group.path.at(-1) === 'pellet-batch');
+  expect(inventory.resources!.pelletMarks).toBe(96); expect(batches).toHaveLength(1);
+  expect(batches[0]!.instances).toBe(96); expect(batches[0]!.calls).toBe(1);
+  expect(inventory.render!.chunks.length).toBeLessThanOrEqual(25);
+  expect(inventory.budget.memory).toBeLessThanOrEqual(128 * 1024 * 1024);
+  await page.evaluate(() => {
+    const gl = document.querySelector('canvas')!.getContext('webgl2')!;
+    gl.clientWaitSync = () => gl.TIMEOUT_EXPIRED;
+  });
+  const unloaded = await page.evaluate(() => window.measurementHarness.unloadVisual('0_0'));
+  expect(unloaded.resources!.pelletMarks).toBe(0);
+  for (let cycle = 0; cycle < 5; cycle++) {
+    const closed = await page.evaluate(() => window.measurementHarness.close());
+    expect(closed.releasedBudget.memory).toBe(0); expect(closed.render!.instances).toBe(0);
+    expect(closed.resources!.instanceBytes).toBe(0); expect(closed.render!.geometries).toBe(0);
+    if (cycle < 4) await page.evaluate(() => window.measurementHarness.open(false, 'instanced'));
+  }
+});
+
+for (const quality of ['low', 'balanced', 'high'] as const) test(`split shadow/main timers recover from real WebGL context loss (${quality})`, async ({ page }) => {
+  test.setTimeout(60000);
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.goto(`/e2e/shadow-harness.html?quality=${quality}&shadow=baseline`);
+  await page.waitForFunction(() => !!window.shadowHarness);
+  await expect.poll(() => page.evaluate(() => window.shadowHarness.stats().submissions)).toBeGreaterThan(3);
+  const initial = await page.evaluate(() => window.shadowHarness.stats());
+  expect(initial.behindVisibleInMain).toBe(false);
+  const inventory = await page.evaluate(() => window.shadowHarness.inventory());
+  expect(inventory!.groups.some(group => group.pass === 'shadow' && group.path.includes('behind-camera-caster'))).toBe(quality !== 'low');
+  const beforeLoss = initial.frames;
+  const lostAt = await page.evaluate(() => { const at = performance.now(); window.shadowHarness.lose(); return at; });
+  await expect.poll(() => page.evaluate(() => window.shadowHarness.stats().render.errors.length)).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(() => window.shadowHarness.stats().frames)).toBeGreaterThan(beforeLoss + 3);
+  await page.waitForTimeout(100);
+  await page.evaluate(() => window.shadowHarness.restore());
+  await expect.poll(() => page.evaluate(() => window.shadowHarness.stats().render.errors)).toEqual([]);
+  await expect.poll(() => page.evaluate(() => window.shadowHarness.stats().submissions)).toBeGreaterThan(initial.submissions + 3);
+  await expect.poll(() => page.evaluate(({ lostAt, enabled }) => window.shadowHarness.stats().measurement!.samples.some(sample => sample.at > lostAt && sample.gpuMainMs !== null && (!enabled || sample.gpuShadowMs !== null)), { lostAt, enabled: quality !== 'low' })).toBe(true);
+  const restored = await page.evaluate(() => window.shadowHarness.stats());
+  const size = quality === 'low' ? 0 : quality === 'balanced' ? 1024 : 2048;
+  expect(restored.resources.shadow!.mapSize).toEqual([size, size]); expect(restored.resources.shadowTargets).toBe(quality === 'low' ? 0 : 1);
+  expect(restored.measurement!.gpu.queries).toBeLessThanOrEqual(4);
+  const closed = await page.evaluate(() => window.shadowHarness.dispose());
+  expect(closed.budget.memory).toBe(0); expect(closed.resources.shadowTargets).toBe(0); expect(errors).toEqual([]);
+});
+
 test('shares real GPU resources across two static groups and a dynamic model, then releases the last owner', async ({ page }) => {
   let requests = 0;
   page.on('request', (request) => { if (request.url().endsWith('tablet.glb')) requests++; });

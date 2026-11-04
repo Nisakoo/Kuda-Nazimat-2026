@@ -1,3 +1,4 @@
+import { testArtifactsRoot } from '../playwright.settings';
 import { expect, test, type Page } from '@playwright/test';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
@@ -119,7 +120,7 @@ test('solo buys and feeds through the real server, rejects wrong food and restor
   await page.getByRole('button', { name: 'Добавить в словарь', exact: true }).click();
   await expect(merchant).toHaveClass(/known/);
   await expect(page.getByText('В словаре', { exact: true })).toBeVisible();
-  await page.screenshot({ path: resolve(process.env.UI_EVIDENCE_DIR ?? '../tasks/evidence/interface-shortcuts-2026-11-01', 'npc-word.png') });
+  await page.screenshot({ path: resolve(process.env.UI_EVIDENCE_DIR ?? join(testArtifactsRoot, 'interface-shortcuts'), 'npc-word.png') });
   await page.keyboard.press('Escape');
   await expect(page.getByLabel('Перевод слова')).toHaveCount(0);
   await expect(page.getByRole('dialog', { name: 'Разговор с жителем', exact: true })).toBeVisible();
@@ -130,7 +131,7 @@ test('solo buys and feeds through the real server, rejects wrong food and restor
   await resume(page); await interact(page, 'Торговец фруктами');
   await expect(page.locator('.resident-history')).toContainText('test merchant reply');
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.screenshot({ path: resolve(process.env.UI_EVIDENCE_DIR ?? '../tasks/evidence/interface-shortcuts-2026-11-01', 'npc-390.png') });
+  await page.screenshot({ path: resolve(process.env.UI_EVIDENCE_DIR ?? join(testArtifactsRoot, 'interface-shortcuts'), 'npc-390.png') });
   await page.setViewportSize({ width: 1280, height: 800 });
 
   for (const name of ['Финики', 'Красные плоды', 'Жёлтые фрукты']) { await page.getByRole('button', { name: `Купить: ${name}`, exact: true }).click(); await expect(page.getByRole('status').filter({ hasText: 'Предмет добавлен' })).toBeVisible(); }

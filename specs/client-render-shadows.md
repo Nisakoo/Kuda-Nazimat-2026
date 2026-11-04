@@ -2,7 +2,7 @@
 id: client-render-shadows
 type: module-design
 status: ready
-implementation: not-started
+implementation: complete
 parent: architecture
 summary: Снижение стоимости существующей одной карты теней без потери видимых силуэтов.
 related:
