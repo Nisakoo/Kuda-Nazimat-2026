@@ -14,7 +14,7 @@ import re
 import sys
 
 from local_common import (WorkerError, compile_prompt, compile_translation, configure_offline, emit,
-                          normalize_text, normalize_target_text, normalize_translation, read_message, verify_manifest)
+                          normalize_text, normalize_target_text, normalize_translation, read_message, strip_thinking, verify_manifest)
 
 
 class Runtime:
@@ -111,14 +111,16 @@ class Runtime:
             raise WorkerError('model_unavailable', 'Invalid text-only Qwen3.5 4-bit artifact') from None
 
     def answer(self, request):
+        stream_tokens = bool(request.get('stream'))
         return self._answer_prompt(compile_prompt(request, self.tokenizer),
                                    normalize_target_text if request.get('locale') in ('en', 'es') else None,
-                                   max_tokens=256 if request.get('locale') in ('en', 'es') else 128)
+                                   max_tokens=256 if request.get('locale') in ('en', 'es') else 128,
+                                   stream_tokens=stream_tokens)
 
     def translate(self, request):
         return self._answer_prompt(compile_translation(request, self.tokenizer), normalize_translation)
 
-    def _answer_prompt(self, prompt, strict_normalize, max_tokens=128):
+    def _answer_prompt(self, prompt, strict_normalize, max_tokens=128, stream_tokens=False):
         ids = self.tokenizer.encode(prompt, add_special_tokens=False)
         if not isinstance(ids, list) or len(ids) > 1792 or len(ids) + max_tokens > 2048:
             raise WorkerError('input_too_long', 'Input token limit exceeded')
@@ -139,6 +141,8 @@ class Runtime:
                     if size > 16384:
                         raise WorkerError('output_limit', 'Model output limit exceeded')
                     parts.append(chunk)
+                    if stream_tokens:
+                        emit({'type': 'partial', 'text': strip_thinking(''.join(parts))})
                     reason = getattr(item, 'finish_reason', None)
                 if reason != 'stop':
                     raise WorkerError('invalid_response', 'Model did not finish normally')

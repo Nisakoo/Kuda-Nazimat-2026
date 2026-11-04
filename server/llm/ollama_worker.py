@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-from local_common import WorkerError, _unique_pairs, compile_prompt, compile_translation, configure_offline, count_prompt_tokens, emit, normalize_text, normalize_target_text, normalize_translation, read_message, verify_manifest
+from local_common import WorkerError, _unique_pairs, compile_prompt, compile_translation, configure_offline, count_prompt_tokens, emit, normalize_text, normalize_target_text, normalize_translation, read_message, strip_thinking, verify_manifest
 
 MODEL = 'qwen3.5:2b-q4_K_M'
 SMALL_MODEL = 'qwen3.5:0.8b-q8_0'
@@ -445,7 +445,7 @@ class OllamaWorker:
             error.diagnostic = 'ollama_response_invalid'
             raise error from None
 
-    def generate(self, prompt, predict, timeout=10, allow_empty=False, expected_tokens=None, progress=False, target=False, translation=False):
+    def generate(self, prompt, predict, timeout=10, allow_empty=False, expected_tokens=None, progress=False, target=False, translation=False, stream_tokens=False):
         if expected_tokens is not None and (not isinstance(expected_tokens, int) or isinstance(expected_tokens, bool) or not 0 <= expected_tokens <= 1792):
             raise WorkerError('input_too_long', 'Input token limit exceeded')
         o = self.options
@@ -501,6 +501,8 @@ class OllamaWorker:
                     # At most 6 decoding updates, independent of model text size.
                     if progress and chunks in (1, 16, 64, 256, 1024, 4096):
                         emit({'type': 'progress', 'stage': 'decoding', 'outputChunks': chunks})
+                    if stream_tokens and not translation:
+                        emit({'type': 'partial', 'text': strip_thinking(''.join(parts))})
             except (ValueError, UnicodeError, RecursionError):
                 raise invalid() from None
 
@@ -544,11 +546,12 @@ class OllamaWorker:
         timeout = min(deadline / 1000 - time.time(), budget - (time.monotonic() - began))
         if not math.isfinite(timeout) or timeout <= 0:
             raise WorkerError('invalid_message', 'Expired answer deadline')
+        extra = {'stream_tokens': True} if request.get('stream') else {}
         if translation:
             return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True, translation=True)
         if request.get('locale') in ('en', 'es'):
-            return self.generate(prompt, 256, timeout=timeout, expected_tokens=tokens, progress=True, target=True)
-        return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True)
+            return self.generate(prompt, 256, timeout=timeout, expected_tokens=tokens, progress=True, target=True, **extra)
+        return self.generate(prompt, 128, timeout=timeout, expected_tokens=tokens, progress=True, **extra)
 
     def stop(self):
         if self.child is not None:

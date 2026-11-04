@@ -102,7 +102,7 @@ function emojiLike(text: string): boolean {
 function validTargetText(text: string): boolean {
   return validUnicode(text) && [...text].length <= 800 && !emojiLike(text) && !hasObviousCyrillicReply(text);
 }
-function boundedRequest(request: NpcAnswerRequest): NpcAnswerRequest | undefined {
+function boundedRequest(request: NpcAnswerRequest, stream = false): (NpcAnswerRequest & { stream?: boolean }) | undefined {
   if (!request || !request.npc || !Array.isArray(request.history) || !['ru', 'en', 'es'].includes(request.locale) || !Number.isFinite(request.deadlineAt)) return;
   const { requestKey, playerId, playerName, question, locale, deadlineAt } = request;
   const { id, name, topic, persona, greeting } = request.npc;
@@ -112,7 +112,7 @@ function boundedRequest(request: NpcAnswerRequest): NpcAnswerRequest | undefined
   if (Buffer.byteLength(question) > 4096 || (locale !== 'ru' && (!validUnicode(question) || [...question].length > 800 || !question.trim()))) return;
   const history = request.history.slice(-6);
   if (history.some((entry) => !entry || typeof entry.question !== 'string' || typeof entry.answer !== 'string')) return;
-  const safe: NpcAnswerRequest = { requestKey, playerId, playerName, question, locale, deadlineAt, npc: { id, name, topic, persona, greeting, ...(style ? { style } : {}) }, history: history.map(({ question, answer }) => ({ question, answer })) };
+  const safe: NpcAnswerRequest & { stream?: boolean } = { requestKey, playerId, playerName, question, locale, deadlineAt, npc: { id, name, topic, persona, greeting, ...(style ? { style } : {}) }, history: history.map(({ question, answer }) => ({ question, answer })), ...(stream || request.stream ? { stream: true } : {}) };
   while (jsonBytes({ op: 'answer', request: safe }) + 1 > LIMIT) {
     if (!safe.history.length) return;
     // Whole oldest pairs only. The worker still performs exact tokenizer admission afterwards.
@@ -193,10 +193,11 @@ interface Session {
   exited: boolean;
   phase: 'starting' | 'ready' | 'stopping';
   startup: Pending & { resolve(): void };
-  answer?: Pending & { resolve(value: { text: string }): void; expired(): boolean; aborted(): boolean; mode: 'legacy' | 'target' | 'translation' };
+  answer?: Pending & { resolve(value: { text: string }): void; expired(): boolean; aborted(): boolean; mode: 'legacy' | 'target' | 'translation'; onPartial?: PartialAnswer };
   buffer: Buffer;
   outputBytes: number;
   messageCount: number;
+  partialCount: number;
   stderrBytes: number;
   readyReceived: boolean;
   measured: boolean;
@@ -332,6 +333,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     // Progress can coalesce with an answer. A valid terminal prefix plus any extra bytes cannot.
     let offset = 0;
     let count = s.messageCount;
+    let partialCount = s.partialCount;
     let nextDiagnostic = diagnostic;
     let terminal: Record<string, unknown> | undefined;
     let error: Failure | undefined;
@@ -339,13 +341,14 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     const integer = (value: unknown, max: number): value is number => Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= max;
     try {
       for (let end = newline; end >= 0; end = s.buffer.indexOf(10, offset)) {
-        if (++count > 12 || terminal) throw new Error();
+        if (terminal) throw new Error();
         const parsed: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(s.buffer.subarray(offset, end)));
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error();
         const message = parsed as Record<string, unknown>;
         const lineBytes = end - offset;
         offset = end + 1;
         if (message.type === 'progress') {
+          if (++count > 12) throw new Error();
           if (lineBytes > 512) throw new Error();
           if (backend !== 'ollama' || s.phase !== 'ready' || !pending || !nextDiagnostic) throw new Error();
           if (message.stage === 'prefill') {
@@ -361,6 +364,14 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
           } else throw new Error();
           continue;
         }
+        if (message.type === 'partial') {
+          if (++partialCount > 512) throw new Error();
+          if (s.phase !== 'ready' || !pending || typeof message.text !== 'string' || Object.keys(message).length !== 2) throw new Error();
+          if (Buffer.byteLength(message.text) > TEXT_LIMIT) { error = 'output_limit'; break; }
+          if (pending.onPartial) pending.onPartial(message.text);
+          continue;
+        }
+        if (++count > 12) throw new Error();
         terminal = message;
         if (message.type === 'error') {
           // Never expose arbitrary worker output, paths, prompts or stderr.
@@ -381,6 +392,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
       if (terminal && offset !== s.buffer.length) throw new Error();
     } catch { fail(s, 'protocol_error'); return; }
     s.messageCount = count;
+    s.partialCount = partialCount;
     s.buffer = s.buffer.subarray(offset);
     diagnostic = nextDiagnostic;
     // Progress never resets the deadline or releases an aborted generation.
@@ -420,7 +432,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     try { child = spawn(String(options.python), [...(runtime.workerPrefix ?? ['-u', '-B']), runtime.workerPath], { shell: false, detached: true, stdio: ['pipe', 'pipe', 'pipe'], env }); }
     catch { starting = undefined; lastFailure = 'unavailable'; throw new Error('unavailable'); }
     const s: Session = {
-      child, group: child.pid, exited: false, phase: 'starting', buffer: Buffer.alloc(0), outputBytes: 0, messageCount: 0, stderrBytes: 0, readyReceived: false, measured: false,
+      child, group: child.pid, exited: false, phase: 'starting', buffer: Buffer.alloc(0), outputBytes: 0, messageCount: 0, partialCount: 0, stderrBytes: 0, readyReceived: false, measured: false,
       startup: { resolve, reject, clear: () => { if (timer) scheduler.clearTimeout(timer); } },
       startupExpired: () => clock.now() - wall >= timeout || runtime.monotonicNow() - began >= timeout,
     };
@@ -438,7 +450,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     if (child.pid !== undefined) void watch(s);
     try { await promise; } finally { if (starting === promise) starting = undefined; }
   }
-  function execute(request: NpcAnswerRequest | LocalTranslationRequest, signal: AbortSignal, operation: 'answer' | 'translate'): Promise<{ text: string }> {
+  function execute(request: NpcAnswerRequest | LocalTranslationRequest, signal: AbortSignal, operation: 'answer' | 'translate', onPartial?: PartialAnswer): Promise<{ text: string }> {
       const s = owned;
       if (!s || s.phase !== 'ready') return Promise.reject(new Error('unavailable'));
       if (s.answer) return Promise.reject(new Error('busy'));
@@ -454,6 +466,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
           expired: () => !Number.isFinite(remaining) || clock.now() >= request.deadlineAt || runtime.monotonicNow() - began >= remaining,
           aborted: () => signal.aborted,
           mode: operation === 'translate' ? 'translation' : ((request as NpcAnswerRequest).locale === 'ru' ? 'legacy' : 'target'),
+          onPartial,
           clear: () => { if (timer) scheduler.clearTimeout(timer); signal.removeEventListener('abort', abort); },
         };
       });
@@ -461,8 +474,8 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
       if (!Number.isFinite(remaining) || remaining <= 0 || remaining > NPC_TIMING.maxMs) { fail(s, 'timeout'); return promise; }
       signal.addEventListener('abort', abort, { once: true });
       timer = scheduler.setTimeout(() => fail(s, 'timeout'), remaining);
-      s.outputBytes = 0; s.messageCount = 0; s.stderrBytes = 0;
-      const bounded = operation === 'answer' ? boundedRequest(request as NpcAnswerRequest) : boundedTranslation(request as LocalTranslationRequest);
+      s.outputBytes = 0; s.messageCount = 0; s.partialCount = 0; s.stderrBytes = 0;
+      const bounded = operation === 'answer' ? boundedRequest(request as NpcAnswerRequest, Boolean(onPartial)) : boundedTranslation(request as LocalTranslationRequest);
       if (!bounded || !write(s, { op: operation, request: bounded })) fail(s, 'input_too_long');
       return promise;
   }
@@ -473,7 +486,7 @@ function build(backend: Backend, options: Record<string, unknown>, deps: Deps, r
     lastFailure: () => lastFailure,
     diagnostics: () => diagnostic ? { ...diagnostic, elapsedMs: elapsed(),
       stage: diagnostic.stage === 'complete' && !answerAccepted ? (diagnostic.outputChunks ? 'decoding' : 'prefill') : diagnostic.stage } : undefined,
-    answer: (request: NpcAnswerRequest, signal: AbortSignal) => execute(request, signal, 'answer'),
+    answer: (request: NpcAnswerRequest, signal: AbortSignal, onPartial?: PartialAnswer) => execute(request, signal, 'answer', onPartial),
     translate: (request: LocalTranslationRequest, signal: AbortSignal) => execute(request, signal, 'translate'),
   };
 }

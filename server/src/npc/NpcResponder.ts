@@ -8,6 +8,7 @@ export interface NpcAnswerRequest {
   readonly requestKey: string; readonly playerId: string; readonly playerName: string;
   readonly npc: NpcProfile; readonly question: string; readonly history: readonly DialogueEntry[];
   readonly locale: 'ru' | 'en' | 'es'; readonly deadlineAt: number;
+  readonly stream?: boolean;
 }
 /**
  * Private current/last answer timing only. No identifiers, content, or IO.

@@ -436,6 +436,24 @@ class WorkerTests(unittest.TestCase):
             with self.assertRaises(common.WorkerError): self.w.answer(request())
             self.assertEqual([call.args[0]['stage'] for call in emit.call_args_list], ['prefill'])
 
+    def test_stream_true_emits_partial_tokens(self):
+        self.w.tokenizer = Tokenizer()
+        prompt = common.compile_prompt(request(), self.w.tokenizer)
+        count = common.count_prompt_tokens(prompt, self.w.tokenizer)
+        lines = b'{"response":"Hel","done":false}\n{"response":"lo","done":true,"prompt_eval_count":' + str(count).encode() + b'}\n'
+        with mock.patch.object(self.w, 'http', return_value=lines), mock.patch.object(worker, 'emit') as emit:
+            req = request()
+            req['stream'] = True
+            self.assertEqual(self.w.answer(req), 'Hello')
+            events = [call.args[0] for call in emit.call_args_list]
+            self.assertEqual(events, [
+                {'type': 'progress', 'stage': 'prefill', 'promptTokens': count},
+                {'type': 'progress', 'stage': 'decoding', 'outputChunks': 1},
+                {'type': 'partial', 'text': 'Hel'},
+                {'type': 'partial', 'text': 'Hello'},
+                {'type': 'progress', 'stage': 'complete', 'outputChunks': 2},
+            ])
+
     def test_bad_streams(self):
         for raw in (b'{"response":"x"}\n', b'{"error":"bad","done":true}\n',
                     b'{"thinking":"secret","done":true}\n', b'{"done":true}\n{"done":true}\n',
