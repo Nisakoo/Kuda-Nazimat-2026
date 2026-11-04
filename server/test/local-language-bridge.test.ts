@@ -95,7 +95,7 @@ it.each(['en', 'es'] as const)('projects only the public %s role for every NPC',
     const projected = f.responder.answer.mock.lastCall![0].npc;
     expect(projected).toEqual(localNpcPromptProfile(id, language));
     expect(projected).not.toBe(npc);
-    expect(Object.keys(projected).sort()).toEqual(['greeting', 'id', 'name', 'persona', 'topic']);
+    expect(Object.keys(projected).sort()).toEqual(['greeting', 'id', 'name', 'persona', 'style', 'topic']);
     const text = JSON.stringify(projected).toLowerCase();
     for (const word of words) expect(text).toContain(word);
     expect(text).not.toMatch(/secret|guide|private|белая|white goat|cabra blanca|researcher|student/);
@@ -109,7 +109,7 @@ it.each(['en', 'es'] as const)('projects only the public %s role for every NPC',
     await f.language.answer({ ...canonical, name: 'Untrusted replacement' }, 'hello', language, [], new AbortController().signal, context);
     const projected = f.responder.answer.mock.lastCall![0].npc;
     expect(projected).toMatchObject({ id, name: canonical.name, topic: canonical.topic, persona: canonical.persona });
-    expect(Object.keys(projected).sort()).toEqual(['greeting', 'id', 'name', 'persona', 'topic']);
+    expect(Object.keys(projected).sort()).toEqual(['greeting', 'id', 'name', 'persona', 'style', 'topic']);
     expect(f.responder.answer.mock.lastCall![0].locale).toBe(language);
   }
   expect(NPCS).toEqual(before);

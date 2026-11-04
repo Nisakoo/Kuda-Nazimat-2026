@@ -358,7 +358,7 @@ class Connection implements Channel {
   private ask(requestId: string, targetId: string, question: string, stream: boolean): void {
     const target = this.deps.game.interact(this, targetId);
     if (!target.ok) { this.error(requestId, 'FORBIDDEN', target.reason === 'too-far' ? 'Подойдите ближе.' : 'Собеседник недоступен.'); return; }
-    const { id, name, topic, persona, greeting } = target.npc;
+    const { id, name, topic, persona, greeting, style } = target.npc;
     let onPartial: ((text: string) => void) | undefined;
     if (stream) {
       const throttle = new PartialThrottle(this.deps.scheduler, PARTIAL_INTERVAL_MS, (seq, text) => {
@@ -368,7 +368,7 @@ class Connection implements Channel {
       onPartial = (text) => throttle.push(text);
     }
     const authorize = () => this.npcAccess(targetId);
-    this.deps.npc.ask({ sessionId: this.sessionId, authorize, connectionId: this.id, requestId, player: this.identity, npc: { id, name, topic, persona, greeting }, question }, onPartial)
+    this.deps.npc.ask({ sessionId: this.sessionId, authorize, connectionId: this.id, requestId, player: this.identity, npc: { id, name, topic, persona, greeting, ...(style ? { style } : {}) }, question }, onPartial)
       .then((answer) => this.deliver(requestId, targetId, answer), () => this.deliver(requestId, targetId, { ok: false, reason: 'unavailable' }));
   }
 

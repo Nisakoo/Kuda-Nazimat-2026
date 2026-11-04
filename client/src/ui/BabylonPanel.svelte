@@ -171,10 +171,10 @@
         <div class="babel-actions babel-word-actions"><button disabled={view.busy} onclick={() => void learnSelected()}>{selectedWord.learned ? 'Вернуть в «Учу»' : 'Запомнил'}</button><button class="secondary babel-action-icon" onclick={() => edit(selectedWord)}><Icon name="pencil" size={20}/> Изменить</button><button class="secondary babel-action-icon" disabled={view.busy} onclick={() => void game.babylonAction({ type: 'word-delete', id: selectedWord.id })}><Icon name="trash" size={20}/> Удалить</button></div>{:else}<p class="babel-muted">{search ? 'Ничего не найдено.' : 'Здесь пока нет слов. Добавьте новое.'}</p>{/if}</div></div>
     {/if}
     {#if gameState && panel === 'interaction' && goat}<section class="babel-inventory"><h3>Выберите корм</h3><div class="babel-inventory-grid">{#each MARKET_ITEMS as item}<button class="secondary babel-item" class:selected={selected === item.id} disabled={!gameState.inventory[item.id]} onclick={() => selected = item.id}><span>{item.name} · {gameState.inventory[item.id]}</span></button>{/each}</div></section>{/if}
-    {#if view.busy}<p role="status">Ожидаем подтверждения сервера…</p>{/if}
+    {#if view.busy && panel !== 'interaction'}<p role="status">Ожидаем подтверждения сервера…</p>{/if}
     {#if view.notice}<p role="status">{view.notice}</p>{/if}
-    {#if view.error}<p class="capture-error" role="alert">{view.error}</p>{/if}
-    {#if view.canRetry}<button class="secondary" disabled={view.busy} onclick={() => void game.retryBabylon()}>Повторить запрос</button>{/if}
+    {#if view.error}<p class={panel === 'interaction' ? 'babel-dialogue-notice' : 'capture-error'} role="alert">{view.error}</p>{/if}
+    {#if view.canRetry}<button class="secondary" disabled={view.busy} onclick={() => void game.retryBabylon()}>{panel === 'interaction' ? 'Спросить снова' : 'Повторить запрос'}</button>{/if}
     {#if panel === 'setup'}<button class="secondary" onclick={() => game.logout()}>Выйти из сессии</button>{/if}
     </div>
     {#if panel !== 'setup'}<div class="babel-footer"><button class="secondary" disabled={panel === 'intro' && view.busy} onclick={() => void close()}>Закрыть</button></div>{/if}

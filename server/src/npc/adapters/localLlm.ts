@@ -106,11 +106,13 @@ function boundedRequest(request: NpcAnswerRequest): NpcAnswerRequest | undefined
   if (!request || !request.npc || !Array.isArray(request.history) || !['ru', 'en', 'es'].includes(request.locale) || !Number.isFinite(request.deadlineAt)) return;
   const { requestKey, playerId, playerName, question, locale, deadlineAt } = request;
   const { id, name, topic, persona, greeting } = request.npc;
+  const style = request.npc.style;
+  if (style !== undefined && style !== 'concise' && style !== 'detailed') return;
   if (![requestKey, playerId, playerName, question, id, name, topic, persona, greeting].every((value) => typeof value === 'string')) return;
   if (Buffer.byteLength(question) > 4096 || (locale !== 'ru' && (!validUnicode(question) || [...question].length > 800 || !question.trim()))) return;
   const history = request.history.slice(-6);
   if (history.some((entry) => !entry || typeof entry.question !== 'string' || typeof entry.answer !== 'string')) return;
-  const safe: NpcAnswerRequest = { requestKey, playerId, playerName, question, locale, deadlineAt, npc: { id, name, topic, persona, greeting }, history: history.map(({ question, answer }) => ({ question, answer })) };
+  const safe: NpcAnswerRequest = { requestKey, playerId, playerName, question, locale, deadlineAt, npc: { id, name, topic, persona, greeting, ...(style ? { style } : {}) }, history: history.map(({ question, answer }) => ({ question, answer })) };
   while (jsonBytes({ op: 'answer', request: safe }) + 1 > LIMIT) {
     if (!safe.history.length) return;
     // Whole oldest pairs only. The worker still performs exact tokenizer admission afterwards.

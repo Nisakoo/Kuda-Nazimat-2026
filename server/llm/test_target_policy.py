@@ -44,10 +44,10 @@ class TargetTests(unittest.TestCase):
             for example in (['I do not know who the king is', 'I do not know today’s weather', 'I do not know a way to earn money here'] if locale == 'en' else
                             ['No sé quién es el rey', 'No sé qué tiempo hace hoy', 'No sé cómo ganar dinero aquí']):
                 self.assertIn(example, system)
-            self.assertEqual(len(tok.messages), 3)
-            self.assertIn('new answer', tok.messages[1]['content'])
-            self.assertNotIn('old answer', tok.messages[1]['content'])
-            self.assertIn('привет', tok.messages[-1]['content'])
+            self.assertEqual(len(tok.messages), 4)
+            self.assertEqual(tok.messages[1], {'role': 'user', 'content': 'new'})
+            self.assertEqual(tok.messages[2], {'role': 'assistant', 'content': 'new answer'})
+            self.assertEqual(tok.messages[3], {'role': 'user', 'content': 'привет'})
             self.assertFalse(tok.options['enable_thinking'])
             req['npc']['persona'] = 'x' * 1800
             with self.assertRaises(common.WorkerError) as error: common.compile_prompt(req, tok)
@@ -68,8 +68,11 @@ class TargetTests(unittest.TestCase):
             with self.assertRaises(common.WorkerError): common.compile_prompt(req, tok)
         for value in ['x' * 800, '𐀀' * 800, '¡Hola, señor! 25 °C; ∑ 2 + 2 = 4. ؎ ب\u200dب']:
             self.assertEqual(common.normalize_target_text(value), value)
-        for value in ['x' * 801, '𐀀' * 801, '\ud800', '\udc00', 'Hello 🙂', 'Hi ☀️', '1️⃣',
-                      '1\u20e3', '🇪🇸', '👩\u200d🔬', '🏽', 'text\ufe0f']:
+        self.assertEqual(common.normalize_target_text('Hello 🙂'), 'Hello')
+        self.assertEqual(common.normalize_target_text('Hi ☀️'), 'Hi')
+        self.assertEqual(common.normalize_target_text('text\ufe0f'), 'text')
+        for value in ['x' * 801, '𐀀' * 801, '\ud800', '\udc00', '1️⃣',
+                      '1\u20e3', '🇪🇸', '👩\u200d🔬', '🏽', '🙂', '☀️']:
             with self.assertRaises(common.WorkerError): common.normalize_target_text(value)
         self.assertEqual(len(common.normalize_text('x' * 5000)), 4000)
 
@@ -102,7 +105,9 @@ class TargetTests(unittest.TestCase):
                 with self.assertRaises(common.WorkerError): runtime.answer(request(locale))
             runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text='Hello.', finish_reason='stop')])
             self.assertEqual(runtime.answer(request(locale)), 'Hello.')
-            for text in ('Hello 🙂', 'x' * 801, '\ud800', 'NPC: Я продаю свежие фрукты на рынке.'):
+            runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text='Hello 🙂', finish_reason='stop')])
+            self.assertEqual(runtime.answer(request(locale)), 'Hello')
+            for text in ('🙂', 'x' * 801, '\ud800', 'NPC: Я продаю свежие фрукты на рынке.'):
                 runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text=text, finish_reason='stop')])
                 with self.assertRaises(common.WorkerError): runtime.answer(request(locale))
             runtime.stream_generate = lambda *a, **kw: iter([types.SimpleNamespace(text='', finish_reason=None)] * 257)

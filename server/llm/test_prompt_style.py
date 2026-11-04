@@ -34,6 +34,39 @@ class PromptStyleTests(unittest.TestCase):
         self.assertFalse(tokenizer.options['enable_thinking'])
         self.assertTrue(tokenizer.options['add_generation_prompt'])
 
+    def test_style_concise_detailed_and_continuation_en(self):
+        tokenizer = Tokenizer()
+        profile_concise = {'name': 'Potter', 'topic': 'Pots', 'persona': 'Shapes clay', 'greeting': 'Hello', 'style': 'concise'}
+        compile_prompt({'locale': 'en', 'question': 'tell me more', 'npc': profile_concise,
+                        'history': [{'question': 'hi', 'answer': 'hello'}]}, tokenizer)
+        system_concise = tokenizer.messages[0]['content']
+        self.assertIn('1–2 short complete sentences', system_concise)
+        self.assertIn('up to 25–30 words', system_concise)
+        self.assertIn('Continuing conversation: answer directly; do not greet again', system_concise)
+        self.assertIn('No meta-commentary on modern eras or technology.', system_concise)
+
+        profile_detailed = {'name': 'Scholar', 'topic': 'Scrolls', 'persona': 'Reads clay', 'greeting': 'Greetings', 'style': 'detailed'}
+        compile_prompt({'locale': 'en', 'question': 'hi', 'npc': profile_detailed, 'history': []}, tokenizer)
+        system_detailed = tokenizer.messages[0]['content']
+        self.assertIn('2–4 short complete sentences', system_detailed)
+        self.assertNotIn('Continuing conversation', system_detailed)
+
+    def test_style_concise_detailed_ru(self):
+        tokenizer = Tokenizer()
+        profile_concise = {'name': 'Гончар', 'topic': 'Глина', 'persona': 'Мастер', 'greeting': 'Привет', 'style': 'concise'}
+        compile_prompt({'locale': 'ru', 'question': 'вопрос', 'npc': profile_concise, 'history': []}, tokenizer)
+        self.assertIn('1–2 коротких предложения, всего до 20 слов', tokenizer.messages[0]['content'])
+
+        profile_detailed = {'name': 'Писец', 'topic': 'Таблички', 'persona': 'Учитель', 'greeting': 'Привет', 'style': 'detailed'}
+        compile_prompt({'locale': 'ru', 'question': 'вопрос', 'npc': profile_detailed, 'history': []}, tokenizer)
+        self.assertIn('2–4 предложения', tokenizer.messages[0]['content'])
+
+    def test_invalid_style_rejected(self):
+        tokenizer = Tokenizer()
+        profile_bad = {'name': 'Гончар', 'topic': 'Глина', 'persona': 'Мастер', 'greeting': 'Привет', 'style': 'rambling'}
+        with self.assertRaises(Exception):
+            compile_prompt({'locale': 'en', 'question': 'hi', 'npc': profile_bad, 'history': []}, tokenizer)
+
 
 if __name__ == '__main__':
     unittest.main()

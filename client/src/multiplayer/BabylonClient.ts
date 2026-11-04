@@ -2,6 +2,7 @@ import { requestId as createRequestId } from '../shared/requestId';
 import type { BabylonAction, BabylonRequest, BabylonResult, BabylonState } from '../../../shared/babylon/types.ts';
 import { parseBabylonRequest, parseBabylonResult } from '../../../shared/babylon/validate.ts';
 import type { ServerSession } from '../../../shared/protocol/types.ts';
+import { NPC_TIMING } from '../../../shared/protocol/npcTiming.ts';
 export interface BabylonView { state: BabylonState | null; busy: boolean; error: string | null; notice: string | null; suggestion: string | null; canRetry: boolean }
 class RequestFailure extends Error {
   constructor(message: string, readonly retryable: boolean) { super(message); }
@@ -55,7 +56,8 @@ export class BabylonClient {
   private async request(packet: BabylonRequest): Promise<BabylonResult> {
     const controller = new AbortController(); this.requests.add(controller);
     if (packet.action.type === 'npc') this.npcRequest = controller;
-    const timeout = setTimeout(() => controller.abort(), 30000);
+    const timeoutMs = packet.action.type === 'npc' ? NPC_TIMING.maxMs : 30000;
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const response = await fetch(`${this.url.replace(/\/$/, '')}/api/babylon`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.session.token}` }, body: JSON.stringify(packet), signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error' });
       controller.signal.throwIfAborted();

@@ -62,5 +62,6 @@ dialog.babel-panel:not([open]) { display: none; }
 .babel-panel .babel-word-tabs button.active { color: #073c48; border-bottom-color: #079a96; }
 .babel-word-layout { border-top: 0; padding-top: 12px; }.babel-word-detail h3 { font-size: 1.65rem; }.babel-word-detail form label { display: block; font-size: .9rem; margin: 8px 0; }.babel-word-actions { margin-top: 12px; }
 .babel-participants { margin: 8px 0; }.babel-compose button { white-space: nowrap; }
+.babel-dialogue-notice { color: #49392b; background: #f4e8d4; border-left: 3px solid #be865a; border-radius: 4px; padding: 10px 14px; font-size: 13px; line-height: 1.5; margin: 12px 0; font-style: italic; }
 @media (max-width: 600px) { .babel-tools-layout { grid-template-columns: 1fr; gap: 12px; }.babel-tool-detail { border-left: 0; border-top: 1px solid #e9d5b6; padding: 12px 0 0; }.babel-panel .babel-tool-card { min-height: 135px; }.tool-illustration { height: 100px; } }
 @media (max-width: 600px) { dialog.babel-panel { width: calc(100% - 16px); max-height: calc(100svh - 16px); } .babel-content { padding: 16px; } .babel-word-layout { grid-template-columns: 1fr; gap: 12px; } .babel-word-list { max-height: 180px; } .babel-word-detail { border-left: 0; border-top: 1px solid #e9d5b6; padding: 12px 0 0; } .babel-panel .babel-compose { flex-wrap: wrap; } .babel-compose label { flex-basis: 100%; order: -1; } }

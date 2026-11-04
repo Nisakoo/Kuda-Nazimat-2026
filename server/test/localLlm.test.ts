@@ -578,6 +578,11 @@ describe.skipIf(process.platform === 'win32')('real Node fixture supervision (no
     await expect(responder.answer({ ...answerRequest(), history } as unknown as ReturnType<typeof answerRequest>, new AbortController().signal)).rejects.toThrow('input_too_long');
     expect(alive(pid())).toBe(false);
   });
+  it('rejects invalid style defensively', async () => {
+    const { responder, pid } = fixture(); await responder.start();
+    await expect(responder.answer({ ...answerRequest(), npc: { ...answerRequest().npc, style: 'invalid' as unknown as 'concise' } }, new AbortController().signal)).rejects.toThrow('input_too_long');
+    expect(alive(pid())).toBe(false);
+  });
   it('fails closed on startup memory excess, invalid measurements or measurement errors', async () => {
     for (const { memoryBytes, reason } of [
       { memoryBytes: async () => 3_500_000_000, reason: 'resource_limit' },

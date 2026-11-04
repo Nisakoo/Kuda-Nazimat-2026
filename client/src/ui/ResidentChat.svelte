@@ -8,7 +8,6 @@
   let pendingQuestion = $state('');
   let history: HTMLDivElement;
   const replies = $derived(view.state?.replies.filter(reply => reply.npcId === target) ?? []);
-  const language = $derived(({ ru: 'Русский', en: 'English', es: 'Español' })[view.state?.profile?.learning ?? 'en']);
   const lastReply = $derived(replies.at(-1)?.id);
   $effect(() => { if (lastReply && history) history.scrollTop = history.scrollHeight; });
   async function send() {
@@ -32,7 +31,7 @@
         <div class="resident-message outgoing"><small>Вы</small><p>{reply.question}</p></div>
         <div class="resident-message"><small>{name}<span>{({ ru: 'Русский', en: 'English', es: 'Español' })[reply.language]}</span></small><div class="resident-bubble"><ResidentWords text={reply.text} {game} {view} enabled={reply.language === view.state?.profile?.learning}/></div></div>
       {/each}
-      {#if pendingQuestion}<div class="resident-message outgoing"><small>Вы</small><p>{pendingQuestion}</p></div><p role="status">Житель отвечает…</p>{:else if !replies.length}<p class="babel-muted">Начните разговор. Ответы появятся здесь на {language}.</p>{/if}
+      {#if pendingQuestion}<div class="resident-message outgoing"><small>Вы</small><p>{pendingQuestion}</p></div><p role="status">Житель отвечает…</p>{/if}
     </div>
     <form class="resident-compose" onsubmit={event => { event.preventDefault(); void send(); }}><label class="sr-only" for="resident-question">Вопрос NPC</label><textarea id="resident-question" aria-label="Вопрос NPC" placeholder="Спросить на родном языке…" bind:value={question} maxlength="500" required></textarea><button disabled={view.busy || !question.trim()}>Спросить</button></form>
   </div>

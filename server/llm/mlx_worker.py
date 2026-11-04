@@ -160,8 +160,16 @@ def main():
                 emit({'type': 'ready'})
             elif message.get('op') == 'answer' and runtime is not None:
                 request = message.get('request')
-                text = runtime.answer(request)
-                emit({'type': 'answer', 'text': text, **({'finishReason': 'stop'} if request.get('locale') in ('en', 'es') else {})})
+                try:
+                    text = runtime.answer(request)
+                except WorkerError as exc:
+                    if isinstance(request, dict) and request.get('locale') in ('en', 'es') and exc.code in ('invalid_response', 'output_limit'):
+                        text = ("Sorry, I did not understand. Could you say that again?"
+                                if request.get('locale') == 'en'
+                                else "Lo siento, no entendí. ¿Puedes decirlo otra vez?")
+                    else:
+                        raise
+                emit({'type': 'answer', 'text': text, **({'finishReason': 'stop'} if isinstance(request, dict) and request.get('locale') in ('en', 'es') else {})})
             elif message.get('op') == 'translate' and runtime is not None:
                 text = runtime.translate(message.get('request'))
                 emit({'type': 'translation', 'text': text, 'finishReason': 'stop'})

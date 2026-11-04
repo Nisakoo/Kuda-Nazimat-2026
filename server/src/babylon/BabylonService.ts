@@ -137,8 +137,8 @@ export class BabylonService {
     if (live === undefined) return base ?? fail('INVALID', 'Неизвестный собеседник');
     if (live === null) return fail(base ? 'FORBIDDEN' : 'INVALID', base ? 'Собеседник сейчас недоступен.' : 'Неизвестный собеседник');
     if (!base && live.mapId !== 'market') fail('INVALID', 'Неизвестный собеседник');
-    const { id, name, topic, persona, greeting } = live.profile;
-    return { id, name, topic, persona, greeting, x: base?.x ?? live.x, z: base?.z ?? live.z };
+    const { id, name, topic, persona, greeting, style } = live.profile;
+    return { id, name, topic, persona, greeting, ...(style ? { style } : {}), x: base?.x ?? live.x, z: base?.z ?? live.z };
   }
   private async execute(identity: PlayerIdentity, packet: BabylonRequest, connectionId: string, fingerprint: string, authorize: () => Promise<boolean>, scope?: NpcSessionScope): Promise<BabylonResult> {
     const { store, id, now } = this.deps, a = packet.action, pid = identity.playerId;
@@ -365,7 +365,12 @@ export class BabylonService {
         if (operation?.status !== 'complete') store.saveOperation(pid, packet.requestId, { fingerprint, ...operationScope, status: 'failed' });
       });
       const saved = store.operation(pid, packet.requestId);
-      if (saved?.status !== 'complete') fail(result.reason === 'player-busy' || result.reason === 'server-busy' ? 'RATE_LIMIT' : 'UNAVAILABLE', 'Переводчик занят или недоступен. Повторите запрос.');
+      const failureMessage = a.type === 'npc'
+        ? 'Собеседник растерянно смотрит на вас: кажется, вас не поняли или слова прозвучали неразборчиво. Попробуйте повторить или спросить иначе.'
+        : a.type === 'suggest'
+        ? 'Подсказка перевода временно недоступна. Попробуйте снова через несколько секунд.'
+        : 'Перевод сообщения сейчас недоступен. Попробуйте снова через несколько секунд.';
+      if (saved?.status !== 'complete') fail(result.reason === 'player-busy' || result.reason === 'server-busy' ? 'RATE_LIMIT' : 'UNAVAILABLE', failureMessage);
     }
     const saved = store.operation(pid, packet.requestId);
     return saved?.suggestion ? { suggestion: saved.suggestion } : {};

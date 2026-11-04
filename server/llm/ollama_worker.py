@@ -590,12 +590,32 @@ def main():
                 if msg.get('op') not in ('answer', 'translate') or not isinstance(msg.get('request'), dict):
                     raise WorkerError('invalid_message', 'Expected answer or translation message')
                 request = msg['request']
-                if msg['op'] == 'translate':
-                    text = worker.translate(request)
-                    emit({'type': 'translation', 'text': text, 'finishReason': 'stop'})
-                else:
-                    text = worker.answer(request)
-                    emit({'type': 'answer', 'text': text, **({'finishReason': 'stop'} if request.get('locale') in ('en', 'es') else {})})
+                try:
+                    if msg['op'] == 'translate':
+                        text = worker.translate(request)
+                        emit({'type': 'translation', 'text': text, 'finishReason': 'stop'})
+                    else:
+                        try:
+                            text = worker.answer(request)
+                        except WorkerError as exc:
+                            if request.get('locale') in ('en', 'es') and exc.code in ('invalid_response', 'output_limit'):
+                                text = ("Sorry, I did not understand. Could you say that again?"
+                                        if request.get('locale') == 'en'
+                                        else "Lo siento, no entendí. ¿Puedes decirlo otra vez?")
+                            else:
+                                raise
+                        emit({'type': 'answer', 'text': text, **({'finishReason': 'stop'} if request.get('locale') in ('en', 'es') else {})})
+                except WorkerError as exc:
+                    result = {'type': 'error', 'code': exc.code, 'message': str(exc)[:200]}
+                    diagnostic = getattr(exc, 'diagnostic', None) or (worker.stage if worker is not None else None)
+                    if diagnostic:
+                        result['diagnostic'] = diagnostic
+                    emit(result)
+                except Exception:
+                    result = {'type': 'error', 'code': 'model_unavailable', 'message': 'Local worker failed'}
+                    if worker is not None and worker.stage:
+                        result['diagnostic'] = worker.stage
+                    emit(result)
         except WorkerError as exc:
             result = {'type': 'error', 'code': exc.code, 'message': str(exc)[:200]}
             diagnostic = getattr(exc, 'diagnostic', None) or (worker.stage if worker is not None else None)

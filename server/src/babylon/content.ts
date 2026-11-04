@@ -3,31 +3,49 @@ import type { ItemId, Language } from '../../../shared/babylon/types.ts';
 import type { NpcProfile } from '../contracts.ts';
 export const ITEMS: Readonly<Record<ItemId, string>> = { dates: 'fruit-seller', 'red-fruit': 'fruit-seller', 'yellow-fruit': 'fruit-seller', water: 'potter', fabric: 'fabric-seller' };
 export const GOATS = PASTURE_GOATS;
-const CITY_NPCS = Object.fromEntries(CITY_RESIDENTS.filter(n => !n.legacy).map(n => [n.id, { id:n.id,name:n.name,topic:n.topic,persona:n.persona,greeting:`Добро пожаловать. Я ${n.name}.`,x:n.x,z:n.z }]));
+function residentStyle(role: string, persona: string): 'concise' | 'detailed' {
+  if (role.includes('писец') || role.includes('жрец') || role.includes('жриц') || role.includes('учен') || role.includes('учитель') || role.includes('сказочник') || persona.includes('сложная') || persona.includes('длинные')) {
+    return 'detailed';
+  }
+  return 'concise';
+}
+const CITY_NPCS = Object.fromEntries(CITY_RESIDENTS.filter(n => !n.legacy).map(n => [n.id, { id:n.id,name:n.name,topic:n.topic,persona:n.persona,greeting:`Добро пожаловать. Я ${n.name}.`,x:n.x,z:n.z,style:residentStyle(n.role, n.persona) }]));
 export const NPCS: Readonly<Record<string, NpcProfile & { x: number; z: number }>> = {
   ...CITY_NPCS,
-  'fruit-seller': { id: 'fruit-seller', name: 'Торговец фруктами', topic: 'Финики и фрукты', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Добро пожаловать!', x: -4.5, z: .5 },
-  'fabric-seller': { id: 'fabric-seller', name: 'Торговка тканями', topic: 'Ткани и узоры', persona: 'Жительница древнего Вавилона, учебная реконструкция', greeting: 'Рассмотри ткани.', x: -3, z: -5.2 },
-  potter: { id: 'potter', name: 'Гончар', topic: 'Глиняная посуда и вода', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Здесь есть вода в кувшине.', x: 4.6, z: -.5 },
-  shepherd: { id: 'shepherd', name: 'Пастух', topic: 'Козы', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Помоги накормить коз.', x: -3, z: PASTURE_ORIGIN.z + 6 },
+  'fruit-seller': { id: 'fruit-seller', name: 'Торговец фруктами', topic: 'Финики и фрукты', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Добро пожаловать!', x: -4.5, z: .5, style: 'concise' },
+  'fabric-seller': { id: 'fabric-seller', name: 'Торговка тканями', topic: 'Ткани и узоры', persona: 'Жительница древнего Вавилона, учебная реконструкция', greeting: 'Рассмотри ткани.', x: -3, z: -5.2, style: 'concise' },
+  potter: { id: 'potter', name: 'Гончар', topic: 'Глиняная посуда и вода', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Здесь есть вода в кувшине.', x: 4.6, z: -.5, style: 'concise' },
+  shepherd: { id: 'shepherd', name: 'Пастух', topic: 'Козы', persona: 'Житель древнего Вавилона, учебная реконструкция', greeting: 'Помоги накормить коз.', x: -3, z: PASTURE_ORIGIN.z + 6, style: 'concise' },
 };
 // Public prompt-only projections. Keep UI labels and the canonical world content above unchanged.
 const PROMPT_PROFILES: Readonly<Record<string, Readonly<Record<'en' | 'es', Omit<NpcProfile, 'id'>>>>> = {
   'fruit-seller': {
-    en: { name: 'Fruit seller', topic: 'Dates and fruit', persona: 'I am a fruit seller. I sell dates and fruit.', greeting: 'Welcome!' },
-    es: { name: 'Vendedor de fruta', topic: 'Dátiles y fruta', persona: 'Soy vendedor de fruta. Vendo dátiles y fruta.', greeting: '¡Bienvenido!' },
+    en: { name: 'Fruit seller', topic: 'Dates and fruit', persona: 'I am a fruit seller. I sell dates and fruit.', greeting: 'Welcome!', style: 'concise' },
+    es: { name: 'Vendedor de fruta', topic: 'Dátiles y fruta', persona: 'Soy vendedor de fruta. Vendo dátiles y fruta.', greeting: '¡Bienvenido!', style: 'concise' },
   },
   'fabric-seller': {
-    en: { name: 'Fabric seller', topic: 'Cloth and patterns', persona: 'I am a fabric seller. I sell cloth. I know about patterns.', greeting: 'Look at the cloth.' },
-    es: { name: 'Vendedora de telas', topic: 'Telas y diseños', persona: 'Soy vendedora de telas. Vendo telas. Conozco los diseños.', greeting: 'Mira las telas.' },
+    en: { name: 'Fabric seller', topic: 'Cloth and patterns', persona: 'I am a fabric seller. I sell cloth. I know about patterns.', greeting: 'Look at the cloth.', style: 'concise' },
+    es: { name: 'Vendedora de telas', topic: 'Telas y diseños', persona: 'Soy vendedora de telas. Vendo telas. Conozco los diseños.', greeting: 'Mira las telas.', style: 'concise' },
   },
   potter: {
-    en: { name: 'Potter', topic: 'Clay pots and water', persona: 'I am a potter. I work with clay pots and water.', greeting: 'There is water in a jug.' },
-    es: { name: 'Alfarero', topic: 'Vasijas de barro y agua', persona: 'Soy alfarero. Trabajo con vasijas de barro y agua.', greeting: 'Hay agua en una jarra.' },
+    en: {
+      name: 'Adadu the Potter',
+      topic: 'Clay pots, water jars, and market life',
+      persona: 'I am Adadu, a master potter in the market of ancient Babylon. I shape clay pots, bowls, and water jars by hand and bake them in my kiln. I know the city market, the river Euphrates, and my neighbours Eriba and Nabu.',
+      greeting: 'Hello, traveller! I am Adadu the potter. Welcome to my workshop.',
+      style: 'concise',
+    },
+    es: {
+      name: 'Adadu el Alfarero',
+      topic: 'Vasijas de barro, jarras de agua y vida del mercado',
+      persona: 'Soy Adadu, un maestro alfarero en el mercado de la antigua Babilonia. Moldeo vasijas, cuencos y jarras de agua con barro del río Éufrates y las cocino en mi horno. Conozco el mercado y a mis vecinos Eriba y Nabu.',
+      greeting: '¡Hola, viajero! Soy Adadu el alfarero. Bienvenido a mi taller.',
+      style: 'concise',
+    },
   },
   shepherd: {
-    en: { name: 'Shepherd', topic: 'Goats', persona: 'I am a shepherd. I care for goats.', greeting: 'Help feed the goats.' },
-    es: { name: 'Pastor', topic: 'Cabras', persona: 'Soy pastor. Cuido las cabras.', greeting: 'Ayuda a alimentar a las cabras.' },
+    en: { name: 'Shepherd', topic: 'Goats', persona: 'I am a shepherd. I care for goats.', greeting: 'Help feed the goats.', style: 'concise' },
+    es: { name: 'Pastor', topic: 'Cabras', persona: 'Soy pastor. Cuido las cabras.', greeting: 'Ayuda a alimentar a las cabras.', style: 'concise' },
   },
 };
 
@@ -37,7 +55,8 @@ export function localNpcPromptProfile(id: string, language: 'en' | 'es'): NpcPro
     const resident = CITY_RESIDENTS.find(npc => npc.id === id && !npc.legacy);
     if (!resident) throw new Error('Unknown Babylon NPC');
     // Preserve the authored city identity until a localized projection is authored.
-    return { id, name: resident.name, topic: resident.topic, persona: resident.persona, greeting: language === 'en' ? 'Welcome!' : '¡Bienvenido!' };
+    const style: 'concise' | 'detailed' = residentStyle(resident.role, resident.persona);
+    return { id, name: resident.name, topic: resident.topic, persona: resident.persona, greeting: language === 'en' ? 'Welcome!' : '¡Bienvenido!', style };
   }
   return { id, ...profile, persona: `${profile.persona} ${language === 'en' ? 'I live in ancient Babylon.' : 'Vivo en la antigua Babilonia.'}` };
 }
