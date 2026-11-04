@@ -16,10 +16,7 @@ import { damp } from './CharacterMotion';
 import { FrameFence } from './FrameFence';
 import type { SceneStateMessage } from '../../../../shared/world-life/types.ts';
 import { WorldLifeVisuals } from './WorldLifeVisuals';
-import { RenderMeasurement } from './RenderMeasurement';
-import { DrawInventory } from './DrawInventory';
 import type { WorldBudget } from '../../map/WorldBudget';
-import type { BufferAttribute, InterleavedBufferAttribute, Mesh, InstancedMesh, SkinnedMesh, Texture } from 'three';
 
 export class ThreeRenderer implements RenderAdapter {
   private shotgun: ShotgunVisuals | null = null;
@@ -43,11 +40,8 @@ export class ThreeRenderer implements RenderAdapter {
   private sun: DirectionalLight | null = null;
   private readonly errors = new Map<string, string>();
   private frameFence: FrameFence | null = null;
-  private measurement: RenderMeasurement | null = null;
-  private inventoryRequested = false;
-  private inventory: ReturnType<DrawInventory['finish']> | null = null;
-  private readonly contextLost = (): void => { this.measurement?.gpu.contextLost(); this.frameFence?.contextLost(); this.errors.set('gpu', 'Графический контекст потерян.'); };
-  private readonly contextRestored = (): void => { this.measurement?.gpu.contextRestored(); this.frameFence?.contextRestored(); this.errors.delete('gpu'); };
+  private readonly contextLost = (): void => { this.frameFence?.contextLost(); this.errors.set('gpu', 'Графический контекст потерян.'); };
+  private readonly contextRestored = (): void => { this.frameFence?.contextRestored(); this.errors.delete('gpu'); };
 
   constructor(private readonly modelAssets: AssetManager, private readonly proceduralDemo = true, private readonly marketStyle = false, private readonly quality: GraphicsQuality = 'balanced', private readonly markBudget?: WorldBudget, private readonly batchedMarks = quality !== 'high') {}
 
@@ -117,54 +111,6 @@ export class ThreeRenderer implements RenderAdapter {
   revealChunks(): void { this.chunks?.reveal(); }
   unloadChunk(id: string): void { this.chunks?.unload(id); this.shotgun?.pruneDetachedMarks(); this.errors.delete(`chunk:${id}`); }
   retryFailedModels(): void { this.errors.clear(); this.visuals?.retryFailed(); this.life?.retryFailed(); }
-  setMeasurementEnabled(enabled: boolean, passes = false): void {
-    this.measurement?.dispose();
-    this.measurement = enabled && this.renderer ? new RenderMeasurement(this.renderer.getContext() as WebGL2RenderingContext, passes) : null;
-  }
-  readMeasurement(): ReturnType<RenderMeasurement['read']> | null { return this.measurement?.read() ?? null; }
-  measurementStatus() { return this.measurement?.gpu.stats ?? { status: 'disabled', queries: 0, rejected: 0 }; }
-  requestDrawInventory(): void { this.inventory = null; this.inventoryRequested = true; }
-  readDrawInventory() { return this.inventory; }
-  measurementResources() {
-    // Snapshot-only estimates of scene-owned storage, not a measurement of driver VRAM.
-    const buffers = new Set<BufferAttribute | import('three').InterleavedBuffer>();
-    const textures = new Set<Texture>();
-    let instanceCount = 0, instanceBytes = 0;
-    const add = (attribute: BufferAttribute | InterleavedBufferAttribute) => {
-      buffers.add('isInterleavedBufferAttribute' in attribute ? attribute.data : attribute);
-    };
-    this.scene?.traverse(node => {
-      const mesh = node as Mesh;
-      if (!mesh.isMesh) return;
-      for (const attribute of Object.values(mesh.geometry.attributes)) add(attribute);
-      if (mesh.geometry.index) add(mesh.geometry.index);
-      for (const attributes of Object.values(mesh.geometry.morphAttributes)) for (const attribute of attributes ?? []) add(attribute);
-      const instances = node as InstancedMesh;
-      if (instances.isInstancedMesh) { instanceCount += instances.count; instanceBytes += instances.instanceMatrix.array.byteLength + (instances.instanceColor?.array.byteLength ?? 0); }
-      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
-        for (const value of Object.values(material)) if (value && typeof value === 'object' && 'isTexture' in value) textures.add(value as Texture);
-      }
-      const skin = node as SkinnedMesh;
-      if (skin.isSkinnedMesh && skin.skeleton.boneTexture) textures.add(skin.skeleton.boneTexture);
-    });
-    let textureBaseBytes = 0;
-    for (const texture of textures) {
-      const image = texture.image as { width?: number; height?: number } | undefined;
-      textureBaseBytes += (image?.width ?? 0) * (image?.height ?? 0) * 4;
-    }
-    const shadow = this.sun?.shadow.map;
-    const shadowCamera = this.sun?.shadow.camera;
-    return { geometryAttributeBytes: [...buffers].reduce((bytes, attribute) => bytes + attribute.array.byteLength, 0),
-      instanceCount, instanceBytes, textureRgbaBaseLevelEstimateBytes: textureBaseBytes,
-      shadowTargets: Number(!!shadow), shadowTargetRgbaDepthEstimateBytes: shadow ? shadow.width * shadow.height * 8 : 0,
-      extraTargets: 0, programs: this.renderer?.info.programs?.length ?? 0, queries: this.measurement?.gpu.stats.queries ?? 0, pelletMarks: this.shotgun?.markCount ?? 0,
-      shadow: this.sun && shadowCamera ? { enabled: this.sun.castShadow && !!this.renderer?.shadowMap.enabled, mapSize: this.sun.shadow.mapSize.toArray(), filter: this.renderer?.shadowMap.type,
-        extent: [shadowCamera.left, shadowCamera.right, shadowCamera.bottom, shadowCamera.top, shadowCamera.near, shadowCamera.far],
-        bias: this.sun.shadow.bias, normalBias: this.sun.shadow.normalBias, autoUpdate: this.sun.shadow.autoUpdate,
-        position: this.sun.position.toArray(), target: this.sun.target.position.toArray(), textureFormat: shadow?.texture.format ?? null, textureType: shadow?.texture.type ?? null,
-        depthTextureType: shadow?.depthTexture?.type ?? null, depthTextureFormat: shadow?.depthTexture?.format ?? null, depthCompare: shadow?.depthTexture?.compareFunction ?? null, depthBuffer: shadow?.depthBuffer ?? false } : null,
-      note: 'Scene geometry/instance arrays and RGBA base levels; excludes driver overhead, mipmaps, default framebuffer/MSAA. Shadow estimate includes RGBA + depth32. Not measured VRAM or WorldBudget reserve.' };
-  }
   getDiagnostics(): RenderDiagnostics {
     const stats = this.library?.stats;
     return { chunks: this.chunks?.ids ?? [], entities: [...this.visuals?.ids ?? [], ...this.life?.ids ?? []], models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
@@ -182,25 +128,17 @@ export class ThreeRenderer implements RenderAdapter {
 
   render(elapsedSeconds: number, alpha: number): boolean {
     if (!this.renderer || !this.scene || !this.camera || !this.visuals) return false;
-    const measurement = this.measurement;
-    measurement?.begin();
     // Loads must progress even under GPU backpressure. Presentation can wait.
     this.library?.flush();
-    measurement?.phase('cloneQueue');
     if (!this.frameFence?.canSubmit()) {
-      measurement?.phase('fence'); measurement?.finish(false);
       if (this.frameFence?.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
       return false;
     }
-    measurement?.phase('fence');
     const delta = Math.max(0, elapsedSeconds - this.lastElapsed);
     this.lastElapsed = elapsedSeconds;
     this.visuals.animate(alpha, elapsedSeconds, delta);
-    measurement?.phase('entities');
     this.life?.animate(elapsedSeconds,delta,this.chunks?.readyIds ?? []);
-    measurement?.phase('worldLife');
     this.chunks?.animate(delta,this.life?.sceneTime(elapsedSeconds) ?? elapsedSeconds*1000,this.sceneState?.definition.wind, this.visuals.position(this.playerId) ?? undefined);
-    measurement?.phase('chunks');
     const position = this.visuals.position(this.playerId);
     if (position) this.target.copy(position);
     else this.target.set(0, 0, 0);
@@ -220,7 +158,6 @@ export class ThreeRenderer implements RenderAdapter {
     this.shotgun?.animate(Math.min(delta,.1),firstPerson);
     // Update before camera probes; suppress only the renderer's duplicate scene traversal.
     this.scene.updateMatrixWorld();
-    measurement?.phase('matricesAndSetup');
     if(firstPerson) {
       this.camera.position.copy(this.target);this.camera.rotation.set(-pitch,yaw,0,'YXZ');
     } else {
@@ -232,39 +169,17 @@ export class ThreeRenderer implements RenderAdapter {
     this.camera.lookAt(this.target);
     }
     this.camera.updateMatrixWorld();
-    measurement?.phase('camera');
     this.shotgun?.flushShots();
-    measurement?.phase('shots');
     this.scene.matrixWorldAutoUpdate = false;
     this.renderer.info.reset();
-    const inventory = this.inventoryRequested ? new DrawInventory(this.scene) : null;
-    const renderer = this.renderer;
-    const shadowRender = renderer.shadowMap.render;
-    if (measurement?.passes) renderer.shadowMap.render = (...args) => {
-      const calls = renderer.info.render.calls, triangles = renderer.info.render.triangles;
-      measurement.beginShadow(renderer.shadowMap.enabled && !!this.sun?.castShadow);
-      const started = performance.now();
-      try { return shadowRender.apply(renderer.shadowMap, args); }
-      finally { measurement.endShadow(performance.now() - started, renderer.info.render.calls - calls, renderer.info.render.triangles - triangles); }
-    };
-    measurement?.startGpu();
-    let submitted = false;
-    try { this.renderer.render(this.scene, this.camera); submitted = true; }
-    finally {
-      this.scene.matrixWorldAutoUpdate = true;
-      if (measurement?.passes) renderer.shadowMap.render = shadowRender;
-      measurement?.phase('submit');
-      measurement?.finish(submitted, this.renderer.info.render.calls, this.renderer.info.render.triangles);
-      if (inventory) { this.inventory = inventory.finish(); this.inventoryRequested = false; }
-    }
+    try { this.renderer.render(this.scene, this.camera); }
+    finally { this.scene.matrixWorldAutoUpdate = true; }
     this.frameFence.submitted();
     if (this.frameFence.failed) this.errors.set('gpu', 'Не удалось синхронизировать графический процессор.');
     return true;
   }
 
   dispose(): void {
-    this.measurement?.dispose(); this.measurement = null;
-    this.inventory = null; this.inventoryRequested = false;
     this.shotgun?.dispose();this.shotgun=null;
     this.life?.dispose(); this.life = null; this.sceneState = null;
     this.chunks?.dispose();

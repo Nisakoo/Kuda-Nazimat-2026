@@ -26,13 +26,13 @@ test('quality profiles persist, recreate antialiasing and cap only the 3D drawin
     const old = await page.locator('canvas[aria-label="Трёхмерная сцена"]').elementHandle();
     await page.getByRole('button', { name: 'Применить и открыть карту' }).click(); await enter(page);
     expect(await old!.evaluate((canvas: HTMLCanvasElement) => canvas.getContext('webgl2')!.isContextLost())).toBe(true); await old!.dispose();
-    const info = await buffer(); expect(info.width).toBe(quality === 'high' ? 2560 : 1280); expect(info.css).toBe(1280);
+    const info = await buffer(); expect(info.width).toBe(quality === 'high' ? 1920 : 1280); expect(info.css).toBe(1280);
     expect(info.antialias).toBe(quality !== 'low');
     expect(await page.evaluate(() => localStorage.getItem('world.graphics-quality'))).toBe(quality);
     await page.keyboard.down('w'); await page.waitForTimeout(300); await page.keyboard.up('w');
     await page.reload(); await enter(page);
     expect((await buffer()).antialias).toBe(quality !== 'low');
-    expect((await buffer()).width).toBe(quality === 'high' ? 2560 : 1280);
+    expect((await buffer()).width).toBe(quality === 'high' ? 1920 : 1280);
   }
   await page.setViewportSize({ width: 1000, height: 700 }); await expect.poll(async () => (await buffer()).width).toBe(1000);
   await page.reload(); await enter(page); expect((await buffer()).width).toBe(1000);

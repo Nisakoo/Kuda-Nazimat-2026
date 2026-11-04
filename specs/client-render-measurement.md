@@ -1,7 +1,7 @@
 ---
 id: client-render-measurement
 type: module-design
-status: ready
+status: retired
 implementation: complete
 parent: architecture
 summary: Воспроизводимые измерения CPU, GPU, загрузки и ресурсов перед оптимизацией клиента.
