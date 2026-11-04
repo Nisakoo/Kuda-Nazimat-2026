@@ -111,7 +111,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
     const responder = createResponder(config.npc.adapter, config.npc.options, { clock: systemClock, scheduler: systemScheduler });
     npc = createNpcDialogueService({ responder, dialogue: stores.dialogue, clock: systemClock, scheduler: systemScheduler, logger, metrics }, config.npc);
     await npc.start();
-    language = languagePort ?? createLanguagePort(config.language.adapter, config.language.options, { responder, ready: npc.ready, observeRuntimeFailure: npc.observeRuntimeFailure });
+    language = languagePort ?? createLanguagePort(config.language.adapter, config.language.options, { responder, dialogue: stores.dialogue, ready: npc.ready, observeRuntimeFailure: npc.observeRuntimeFailure });
     try {
       await language.start?.(); languageReady = language.ready?.() ?? true;
       if (languageReady) logger.child('language').info('language.ready', 'Переводчик готов', { mode: language.mode, languages: language.languages });

@@ -1,10 +1,14 @@
 import type { LanguagePort, LanguageCallContext } from './ports.ts';
 import type { NpcResponder } from '../npc/NpcResponder.ts';
+import type { DialogueStore } from '../npc/ports.ts';
 import { hasObviousCyrillicReply } from '../npc/targetLanguage.ts';
+import { classifyPlayerIntent, transitionAttitude } from '../npc/intentClassifier.ts';
+import { extractPlayerFact } from '../npc/factExtractor.ts';
 import { localNpcPromptProfile } from './content.ts';
 
 export interface BorrowedLanguageRuntime {
   readonly responder: NpcResponder;
+  readonly dialogue?: DialogueStore;
   ready(): boolean;
   observeRuntimeFailure(): void;
 }
@@ -48,13 +52,26 @@ export function createLocalLanguagePort(runtime: BorrowedLanguageRuntime): Langu
         await prepare(signal, context);
         check(signal, context);
         const deadlineAt = context.budget.deadlineAt();
+        const currentAttitude = runtime.dialogue?.attitude?.(context.player.playerId, npc.id, context.sessionId) ?? 'ordinary';
+        const intent = classifyPlayerIntent(question);
+        const nextAttitude = transitionAttitude(currentAttitude, intent);
+        const facts = runtime.dialogue?.facts?.(context.player.playerId, npc.id, context.sessionId) ?? [];
         const result = await responder.answer({
           requestKey: JSON.stringify([context.requestKey, 'npc', npc.id]), playerId: context.player.playerId,
-          playerName: context.player.displayName, npc: localNpcPromptProfile(npc.id, language), question, locale: language, deadlineAt,
+          playerName: context.player.displayName, npc: { ...localNpcPromptProfile(npc.id, language), attitude: nextAttitude }, question, locale: language, deadlineAt,
           history: history.slice(-6).map(({ question, text }) => ({ question, answer: text })),
+          facts: facts.length ? facts : undefined,
         }, signal);
         if (hasObviousCyrillicReply(result.text)) throw new Error('NPC reply does not match target script');
-        return await deliver(signal, context, result.text);
+        const text = await deliver(signal, context, result.text);
+        if (nextAttitude !== currentAttitude) {
+          runtime.dialogue?.setAttitude?.(context.player.playerId, npc.id, context.sessionId, nextAttitude, Date.now());
+        }
+        const fact = extractPlayerFact(question);
+        if (fact) {
+          runtime.dialogue?.appendFact?.(context.player.playerId, npc.id, context.sessionId, fact, Date.now());
+        }
+        return text;
       } finally { runtime.observeRuntimeFailure(); }
     },
   };
