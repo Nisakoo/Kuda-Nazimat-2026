@@ -142,6 +142,11 @@ class TargetTests(unittest.TestCase):
                 runtime.tokenizer.encode.return_value = ids
             self.assertEqual(runtime.answer(request('ru')), 'Ответ')
             self.assertEqual(runtime.generate.call_args.kwargs['max_tokens'], 128)
+            runtime.stream_generate = Mock(return_value=iter([types.SimpleNamespace(text='Привет, ', finish_reason=None), types.SimpleNamespace(text='мир!', finish_reason='stop')]))
+            ru_stream_req = dict(request('ru'))
+            ru_stream_req['stream'] = True
+            self.assertEqual(runtime.answer(ru_stream_req), 'Привет, мир!')
+            self.assertEqual(runtime.stream_generate.call_args.kwargs['max_tokens'], 128)
             for count in (128, 129):
                 frames = [types.SimpleNamespace(text='x', finish_reason=None) for _ in range(count)]
                 frames[-1].finish_reason = 'stop'

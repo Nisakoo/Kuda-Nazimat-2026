@@ -147,8 +147,26 @@ class Runtime:
                 if reason != 'stop':
                     raise WorkerError('invalid_response', 'Model did not finish normally')
                 return strict_normalize(''.join(parts))
-            text = self.generate(self.model, self.tokenizer, ids, max_tokens=128,
-                                 sampler=self.sampler, logits_processors=self.processors, verbose=False)
+            elif stream_tokens:
+                parts = []
+                size = 0
+                for count, item in enumerate(self.stream_generate(self.model, self.tokenizer, ids, max_tokens=max_tokens,
+                                                                  sampler=self.sampler, logits_processors=self.processors), 1):
+                    chunk = getattr(item, 'text', None)
+                    if count > max_tokens or not isinstance(chunk, str):
+                        break
+                    try:
+                        size += len(chunk.encode('utf-8'))
+                    except UnicodeError:
+                        break
+                    if size > 16384:
+                        break
+                    parts.append(chunk)
+                    emit({'type': 'partial', 'text': strip_thinking(''.join(parts))})
+                text = ''.join(parts)
+            else:
+                text = self.generate(self.model, self.tokenizer, ids, max_tokens=128,
+                                     sampler=self.sampler, logits_processors=self.processors, verbose=False)
         return normalize_text(text)
 
 

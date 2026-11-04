@@ -60,6 +60,7 @@ input[type=checkbox] { accent-color: #246d61; }
 .message { background: #e9eee3; border-radius: 0 12px 12px; padding: 12px 15px; font-size: 13px; line-height: 1.7; margin: 8px 35px 12px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .message span { display: block; font-size: 10px; color: #64826b; font-weight: 700; margin-bottom: 3px; }
 .message.player-message { margin-left: 35px; margin-right: 0; background: #dbebe2; border-radius: 12px 0 12px 12px; }
+.message.pending-prefill { min-height: 24px; }
 .questions { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
 button.question { font-weight: 500; background: #fffefa; border: 1px solid #cfddcf; color: #54735f; padding: 8px 11px; font-size: 11px; }
 .input-row { display: flex; gap: 8px; }

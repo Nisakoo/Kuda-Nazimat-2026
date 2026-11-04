@@ -112,6 +112,21 @@ header { justify-content: flex-end; }
 .resident-message { max-width: 92%; margin: 0 0 16px; }
 .resident-message small { display: flex; justify-content: space-between; gap: 16px; color: #66736b; margin-bottom: 5px; }
 .resident-message p, .resident-bubble { margin: 0; background: #efe3cc; padding: 12px 14px; border-radius: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.typing-bubble { display: flex; align-items: center; gap: 10px; color: #58685e; font-style: italic; }
+.typing-dots { display: inline-flex; gap: 4px; vertical-align: middle; }
+.typing-dots span { width: 6px; height: 6px; background: #4a685e; border-radius: 50%; animation: typingDot 1.4s infinite ease-in-out; }
+.typing-dots span:nth-child(1) { animation-delay: 0s; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+  40% { transform: scale(1.1); opacity: 1; }
+}
+.typing-cursor { display: inline-block; animation: blinkCursor 0.8s infinite; color: #287b73; font-weight: bold; margin-left: 2px; }
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
 .resident-message.outgoing { margin-left: auto; }
 .resident-message.outgoing p { background: #dce8dc; }
 .babel-panel .resident-compose { display: flex; gap: 8px; align-items: end; margin-top: 12px; }

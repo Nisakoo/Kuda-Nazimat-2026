@@ -18,7 +18,8 @@
     {#each dialog.messages as message, index (index)}
       <p class:player-message={message.author === 'player'} class="message"><span>{message.author === 'player' ? 'Вы' : dialog.name}</span>{message.text}</p>
     {/each}
-    {#if pending && partial}<p class="message streaming-answer"><span>{dialog.name}</span>{partial}</p>{/if}
+    {#if pending && partial}<p class="message streaming-answer"><span>{dialog.name}</span>{partial}<span class="typing-cursor" aria-hidden="true">▍</span></p>{/if}
+    {#if pending && !partial}<p class="message pending-prefill"><span>{dialog.name}</span><span class="typing-dots"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></span></p>{/if}
   </div>
   {#if pending}<p class="small subtle">{partial ? 'Житель отвечает…' : 'Ожидаем ответ…'}</p>{/if}
   {#if error}<p class="capture-error" role="alert">{error}</p>{/if}

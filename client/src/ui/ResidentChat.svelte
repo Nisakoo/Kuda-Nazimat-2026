@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { tick, onDestroy } from 'svelte';
   import type { GameApp, BabylonView } from '../app/GameApp';
   import type { AvatarId } from '../../../shared/avatar/types';
   import ResidentWords from './ResidentWords.svelte';
@@ -7,13 +7,62 @@
   let question = $state('');
   let pendingQuestion = $state('');
   let history: HTMLDivElement;
+
+  let streamingReplyId = $state<string | null>(null);
+  let revealedChars = $state<number>(0);
+  let streamTimer: ReturnType<typeof setTimeout> | null = null;
+
   const replies = $derived(view.state?.replies.filter(reply => reply.npcId === target) ?? []);
-  const lastReply = $derived(replies.at(-1)?.id);
-  $effect(() => { if (lastReply && history) history.scrollTop = history.scrollHeight; });
+  const lastReply = $derived(replies.at(-1));
+
+  let initialized = false;
+  const seenReplyIds = new Set<string>();
+
+  function startTyping(id: string, fullText: string) {
+    if (streamTimer) clearTimeout(streamTimer);
+    streamingReplyId = id;
+    revealedChars = 0;
+
+    function step() {
+      if (streamingReplyId !== id) return;
+      revealedChars = Math.min(fullText.length, revealedChars + Math.max(2, Math.floor(fullText.length / 30)));
+      if (history) history.scrollTop = history.scrollHeight;
+      if (revealedChars < fullText.length) {
+        streamTimer = setTimeout(step, 20);
+      } else {
+        streamingReplyId = null;
+        streamTimer = null;
+      }
+    }
+    step();
+  }
+
+  $effect(() => {
+    if (!initialized) {
+      for (const r of replies) { seenReplyIds.add(r.id); }
+      initialized = true;
+      return;
+    }
+    if (lastReply && !seenReplyIds.has(lastReply.id)) {
+      seenReplyIds.add(lastReply.id);
+      startTyping(lastReply.id, lastReply.text);
+    }
+  });
+
+  onDestroy(() => {
+    if (streamTimer) clearTimeout(streamTimer);
+  });
+
+  $effect(() => { if ((lastReply || pendingQuestion) && history) history.scrollTop = history.scrollHeight; });
+
   async function send() {
     if (view.busy || !question.trim()) return;
     pendingQuestion = question;
-    if (await game.babylonAction({ type: 'npc', targetId: target, text: question })) question = '';
+    const q = question;
+    question = '';
+    if (await game.babylonAction({ type: 'npc', targetId: target, text: q })) {
+      // Sent successfully
+    }
     pendingQuestion = '';
     await tick();
     if (history) history.scrollTop = history.scrollHeight;
@@ -29,9 +78,28 @@
     <div class="resident-history" bind:this={history} aria-label="Разговор с жителем" aria-live="polite">
       {#each replies as reply (reply.id)}
         <div class="resident-message outgoing"><small>Вы</small><p>{reply.question}</p></div>
-        <div class="resident-message"><small>{name}<span>{({ ru: 'Русский', en: 'English', es: 'Español' })[reply.language]}</span></small><div class="resident-bubble"><ResidentWords text={reply.text} {game} {view} enabled={reply.language === view.state?.profile?.learning}/></div></div>
+        <div class="resident-message">
+          <small>{name}<span>{({ ru: 'Русский', en: 'English', es: 'Español' })[reply.language]}</span></small>
+          <div class="resident-bubble">
+            {#if streamingReplyId === reply.id}
+              <ResidentWords text={reply.text.slice(0, revealedChars)} {game} {view} enabled={false}/>
+              <span class="typing-cursor" aria-hidden="true">▍</span>
+            {:else}
+              <ResidentWords text={reply.text} {game} {view} enabled={reply.language === view.state?.profile?.learning}/>
+            {/if}
+          </div>
+        </div>
       {/each}
-      {#if pendingQuestion}<div class="resident-message outgoing"><small>Вы</small><p>{pendingQuestion}</p></div><p role="status">Житель отвечает…</p>{/if}
+      {#if pendingQuestion}
+        <div class="resident-message outgoing"><small>Вы</small><p>{pendingQuestion}</p></div>
+        <div class="resident-message">
+          <small>{name}<span>{({ ru: 'Русский', en: 'English', es: 'Español' })[view.state?.profile?.learning ?? 'en']}</span></small>
+          <div class="resident-bubble typing-bubble" role="status" aria-label="Житель отвечает…">
+            <span class="typing-dots"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></span>
+            <span class="typing-text">Житель отвечает…</span>
+          </div>
+        </div>
+      {/if}
     </div>
     <form class="resident-compose" onsubmit={event => { event.preventDefault(); void send(); }}><label class="sr-only" for="resident-question">Вопрос NPC</label><textarea id="resident-question" aria-label="Вопрос NPC" placeholder="Спросить на родном языке…" bind:value={question} maxlength="500" required></textarea><button disabled={view.busy || !question.trim()}>Спросить</button></form>
   </div>
