@@ -6,6 +6,8 @@ import type { NpcResponder } from './NpcResponder.ts';
 import type { DialogueStore } from './ports.ts';
 import { createGenerationQueue } from './GenerationQueue.ts';
 import { isNpcFailureCode } from './failureCodes.ts';
+import { classifyPlayerIntent, transitionAttitude } from './intentClassifier.ts';
+import { extractPlayerFact } from './factExtractor.ts';
 import { NPC_TIMING } from '../../../shared/protocol/npcTiming.ts';
 
 export function normalizeAnswer(text: string): string { return text.replace(/\r\n/g, '\n').replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, '').trim().slice(0, 4000); }
@@ -103,6 +105,10 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
         if (!available || !backendReady()) throw new Error('unavailable');
         if (!authorized()) throw new Error('Access lost');
         const history = dialogue.history(q.player.playerId, q.npc.id, q.sessionId).slice(-6);
+        const currentAttitude = dialogue.attitude?.(q.player.playerId, q.npc.id, q.sessionId) ?? 'ordinary';
+        const intent = classifyPlayerIntent(q.question);
+        const nextAttitude = transitionAttitude(currentAttitude, intent);
+        const facts = dialogue.facts?.(q.player.playerId, q.npc.id, q.sessionId) ?? [];
         // Synchronous history IO consumes the original queue budget. Re-read immediately before dispatch.
         if (!authorized() || budget.expired()) throw new Error('Expired or access lost');
         const deadlineAt = budget.deadlineAt();
@@ -117,14 +123,23 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
           }
           onPartial(clean);
         });
-        const result = await responder.answer({ requestKey: q.connectionId + ':' + q.requestId, playerId: q.player.playerId, playerName: q.player.displayName, npc: q.npc, question: q.question, history, locale: 'ru', deadlineAt }, signal, partial);
+        const result = await responder.answer({ requestKey: q.connectionId + ':' + q.requestId, playerId: q.player.playerId, playerName: q.player.displayName, npc: { ...q.npc, attitude: nextAttitude }, question: q.question, history, facts, locale: 'ru', deadlineAt }, signal, partial);
         finished = true;
         const text = normalizeAnswer(result.text);
         if (budget.expired()) throw new Error('Expired');
         if (!text) throw new Error('Empty answer');
         if (!authorized() || budget.expired()) throw new Error('Access lost');
         // Deadline check and SQLite append are synchronous; cancellation cannot interleave.
-        try { dialogue.append(q.player.playerId, q.npc.id, q.question, text, clock.now(), q.sessionId); }
+        try {
+          dialogue.append(q.player.playerId, q.npc.id, q.question, text, clock.now(), q.sessionId);
+          if (nextAttitude !== currentAttitude) {
+            dialogue.setAttitude?.(q.player.playerId, q.npc.id, q.sessionId, nextAttitude, clock.now());
+          }
+          const fact = extractPlayerFact(q.question);
+          if (fact) {
+            dialogue.appendFact?.(q.player.playerId, q.npc.id, q.sessionId, fact, clock.now());
+          }
+        }
         catch (error) { logger.error('db.transaction.failed', 'Не удалось сохранить ответ NPC', { operation: 'dialogue.append', playerId: q.player.playerId, npcId: q.npc.id, error }); throw error; }
         logTiming('completed');
         return text;

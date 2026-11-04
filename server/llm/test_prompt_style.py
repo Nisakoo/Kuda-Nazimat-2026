@@ -67,6 +67,33 @@ class PromptStyleTests(unittest.TestCase):
         with self.assertRaises(Exception):
             compile_prompt({'locale': 'en', 'question': 'hi', 'npc': profile_bad, 'history': []}, tokenizer)
 
+    def test_attitude_displeased_and_friendly(self):
+        tokenizer = Tokenizer()
+        profile = {'name': 'Potter', 'topic': 'Clay', 'persona': 'Crafter', 'greeting': 'Hello', 'attitude': 'displeased'}
+        compile_prompt({'locale': 'en', 'question': 'hi', 'npc': profile, 'history': []}, tokenizer)
+        self.assertIn('Attitude: displeased', tokenizer.messages[0]['content'])
+        self.assertIn('Speak coldly and tersely', tokenizer.messages[0]['content'])
+
+        profile['attitude'] = 'friendly'
+        compile_prompt({'locale': 'en', 'question': 'hi', 'npc': profile, 'history': []}, tokenizer)
+        self.assertIn('Attitude: friendly', tokenizer.messages[0]['content'])
+        self.assertIn('Speak warmly, welcomingly and openly', tokenizer.messages[0]['content'])
+
+        profile_ru = {'name': 'Гончар', 'topic': 'Глина', 'persona': 'Мастер', 'greeting': 'Привет', 'attitude': 'displeased'}
+        compile_prompt({'locale': 'ru', 'question': 'вопрос', 'npc': profile_ru, 'history': []}, tokenizer)
+        self.assertIn('Отношение: недовольное', tokenizer.messages[0]['content'])
+        self.assertIn('Отвечай сухо, холодно и сдержанно', tokenizer.messages[0]['content'])
+
+    def test_facts_injection(self):
+        tokenizer = Tokenizer()
+        profile = {'name': 'Potter', 'topic': 'Clay', 'persona': 'Crafter', 'greeting': 'Hello'}
+        compile_prompt({'locale': 'en', 'question': 'hi', 'npc': profile, 'history': [],
+                        'facts': ['Traveler said their name is Luka', 'Traveler said they come from Ur']}, tokenizer)
+        content = tokenizer.messages[0]['content']
+        self.assertIn('Notes about traveler (untrusted statements by the player)', content)
+        self.assertIn('Traveler said their name is Luka', content)
+        self.assertIn('Traveler said they come from Ur', content)
+
 
 if __name__ == '__main__':
     unittest.main()

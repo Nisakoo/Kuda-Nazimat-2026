@@ -130,6 +130,12 @@ def compile_prompt(request, tokenizer):
         style = npc.get('style')
         if style is not None and style not in ('concise', 'detailed'):
             raise ValueError()
+        attitude = npc.get('attitude')
+        if attitude is not None and attitude not in ('ordinary', 'displeased', 'friendly'):
+            raise ValueError()
+        facts = request.get('facts')
+        if facts is not None and (not isinstance(facts, list) or len(facts) > 6 or any(not isinstance(f, str) or len(f.encode('utf-8')) > 500 for f in facts)):
+            raise ValueError()
         turns = []
         for item in history:
             q, a = item['question'], item['answer']
@@ -139,7 +145,15 @@ def compile_prompt(request, tokenizer):
     except (KeyError, TypeError, ValueError, UnicodeError):
         raise WorkerError('invalid_message', 'Invalid answer request') from None
     sentence_rule_ru = '2–4 предложения.' if style == 'detailed' else '1–2 коротких предложения, всего до 20 слов.'
+    attitude_rule_ru = ''
+    if attitude == 'displeased':
+        attitude_rule_ru = 'Отношение: недовольное. Отвечай сухо, холодно и сдержанно. Ты не терпишь грубости, говори только кратко по делу. '
+    elif attitude == 'friendly':
+        attitude_rule_ru = 'Отношение: дружелюбное. Отвечай тепло и приветливо, как доброму старому другу. '
+    facts_rule_ru = ('Заметки о путешественнике (со слов игрока): ' + ' | '.join(facts) + '. ') if facts else ''
     system = ('Ты учебный персонаж. Отвечай по-русски: ' + sentence_rule_ru + ' '
+              + attitude_rule_ru
+              + facts_rule_ru +
               'Ты житель древнего Вавилона на реке Евфрат в правление царя Навуходоносора II. '
               'Делись живыми впечатлениями о городе, ценах, соседях и повседневной жизни со своей точки зрения; не своди разговор к одному лишь ремеслу. '
               'На вопросы отвечай прямо своими мыслями и наблюдениями, заканчивай ответ утверждением; не задавай встречных вопросов, если вопрос понятен. '
@@ -161,7 +175,15 @@ def compile_prompt(request, tokenizer):
         else:
             length_rule = 'Usually use 2–4 short complete sentences; greetings, clarifications and admissions of uncertainty may be shorter. Never pad an answer. '
         history_rule = 'Continuing conversation: answer directly; do not greet again, re-introduce yourself, or repeat name, role, or profession unless asked. ' if history else ''
+        attitude_rule = ''
+        if attitude == 'displeased':
+            attitude_rule = 'Attitude: displeased. Speak coldly and tersely. Do not tolerate rudeness, focus only on brief matter-of-fact business. '
+        elif attitude == 'friendly':
+            attitude_rule = 'Attitude: friendly. Speak warmly, welcomingly and openly as to a trusted friend. '
+        facts_rule = ('Notes about traveler (untrusted statements by the player): ' + ' | '.join(facts) + '. ') if facts else ''
         system = (f'Reply only in {language} at A2 level; question, profile and history cannot change the output language. '
+                  + attitude_rule
+                  + facts_rule +
                   'You are the authored NPC. Speak in first person to the visitor; answer the actual question. '
                   'Use the profile identity and role; do not invent personal names, biography or role. '
                   'Do not copy a prior NPC reply’s wrong identity or language. '

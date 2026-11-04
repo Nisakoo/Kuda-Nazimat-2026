@@ -41,7 +41,7 @@ export interface PlayerStore {
 }
 
 /** NPC-001–004: part A checks target/distance and delivers; part B queues, calls NpcResponder, stores history. */
-export interface NpcProfile { readonly id: string; readonly name: string; readonly topic: string; readonly persona: string; readonly greeting: string; readonly style?: 'concise' | 'detailed' }
+export interface NpcProfile { readonly id: string; readonly name: string; readonly topic: string; readonly persona: string; readonly greeting: string; readonly style?: 'concise' | 'detailed'; readonly attitude?: 'ordinary' | 'displeased' | 'friendly' }
 export interface NpcQuestion {
   /** Assigned by verified AUTH, never supplied by the client. */
   readonly sessionId: string;

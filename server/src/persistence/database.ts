@@ -159,6 +159,39 @@ export function sqliteStores(db: DatabaseSync, now: () => number = Date.now, obs
         db.prepare('DELETE FROM npc_dialogue WHERE player_id = ? AND npc_id = ? AND id NOT IN (SELECT id FROM npc_dialogue WHERE player_id = ? AND npc_id = ? ORDER BY created_at DESC, id DESC LIMIT 50)').run(playerId, npcId, playerId, npcId);
       }));
     },
+    attitude(playerId, npcId, sessionId) {
+      if (!sessionId) return 'ordinary';
+      try {
+        const row = db.prepare('SELECT attitude FROM npc_relationships WHERE session_id = ? AND player_id = ? AND npc_id = ?').get(sessionId, playerId, npcId) as { attitude?: string } | undefined;
+        return (row?.attitude === 'displeased' || row?.attitude === 'friendly') ? row.attitude : 'ordinary';
+      } catch { return 'ordinary'; }
+    },
+    setAttitude(playerId, npcId, sessionId, attitude, now) {
+      if (!sessionId) throw new Error('Missing AUTH scope');
+      try {
+        db.prepare(`
+          INSERT INTO npc_relationships (session_id, player_id, npc_id, attitude, updated_at)
+          VALUES (?, ?, ?, ?, ?)
+          ON CONFLICT(session_id, player_id, npc_id) DO UPDATE SET attitude = excluded.attitude, updated_at = excluded.updated_at
+        `).run(sessionId, playerId, npcId, attitude, now);
+      } catch {}
+    },
+    facts(playerId, npcId, sessionId) {
+      if (!sessionId) return [];
+      try {
+        const rows = db.prepare('SELECT fact FROM npc_memory_facts WHERE session_id = ? AND player_id = ? AND npc_id = ? ORDER BY created_at ASC, id ASC LIMIT 6').all(sessionId, playerId, npcId) as { fact: string }[];
+        return rows.map(r => r.fact);
+      } catch { return []; }
+    },
+    appendFact(playerId, npcId, sessionId, fact, now) {
+      if (!sessionId) throw new Error('Missing AUTH scope');
+      try {
+        transaction(db, () => {
+          db.prepare('INSERT INTO npc_memory_facts (session_id, player_id, npc_id, fact, created_at) VALUES (?, ?, ?, ?, ?)').run(sessionId, playerId, npcId, fact, now);
+          db.prepare('DELETE FROM npc_memory_facts WHERE session_id = ? AND player_id = ? AND npc_id = ? AND id NOT IN (SELECT id FROM npc_memory_facts WHERE session_id = ? AND player_id = ? AND npc_id = ? ORDER BY created_at DESC, id DESC LIMIT 20)').run(sessionId, playerId, npcId, sessionId, playerId, npcId);
+        });
+      } catch {}
+    },
   };
   return { accounts, sessions, players, avatars, equipment, dialogue };
 }

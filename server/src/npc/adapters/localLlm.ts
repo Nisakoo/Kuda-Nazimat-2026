@@ -107,12 +107,21 @@ function boundedRequest(request: NpcAnswerRequest, stream = false): (NpcAnswerRe
   const { requestKey, playerId, playerName, question, locale, deadlineAt } = request;
   const { id, name, topic, persona, greeting } = request.npc;
   const style = request.npc.style;
+  const attitude = request.npc.attitude;
   if (style !== undefined && style !== 'concise' && style !== 'detailed') return;
+  if (attitude !== undefined && !['ordinary', 'displeased', 'friendly'].includes(attitude)) return;
   if (![requestKey, playerId, playerName, question, id, name, topic, persona, greeting].every((value) => typeof value === 'string')) return;
   if (Buffer.byteLength(question) > 4096 || (locale !== 'ru' && (!validUnicode(question) || [...question].length > 800 || !question.trim()))) return;
   const history = request.history.slice(-6);
   if (history.some((entry) => !entry || typeof entry.question !== 'string' || typeof entry.answer !== 'string')) return;
-  const safe: NpcAnswerRequest & { stream?: boolean } = { requestKey, playerId, playerName, question, locale, deadlineAt, npc: { id, name, topic, persona, greeting, ...(style ? { style } : {}) }, history: history.map(({ question, answer }) => ({ question, answer })), ...(stream || request.stream ? { stream: true } : {}) };
+  const facts = Array.isArray(request.facts) ? request.facts.slice(-6).filter(f => typeof f === 'string' && f.length <= 500) : undefined;
+  const safe: NpcAnswerRequest & { stream?: boolean } = {
+    requestKey, playerId, playerName, question, locale, deadlineAt,
+    npc: { id, name, topic, persona, greeting, ...(style ? { style } : {}), ...(attitude ? { attitude } : {}) },
+    history: history.map(({ question, answer }) => ({ question, answer })),
+    ...(facts?.length ? { facts } : {}),
+    ...(stream || request.stream ? { stream: true } : {})
+  };
   while (jsonBytes({ op: 'answer', request: safe }) + 1 > LIMIT) {
     if (!safe.history.length) return;
     // Whole oldest pairs only. The worker still performs exact tokenizer admission afterwards.

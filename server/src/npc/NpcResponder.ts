@@ -7,6 +7,7 @@ export interface LocalTranslationRequest {
 export interface NpcAnswerRequest {
   readonly requestKey: string; readonly playerId: string; readonly playerName: string;
   readonly npc: NpcProfile; readonly question: string; readonly history: readonly DialogueEntry[];
+  readonly facts?: readonly string[];
   readonly locale: 'ru' | 'en' | 'es'; readonly deadlineAt: number;
   readonly stream?: boolean;
 }
