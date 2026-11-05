@@ -1,11 +1,12 @@
 import type { Object3D } from 'three';
+import { namedNode } from './namedNode';
 import type { Vector3 } from '../../../../shared/world/types';
 
 /** Presentation-only linkage: the closed route defines its fixed mill axle. */
 export function poseMillDrive(root: Object3D, position: Vector3, yaw: number, route: readonly Vector3[]): void {
-  const arm = root.getObjectByName('pack-drive-arm');
-  const drop = root.getObjectByName('pack-drive-drop');
-  const hub = root.getObjectByName('pack-drive-hub');
+  const arm = namedNode(root, 'pack-drive-arm');
+  const drop = namedNode(root, 'pack-drive-drop');
+  const hub = namedNode(root, 'pack-drive-hub');
   if (!arm || !drop || !hub || !route.length) return;
   const center = route.reduce((sum, point) => ({ x: sum.x + point.x / route.length, y: sum.y + point.y / route.length, z: sum.z + point.z / route.length }), { x: 0, y: 0, z: 0 });
   const dx = center.x - position.x, dz = center.z - position.z, c = Math.cos(yaw), s = Math.sin(yaw);

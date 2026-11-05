@@ -8,6 +8,7 @@ import { createCharacter } from './CharacterRig';
 import type { CharacterRig } from './CharacterRig';
 import { CHARACTER_MOTION, approach, damp, turnTowards } from './CharacterMotion';
 import { createHeldTool } from './heldTool';
+import { namedNode } from './namedNode';
 import type { MotionStatus } from '../../../../shared/world/types.ts';
 
 interface Visual {
@@ -53,7 +54,7 @@ export class EntityVisuals {
   }
   handAnchor(id: string): Object3D | undefined {
     const visual = this.visuals.get(id);
-    return visual?.model?.root.getObjectByName('wrist-right') ?? visual?.rig?.hand;
+    return (visual?.model ? namedNode(visual.model.root, 'wrist-right') : undefined) ?? visual?.rig?.hand;
   }
   constructor(private readonly scene: Scene, private readonly assets: SceneAssets, private readonly library?: GltfLibrary, private readonly report: (id: string, error: string | null) => void = () => {}, private readonly marketStyle = false) {}
   get ids(): readonly string[] { return [...this.visuals.keys()]; }
@@ -138,8 +139,8 @@ export class EntityVisuals {
       if (visual.held) visual.held.visible = !this.held.has(id);
       // Apply the confirmed hand pose after the GLB mixer; airborne arms retain the jump clip.
       if (visual.model && visual.airWeight < .5 && (this.held.has(id) || visual.handAction)) {
-        const shoulder = visual.model.root.getObjectByName('shoulder-right');
-        const elbow = visual.model.root.getObjectByName('elbow-right');
+        const shoulder = namedNode(visual.model.root, 'shoulder-right');
+        const elbow = namedNode(visual.model.root, 'elbow-right');
         const progress = visual.handTime / .65;
         const reach = visual.handAction ? Math.sin(Math.PI * progress) : 0;
         const weight = visual.handAction === 'pickup' ? progress : visual.handAction === 'place' ? 1-progress : 1;

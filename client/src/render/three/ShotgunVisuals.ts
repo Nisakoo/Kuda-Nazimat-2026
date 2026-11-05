@@ -5,6 +5,7 @@ import type { Shot, ShotgunState } from '../../../../shared/shotgun/types.ts';
 import type { EntityVisuals } from './EntityVisuals';
 import { CameraRaycast } from './CameraRaycast';
 import { PelletMarks } from './PelletMarks';
+import { namedNode } from './namedNode';
 import { BudgetExhausted, type WorldBudget } from '../../map/WorldBudget';
 
 /** Owns bounded procedural resources; never changes authoritative scene objects. */
@@ -127,10 +128,10 @@ export class ShotgunVisuals {
       for(const model of local&&firstPerson?[this.viewGun]:[gun]) {
         if(model===this.viewGun){model.position.set(.27,-.28-reload*.16,-.52+recoil*.13);model.rotation.set(recoil*.13+reload*.35,0,-reload*.5);}
         else model.rotation.z=reload*.55+recoil*.12;
-        const flash=model.getObjectByName('flash')!;flash.visible=age>=0&&age<.065;
-        model.getObjectByName('pump')!.position.z=-.38+(age>.12&&age<.5?Math.sin((age-.12)/.38*Math.PI)*.1:0);
-        model.getObjectByName('loading-hand')!.position.set(-.015-reload*.08,-.13-reload*.12,-.38+reload*.23);
-        const shell=model.getObjectByName('shell')!;shell.visible=weapon.reloadLeft>.3&&weapon.reloadLeft<2; shell.position.y=-.19-Math.abs(Math.sin(weapon.reloadLeft*8))*.07;
+        const flash=namedNode(model,'flash')!;flash.visible=age>=0&&age<.065;
+        namedNode(model,'pump')!.position.z=-.38+(age>.12&&age<.5?Math.sin((age-.12)/.38*Math.PI)*.1:0);
+        namedNode(model,'loading-hand')!.position.set(-.015-reload*.08,-.13-reload*.12,-.38+reload*.23);
+        const shell=namedNode(model,'shell')!;shell.visible=weapon.reloadLeft>.3&&weapon.reloadLeft<2; shell.position.y=-.19-Math.abs(Math.sin(weapon.reloadLeft*8))*.07;
       }
     }
     for(let i=this.marks.length-1;i>=0;i--) {const mark=this.marks[i]!; mark.age+=dt; if(mark.age>30 || !mark.mesh.parent?.parent){mark.mesh.removeFromParent();this.marks.splice(i,1);}}

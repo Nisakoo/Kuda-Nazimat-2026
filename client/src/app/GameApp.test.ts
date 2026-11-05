@@ -453,6 +453,28 @@ describe('application lifecycle', () => {
     }
   });
 
+  it('patches the sprint stamina ring at most every 6 steps while depletion stays immediate', () => {
+    const lockProperty = Object.getOwnPropertyDescriptor(document, 'pointerLockElement');
+    let locked: Element | null = null;
+    Object.defineProperty(document, 'pointerLockElement', { configurable: true, get: () => locked });
+    Object.defineProperty(host, 'requestPointerLock', { configurable: true, value: () => { locked = host; document.dispatchEvent(new Event('pointerlockchange')); return Promise.resolve(); } });
+    try {
+      let screen = ''; const stamina: number[] = []; let previous: number | undefined;
+      app.subscribe(snapshot => { screen = snapshot.screen; if (snapshot.stamina !== previous) { previous = snapshot.stamina; stamina.push(snapshot.stamina); } });
+      app.start(host); app.enterWorld();
+      expect(screen).toBe('playing'); stamina.length = 0;
+      app.send({ type: 'move', direction: { x: 1, z: 0 } }); app.send({ type: 'sprint', held: true });
+      let time = 0; advance(time);
+      // 60 frames of 1/60 s: one simulation step each.
+      for (let frame = 0; frame < 60; frame++) advance(time += 1000 / 60);
+      expect(app.getWorldSnapshot()?.entities.find(entity => entity.motion)?.motion?.stamina).toBeLessThan(100);
+      // Leaving full is immediate; afterwards at most one patch per 6 steps (~10 Hz) instead of one per step.
+      expect(stamina.length).toBeGreaterThan(3); expect(stamina.length).toBeLessThanOrEqual(12);
+    } finally {
+      if (lockProperty) Object.defineProperty(document, 'pointerLockElement', lockProperty); else Reflect.deleteProperty(document, 'pointerLockElement');
+    }
+  });
+
   it('integrates silent audio baselines, confirmed movement and one jump, volume storage and scene disposal', () => {
     const movement = vi.spyOn(WorldAudio.prototype, 'movement');
     const disposed = vi.spyOn(WorldAudio.prototype, 'dispose');

@@ -8,8 +8,11 @@ import type { Lease } from '../../shared/AsyncLeaseCache';
 import { AVATAR_WALK_MAX_PACE, avatarWalkPacing } from './AvatarWalkPace';
 import type { GraphicsQuality } from '../GraphicsQuality';
 import { configureShadows, freezeStaticTransforms } from './modelPresentation';
+import { mergeStaticMeshes } from './staticMerge';
 
-interface Template { readonly scene: Object3D; readonly animations: AnimationClip[]; readonly sources: readonly Lease<ArrayBuffer>[] }
+interface Template { readonly scene: Object3D; readonly animations: AnimationClip[]; readonly sources: readonly Lease<ArrayBuffer>[];
+  /** Lazily built variant for streamed scenery: shadows configured and static meshes merged once per template. */
+  staticScene?: Object3D }
 export interface ModelInstance {
   readonly root: Object3D;
   /** Present only for validated avatar metadata; converts observed m/s to clip pace. */
@@ -23,14 +26,16 @@ function disposeTemplate(template: Template): void {
   const geometries = new Set<BufferGeometry>();
   const materials = new Set<Material>();
   const textures = new Set<Texture>();
-  template.scene.traverse((object) => {
+  const collect = (object: Object3D) => {
     const mesh = object as SkinnedMesh;
     if (mesh.geometry) geometries.add(mesh.geometry);
     for (const material of Array.isArray(mesh.material) ? mesh.material : mesh.material ? [mesh.material] : []) {
       materials.add(material);
       for (const value of Object.values(material)) if (value && typeof value === 'object' && 'isTexture' in value) textures.add(value as Texture);
     }
-  });
+  };
+  template.scene.traverse(collect);
+  template.staticScene?.traverse(collect);
   for (const geometry of geometries) geometry.dispose();
   for (const material of materials) material.dispose();
   for (const texture of textures) { texture.dispose(); if (typeof ImageBitmap !== 'undefined' && texture.source.data instanceof ImageBitmap) texture.source.data.close(); }
@@ -95,8 +100,9 @@ export class GltfLibrary {
   }
 
   private makeInstance(lease: Lease<Template>, id: string, staticTransforms: boolean): ModelInstance {
-    const root = clone(lease.value.scene);
-    configureShadows(root, this.quality, id);
+    // Streamed scenery clones a pre-merged variant whose shadow flags are already set.
+    const root = clone(staticTransforms ? this.staticScene(lease.value, id) : lease.value.scene);
+    if (!staticTransforms) configureShadows(root, this.quality, id);
     if (staticTransforms) freezeStaticTransforms(root, lease.value.animations);
     const mixer = lease.value.animations.some(clip => clip.tracks.length) ? new AnimationMixer(root) : null;
     const avatarWalk = avatarWalkPacing(root, lease.value.animations.find(clip => clip.name === 'walk')?.duration);
@@ -154,6 +160,16 @@ export class GltfLibrary {
     };
     this.instances.add(instance);
     return instance;
+  }
+
+  private staticScene(template: Template, id: string): Object3D {
+    if (!template.staticScene) {
+      const scene = clone(template.scene);
+      configureShadows(scene, this.quality, id);
+      mergeStaticMeshes(scene, template.animations);
+      template.staticScene = scene;
+    }
+    return template.staticScene;
   }
 
   private async load(id: string, signal: AbortSignal): Promise<Template> {

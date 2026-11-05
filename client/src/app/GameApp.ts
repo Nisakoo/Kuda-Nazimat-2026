@@ -12,6 +12,7 @@ import { AvatarClient } from '../multiplayer/AvatarClient';
 import { EquipmentClient } from '../multiplayer/EquipmentClient';
 import type { EquipmentView } from '../multiplayer/EquipmentClient';
 import type { ToolId } from '../../../shared/equipment/types';
+
 export type { EquipmentView };
 import type { AvatarView } from '../multiplayer/AvatarClient';
 import type { AvatarId } from '../../../shared/avatar/types';
@@ -58,6 +59,8 @@ import type { FrameRatePoint } from './FrameMetrics';
 import { WorldAudio } from '../audio/WorldAudio';
 import type { AudioOrigin } from '../audio/WorldAudio';
 import { babylonAudioChanges, babylonAudioHistory } from './audioPresentation';
+/** Simulation steps between continuous HUD patches (60 Hz step → ~10 Hz). */
+const HOT_HUD_INTERVAL = 6;
 
 const browserClock: Clock = { now: () => Date.now(), set: (callback, ms) => window.setTimeout(callback, ms), clear: (id) => window.clearTimeout(id) };
 export type BabylonPanel = 'setup' | 'languages' | 'intro' | 'task' | 'inventory' | 'stone' | 'words' | 'interaction' | 'chat';
@@ -211,6 +214,8 @@ export class GameApp {
   private readonly listeners = new Set<(snapshot: AppSnapshot) => void>();
 
   private graphicsQuality = readGraphicsQuality();
+  private hudFrame = 0;
+  private hotHudFrame = -Infinity;
 
   constructor(
     public config: ClientConfig,
@@ -828,14 +833,13 @@ export class GameApp {
     // Chunk fetches enqueue visuals later; an empty renderer queue alone is not readiness.
     const visualLoading = diagnostics.pending > 0 || Boolean(worldStats?.loading);
     const visualError = this.worldFailure || worldStats?.errors.length ? 'Не удалось загрузить участок мира. Повторите загрузку в меню.' : diagnostics.errors.length ? 'Не удалось загрузить часть оформления. Откройте меню, чтобы повторить загрузку.' : null;
-    const modelStats = `Модели: ${diagnostics.models} · Экземпляры: ${diagnostics.instances}`;
     const position = this.current?.entities.find((entity) => entity.id === this.session?.playerId)?.transform?.position;
     const worldReady = (this.world ? Boolean(position && this.world.isPrepared(position)) : this.createMap === null) && (!(this.session instanceof OnlineSession) || this.session.state.status === 'connected');
     if (this.snapshot.entryStage === 'loading' && worldReady && !this.worldStarting && !visualLoading && !diagnostics.errors.length && !this.worldFailure && !worldStats?.errors.length) {
       this.renderer?.revealChunks?.();
       if (!this.snapshot.entryReveal) this.patch({ entryReveal: true });
     }
-    if (this.snapshot.entryStage === 'loading' && worldReady && !this.worldStarting && this.snapshot.entryReveal && !visualLoading && !visualError && !(this.renderer?.getDiagnostics().appearing ?? 0)) {
+    if (this.snapshot.entryStage === 'loading' && worldReady && !this.worldStarting && this.snapshot.entryReveal && !visualLoading && !visualError && !(diagnostics.appearing ?? 0)) {
       this.patch({ entryStage: null, entryReveal: false, screen: 'playing', worldReady: true, visualLoading: false });
       this.stop();
       if (this.autoCaptureEntry && !document.hidden && document.hasFocus()) this.requestPlay();
@@ -843,10 +847,15 @@ export class GameApp {
     }
     const worldWaiting = this.waitingForWorld && Boolean(worldStats?.loading || worldStats?.deferred);
     const region = position ? this.world?.region(position) || 'Площадь открытий' : 'Площадь открытий';
-    const budget = this.worldBudget.stats;
-    const cacheStats = `${budget.memory} / ${budget.memoryLimit} байт памяти · Чанки: ${worldStats?.ready ?? 0} · Ожидание: ${worldStats?.loading ?? 0} · Отложено: ${worldStats?.deferred ?? 0}${worldStats?.deferred ? ' (защита памяти)' : ''}`;
-    if (visualLoading !== this.snapshot.visualLoading || visualError !== this.snapshot.visualError || worldReady !== this.snapshot.worldReady || worldWaiting !== this.snapshot.worldWaiting || region !== this.snapshot.region || (this.snapshot.debug && (modelStats !== this.snapshot.modelStats || cacheStats !== this.snapshot.cacheStats))) {
-      this.patch({ visualLoading, visualError, modelStats, worldReady, worldWaiting, region, cacheStats });
+    // Runs every frame: build the diagnostic strings only for the debug view or an actual patch.
+    const statsText = () => {
+      const budget = this.worldBudget.stats;
+      return { modelStats: `Модели: ${diagnostics.models} · Экземпляры: ${diagnostics.instances}`,
+        cacheStats: `${budget.memory} / ${budget.memoryLimit} байт памяти · Чанки: ${worldStats?.ready ?? 0} · Ожидание: ${worldStats?.loading ?? 0} · Отложено: ${worldStats?.deferred ?? 0}${worldStats?.deferred ? ' (защита памяти)' : ''}` };
+    };
+    const debugStats = this.snapshot.debug ? statsText() : null;
+    if (visualLoading !== this.snapshot.visualLoading || visualError !== this.snapshot.visualError || worldReady !== this.snapshot.worldReady || worldWaiting !== this.snapshot.worldWaiting || region !== this.snapshot.region || (debugStats && (debugStats.modelStats !== this.snapshot.modelStats || debugStats.cacheStats !== this.snapshot.cacheStats))) {
+      this.patch({ visualLoading, visualError, worldReady, worldWaiting, region, ...(debugStats ?? statsText()) });
       this.presentCamera();
     }
   }
@@ -1150,6 +1159,12 @@ export class GameApp {
 
   private updateHud(force = false): void {
     if (!this.current || this.snapshot.screen !== 'playing') return;
+    // The stamina ring changes every sprint step and each patch re-renders the whole App snapshot;
+    // limit it to ~10 Hz. Discrete changes (appear, block, empty/full) stay immediate. The map
+    // stops gameplay, so its marker only follows authoritative deltas and is not throttled.
+    this.hudFrame++;
+    const hotDue = force || this.hudFrame - this.hotHudFrame >= HOT_HUD_INTERVAL;
+    let hot = false;
     const transform = this.current.entities.find((entity) => entity.id === this.session?.playerId)?.transform;
     const player = transform?.position;
     if (!player) return;
@@ -1189,12 +1204,15 @@ export class GameApp {
       if (JSON.stringify(peers) !== JSON.stringify(this.snapshot.mapPeers)) Object.assign(changes, { mapPeers: peers });
     }
     const motion = this.current.entities.find(entity => entity.id === this.session?.playerId)?.motion;
-    if (motion && (motion.stamina !== this.snapshot.stamina || motion.sprintBlocked !== this.snapshot.sprintBlocked)) Object.assign(changes, { stamina: motion.stamina, sprintBlocked: motion.sprintBlocked });
+    if (motion && (motion.sprintBlocked !== this.snapshot.sprintBlocked || motion.stamina !== this.snapshot.stamina && (hotDue || motion.stamina <= 0 || motion.stamina >= 100 || this.snapshot.stamina >= 100))) {
+      Object.assign(changes, { stamina: motion.stamina, sprintBlocked: motion.sprintBlocked }); hot = true;
+    }
     if (nearby?.id !== this.snapshot.nearby?.id) Object.assign(changes, { nearby });
     if (this.snapshot.debug && (force || this.current.tick % 6 === 0)) {
       const coordinates = 'X ' + player.x.toFixed(1) + ' · Z ' + player.z.toFixed(1) + ' · Y ' + player.y.toFixed(1);
       if (coordinates !== this.snapshot.coordinates) Object.assign(changes, { coordinates });
     }
+    if (hot) this.hotHudFrame = this.hudFrame;
     if (Object.keys(changes).length > 0) this.patch(changes);
   }
 

@@ -36,3 +36,19 @@ it('prunes distant chunks while preserving hidden surfaces and moving nested obs
     }
   } finally { spy.mockRestore(); geometry.dispose(); material.dispose(); }
 });
+
+it('reuses probes while camera, target and obstacles are unchanged, and re-probes on change or periodically', () => {
+  const raycast = new CameraRaycast(); const intersect = vi.spyOn(raycast, 'intersect');
+  const camera = new CameraObstruction(raycast);
+  const wall = new Mesh(new BoxGeometry(.2, 2, .2), new MeshBasicMaterial()); wall.position.set(0, 1, 2); wall.updateMatrixWorld(true);
+  const obstacles = [wall]; const target = new Vector3(0, 1, 0), direction = new Vector3(0, 0, 1);
+  const first = camera.resolve(target, direction, 5, .3, .2, obstacles, 1/60);
+  const probes = intersect.mock.calls.length; expect(probes).toBeGreaterThan(0);
+  for (let i = 0; i < 8; i++) expect(camera.resolve(target, direction, 5, .3, .2, obstacles, 1/60)).toBe(first);
+  expect(intersect.mock.calls.length).toBe(probes);
+  camera.resolve(new Vector3(0, 1, .01), direction, 5, .3, .2, obstacles, 1/60);
+  expect(intersect.mock.calls.length).toBe(probes * 2);
+  for (let i = 0; i < 10; i++) camera.resolve(new Vector3(0, 1, .01), direction, 5, .3, .2, obstacles, 1/60);
+  expect(intersect.mock.calls.length).toBe(probes * 3);
+  wall.geometry.dispose(); wall.material.dispose();
+});

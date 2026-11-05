@@ -16,6 +16,15 @@ describe('streamed visual chunk readiness',()=>{
     const first=scene.getObjectByName('bench-a')!,second=scene.getObjectByName('bench-b')!;expect(first.position.toArray()).toEqual([1,0,2]);expect(second.rotation.y).toBe(1);
     chunks.unload('0_0');expect(chunks.readyIds).toEqual([]);expect(a.dispose).toHaveBeenCalledOnce();expect(b.dispose).toHaveBeenCalledOnce();expect(scene.children).toHaveLength(0);chunks.dispose();
   });
+  it('keeps ready IDs and camera obstacle roots stable between changes',async()=>{
+    const scene=new Scene();const library={instantiate:async()=>instance()} as unknown as GltfLibrary;const chunks=new VisualChunks(scene,library);
+    await chunks.load(chunk);const ready=chunks.readyIds;expect(chunks.readyIds).toBe(ready);
+    expect(chunks.obstacles.map(root=>root.name)).toEqual(['chunk:0_0']);const obstacles=chunks.obstacles;
+    await chunks.load({...chunk,id:'1_0'});expect(chunks.readyIds).not.toBe(ready);expect(chunks.readyIds).toEqual(['0_0','1_0']);
+    expect(chunks.obstacles).toBe(obstacles);expect(obstacles.map(root=>root.name)).toEqual(['chunk:0_0','chunk:1_0']);
+    chunks.unload('0_0');expect(chunks.readyIds).toEqual(['1_0']);expect(obstacles.map(root=>root.name)).toEqual(['chunk:1_0']);
+    chunks.dispose();expect(obstacles).toEqual([]);
+  });
   it('does not restore a chunk after its pending models complete following unload',async()=>{
     const scene=new Scene();let resolve!:(value:ModelInstance)=>void;
     const library={instantiate:()=>new Promise<ModelInstance>(done=>{resolve=done;})} as unknown as GltfLibrary;

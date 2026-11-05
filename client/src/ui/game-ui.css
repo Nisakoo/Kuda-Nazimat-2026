@@ -27,6 +27,8 @@ header { padding: 22px 32px 12px; background: none; align-items: flex-start; }
 .hud-dock .chosen::after { content: ''; position: absolute; bottom: 0; left: 12%; right: 12%; height: 3px; background: var(--ui-teal); }
 .game-screen .world-actions { margin-bottom: 180px; }
 .game-screen .modal-backdrop { background: none; backdrop-filter: none; }
+/* Backdrop blur over a live WebGL canvas is a full-screen compositor pass every frame on integrated GPUs. */
+.game-screen .glass { backdrop-filter: none; background: #f9faf2fc; }
 .game-screen dialog::backdrop { background: #513f2820; }
 .game-screen .panel, .game-screen .dialog-panel { background: var(--ui-paper); border: 2px solid #fff9e9; border-radius: 4px; color: var(--ui-ink); box-shadow: 0 10px 35px #5c3b2138; }
 /* Paper and corner facets above use game-screen specificity, so the panel shorthand cannot erase them. */

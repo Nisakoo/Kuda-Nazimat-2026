@@ -18,6 +18,15 @@ import type { SceneStateMessage } from '../../../../shared/world-life/types.ts';
 import { WorldLifeVisuals } from './WorldLifeVisuals';
 import type { WorldBudget } from '../../map/WorldBudget';
 
+/** Error map whose value list is rebuilt only after a change; diagnostics are read every frame. */
+class ErrorMap extends Map<string, string> {
+  private list: readonly string[] | null = null;
+  override set(key: string, value: string): this { if (super.get(key) !== value) this.list = null; return super.set(key, value); }
+  override delete(key: string): boolean { const removed = super.delete(key); if (removed) this.list = null; return removed; }
+  override clear(): void { if (this.size) this.list = null; super.clear(); }
+  get valueList(): readonly string[] { return this.list ??= [...this.values()]; }
+}
+
 export class ThreeRenderer implements RenderAdapter {
   private shotgun: ShotgunVisuals | null = null;
   private renderer: WebGLRenderer | null = null;
@@ -38,7 +47,8 @@ export class ThreeRenderer implements RenderAdapter {
   private sceneState: SceneStateMessage | null = null;
   private focusHeight = .8;
   private sun: DirectionalLight | null = null;
-  private readonly errors = new Map<string, string>();
+  private readonly errors = new ErrorMap();
+  private synced: { previous: WorldSnapshot; current: WorldSnapshot; playerId: EntityId | null } | null = null;
   private frameFence: FrameFence | null = null;
   private readonly contextLost = (): void => { this.frameFence?.contextLost(); this.errors.set('gpu', 'Графический контекст потерян.'); };
   private readonly contextRestored = (): void => { this.frameFence?.contextRestored(); this.errors.delete('gpu'); };
@@ -60,8 +70,9 @@ export class ThreeRenderer implements RenderAdapter {
     this.scene = new Scene();
     this.scene.matrixAutoUpdate = false;
     this.scene.background = new Color(this.marketStyle ? '#edc5a4' : '#e8d9ba');
-    this.scene.fog = new Fog(this.marketStyle ? '#edc5a4' : '#e8d9ba', 38, 80);
-    this.camera = new PerspectiveCamera(48, 1, 0.1, 120);
+    const viewDistance = GRAPHICS_PROFILES[this.quality].viewDistance;
+    this.scene.fog = new Fog(this.marketStyle ? '#edc5a4' : '#e8d9ba', viewDistance * .475, viewDistance);
+    this.camera = new PerspectiveCamera(48, 1, 0.1, viewDistance + 5);
     const sun = new DirectionalLight(this.marketStyle ? '#ffcf91' : '#fff0cf', this.marketStyle ? 2.7 : 2);
     sun.position.set(this.marketStyle ? 18 : -8, this.marketStyle ? 12 : 18, this.marketStyle ? -12 : 10);
     if (this.marketStyle) {
@@ -86,6 +97,10 @@ export class ThreeRenderer implements RenderAdapter {
 
   syncWorld(previous: WorldSnapshot, current: WorldSnapshot, playerId: EntityId | null): void {
     this.playerId = playerId;
+    // Online presentation re-submits the same interpolation pair every frame until a new snapshot arrives.
+    const last = this.synced;
+    if (last && last.previous === previous && last.current === current && last.playerId === playerId) return;
+    this.synced = { previous, current, playerId };
     this.visuals?.sync(previous, current, playerId);
   }
 
@@ -94,7 +109,7 @@ export class ThreeRenderer implements RenderAdapter {
   setCamera(view: CameraView): void { this.view = { ...view }; }
   setBuildingSymbols(visible: boolean): void { this.chunks?.setBuildingSymbols(visible); }
   setSceneState(state: SceneStateMessage | null): void { this.sceneState = state; this.life?.setState(state,this.lastElapsed); this.shotgun?.pruneDetachedMarks(); }
-  registerModels(models: Readonly<Record<string, string>>): void { this.library?.register(models); }
+  registerModels(models: Readonly<Record<string, string>>): void { this.library?.register(models); this.synced = null; }
   async loadChunk(chunk: VisualChunk): Promise<void> {
     if (!this.chunks) throw new Error('Renderer is not mounted');
     this.errors.delete(`chunk:${chunk.id}`);
@@ -113,8 +128,10 @@ export class ThreeRenderer implements RenderAdapter {
   retryFailedModels(): void { this.errors.clear(); this.visuals?.retryFailed(); this.life?.retryFailed(); }
   getDiagnostics(): RenderDiagnostics {
     const stats = this.library?.stats;
-    return { chunks: this.chunks?.ids ?? [], entities: [...this.visuals?.ids ?? [], ...this.life?.ids ?? []], models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
-      appearing: this.chunks?.appearing ?? 0, pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: [...this.errors.values()], geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
+    // Polled every frame: id lists are materialised only when a caller actually reads them.
+    const chunks = this.chunks, visuals = this.visuals, life = this.life;
+    return { get chunks() { return chunks?.ids ?? []; }, get entities() { return [...visuals?.ids ?? [], ...life?.ids ?? []]; }, models: stats?.resources ?? 0, instances: stats?.instances ?? 0, queued: stats?.queued ?? 0,
+      appearing: this.chunks?.appearing ?? 0, pending: (stats?.loading ?? 0) + (stats?.queued ?? 0), errors: this.errors.valueList, geometries: this.renderer?.info.memory.geometries ?? 0, textures: this.renderer?.info.memory.textures ?? 0, drawCalls: this.renderer?.info.render.calls ?? 0 };
   }
 
   resize(width: number, height: number, pixelRatio: number): void {
@@ -164,7 +181,7 @@ export class ThreeRenderer implements RenderAdapter {
     this.cameraDirection.copy(this.camera.position).sub(this.target).normalize();
     const halfHeight = Math.tan(this.camera.fov*Math.PI/360)*this.camera.near+.08;
     const allowed = this.obstruction.resolve(this.target,this.cameraDirection,distance,
-      halfHeight*this.camera.aspect,halfHeight,this.scene.children.filter(child=>child.name.startsWith('chunk:')),delta);
+      halfHeight*this.camera.aspect,halfHeight,this.chunks?.obstacles ?? [],delta);
     this.camera.position.copy(this.target).addScaledVector(this.cameraDirection,allowed);
     this.camera.lookAt(this.target);
     }
@@ -205,6 +222,6 @@ export class ThreeRenderer implements RenderAdapter {
     this.library = null;
     this.chunks = null;
     this.errors.clear();
-    this.obstruction = new CameraObstruction(this.raycast); this.lastElapsed = 0;
+    this.obstruction = new CameraObstruction(this.raycast); this.lastElapsed = 0; this.synced = null;
   }
 }
