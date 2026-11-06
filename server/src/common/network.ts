@@ -1,7 +1,7 @@
 import { networkInterfaces } from 'node:os';
 import type { NetworkInterfaceInfo } from 'node:os';
 
-/** OFFLINE-002: one non-loopback IPv4 per interface; private ranges first, link-local last. */
+/** One non-loopback IPv4 per interface; private ranges first, link-local last. */
 export interface LanAddress { readonly name: string; readonly address: string; readonly kind: 'private' | 'other' | 'link-local' }
 
 const RANK = { private: 0, other: 1, 'link-local': 2 } as const;
@@ -25,7 +25,7 @@ export function isLoopback(address: string | undefined): boolean {
   return address === '127.0.0.1' || address === '::1' || address === '::ffff:127.0.0.1';
 }
 
-/** OFFLINE-006: the server never changes the firewall itself, it only explains what to allow. */
+/** The server never changes the firewall itself, it only explains what to allow. */
 export function firewallHint(platform: NodeJS.Platform = process.platform): string {
   if (platform === 'win32') return 'Windows: при первом запуске разрешите Node.js для частных сетей; профиль сети роутера должен быть «Частная».';
   if (platform === 'darwin') return 'macOS: разрешите входящие подключения для Node в «Системные настройки → Сеть → Брандмауэр».';
@@ -34,7 +34,7 @@ export function firewallHint(platform: NodeJS.Platform = process.platform): stri
 
 export interface Connection {
   readonly local: string; readonly lan: readonly (LanAddress & { readonly url: string })[]; readonly operator: string; readonly warnings: readonly string[];
-  /** TLS-010: the one plain-HTTP page, per reachable address; the game itself is https only. */
+  /** The one plain-HTTP page, per reachable address; the game itself is https only. */
   readonly setup: readonly string[];
 }
 

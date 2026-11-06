@@ -19,8 +19,8 @@ function route(rest: string): string {
 }
 
 /**
- * ADMIN-ACCESS-001–005: the same administrator screen for any laptop of the network, behind an administrator
- * session (AUTH-017–020). `/admin` serves the page; `/api/admin/login|dev|logout` give and end the session;
+ * The same administrator screen for any laptop of the network, behind an administrator
+ * session. `/admin` serves the page; `/api/admin/login|dev|logout` give and end the session;
  * every other `/api/admin/<path>` is exactly `/api/operator/<path>` once the session is verified.
  * False when the path is not ours.
  */
@@ -71,7 +71,7 @@ export async function handleAdminAccess(req: IncomingMessage, res: ServerRespons
   const who = { ip: clientIp(req), accountId: check.identity.accountId, name: check.identity.displayName };
   const operatorPath = `/api/operator/${rest}`;
   if (req.method !== 'GET' && req.method !== 'HEAD') {
-    // ADMIN-ACCESS-005: every change is counted and logged with the administrator, never with its content.
+    // Every change is counted and logged with the administrator, never with its content.
     const actions = deps.metrics.counter('admin_actions_total', 'Изменения администратора по маршруту и результату');
     res.once('finish', () => {
       const result = res.statusCode < 400 ? 'ok' : res.statusCode === 409 ? 'conflict' : res.statusCode < 500 ? 'rejected' : 'error';

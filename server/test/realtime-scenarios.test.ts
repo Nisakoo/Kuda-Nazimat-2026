@@ -2,7 +2,7 @@ import { expect, it } from 'vitest';
 import type { ServerMessage } from '../../shared/protocol/types.ts';
 import { setup } from './harness.ts';
 
-/** REALTIME S3–S6 on the full application (HTTP login, Socket.IO, SQLite); a-realtime.test.ts covers S1 and AUTH S4. */
+/** Realtime scenarios on the full application (HTTP login, Socket.IO, SQLite); a-realtime.test.ts covers the basic handshake and two-player flow. */
 const CHUNKS = ['0_0', '-1_0', '1_0', '0_1', '0_-1'];
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const position = (m: ServerMessage | undefined, id: string) => (m?.type === 'delta' ? m.upsert : m?.type === 'joined' || m?.type === 'snapshot' ? m.snapshot.entities : []).find((e) => e.id === id)?.transform?.position;
@@ -23,7 +23,7 @@ async function players(names: string[], overrides: Record<string, unknown> = {})
   return { server, players: result };
 }
 
-it('S3: forged fields, foreign playerId and v2 are rejected; an input flood is dropped silently', async () => {
+it('forged fields, foreign playerId and v2 are rejected; an input flood is dropped silently', async () => {
   const { players: [anya, boris] } = await players(['Аня', 'Борис']);
   const start = position(anya!.joined, anya!.id)!;
   anya!.socket.emit('game', { v: 3, type: 'input', requestId: 'forged', sequence: 1, direction: { x: 0, z: 0 }, preparedChunks: [], sprint: false, jumpId: 0, position: { x: 99, y: 0, z: 99 } });
@@ -42,7 +42,7 @@ it('S3: forged fields, foreign playerId and v2 are rejected; an input flood is d
   await expect.poll(() => anya!.socket.connected).toBe(false);
 });
 
-it('S4: resync answers the current revision and the next delta builds on it; leaving the AOI removes the entity', async () => {
+it('resync answers the current revision and the next delta builds on it; leaving the AOI removes the entity', async () => {
   const { players: [anya, boris] } = await players(['Аня', 'Борис'], { aoiRadius: 5 });
   await anya!.walk({ x: 0, z: 1 }, 400);
   await expect.poll(() => boris!.packets.some((p) => p.type === 'delta')).toBe(true);
@@ -56,7 +56,7 @@ it('S4: resync answers the current revision and the next delta builds on it; lea
   expect(following[0]).toMatchObject({ baseRevision: snapshot.revision });
 });
 
-it('S5: a reconnect inside the grace period is invisible to the observer and keeps the position', async () => {
+it('a reconnect inside the grace period is invisible to the observer and keeps the position', async () => {
   const { server, players: [anya, boris] } = await players(['Аня', 'Борис'], { disconnectGraceMs: 1500 });
   await anya!.walk({ x: 1, z: 0 }, 300); await sleep(600); // past the 250 ms intent timeout and a broadcast
   const before = position(boris!.packets.filter((p) => p.type === 'delta' && position(p, anya!.id)).at(-1), anya!.id)!;
@@ -71,7 +71,7 @@ it('S5: a reconnect inside the grace period is invisible to the observer and kee
   if (last?.type === 'delta') expect(last.upsert.filter((e) => e.character?.kind === 'player' && e.id !== boris!.id).length).toBeLessThanOrEqual(1);
 });
 
-it('S6: interact succeeds near the NPC and is FORBIDDEN 5 m away; chat reaches both with unique ids and stays text', async () => {
+it('interact succeeds near the NPC and is FORBIDDEN 5 m away; chat reaches both with unique ids and stays text', async () => {
   const { players: [anya, boris] } = await players(['Аня', 'Борис']);
   const near = anya!.command('interact', { targetId: 'guide' });
   expect(await anya!.wait((p) => 'requestId' in p && p.requestId === near && (p.type === 'interacted' || p.type === 'error'))).toMatchObject({ type: 'interacted', targetId: 'guide' });
@@ -88,7 +88,7 @@ it('S6: interact succeeds near the NPC and is FORBIDDEN 5 m away; chat reaches b
   expect(boris!.packets.find((p) => p.type === 'chat' && p.requestId === b)).toMatchObject({ playerId: boris!.id });
 });
 
-it('S3: chat is limited to one message per second after a burst of three; more than ten invalid packets in 10 s disconnect', async () => {
+it('chat is limited to one message per second after a burst of three; more than ten invalid packets in 10 s disconnect', async () => {
   const { players: [anya] } = await players(['Аня']);
   const ids = [1, 2, 3, 4].map((n) => anya!.command('chat-send', { text: `сообщение ${n}` }));
   for (const id of ids.slice(0, 3)) await anya!.wait((p) => p.type === 'chat' && p.requestId === id);

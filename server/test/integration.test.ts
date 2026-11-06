@@ -298,7 +298,7 @@ it('an enrolled BABEL player can still use legacy chat and NPCs on the old maps'
   const question = client.command('npc-question', { targetId: 'guide', text: 'История' }); await client.wait(p => p.type === 'npc-answer' && p.requestId === question);
 });
 
-it('streams an NPC answer over a real socket only on request, and npc-cancel ends it without an answer (PROTO-007)', async () => {
+it('streams an NPC answer over a real socket only on request, and npc-cancel ends it without an answer', async () => {
   const { config, guest, connect } = await setup({ npc: { options: { delayMs: 600 } } });
   const client = await connect((await guest('Поток')).token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
   const streamed = client.command('npc-question', { targetId: 'guide', text: 'История', stream: true });

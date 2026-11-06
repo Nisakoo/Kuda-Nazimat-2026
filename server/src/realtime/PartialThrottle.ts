@@ -1,7 +1,7 @@
 import type { Scheduler, TimerHandle } from '../common/time.ts';
 
 /**
- * PROTO-007: at most one npc-partial per interval for one question; the newest text replaces an unsent one,
+ * At most one npc-partial per interval for one question; the newest text replaces an unsent one,
  * an unchanged text is not resent and nothing leaves after stop(). seq starts at 1 and only grows.
  */
 export class PartialThrottle {

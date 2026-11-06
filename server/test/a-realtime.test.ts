@@ -81,7 +81,7 @@ const positionOf = (m: ServerMessage, id: string) => (m.type === 'delta' ? m.ups
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const disconnect = async (c: { socket: Socket }) => { c.socket.disconnect(); await sleep(50); };
 
-describe('handshake (AUTH-003, PROTO-008 §1)', () => {
+describe('handshake', () => {
   it('rejects a missing token and a wrong protocol version', async () => {
     expect(await client('nope').refused()).toBe('UNAUTHORIZED');
     expect(await client('token-anya-000000000001', 2).refused()).toBe('VERSION');
@@ -89,7 +89,7 @@ describe('handshake (AUTH-003, PROTO-008 §1)', () => {
   });
 });
 
-describe('two players (REALTIME-002, 005)', () => {
+describe('two players', () => {
   it('joins with a valid snapshot and bootstrap, then syncs movement through deltas', async () => {
     const anya = await joined('token-anya-000000000001');
     expect(anya.joined.playerId).toBe('p_anya');
@@ -106,7 +106,7 @@ describe('two players (REALTIME-002, 005)', () => {
     expect(delta.revision).toBe(delta.baseRevision + 1);
     expect(boris.inbox.filter((m) => m.type === 'delta').every((m) => m.type === 'delta' && (m.upsert.length > 0 || m.remove.length > 0))).toBe(true);
 
-    // NPC-001: near target gets an answer via NpcQuestions, far target is refused.
+    // Near target gets an answer via NpcQuestions, far target is refused.
     const asking = anya.send({ type: 'npc-question', targetId: 'far', text: 'Привет?' });
     expect(await anya.next((m) => m.type === 'error' && m.requestId === asking)).toMatchObject({ code: 'FORBIDDEN' });
     for (let i = 0; i < 10; i++) { anya.input({ x: 1, z: 0 }); await sleep(50); }
@@ -115,24 +115,24 @@ describe('two players (REALTIME-002, 005)', () => {
     expect(await anya.next((m) => m.type === 'npc-answer' && m.requestId === question)).toMatchObject({ targetId: 'near', text: 'Ответ NPC near' });
     expect(asked.at(-1)).toMatchObject({ question: 'Что ты знаешь?', player: { playerId: 'p_anya' }, npc: { id: 'near', persona: 'Персона' } });
 
-    // REALTIME-008: chat reaches both, with the sender's requestId; control characters are refused.
+    // Chat reaches both, with the sender's requestId; control characters are refused.
     const said = anya.send({ type: 'chat-send', text: '<b>привет</b>' });
     expect(await boris.next((m) => m.type === 'chat' && m.requestId === said)).toMatchObject({ playerId: 'p_anya', name: 'Аня', text: '<b>привет</b>' });
     await anya.next((m) => m.type === 'chat' && m.requestId === said);
     const bad = anya.send({ type: 'chat-send', text: 'a\u0007b' });
     expect(await anya.next((m) => m.type === 'error' && m.requestId === bad)).toMatchObject({ code: 'INVALID' });
 
-    // SERVER-WORLD-006: files around the player only; nothing for an unknown account or path.
+    // Files around the player only; nothing for an unknown account or path.
     expect(game.worldFile('maps/test/manifest.json', 'a1').ok).toBe(true);
     expect(game.worldFile('maps/test/chunks/1_0.json', 'a1').ok).toBe(true);
     expect(game.worldFile('maps/test/chunks/2_0.json', 'a1').ok).toBe(false);
     expect(game.worldFile('maps/test/chunks/0_0.json', 'a3').ok).toBe(false);
     expect(game.worldFile('../package.json', 'a1').ok).toBe(false);
 
-    // SERVER-006: third account while two seats are taken.
+    // Third account while two seats are taken.
     expect(await client('token-vera-000000000003').refused()).toBe('UNAVAILABLE');
 
-    // AUTH-005: a second tab of Anya takes over; the first gets UNAUTHORIZED from "server" and is closed.
+    // A second tab of Anya takes over; the first gets UNAUTHORIZED from "server" and is closed.
     const before = game.activePlayers();
     const firstTabId = anya.socket.id;
     const tab2 = await joined('token-anya-000000000001');
@@ -144,7 +144,7 @@ describe('two players (REALTIME-002, 005)', () => {
     expect(firstTabId).toBeTruthy();
     expect(cancelled).toContain(firstTabId);
 
-    // REALTIME-006: after the grace period the seat is freed and the position saved.
+    // After the grace period the seat is freed and the position saved.
     await disconnect(tab2);
     await disconnect(boris);
     await sleep(500);
@@ -153,7 +153,7 @@ describe('two players (REALTIME-002, 005)', () => {
   });
 });
 
-describe('protocol hygiene (REALTIME-001, PROTO-008 §5)', () => {
+describe('protocol hygiene', () => {
   it('requires join first, rejects duplicate requestIds and unknown fields', async () => {
     const vera = client('token-vera-000000000003');
     await vera.connected();

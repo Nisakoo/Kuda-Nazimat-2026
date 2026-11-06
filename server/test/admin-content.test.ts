@@ -26,7 +26,7 @@ import { systemClock, systemScheduler } from '../src/common/time.ts';
 import { parseBabylonRequest } from '../../shared/babylon/validate.ts';
 import { makeWorld, npc } from './a-helpers.ts';
 
-/** ADMIN-SRV: real server, SQLite and Socket.IO; the administrator acts through the loopback HTTP API. */
+/** Content administration: real server, SQLite and Socket.IO; the administrator acts through the loopback HTTP API. */
 const cleanups: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
 
@@ -84,7 +84,7 @@ async function start(options: { scene?: boolean; delayMs?: number } = {}) {
 
 const entityIn = (p: ServerMessage, id: string) => p.type === 'delta' ? p.upsert.find((e) => e.id === id) : undefined;
 
-it('ADMIN-SRV-014: stale edits conflict; reset and journal retention never reuse revisions', async () => {
+it('stale edits conflict; reset and journal retention never reuse revisions', async () => {
   const { op, restart, config } = await start();
   const first = (await op('GET', '/api/operator/npcs/guide')).body.npc;
   const changed = await op('PATCH', '/api/operator/npcs/guide', { revision: first.revision, topic: 'Новая тема' });
@@ -101,7 +101,7 @@ it('ADMIN-SRV-014: stale edits conflict; reset and journal retention never reuse
   expect((await op('DELETE', '/api/operator/npcs/guide')).status).toBe(403);
 });
 
-it('ADMIN-SRV S1, S2, S7: live edits reach players and the model, persist, reset and are journaled once', async () => {
+it('live edits reach players and the model, persist, reset and are journaled once', async () => {
   const { op, player, restart } = await start();
   expect((await op('GET', '/api/operator/journal?action=npc.seed')).body.total).toBe(2);
   const list = (await op('GET', '/api/operator/npcs')).body;
@@ -117,7 +117,7 @@ it('ADMIN-SRV S1, S2, S7: live edits reach players and the model, persist, reset
   const answer = await a.wait((p) => p.type === 'npc-answer' && p.requestId === question);
   expect(answer.type === 'npc-answer' && answer.text.startsWith('Свежие финики!')).toBe(true);
 
-  // S2: the embedded figure cannot move or change appearance; nothing is written.
+  // The embedded figure cannot move or change appearance; nothing is written.
   for (const patch of [{ position: { x: 2, z: 6 } }, { assetId: 'avatar-dan' }, { mapId: 'test' }]) {
     const refused = await op('PATCH', '/api/operator/npcs/guide', patch);
     expect([refused.status, refused.body.error.code]).toEqual([400, 'INVALID']);
@@ -141,7 +141,7 @@ it('ADMIN-SRV S1, S2, S7: live edits reach players and the model, persist, reset
   expect(reset.body.npc).toMatchObject({ topic: 'Тема', greeting: 'Привет', overridden: [] });
 });
 
-it('ADMIN-SRV S3, S4, S9: withdrawn NPC cancels the question, disappears and returns; created NPC is live; access is guarded', async () => {
+it('withdrawn NPC cancels the question, disappears and returns; created NPC is live; access is guarded', async () => {
   const { op, player, origin } = await start({ delayMs: 1500 });
   const a = await player('Бэла');
   await a.wait((p) => (p.type === 'joined' && p.snapshot.entities.some((e) => e.id === 'tutor')));
@@ -166,7 +166,7 @@ it('ADMIN-SRV S3, S4, S9: withdrawn NPC cancels the question, disappears and ret
   const actions = (await op('GET', '/api/operator/journal?target=npc&id=tutor&order=asc')).body.entries.map((e: any) => e.action);
   expect(actions).toEqual(['npc.seed', 'npc.disable', 'npc.enable', 'npc.delete', 'npc.restore']);
 
-  // S4: created NPC with a player appearance.
+  // Created NPC with a player appearance.
   const created = await op('POST', '/api/operator/npcs', { id: 'baker', mapId: 'test', name: 'Пекарь', topic: 'Хлеб', persona: 'Добродушный', greeting: 'Тёплый хлеб!', position: { x: -1, z: 6 }, assetId: 'avatar-dan' });
   expect(created.status).toBe(201);
   expect(created.body.npc).toMatchObject({ origin: 'admin', embedded: false, interactionRadius: 2.5, assetId: 'avatar-dan' });
@@ -176,7 +176,7 @@ it('ADMIN-SRV S3, S4, S9: withdrawn NPC cancels the question, disappears and ret
   expect((await op('POST', '/api/operator/npcs', { id: 'other', mapId: 'test', name: 'П', topic: 'Т', persona: 'П', greeting: 'П', position: { x: -1, z: 6 }, assetId: 'unknown-model' })).status).toBe(400);
   expect((await op('POST', '/api/operator/npcs/baker/reset', {})).status).toBe(409);
 
-  // S9: CSRF guard and loopback-only routes.
+  // CSRF guard and loopback-only routes.
   const forged = await op('PATCH', '/api/operator/npcs/tutor', { name: 'Взлом' }, { 'Content-Type': 'application/json', Origin: 'http://evil.example' });
   expect(forged.status).toBe(403);
   expect((await op('PATCH', '/api/operator/npcs/tutor', { name: 'Взлом' }, { 'Content-Type': 'application/json', Origin: origin() })).status).toBe(403);
@@ -189,7 +189,7 @@ it('ADMIN-SRV S3, S4, S9: withdrawn NPC cancels the question, disappears and ret
   }
 });
 
-it('ADMIN-SRV S6, S8: scene reset returns held apples; account card, journal and CSV never contain secrets', async () => {
+it('scene reset returns held apples; account card, journal and CSV never contain secrets', async () => {
   const { op, guest, restart, config, origin } = await start({ scene: true });
   const { token } = await guest('Мира');
   await guest('Мира');
@@ -213,7 +213,7 @@ it('ADMIN-SRV S6, S8: scene reset returns held apples; account card, journal and
   expect(after.revision).toBeGreaterThan(held.revision);
   expect((await op('POST', '/api/operator/world/nowhere/reset-scene', {})).status).toBe(404);
 
-  // S8: account actions through the existing AUTH-010 routes are journaled without the temporary password.
+  // Account actions through the existing operator routes are journaled without the temporary password.
   const resetPassword = await op('POST', '/api/operator/actions/reset-password', { name: 'Мира' });
   const temporary = String(resetPassword.body.temporaryPassword);
   expect(temporary.length).toBeGreaterThan(5);
@@ -238,7 +238,7 @@ it('ADMIN-SRV S6, S8: scene reset returns held apples; account card, journal and
   }
 });
 
-it('ADMIN-SRV-008: a pot whose home is occupied by a player stays; the rest go home', async () => {
+it('a pot whose home is occupied by a player stays; the rest go home', async () => {
   const world = await makeWorld([]); cleanups.push(() => rm(dirname(world.worldDir), { recursive: true, force: true }));
   await withScene(world);
   const loaded = await loadWorld({ worldDir: world.worldDir, maps: world.maps, contentDir: world.contentDir });
@@ -275,7 +275,7 @@ it('NpcCatalog: file layer keeps only differences, orphans are reported, created
   expect(() => validatePatch(b, { mapId: 'other' }, context, new Set(['test']))).toThrow('Карта');
 });
 
-it('ADMIN-SRV S5: BABEL answers with the live profile and refuses a withdrawn quest NPC; unknown NPCs keep the task content', async () => {
+it('BABEL answers with the live profile and refuses a withdrawn quest NPC; unknown NPCs keep the task content', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'admin-babel-')); const db = openDatabase(join(dir, 'game.sqlite'));
   cleanups.push(async () => { db.close(); await rm(dir, { recursive: true, force: true }); });
   const person = sqliteStores(db).accounts.findOrCreate('A', 'a', 1);

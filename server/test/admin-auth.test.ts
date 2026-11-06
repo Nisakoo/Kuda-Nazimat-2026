@@ -5,7 +5,7 @@ import { setup } from './harness.ts';
 
 const code = async (promise: Promise<unknown>) => { try { await promise; return 'ok'; } catch (error) { return error instanceof AuthError ? error.code : String(error); } };
 
-it('AUTH-017–020: create-admin, temporary password, scoped sessions and role revocation', async () => {
+it('create-admin, temporary password, scoped sessions and role revocation', async () => {
   const stores = memoryStores(); const revoked: string[] = [];
   const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: { now: () => Date.now() }, ttlMs: 3_600_000, passwordless: false });
   auth.onRevoked((_hashes, reason) => revoked.push(reason));
@@ -29,7 +29,7 @@ it('AUTH-017–020: create-admin, temporary password, scoped sessions and role r
   expect(await code(auth.adminDev())).toBe('DISABLED');
 });
 
-it('AUTH-018/019 over HTTP: admin login and dev autologin, game channel refuses admin tokens, logout ends the admin session', async () => {
+it('admin sessions over HTTP: admin login and dev autologin, game channel refuses admin tokens, logout ends the admin session', async () => {
   const { post, origin, connect } = await setup();
   const dev = await post('/api/admin/dev', {});
   expect(dev.status).toBe(200); expect(Object.keys(dev.body!)).toEqual(['token', 'expiresAt']);
@@ -43,10 +43,10 @@ it('AUTH-018/019 over HTTP: admin login and dev autologin, game channel refuses 
   expect(await post('/api/admin/login', { name: 'Никто', password: 'неверно12' })).toMatchObject({ status: 401, body: { error: { code: 'CREDENTIALS' } } });
   expect((await post('/api/admin/login', { name: 'x' })).status).toBe(400);
   expect((await fetch(`${origin}/api/admin/logout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } })).status).toBe(204);
-  expect((await fetch(`${origin}/api/admin/unknown`)).status).toBe(401); // ADMIN-003: no admin session first
+  expect((await fetch(`${origin}/api/admin/unknown`)).status).toBe(401); // No admin session first
 });
 
-it('AUTH-020: first admin password change and login work when every game seat is occupied', async () => {
+it('first admin password change and login work when every game seat is occupied', async () => {
   const stores = memoryStores();
   const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: { now: Date.now }, ttlMs: 3600000, passwordless: false, canAdmit: () => false });
   const created = await auth.operator.createAdmin('Учитель');

@@ -34,7 +34,7 @@ async function readWorldFile(root: string, relative: string, mapId: string): Pro
   catch { throw new WorldError(mapId, relative, 'файл не найден или недоступен'); }
 }
 
-/** SERVER-WORLD-001–002, 007–008: validate the prepared world once at startup and index every servable file. */
+/** Validate the prepared world once at startup and index every servable file. */
 export async function loadWorld(source: WorldSource): Promise<LoadedWorld> {
   const root = path.resolve(source.worldDir);
   if (!(await stat(root).catch(() => null))?.isDirectory()) throw new Error(`worldDir не найден: ${root}. Соберите клиент (npm --prefix client run build) или укажите worldDir.`);

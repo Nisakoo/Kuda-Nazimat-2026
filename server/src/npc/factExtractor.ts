@@ -1,5 +1,5 @@
 /**
- * NPC-AI-003, NPC-AI-011:
+ * Player fact extraction:
  * "Рассказ игрока можно запомнить только как «игрок сказал», но не как доказанный факт мира или знания NPC."
  */
 export function extractPlayerFact(question: string): string | null {

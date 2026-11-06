@@ -14,7 +14,7 @@ const npc: Entity = {
 };
 
 describe('headless game world', () => {
-  it('MOVE-001: keeps the free component when diagonal movement meets a wall', () => {
+  it('keeps the free component when diagonal movement meets a wall', () => {
     const world = new GameWorld('local', [player]);
     world.setMovementGuard((position) => position.x < .1);
     world.execute('player', { type: 'move', direction: { x: 1, z: 1 } });

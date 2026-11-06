@@ -1,13 +1,13 @@
-/** A `perf` report as accepted by OBS-011, with the server receipt time. */
+/** A `perf` report as accepted from the client, with the server receipt time. */
 export interface PerfReport { readonly fps: number; readonly visible: boolean; readonly frameMs?: number; readonly drawCalls?: number }
 export interface PerfView { readonly fps: number | null; readonly frameMs: number | null; readonly drawCalls: number | null; readonly visible: boolean | null; readonly reportAgeSeconds: number | null }
 
-/** Visible-tab values older than this are «нет данных» (OBS-010). */
+/** Visible-tab values older than this are «нет данных». */
 export const PERF_STALE_MS = 30_000;
 const NONE: PerfView = { fps: null, frameMs: null, drawCalls: null, visible: null, reportAgeSeconds: null };
 
 /**
- * Last client report per player (OBS-010/011). A hidden tab updates only `visible` and the receipt time,
+ * Last client report per player. A hidden tab updates only `visible` and the receipt time,
  * so its FPS never reaches thresholds or charts. Players without a seat are pruned by the caller.
  */
 export class ClientPerf {

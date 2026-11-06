@@ -1,5 +1,5 @@
 /**
- * OBS-007 metrics port and in-process registry: counters, gauges and fixed-bucket histograms,
+ * Metrics port and in-process registry: counters, gauges and fixed-bucket histograms,
  * O(1) updates, no dependencies. Labels are small fixed sets (route, code, outcome) — never IDs or texts.
  */
 export type Labels = Readonly<Record<string, string>>;

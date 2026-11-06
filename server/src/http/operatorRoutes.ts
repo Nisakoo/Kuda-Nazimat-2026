@@ -21,27 +21,27 @@ export interface OperatorDeps {
   readonly health: () => Health;
   readonly warnings: () => readonly LogRecord[];
   readonly dump: (reason: string) => string | null;
-  /** TLS-011, 012: certificate facts and devices that rejected it; absent in tests without TLS wiring. */
+  /** Certificate facts and devices that rejected it; absent in tests without TLS wiring. */
   readonly tls?: () => { fingerprint: string; notAfter: number; names: readonly string[]; uncovered: readonly string[]; untrusted: readonly { ip: string; ts: number; reason: string }[] };
   /** ADMIN-SRV: NPC, world, journal and account routes; absent in tests that do not need them. */
   readonly content?: ContentAdmin;
-  /** OBS-013/014 status groups and history series; absent in tests that do not need them. */
+  /** Status groups and history series; absent in tests that do not need them. */
   readonly overview?: Pick<Overview, 'status' | 'series'>;
 }
 
 const startedAt = Date.now();
 
-/** Who may use the operator routes: the computer itself (OFFLINE-010) or a verified administrator session (ADMIN-ACCESS). */
+/** Who may use the operator routes: the computer itself or a verified administrator session (ADMIN-ACCESS). */
 export type OperatorAccess = { readonly kind: 'loopback' } | { readonly kind: 'admin'; readonly who: Who };
 
-/** AUTH-010 CSRF guard: same loopback origin as the server and the custom header a cross-site form cannot set. */
+/** CSRF guard: same loopback origin as the server and the custom header a cross-site form cannot set. */
 export function trustedAction(req: IncomingMessage): boolean {
   const port = req.socket.localPort;
   const origins = ['localhost', '127.0.0.1', '[::1]'].map((host) => `https://${host}:${port}`);
   return req.headers['x-operator'] === '1' && origins.includes(req.headers.origin ?? '');
 }
 
-/** OBS-008/010/014, OFFLINE-010, AUTH-010; `/operator` and `/api/operator/*`, loopback only. False when not ours. */
+/** Operator screen: `/operator` and `/api/operator/*`, loopback only. False when not ours. */
 export async function handleOperator(req: IncomingMessage, res: ServerResponse, path: string, deps: OperatorDeps, context: RequestContext, access: OperatorAccess = { kind: 'loopback' }): Promise<boolean> {
   if (path !== '/operator' && !path.startsWith('/api/operator/')) return false;
   context.route = path.startsWith('/api/operator/actions/') ? '/api/operator/actions' : path;

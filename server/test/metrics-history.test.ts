@@ -30,7 +30,7 @@ function registry() {
 }
 const presence = (playerId: string, name: string, extra: Partial<PlayerPresence> = {}): PlayerPresence => ({ playerId, name, mapId: 'market', connected: true, releaseInMs: null, rttMs: 40, reconnects: 0, seatedSeconds: 60, ...extra });
 
-describe('history (OBS-013)', () => {
+describe('history', () => {
   it('S11: windows count only their own increments; the ring keeps 4 hours within 1 MB; no data stays null', () => {
     let now = 0; const r = registry();
     const players = [{ playerId: 'p1', connected: true, rttMs: 30, fps: 60, frameMs: 17 }, { playerId: 'p2', connected: true, rttMs: null, fps: null, frameMs: null }, { playerId: 'p3', connected: false, rttMs: 300, fps: 25, frameMs: 40 }, { playerId: 'p4', connected: true, rttMs: 10, fps: 144, frameMs: 7 }];
@@ -73,7 +73,7 @@ describe('history (OBS-013)', () => {
   });
 });
 
-describe('admin data and minute record (OBS-014, 015)', () => {
+describe('admin data and minute record', () => {
   function overview(players: () => PlayerPresence[]) {
     let now = 1_000_000; const r = registry(); const logger = memoryLogger();
     r.metrics.gauge('game_npcs', 'NPC', () => 6);
@@ -98,7 +98,7 @@ describe('admin data and minute record (OBS-014, 015)', () => {
     expect(status.players.find((p: { name: string }) => p.name === 'Мира')).toMatchObject({ fps: 60, reportAgeSeconds: 0 });
     expect(status.players.find((p: { name: string }) => p.name === 'Соня')).toMatchObject({ fps: null, reportAgeSeconds: expect.any(Number) }); // older than 30 s
     expect(view.health().reasons.map((x) => x.text)).toEqual(expect.arrayContaining([expect.stringContaining('Нестабильная связь у игрока Соня'), 'Медленная сеть у игрока Соня (ping 172 мс)']));
-    expect(view.recent()).toHaveLength(60); // OBS-004: the last 10 minutes go into incident dumps
+    expect(view.recent()).toHaveLength(60); // The last 10 minutes go into incident dumps
     const body = JSON.stringify(view.series());
     expect(body.length).toBeLessThanOrEqual(256 * 1024);
     const series = JSON.parse(body) as { stepMs: number; series: Record<string, [number, number | null][]>; players: Record<string, { name: string; rtt: unknown[]; fps: unknown[] }> };
@@ -124,7 +124,7 @@ describe('admin data and minute record (OBS-014, 015)', () => {
   });
 });
 
-describe('report (OBS-017)', () => {
+describe('report', () => {
   const minute = (at: number, overrides: { errors?: number; fps?: number | null; tickSlow?: boolean } = {}) => {
     const r = registry(); let now = at - 60_000;
     const history = new MetricsHistory({ registry: r.metrics, players: () => [{ playerId: 'p1', connected: true, rttMs: 40, fps: overrides.fps === undefined ? 60 : overrides.fps, frameMs: 16 }] }, { now: () => now });

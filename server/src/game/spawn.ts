@@ -1,6 +1,6 @@
 import type { Vector3 } from '../../../shared/world/types.ts';
 
-/** REALTIME-010: minimum horizontal distance to any other player at the moment of appearance. */
+/** Minimum horizontal distance to any other player at the moment of appearance. */
 export const SPAWN_CLEARANCE = 1.2;
 const RINGS = [1.5, 3, 4.5] as const;
 const DIRECTIONS = 8;

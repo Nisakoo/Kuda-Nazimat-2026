@@ -166,7 +166,7 @@
   {
     "direction": "server",
     "valid": true,
-    "note": "PROTO-008: unsolicited error",
+    "note": "unsolicited error",
     "packet": {
       "v": 3,
       "type": "error",
@@ -178,7 +178,7 @@
   {
     "direction": "server",
     "valid": true,
-    "note": "PROTO-008: chat of another player carries the sender's requestId",
+    "note": "chat of another player carries the sender's requestId",
     "packet": {
       "v": 3,
       "type": "chat",

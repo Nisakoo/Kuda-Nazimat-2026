@@ -6,7 +6,7 @@ import { sqliteAdminContent } from '../persistence/adminContent.ts';
 import { accountEntry } from '../content/ContentAdmin.ts';
 
 /**
- * AUTH-010 from the server's console: `npm --prefix server run auth -- <list|reset-password|revoke|unlock> [имя] [--env …]`.
+ * Account operator actions from the server's console: `npm --prefix server run auth -- <list|reset-password|revoke|unlock> [имя] [--env …]`.
  * Live sockets of a running server are closed by its own operator screen; the CLI changes the database,
  * so revoked sessions are refused at their next request. `unlock` affects only a server started afterwards.
  */
@@ -19,7 +19,7 @@ try {
   try {
     const stores = sqliteStores(db);
     const journal = sqliteAdminContent(db);
-    // ADMIN-SRV-010: console actions are journaled like the screen's, without the temporary password.
+    // Console actions are journaled like the screen's, without the temporary password.
     const auth = createAuthService({ accounts: stores.accounts, sessions: stores.sessions, clock: systemClock, ttlMs: config.sessionTtlMs, passwordless: config.auth.passwordless, audit: (entry) => journal.append(accountEntry(entry, systemClock.now(), null)) });
     if (command === 'list') console.table(auth.operator.list().map((a) => ({ имя: a.name, роль: a.role, пароль: a.hasPassword, сменить: a.mustChangePassword, сессий: a.activeSessions, вход: a.lastLoginAt ? new Date(a.lastLoginAt).toLocaleString() : '—' })));
     else if (command === 'reset-password') { const reset = await auth.operator.resetPassword(name); console.log(`Временный пароль для «${reset.name}»: ${reset.temporaryPassword}\nДействует до ${new Date(reset.expiresAt).toLocaleString()}. Игрок войдёт с ним и сразу задаст свой.`); }

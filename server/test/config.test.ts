@@ -6,7 +6,7 @@ import { loadServerConfig, parseConfig, serverArguments } from '../src/app/confi
 
 const path = resolve('/srv/kn/server/config.json');
 
-it('SERVER-009: presets differ per environment and production never allows passwordless login', () => {
+it('presets differ per environment and production never allows passwordless login', () => {
   const dev = parseConfig({}, path, 'development'); const prod = parseConfig({}, path, 'production'); const test = parseConfig({}, path, 'test');
   expect([dev.env, prod.env, test.env]).toEqual(['development', 'production', 'test']);
   expect(dev).toMatchObject({ dbPath: resolve('/srv/kn/server/data/dev.sqlite'), corsOrigins: ['https://localhost:5173'], clientDebug: true, auth: { passwordless: true }, logs: { consoleLevel: 'debug', fileLevel: 'debug' }, monitoring: { validateOutgoing: true } });
@@ -19,7 +19,7 @@ it('SERVER-009: presets differ per environment and production never allows passw
     expect(() => parseConfig(input, path, 'production'), JSON.stringify(input)).toThrow();
 });
 
-it('SERVER-009: --env beats APP_ENV, --port beats PORT, positional words are kept and unknown flags fail', () => {
+it('--env beats APP_ENV, --port beats PORT, positional words are kept and unknown flags fail', () => {
   expect(serverArguments([], {})).toMatchObject({ env: 'development', rest: [] });
   expect(serverArguments([], { APP_ENV: 'production', PORT: '9000' })).toMatchObject({ env: 'production', port: 9000 });
   expect(serverArguments(['--env', 'test', '--port', '9100'], { APP_ENV: 'production', PORT: '9000' })).toMatchObject({ env: 'test', port: 9100 });
@@ -28,7 +28,7 @@ it('SERVER-009: --env beats APP_ENV, --port beats PORT, positional words are kep
   expect(() => serverArguments([], { APP_ENV: 'prod' })).toThrow('Неизвестное окружение');
 });
 
-it('SERVER-009: defaults → preset → file → HOST/PORT → --port', async () => {
+it('defaults → preset → file → HOST/PORT → --port', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'config-')); const file = join(dir, 'config.json');
   try {
     writeFileSync(file, JSON.stringify({ port: 7000, host: '127.0.0.1' }));

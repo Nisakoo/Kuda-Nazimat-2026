@@ -6,7 +6,7 @@ import { frameFromJson, summarize, type Frame } from '../obs/history.ts';
 import { reportTable } from '../obs/thresholds.ts';
 
 /**
- * OBS-017 acceptance report from the server journal, without a running server:
+ * Acceptance report from the server journal, without a running server:
  * `npm --prefix server run report [-- --env <env>] [--file <path>] [--since <ISO> | --last <2h>]`.
  */
 const USAGE = 'Использование: npm --prefix server run report -- [--env development|production|test] [--config <путь>] [--file <журнал.jsonl>] [--since <ISO-время> | --last <длительность: 30m, 2h, 1d>]';

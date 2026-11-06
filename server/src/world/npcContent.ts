@@ -15,7 +15,7 @@ export interface NpcDefinition {
 }
 
 const ID = /^[A-Za-z0-9_-]{1,80}$/;
-/** SERVER-WORLD-008 limits, shared with administrator edits (ADMIN-SRV-002). */
+/** NPC content limits, shared with administrator edits. */
 export const NPC_LIMITS = { id: ID, name: 80, topic: 80, persona: 500, greeting: 500, maxRadius: 20, maxCoordinate: 1e6 } as const;
 const FIELDS = ['id', 'mapId', 'name', 'topic', 'persona', 'greeting', 'position', 'rotationY', 'interactionRadius', 'assetId'];
 
@@ -29,7 +29,7 @@ function finite(value: unknown, index: number, field: string, min = -1e6, max = 
   return value;
 }
 
-/** SERVER-WORLD-008: strict parse of NPC content; map-dependent checks happen in the loader. */
+/** Strict parse of NPC content; map-dependent checks happen in the loader. */
 export function parseNpcContent(raw: unknown): NpcDefinition[] {
   if (!Array.isArray(raw)) throw new Error('npcs.json должен быть массивом');
   const seen = new Set<string>();

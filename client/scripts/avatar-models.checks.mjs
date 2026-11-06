@@ -18,7 +18,7 @@ const bounds=root=>{root.updateMatrixWorld(true);return new Box3().setFromObject
 const parse=async id=>{const bytes=await readFile(file(id));return new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');};
 const glbDocument=bytes=>JSON.parse(bytes.subarray(20,20+bytes.readUInt32LE(12)).toString('utf8'));
 
-describe('TASK-043 original local avatar models',()=>{
+describe('original local avatar models',()=>{
   it('exports exactly four closed IDs, never accepts a path or unknown name',()=>{
     expect(AVATAR_IDS).toEqual(['lukas','nic','dan','ksu']);
     for(const id of ['other','../lukas','lukas.glb','https://invalid/avatar.glb',''])expect(()=>createAvatarModel(id)).toThrow(RangeError);

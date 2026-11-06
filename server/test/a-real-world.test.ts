@@ -18,7 +18,7 @@ const embedded = (name: string, constant: string): unknown => {
 };
 
 // Requires `npm --prefix client run world:generate`; skipped (= unverified) otherwise.
-describe.runIf(ready)('real client worlds (SERVER-WORLD S1, SERVER-DEMO-005)', () => {
+describe.runIf(ready)('real client worlds (server world and demo)', () => {
   it('loads new carry items, clear animal circuits and perched birds in the authoritative scene',async()=>{
     const loaded=await loadWorld({worldDir:publicDir,contentDir:fileURLToPath(new URL('../content/',import.meta.url)),maps:{market:'maps/market/manifest.json',demo:'maps/demo/manifest.json',science:'maps/demo/science.json'}});
     const map=loaded.maps.get('market')!,definition=map.manifest.worldLife!,life=new WorldLife(loaded.maps,1000,'city-life');

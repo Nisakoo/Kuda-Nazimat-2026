@@ -2,7 +2,7 @@ import type { Vector3 } from '../../../shared/world/types.ts';
 import { NPC_LIMITS, type NpcDefinition } from '../world/npcContent.ts';
 
 /**
- * ADMIN-SRV-001–004: the administrator's layer over contentDir/npcs.json. Pure: validation, merge and
+ * The administrator's layer over contentDir/npcs.json. Pure: validation, merge and
  * diff; storage, journal and the live world are the caller's.
  */
 export type NpcFields = Omit<NpcDefinition, 'id'>;
@@ -33,22 +33,22 @@ export interface NpcRecord {
 export interface NpcContext {
   /** Surface height inside the map's chunks, otherwise null. */
   surface(mapId: string, x: number, z: number): number | null;
-  /** ADMIN-SRV-013: the spot is walkable on that map (shared walkability and ceilings). */
+  /** The spot is walkable on that map (shared walkability and ceilings). */
   walkable(mapId: string, x: number, z: number): boolean;
-  /** ADMIN-SRV-013: another live NPC, not `exceptId`, stands closer than {@link MIN_NPC_GAP}. */
+  /** Another live NPC, not `exceptId`, stands closer than {@link MIN_NPC_GAP}. */
   crowded(mapId: string, exceptId: string, x: number, z: number): boolean;
   readonly appearances: ReadonlySet<string>;
 }
 export class ContentError extends Error {
   readonly code: 'INVALID' | 'NOT_FOUND' | 'CONFLICT' | 'FORBIDDEN';
-  /** ADMIN-SRV-014: on a revision conflict, the current state of the NPC. */
+  /** On a revision conflict, the current state of the NPC. */
   readonly current: unknown;
   constructor(code: ContentError['code'], message: string, current?: unknown) { super(message); this.code = code; this.current = current; }
 }
 
 export const MAX_NPCS = 64;
 export const DEFAULT_RADIUS = 2.5;
-/** ADMIN-SRV-013: minimal distance between two NPCs, as between players (REALTIME-010). */
+/** Minimal distance between two NPCs, as between players. */
 export const MIN_NPC_GAP = 1.2;
 const TEXT = { name: NPC_LIMITS.name, topic: NPC_LIMITS.topic, persona: NPC_LIMITS.persona, greeting: NPC_LIMITS.greeting } as const;
 const TEXT_FIELDS = ['name', 'topic', 'persona', 'greeting'] as const;
@@ -130,7 +130,7 @@ function mapOf(value: unknown, maps: ReadonlySet<string>): string {
   return value as string;
 }
 
-/** ADMIN-SRV-002: validated change of a record; throws ContentError on a forbidden or invalid field. */
+/** Validated change of a record; throws ContentError on a forbidden or invalid field. */
 export function validatePatch(record: NpcRecord, patch: Record<string, unknown>, context: NpcContext, maps: ReadonlySet<string>): { fields: Partial<NpcFields>; enabled?: boolean } {
   if (record.deleted) throw new ContentError('CONFLICT', 'Персонаж удалён: сначала восстановите его.');
   const allowed = editableFields(record);
@@ -150,7 +150,7 @@ export function validatePatch(record: NpcRecord, patch: Record<string, unknown>,
   return { fields, ...(enabled === undefined ? {} : { enabled }) };
 }
 
-/** ADMIN-SRV-003: a new NPC with an appearance from the closed list. */
+/** A new NPC with an appearance from the closed list. */
 export function validateCreate(input: Record<string, unknown>, taken: ReadonlySet<string>, context: NpcContext, maps: ReadonlySet<string>): NpcDefinition {
   const known = ['id', 'mapId', 'name', 'topic', 'persona', 'greeting', 'position', 'rotationY', 'interactionRadius', 'assetId'];
   for (const key of Object.keys(input)) if (!known.includes(key)) invalid(`Неизвестное поле: ${key}.`);

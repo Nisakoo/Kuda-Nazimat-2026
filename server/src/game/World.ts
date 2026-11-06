@@ -9,7 +9,7 @@ import type { MotionState, MovementEnvironment } from '../../../shared/movement/
 
 export interface WorldSettings {
   readonly speed: number;            // m/s
-  readonly intentTimeoutMs: number;  // PROTO-008 §4
+  readonly intentTimeoutMs: number;  // how long an unanswered movement intent stays valid
   readonly aoiRadius: number;        // m
   readonly interactTolerance: number;
 }
@@ -37,7 +37,7 @@ interface Player {
   tool: ToolId | null;
 }
 export interface PlacedPlayer { readonly id: string; readonly name: string; readonly mapId: string; readonly position: Vector3; readonly rotationY: number }
-/** OBS-003/005 hooks; the domain reports, the composition root logs. All optional. */
+/** Observability hooks; the domain reports, the composition root logs. All optional. */
 export interface WorldObserver {
   invariant?(name: string, fields: Record<string, unknown>): void;
   recovered?(playerId: string, reason: string): void;
@@ -67,7 +67,7 @@ export class World {
 
   get tick(): number { return this.ticks; }
 
-  /** ADMIN-SRV-005: the administrator's live NPC set; AOI picks the change up at the next broadcast. */
+  /** The administrator's live NPC set; AOI picks the change up at the next broadcast. */
   setNpcs(npcs: readonly NpcDefinition[]): void { this.npcs = new Map(npcs.map((npc) => [npc.id, npc])); }
   hasNpc(npcId: string): boolean { return this.npcs.has(npcId); }
   npcCount(mapId: string): number { let count = 0; for (const npc of this.npcs.values()) if (npc.mapId === mapId) count++; return count; }
@@ -112,7 +112,7 @@ export class World {
     return p && { id: p.id, name: p.name, mapId: p.mapId, position: p.position, rotationY: p.rotationY };
   }
 
-  /** Current positions of every player on a map (REALTIME-010 spawn clearance). */
+  /** Current positions of every player on a map (spawn clearance). */
   playerPositions(mapId: string): Vector3[] {
     return [...this.players.values()].filter((p) => p.mapId === mapId).map((p) => p.position);
   }
@@ -165,7 +165,7 @@ export class World {
     }
     p.motion = next;
     if (!finite(p.motion.position) || !Number.isFinite(p.motion.verticalVelocity)) {
-      // OBS-005: a non-finite body never reaches the AOI or SQLite; it returns to its last safe support.
+      // A non-finite body never reaches the AOI or SQLite; it returns to its last safe support.
       this.observer.invariant?.('player.position.finite', { playerId: p.id, mapId: p.mapId });
       const map = this.maps.get(p.mapId)!;
       const safe = finite(p.motion.safePosition) ? p.motion.safePosition : map.spawn;
@@ -212,7 +212,7 @@ export class World {
     return result;
   }
 
-  /** Area of interest: self plus nearest entities of the same map within aoiRadius (REALTIME-005). */
+  /** Area of interest: self plus nearest entities of the same map within aoiRadius. */
   aoi(playerId: string): Entity[] {
     const self = this.players.get(playerId);
     if (!self) return [];
@@ -242,7 +242,7 @@ export class World {
   }
 }
 
-/** Market NPCs have no assetId: their figures are drawn by the chunk GLB, so no renderable (SERVER-WORLD-008). */
+/** Market NPCs have no assetId: their figures are drawn by the chunk GLB, so no renderable. */
 function npcEntity(npc: NpcDefinition): Entity {
   return {
     id: npc.id,

@@ -47,7 +47,7 @@ export const createGame: CreateGame = async (config: GameConfig, deps: GameDeps)
   let gateway: { close(): Promise<void> } | null = null;
   let running = false;
 
-  /** REALTIME-004: fixed step with drift compensation, bounded catch-up, timing stats. */
+  /** Fixed step with drift compensation, bounded catch-up, timing stats. */
   const startLoop = (): void => {
     const stepMs = 1000 / config.tickHz;
     let next = performance.now();

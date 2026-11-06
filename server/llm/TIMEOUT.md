@@ -16,7 +16,7 @@ make server NPC_TIMEOUT=60
 
 `BACKEND/MODEL` требуют подготовленного профиля; разовый перенос существующих файлов описан в [PROFILES](PROFILES.md). Если profiles.json уже существует, importer повторно не запускать. Timeout сам по себе не требует импорта, новой модели, весов, venv или reinstall.
 
-`make demo BACKEND=ollama MODEL=2b NPC_TIMEOUT=60` передаёт тот же срок, но после main синхронизации demo является alias start: сборка dependencies/build/world и **production**, где пароль обязателен. Текущий UI ещё не поддерживает пароль (TASK-044); для локального входа по имени используйте make server (development). Для обычного запуска уже собранной игры использовать server: он ничего не устанавливает и не скачивает.
+`make demo BACKEND=ollama MODEL=2b NPC_TIMEOUT=60` передаёт тот же срок, но после main синхронизации demo является alias start: сборка dependencies/build/world и **production**, где пароль обязателен. Для локального входа по имени используйте make server (development). Для обычного запуска уже собранной игры использовать server: он ничего не устанавливает и не скачивает.
 
 ## Приоритет и сохранение
 

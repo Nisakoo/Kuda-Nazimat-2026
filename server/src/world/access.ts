@@ -22,7 +22,7 @@ export type PlayerLocator = (accountId: string) => PlayerLocation | null;
 
 const near = (a: ChunkCell, b: ChunkCell, radius: number): boolean => Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z)) <= radius;
 
-/** SERVER-WORLD-006: manifest/models for the player's map, chunks and their collisions only around the player. */
+/** Manifest/models for the player's map, chunks and their collisions only around the player. */
 export function canAccess(file: WorldFile, location: PlayerLocation | null, maps: ReadonlyMap<string, GameMap>, radius: number): boolean {
   if (!location) return false;
   const map = maps.get(location.mapId);

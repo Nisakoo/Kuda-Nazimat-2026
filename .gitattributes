@@ -1,3 +1,4 @@
 *.bin binary
 *.glb binary
 *.png binary
+docs/decisions/README.md merge=union

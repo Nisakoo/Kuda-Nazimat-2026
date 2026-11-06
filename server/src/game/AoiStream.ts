@@ -3,7 +3,7 @@ import type { Entity } from '../../../shared/world/types.ts';
 /** bytes: serialized size of the upserted entities, an estimate of the packet size for OBS (game.delta.large). */
 export interface AoiDelta { readonly revision: number; readonly baseRevision: number; readonly upsert: Entity[]; readonly remove: string[]; readonly bytes: number }
 
-/** Per-connection AOI stream: what the client last received and its revision (PROTO-008 §3). */
+/** Per-connection AOI stream: what the client last received and its revision. */
 export class AoiStream {
   private sent = new Map<string, string>();
   private value = 0;

@@ -10,11 +10,11 @@ export interface ContentAdminDeps {
   readonly world: WorldContentPort;
   readonly clock: Clock;
   readonly logger: Logger;
-  /** Player avatar asset IDs that every client can draw (ADMIN-SRV-002). */
+  /** Player avatar asset IDs that every client can draw. */
   readonly avatarAssets: readonly string[];
-  /** NPC IDs of the BABEL task (ADMIN-SRV-007). */
+  /** NPC IDs of the BABEL task. */
   readonly questNpcs: ReadonlySet<string>;
-  /** ADMIN-SRV-005: aborts unfinished questions to a withdrawn NPC. */
+  /** Aborts unfinished questions to a withdrawn NPC. */
   cancelNpc?(npcId: string): void;
   lockedUntil?(name: string): number | null;
   location?(accountId: string): { mapId: string } | null;
@@ -25,19 +25,19 @@ export interface NpcView {
   readonly mapId: string; readonly name: string; readonly topic: string; readonly persona: string; readonly greeting: string;
   readonly position: NpcDefinition['position']; readonly rotationY: number; readonly interactionRadius: number; readonly assetId: string | null;
   readonly original: NpcDefinition | null; readonly updatedAt: number | null;
-  /** ADMIN-SRV-014: grows with every change; edits must quote it. */
+  /** Grows with every change; edits must quote it. */
   readonly revision: number;
 }
 const ACCOUNT_HISTORY = 50;
 
 export interface AccountAction { readonly action: string; readonly accountId: string | null; readonly name: string; readonly result: Record<string, number | boolean>; readonly by?: Who }
-/** ADMIN-SRV-009 journal entry of an AUTH-010 action; shared by the screen and the CLI. */
+/** Journal entry of an operator account action; shared by the screen and the CLI. */
 export function accountEntry(entry: AccountAction, at: number, ip: string | null): JournalInput {
   return { at, actor: 'admin', ip: entry.by?.ip ?? ip, actorAccountId: entry.by?.accountId ?? null, actorName: entry.by?.name ?? null, targetType: 'account', targetId: entry.accountId ?? `name:${entry.name.toLowerCase()}`, action: `account.${entry.action}`, before: null, after: { name: entry.name, ...entry.result } };
 }
 
 /**
- * ADMIN-SRV-001–011 use cases: the NPC layer applied to the live world, the world-life scene,
+ * Use cases: the NPC layer applied to the live world, the world-life scene,
  * the change journal and account views. HTTP checks access; this service checks content.
  */
 export function createContentAdmin(deps: ContentAdminDeps) {
@@ -63,14 +63,14 @@ export function createContentAdmin(deps: ContentAdminDeps) {
     original: r.base, updatedAt: r.updatedAt, revision: revisions.get(r.id) ?? 0,
   });
   const record = (id: string): NpcRecord => records.get(id) ?? (() => { throw new ContentError('NOT_FOUND', 'Персонаж не найден.'); })();
-  /** ADMIN-SRV-014: an edit quotes the revision it was made from; a stale one changes nothing. */
+  /** An edit quotes the revision it was made from; a stale one changes nothing. */
   const current = (id: string, revision: unknown): NpcRecord => {
     const r = record(id);
     if (typeof revision !== 'number' || !Number.isInteger(revision) || revision < 0) throw new ContentError('INVALID', 'Нужна revision: целое число из карточки персонажа.');
     if (revision !== (revisions.get(id) ?? 0)) throw new ContentError('CONFLICT', 'Персонаж уже изменён: перечитайте карточку и повторите правку.', view(r));
     return r;
   };
-  /** ADMIN-SRV-007: the BABEL task needs its four NPCs present. */
+  /** The BABEL task needs its four NPCs present. */
   const guardQuest = (id: string): void => {
     if (deps.questNpcs.has(id)) throw new ContentError('FORBIDDEN', 'От этого персонажа зависит задание BABEL: выключение и удаление пока запрещены.');
   };
@@ -165,7 +165,7 @@ export function createContentAdmin(deps: ContentAdminDeps) {
     },
 
     journal(filter: JournalFilter): { entries: JournalEntry[]; total: number } { return store.journal(filter); },
-    /** AUTH-010 actions from the screen and the CLI (ADMIN-SRV-010); the temporary password never arrives here. */
+    /** Account actions from the screen and the CLI; the temporary password never arrives here. */
     audit(entry: AccountAction, ip: string | null = null): void {
       store.append(accountEntry(entry, clock.now(), ip));
       log.info('admin.change', 'Действие администратора с аккаунтом', { action: `account.${entry.action}`, targetType: 'account', targetId: entry.accountId, fields: [] });
@@ -192,7 +192,7 @@ export function createContentAdmin(deps: ContentAdminDeps) {
       };
     },
 
-    /** ADMIN-SRV-007: the live NPC for BABEL; null when disabled or deleted, undefined when the world has no such NPC. */
+    /** The live NPC for BABEL; null when disabled or deleted, undefined when the world has no such NPC. */
     babylonNpc(id: string): { profile: NpcProfile; mapId: string; x: number; z: number } | null | undefined {
       const r = records.get(id);
       if (!r) return undefined;

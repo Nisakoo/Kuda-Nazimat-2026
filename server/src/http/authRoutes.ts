@@ -5,7 +5,7 @@ import { BodyError, bearer, body, clientIp, error, fields, json, type RequestCon
 
 type Handler = (input: Record<string, unknown>, ip: string) => Promise<{ token: string; expiresAt: number }>;
 
-/** AUTH-006: `/api/auth/*`. Returns false when the path is not an auth route. */
+/** `/api/auth/*`. Returns false when the path is not an auth route. */
 export async function handleAuth(req: IncomingMessage, res: ServerResponse, path: string, auth: AuthService, log: Logger, context: RequestContext): Promise<boolean> {
   if (!path.startsWith('/api/auth/')) return false;
   const action = path.slice('/api/auth/'.length);
@@ -32,7 +32,7 @@ export async function handleAuth(req: IncomingMessage, res: ServerResponse, path
   if (!input) { error(res, 400, 'INVALID', 'Некорректный запрос входа.'); return true; }
   try {
     const session = await handler.run(input, clientIp(req));
-    // PROTO-008 §7: exactly {token, expiresAt}.
+    // Exactly {token, expiresAt}.
     json(res, handler.status ?? 200, { token: session.token, expiresAt: session.expiresAt });
   } catch (cause) {
     if (!(cause instanceof AuthError)) { log.error('http.failed', 'Ошибка входа', { route: context.route, error: cause }); error(res, 503, 'UNAVAILABLE', 'Сервис входа временно недоступен.'); return true; }

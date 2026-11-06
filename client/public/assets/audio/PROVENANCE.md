@@ -1,6 +1,6 @@
-# Original world audio · NEXT-015
+# Original world audio
 
-All 7 WAV files are original procedural sound designs made for this repository during TASK-042. `client/scripts/generate-world-audio.mjs` is the complete reproducible source. It uses only Node built-ins, deterministic noise (seed 42015), harmonic oscillations, and amplitude envelopes. No samples, recordings, speech synthesis, third-party sound library, copied game sounds, or network resources are used.
+All 7 WAV files are original procedural sound designs made for this repository for the world-life audio set. `client/scripts/generate-world-audio.mjs` is the complete reproducible source. It uses only Node built-ins, deterministic noise (seed 42015), harmonic oscillations, and amplitude envelopes. No samples, recordings, speech synthesis, third-party sound library, copied game sounds, or network resources are used.
 
 The generated audio files are offered under **CC0-1.0** (public-domain dedication; https://creativecommons.org/publicdomain/zero/1.0/). This URL is documentation, not a runtime request. The generator code follows the repository's code licensing terms.
 

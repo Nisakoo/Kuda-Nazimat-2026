@@ -45,7 +45,7 @@ function interfacesCheck(addresses: readonly LanAddress[]): Check {
   return { name: 'Сеть', ok: true, detail: usable.length ? listed : `${listed || 'нет интерфейсов'} — доступен только режим одного компьютера` };
 }
 
-/** TLS-015: read-only look at the certificate; a missing one is fine, the first start creates it. */
+/** Read-only look at the certificate; a missing one is fine, the first start creates it. */
 export function certificateCheck(config: Config, addresses: readonly LanAddress[], now = new Date()): Check {
   const { certPath, keyPath } = certificatePaths(config.tls);
   if (!existsSync(certPath) && !existsSync(keyPath)) return { name: 'Сертификат', ok: true, detail: `${config.tls.dir}: будет создан при первом запуске (npm --prefix server run tls -- init)` };
@@ -60,7 +60,7 @@ export function certificateCheck(config: Config, addresses: readonly LanAddress[
   } catch { return { name: 'Сертификат', ok: false, detail: `${config.tls.dir}: сертификат или ключ повреждены — npm --prefix server run tls -- renew --yes` }; }
 }
 
-/** OFFLINE-008: everything a start needs, without starting the game. */
+/** Everything a start needs, without starting the game. */
 export async function lanCheck(config: Config, options: { addresses?: readonly LanAddress[]; platform?: NodeJS.Platform; node?: string } = {}): Promise<Check[]> {
   const checks: Check[] = [nodeCheck(options.node), interfacesCheck(options.addresses ?? lanAddresses()), await portCheck(config.host, config.port)];
   const index = join(config.clientDir, 'index.html');

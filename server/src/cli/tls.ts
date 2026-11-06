@@ -7,7 +7,7 @@ import { certificateNames, loadCertificate, renewCertificate } from '../tls/stor
 
 const USAGE = 'Использование: npm --prefix server run tls -- status | init | renew --yes | export <файл> [--env ...] [--config <путь>]';
 
-/** TLS-014: no network, no game database; only the certificate directory. */
+/** No network, no game database; only the certificate directory. */
 async function main(): Promise<void> {
   const args = process.argv.slice(2); const yes = args.includes('--yes');
   const { config, args: parsed } = await loadServerConfig(args.filter((arg) => arg !== '--yes'));

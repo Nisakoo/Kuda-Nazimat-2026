@@ -29,7 +29,7 @@ Windows supervisor в этом срезе отсутствует; Windows из �
 1. **До игры** подготовить выбранный runtime и модель по разделам ниже. Интернет допустим только на этом этапе, не во время gameplay. Ничего автоматически не скачивается.
 2. Скопировать подходящий пример: `server/config.ollama.example.json` или `server/config.mlx.example.json` → **`server/config.json`**. Заменить все `/absolute/...` и `REPLACE_...` на реальные значения. Неполный профиль отклоняется, не подменяется заглушкой. `config.json` исключён из git.
 3. Подготовить зависимости Node 24 и клиент: `npm --prefix server ci`, `npm --prefix client ci`, `npm --prefix client run build`.
-4. Запустить **`make server NPC_TIMEOUT=60`** либо **`npm --prefix server start -- --npc-timeout 60`** (development). Вход в игру — **http://localhost:8080/**. После синхронизации main `make start`/`make demo` собирают клиент и запускают **production**, где имя без пароля не принимается. Парольный UI ещё открыт в TASK-044; текущую локальную проверку LLM проводить через development и loopback. Dependencies подготовить заранее, не полагаться на установку во время offline-игры.
+4. Запустить **`make server NPC_TIMEOUT=60`** либо **`npm --prefix server start -- --npc-timeout 60`** (development). Вход в игру — **http://localhost:8080/**. После синхронизации main `make start`/`make demo` собирают клиент и запускают **production**, где имя без пароля не принимается. Полная приёмка парольного UI остаётся отдельной; текущую локальную проверку LLM проводить через development и loopback. Dependencies подготовить заранее, не полагаться на установку во время offline-игры.
 5. Дождаться `NPC готов к вопросам {"status":"ready"}` в серверном терминале и проверить **http://localhost:8080/api/health**: `npc: "ready"` означает, что выбранный worker прошёл startup, но не доказывает скорость ответа. Затем войти по имени в development, выбрать карту **demo** и задать вопрос Лее/Марку. На market новый BABEL-интерфейс использует отдельный test LanguagePort, а не этот NpcResponder. Свежие LLM examples выбирают demo; существующий config автоматически не меняется. Вопрос и ответ сохраняются сервером, не worker.
 
 Примеры привязаны к `127.0.0.1`, чтобы случайно не открыть непроверенный профиль в LAN. `host: "0.0.0.0"` оператор включает отдельно после нужных проверок. Native Ollama port не является игровым адресом.
@@ -98,9 +98,9 @@ Manifest — инструмент закрепления **доверенног�
 
 ## Границы содержания и версии
 
-LLM-адаптер использует серверный профиль NPC и историю пользователя. Он **не реализует** FTS5 grounding, утверждённый учебный корпус, компактную память/preferences/reset/ledger, языки en/es или текстовый streaming. После main синхронизации игровой wire — **v3**; серверные opt-in partial/cancel уже реализованы и проверяются scripted-адаптером, но real workers не вызывают onPartial, а клиент пока не включает stream (TASK-041). Private числовые progress-сообщения не являются текстовыми partial. System prompt не обеспечивает достоверность фактов. Сейчас в игре торговцы/пастух и Лея/Марк; Эйнштейн/Геродот из AI-корпуса требуют отдельной подготовки.
+LLM-адаптер использует серверный профиль NPC и историю пользователя. Он **не реализует** FTS5 grounding, утверждённый учебный корпус, компактную память/preferences/reset/ledger, языки en/es или текстовый streaming. После main синхронизации игровой wire — **v3**; серверные opt-in partial/cancel уже реализованы и проверяются scripted-адаптером, но real workers не вызывают onPartial, а клиент пока не включает stream (см. [protocol.md](../../docs/tech/protocol.md)). Private числовые progress-сообщения не являются текстовыми partial. System prompt не обеспечивает достоверность фактов. Сейчас в игре торговцы/пастух и Лея/Марк; Эйнштейн/Геродот из AI-корпуса требуют отдельной подготовки.
 
-Полная реализация AI, клиентского streaming и аппаратная квалификация — отдельные задачи. `LanguagePort` рынка по умолчанию test; явный `language.adapter: local` подключает уже созданный Ollama/MLX responder к BABEL без второй модели. Одна GenerationQueue обслуживает оба вида работ и не обходит общий лимит. Этот срез нельзя обозначать как завершённый TASK-017/018.
+Полная реализация AI, клиентского streaming и аппаратная квалификация — отдельные задачи. `LanguagePort` рынка по умолчанию test; явный `language.adapter: local` подключает уже созданный Ollama/MLX responder к BABEL без второй модели. Одна GenerationQueue обслуживает оба вида работ и не обходит общий лимит. Этот срез нельзя обозначать как завершённую реализацию AI.
 
 ## Операторская диагностика на Intel Mac
 
@@ -115,4 +115,4 @@ make llm-test
 make llm-lock-check
 ```
 
-Node subprocess fixtures и Python mocks не скачивают и не запускают Ollama/MLX. Общий контракт проверяет отсутствие внешних Node-соединений и допускает явно заданный loopback; он не наблюдает сеть дочернего Python и не заменяет OS/offline-тест. Фактические результаты и unverified gates — [TASK-067](../../tasks/067-configurable-game-llm.md).
+Node subprocess fixtures и Python mocks не скачивают и не запускают Ollama/MLX. Общий контракт проверяет отсутствие внешних Node-соединений и допускает явно заданный loopback; он не наблюдает сеть дочернего Python и не заменяет OS/offline-тест. Фактические результаты и unverified gates — [llm.md](../../docs/tech/llm.md).

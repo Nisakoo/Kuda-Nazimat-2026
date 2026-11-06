@@ -1,6 +1,6 @@
 import type { Summary } from './history.ts';
 
-/** The OBS thresholds table: one source for health (OBS-010), charts (OBS-014), the report (OBS-017) and the load profile. */
+/** The OBS thresholds table: one source for health, charts, the report and the load profile. */
 export const THRESHOLDS = {
   tickP95Ms: 5, tickP95RedMs: 20, broadcastP95Ms: 120, serverErrors: 0, rttMs: 150, fps: 30, npcTimeoutShare: 0.25, logDropped: 0, eventLoopP99Ms: 50,
 } as const;
@@ -10,7 +10,7 @@ export interface ReportRow { readonly label: string; readonly value: string; rea
 export interface ReportHeader { readonly runIds: readonly string[]; readonly env: string | null; readonly from: number | null; readonly to: number | null; readonly peakPlayers: number | null }
 
 const number = (value: number, unit = ''): string => (value === Infinity ? 'выше шкалы' : `${Number.isInteger(value) ? value : value.toFixed(1)}${unit}`);
-/** Missing data is never «в норме» (OBS-017). */
+/** Missing data is never «в норме». */
 function row(label: string, value: number | null, threshold: string, ok: (v: number) => boolean, format: (v: number) => string): ReportRow {
   return value === null ? { label, value: 'нет данных', threshold, verdict: 'nodata' } : { label, value: format(value), threshold, verdict: ok(value) ? 'ok' : 'over' };
 }
@@ -31,7 +31,7 @@ export function reportRows(s: Summary): ReportRow[] {
 const VERDICT: Record<Verdict, string> = { ok: '✅ в норме', over: '❌ превышен', nodata: '— нет данных' };
 const time = (ms: number | null): string => (ms === null ? '—' : new Date(ms).toISOString().replace('T', ' ').slice(0, 19));
 
-/** Markdown table for the console, the load profile and the task evidence (OFFLINE-019). */
+/** Markdown table for the console, the load profile and the task evidence. */
 export function reportTable(summary: Summary, header: ReportHeader): string {
   const lines = [
     `Запуск: ${header.runIds.length ? header.runIds.join(', ') : '—'} · окружение: ${header.env ?? '—'}`,

@@ -38,7 +38,7 @@ export interface AppObservability {
 
 const SLOW_DB_MS = 50;
 
-/** OFFLINE-003: a busy port is a usage error with a way out, not a stack trace. */
+/** A busy port is a usage error with a way out, not a stack trace. */
 function listenError(error: NodeJS.ErrnoException, port: number): Error {
   if (error.code === 'EADDRINUSE') return new Error(`Порт ${port} уже занят: вероятно, сервер уже запущен в другом окне. Закройте его или выберите другой порт: --port <номер> или "port" в config.json.`);
   // Windows reports a port held exclusively by another program as EACCES, not EADDRINUSE.
@@ -51,7 +51,7 @@ function serverVersion(): string {
   try { return (JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string }).version; } catch { return 'unknown'; }
 }
 
-/** OBS-003 `app.start`: what runs and with which settings; the config holds no secrets. */
+/** `app.start` log event: what runs and with which settings; the config holds no secrets. */
 function startFields(config: Config): Record<string, unknown> {
   const version = serverVersion(); let commit: string | undefined;
   try {
@@ -73,7 +73,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   try { if (!(await stat(config.worldDir)).isDirectory()) throw new Error(); }
   catch { throw new Error(`Нет мира ${config.worldDir}. Выполните npm --prefix client run world:generate`); }
 
-  // TLS-001, 009: no certificate, no server; an existing one is never replaced silently.
+  // No certificate, no server; an existing one is never replaced silently.
   const names = () => certificateNames(config.tls, lanAddresses());
   const certificate: ServerCertificate = await loadCertificate(config.tls, names(), new Date());
   const tlsLog = logger.child('tls');
@@ -182,7 +182,7 @@ export async function startApplication(config: Config, createGame: CreateGame, l
   let stopping: Promise<void> | undefined;
   return {
     server: transport.server, certificate,
-    /** OBS-017 table for this run; main prints it at a clean shutdown. */
+    /** Acceptance table for this run; main prints it at a clean shutdown. */
     report: () => metricsView.report(),
     stop(reason = 'shutdown'): Promise<void> {
       if (stopping) return stopping;

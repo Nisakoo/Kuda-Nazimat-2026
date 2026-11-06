@@ -6,7 +6,7 @@ export const LIMITS = { packetBytes: 262144, entities: 256, pending: 32, chat: 5
 export type ConnectionStatus = 'unauthorized' | 'connecting' | 'connected' | 'lost' | 'error' | 'disconnected';
 export type ErrorCode = 'UNAUTHORIZED' | 'VERSION' | 'INVALID' | 'FORBIDDEN' | 'RATE_LIMIT' | 'NOT_READY' | 'UNAVAILABLE';
 export const ERROR_CODES: readonly ErrorCode[] = ['UNAUTHORIZED', 'VERSION', 'INVALID', 'FORBIDDEN', 'RATE_LIMIT', 'NOT_READY', 'UNAVAILABLE'];
-/** requestId of server-originated errors that answer no client request (PROTO-008). */
+/** requestId of server-originated errors that answer no client request. */
 export const SERVER_REQUEST_ID = 'server';
 export interface ServerSession { readonly token: string; readonly expiresAt: number }
 export interface WorldDescriptor {
@@ -20,7 +20,7 @@ export type ClientMessage = Request & (
   | { readonly type: 'join'; readonly mapId: string }
   | { readonly type: 'input'; readonly sequence: number; readonly direction: Direction; readonly sprint: boolean; readonly jumpId: number; readonly preparedChunks: readonly string[] }
   | { readonly type: 'interact'; readonly targetId: string }
-  /** stream: true opts in to `npc-partial` snapshots before the terminal answer (PROTO-007). */
+  /** stream: true opts in to `npc-partial` snapshots before the terminal answer. */
   | { readonly type: 'npc-question'; readonly targetId: string; readonly text: string; readonly stream?: boolean }
   | { readonly type: 'npc-cancel'; readonly questionId: string }
   | { readonly type: 'chat-send'; readonly text: string }

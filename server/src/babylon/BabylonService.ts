@@ -21,7 +21,7 @@ export interface BabylonDeps {
   location(accountId: string): BabylonLocation | null;
   peerLocation?(playerId: string): BabylonLocation | null;
   measure?(kind: 'chat' | 'npc' | 'suggest', durationMs: number, success: boolean): void;
-  /** ADMIN-SRV-007: the live NPC (administrator edits applied); null when disabled or deleted, undefined when unknown. */
+  /** The live NPC (administrator edits applied); null when disabled or deleted, undefined when unknown. */
   npc?(npcId: string): { readonly profile: NpcProfile; readonly mapId: string; readonly x: number; readonly z: number } | null | undefined;
 }
 export class BabylonService {
@@ -130,7 +130,7 @@ export class BabylonService {
     if (party.size > 1 && role !== 1 && targetId === 'shepherd') fail('FORBIDDEN', 'Список пастуха доступен игроку 1.');
     this.near(identity, this.target(targetId));
   }
-  /** Quest NPCs keep their task positions; the administrator's profile and on/off state apply (ADMIN-SRV-007). */
+  /** Quest NPCs keep their task positions; the administrator's profile and on/off state apply. */
   private target(targetId: string): NpcProfile & { x: number; z: number } {
     const base = NPCS[targetId];
     const live = this.deps.npc?.(targetId);

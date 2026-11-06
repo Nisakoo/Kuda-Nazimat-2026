@@ -11,10 +11,10 @@ export KUDA_LLM_MODEL = $(MODEL)
 export KUDA_LLM_PROFILES = $(LLM_PROFILES)
 export KUDA_NPC_TIMEOUT = $(NPC_TIMEOUT)
 
-.PHONY: help client client-test
+.PHONY: help client client-test docs-check
 
 help:
-	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the server in development (ENV=production to override)' 'make server-test  Run server/shared tests' 'make prepare      Once, with internet: install, build client/world, self-check' 'make start        Offline delivery: build and start in production (alias: make demo)' 'make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=60   Prepared model; whole seconds (1-300)' 'make llm-prepare BACKEND=mlx|ollama  Prepare locked Python dependencies with uv' 'make llm-test     Run offline Python fixtures using uv' 'make llm-lock-check  Check committed Python locks offline' 'make llm-import   One-time import of existing local 2B/0.8B configs; no downloads' 'NODE=/path/to/node and LLM_PROFILES=/path/to/profiles.json are optional overrides' 'See README.md for installation, type checks, build and browser checks.'
+	@printf '%s\n' 'make client       Start the Vite client (LAN access enabled)' 'make client-test  Run Vitest without watch' 'make server       Start the server in development (ENV=production to override)' 'make server-test  Run server/shared tests' 'make docs-check   Check relative links in Markdown files' 'make prepare      Once, with internet: install, build client/world, self-check' 'make start        Offline delivery: build and start in production (alias: make demo)' 'make server BACKEND=ollama MODEL=2b NPC_TIMEOUT=60   Prepared model; whole seconds (1-300)' 'make llm-prepare BACKEND=mlx|ollama  Prepare locked Python dependencies with uv' 'make llm-test     Run offline Python fixtures using uv' 'make llm-lock-check  Check committed Python locks offline' 'make llm-import   One-time import of existing local 2B/0.8B configs; no downloads' 'NODE=/path/to/node and LLM_PROFILES=/path/to/profiles.json are optional overrides' 'See docs/tech/setup.md for installation, type checks, build and browser checks.'
 
 client:
 ifeq ($(strip $(CLIENT_RUN_CMD)),)
@@ -23,6 +23,9 @@ ifeq ($(strip $(CLIENT_RUN_CMD)),)
 else
 	$(CLIENT_RUN_CMD)
 endif
+
+docs-check:
+	"$(NODE)" scripts/check-docs.mjs
 
 client-test:
 ifeq ($(strip $(CLIENT_TEST_CMD)),)
@@ -46,7 +49,7 @@ llm-test:
 llm-lock-check:
 	$(UV) lock --check --offline --no-python-downloads --project server/llm/envs/ollama
 	$(UV) lock --check --offline --no-python-downloads --project server/llm/envs/mlx
-# PORT=9000 overrides the configured port (OFFLINE-003); ENV picks the environment (SERVER-009), development by default.
+# PORT=9000 overrides the configured port; ENV picks the environment, development by default.
 ENV ?= development
 export APP_ENV = $(ENV)
 export PORT
@@ -59,7 +62,7 @@ llm-import:
 server-test:
 	npm --prefix server test
 
-# OFFLINE-001: idempotent; never touches the players' database.
+# Idempotent; never touches the players' database.
 prepare:
 	@node -e "const [a,b]=process.versions.node.split('.').map(Number); if (a!==24||b<15) { console.error('Нужен Node 24.15+ в ветке 24, сейчас '+process.versions.node); process.exit(1); }"
 	npm --prefix client ci
@@ -68,7 +71,7 @@ prepare:
 	npm --prefix server run tls -- init --env production
 	npm --prefix server run lan:check -- --env production
 
-# OFFLINE-002: works offline once prepared; dependencies are installed only when missing.
+# Works offline once prepared; dependencies are installed only when missing.
 start:
 	@test -d client/node_modules || npm --prefix client ci
 	@test -d server/node_modules || npm --prefix server ci

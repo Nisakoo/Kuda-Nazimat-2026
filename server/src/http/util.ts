@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-/** Per-request context filled by handlers and read by the access log (OBS-003 `http.request`). */
+/** Per-request context filled by handlers and read by the access log (`http.request` event). */
 export interface RequestContext { route: string; sessionId?: string; playerId?: string }
 
 export function json(res: ServerResponse, status: number, value: unknown, headers: Record<string, string> = {}): void {

@@ -26,7 +26,7 @@ let config;
 let profile;
 try { ({ config, profile } = await loadLaunchConfig()); }
 catch (error) {
-  // No configuration yet, so no file log: report to the console and exit (OBS-003 config.invalid).
+  // No configuration yet, so no file log: report to the console and exit (`config.invalid` event).
   createLogger(consoleSink('info'), 'config').fatal('config.invalid', launchMessage(error));
   process.exit(1);
 }
@@ -58,7 +58,7 @@ try {
     ...(daysLeft(certificate.info, new Date()) < EXPIRY_WARNING_DAYS ? ['Сертификат скоро истечёт: npm --prefix server run tls -- renew --yes'] : [])];
   process.stdout.write(`${connectionBlock({ ...info, warnings }, { fingerprint: certificate.info.fingerprint, notAfter: certificate.info.notAfter })}\n`);
   shutdownOnSignals({ stop: async () => {
-    try { await app.stop(); process.stdout.write(`\nИтог запуска (OBS-017):\n${app.report()}`); } finally { obs.close(); }
+    try { await app.stop(); process.stdout.write(`\nИтог запуска:\n${app.report()}`); } finally { obs.close(); }
   } }, obs.logger);
 } catch (error) {
   obs.logger.fatal('app.start.failed', error instanceof Error ? error.message : 'Ошибка запуска', { error });

@@ -5,7 +5,7 @@ description: Install, update or troubleshoot this game's local MLX/Ollama setup 
 
 # Установка игры и локального ИИ
 
-Работать из корня выбранного checkout/worktree. Источники требований: `specs/server-llm-runtime.md`, `server/llm/SETUP.md`; зависимости: `server/llm/envs/{mlx,ollama}/pyproject.toml` и `uv.lock`. Скилл хранится в репозитории и не требует глобальной установки.
+Работать из корня выбранного checkout/worktree. Источники требований: [docs/tech/llm.md](../../../docs/tech/llm.md), `server/llm/SETUP.md`; зависимости: `server/llm/envs/{mlx,ollama}/pyproject.toml` и `uv.lock`. Скилл хранится в репозитории и не требует глобальной установки.
 
 ## Определить маршрут
 
