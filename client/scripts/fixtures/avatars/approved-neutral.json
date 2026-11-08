@@ -1,7 +1,7 @@
 {
   "lukas": {
-    "candidateGlbSha256": "09053cce8607ae6a01a50b413906df2f687d7bf4b44a4833f9808059fd5123bb",
-    "geometrySha256": "27f0adb5649654e6c838569560c8a338ea6a0fd3122f39cca54b421fb6ca0565",
+    "candidateGlbSha256": "6a954c9fb3141abecc0f36caa92e3f4e8f1297ae38549c1fe79b9d8e2063078f",
+    "geometrySha256": "51b817926fda1444b8759aa9c7fa97da4934bc8655ba549659598c6b9a78c058",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -39,7 +39,7 @@
         ],
         "scale": [
           1.3102679127121797,
-          0.9481349486115309,
+          0.8463541763881546,
           0.9489679881763339
         ]
       },
@@ -108,7 +108,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.67,
+          0.73,
           0
         ],
         "quaternion": [
@@ -118,8 +118,8 @@
           1
         ],
         "scale": [
-          0.84,
-          1,
+          1.08,
+          1.2,
           1
         ]
       },
@@ -726,8 +726,8 @@
     ]
   },
   "nic": {
-    "candidateGlbSha256": "22a1b4b9b0f6dd125a3350277589c5c5752604c72f4c0b59de67a7d8ecd93cda",
-    "geometrySha256": "0df946e300352c145217528cacfb3f7fe98156b79eecef19350deb4a70e8a041",
+    "candidateGlbSha256": "4980597527907bda7b6752602affa30791f41d7b6db3133d7275f7fac59d7e62",
+    "geometrySha256": "49c029953372d5fc31f8644c4c81703b0ac24c3fd8e5d475a74bbc81856b3240",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -765,7 +765,7 @@
         ],
         "scale": [
           1.0330958542538338,
-          0.911392411664594,
+          0.8287292847699297,
           0.9489679881763339
         ]
       },
@@ -834,7 +834,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.67,
+          0.73,
           0
         ],
         "quaternion": [
@@ -844,8 +844,8 @@
           1
         ],
         "scale": [
-          0.84,
-          1,
+          1.08,
+          1.2,
           1
         ]
       },
@@ -1452,8 +1452,8 @@
     ]
   },
   "dan": {
-    "candidateGlbSha256": "9c54c822db8aedec682c046069e2c41f27f51bdac8675499d42bed160aa8f3ae",
-    "geometrySha256": "e4516266963405e4bbe58263649f7ecc2b9a5d2e009ede6cacd98b55a4b8745a",
+    "candidateGlbSha256": "22404bcfbcdb7c8b106f0c49466d79b92e0a0d8c3597fbd8ec45046bf1a166cc",
+    "geometrySha256": "737be3f953b145495beae3e41da1d15c8177b97fd4ae73f81c47d1bdc01781fc",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -1491,7 +1491,7 @@
         ],
         "scale": [
           1.0330958542538338,
-          0.8860017705090936,
+          0.8021390392228797,
           0.9489679881763339
         ]
       },
@@ -1560,7 +1560,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.67,
+          0.73,
           0
         ],
         "quaternion": [
@@ -1570,8 +1570,8 @@
           1
         ],
         "scale": [
-          0.84,
-          1,
+          1.08,
+          1.2,
           1
         ]
       },
@@ -2178,8 +2178,8 @@
     ]
   },
   "ksu": {
-    "candidateGlbSha256": "4349447304788aae069fe5701a28c1779bcab861d8f94c9ebc5d8fc8749059ab",
-    "geometrySha256": "bf531281ab1b80a1b7913209f80f6cfb81e10cbb22c463d59aeb28cdaf745689",
+    "candidateGlbSha256": "597dafccf0e24f059d9fa2f8f7ce5a567a91827ac9d2917639b4a9b7e8f2207b",
+    "geometrySha256": "15ea5f9e386baf917a7ff7556692d2eca3d8c1b750b9f2229b083ff1ea95a0b6",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -2217,7 +2217,7 @@
         ],
         "scale": [
           1.0330958542538338,
-          0.911392411664594,
+          0.8333333319535963,
           0.9469487900305531
         ]
       },
@@ -2286,7 +2286,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.67,
+          0.73,
           0
         ],
         "quaternion": [
@@ -2296,8 +2296,8 @@
           1
         ],
         "scale": [
-          0.84,
-          1,
+          1.08,
+          1.2,
           1
         ]
       },

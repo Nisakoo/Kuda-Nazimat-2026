@@ -17,9 +17,9 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 export const AVATAR_IDS = Object.freeze(['lukas', 'nic', 'dan', 'ksu']);
 export const AVATAR_PROFILE = Object.freeze({ height: 1.8, width: .96, depth: .56, forward: '+Z', up: '+Y', units: 'metres', walkCycleMetres: 1.2 });
 export const AVATAR_PROPORTIONS = Object.freeze({
-  lukas: { height: 1.95, width: 1.04, depth: .56 },
+  lukas: { height: 2.15, width: 1.04, depth: .56 },
   nic: { height: 1.8, width: .82, depth: .56 },
-  dan: { height: 1.8, width: .82, depth: .56 },
+  dan: { height: 2, width: .82, depth: .56 },
   ksu: { height: 1.8, width: .82, depth: .56 },
 });
 const APPEARANCES = {
@@ -28,27 +28,75 @@ const APPEARANCES = {
   dan: { tunic: '#b75233', belt: '#3e7f80', hair: '#403027', lock: '#48352a', glasses: '#c4c0aa', frame: .0036, style: 'tousled' },
   ksu: { tunic: '#829cbf', belt: '#bb8538', hair: '#3b2b23', lock: '#443128', style: 'long' },
 };
-const SKIN = '#f1b077', SKIN_SHADE = '#e3a06c', CREAM = '#f5dfb4', PANTS = '#ead4ab', BOOT = '#71472e', SOLE = '#503723', INK = '#2f251d';
+const SKIN = '#f7bc93', SKIN_SHADE = '#eba47d', BLUSH = '#f29482', CREAM = '#f5dfb4', PANTS = '#ead4ab', BOOT = '#71472e', SOLE = '#503723', INK = '#33241b';
 const MAT = new MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 });
+/** Head surface in head-local metres: a soft ellipsoid with a tapered chin and a gently flattened face. */
+const HEAD = { rx: .243, ry: .285, rz: .235, cy: .005 };
+const headTaper = v => v < 0 ? 1 - .22 * v * v : 1;
+const faceFlat = c => c < .7 ? c : c - (c - .7) ** 2 / .6;
+function headZ(x, y) {
+  const v = (y - HEAD.cy) / HEAD.ry, taper = headTaper(v), u = x / (HEAD.rx * taper);
+  return HEAD.rz * taper * faceFlat(Math.sqrt(Math.max(0, 1 - u * u - v * v)));
+}
 
 function group(parent, name, x = 0, y = 0, z = 0) {
   const result = new Group(); result.name = name; result.position.set(x, y, z); parent.add(result); return result;
 }
 function mesh(parent, geometry, tint, name = '', smooth = false) {
-  // Face colours provide controlled facets without random geometry or normal noise.
-  if (smooth) geometry.computeVertexNormals();
+  // Faceted parts get controlled face-colour variation; smooth skin keeps one even tone.
+  if (smooth) {
+    geometry.deleteAttribute('uv'); geometry.deleteAttribute('normal');
+    geometry = mergeVertices(geometry); geometry.computeVertexNormals();
+  }
   const g = geometry.index ? geometry.toNonIndexed() : geometry;
   g.deleteAttribute('uv'); if (!smooth) g.computeVertexNormals();
   const base = new Color(tint), colors = [];
   for (let i = 0; i < g.attributes.position.count; i += 3) {
-    const shade = 1 + ((((i / 3) * 17 + 11) % 13) - 6) * .006;
+    const shade = smooth ? 1 : 1 + ((((i / 3) * 17 + 11) % 13) - 6) * .006;
     for (let j = 0; j < 3; j++) colors.push(base.r * shade, base.g * shade, base.b * shade);
   }
   g.setAttribute('color', new Float32BufferAttribute(colors, 3));
   const result = new Mesh(g, MAT); result.name = name; parent.add(result); return result;
 }
-function orb(parent, tint, x, y, z, rx, ry, rz, segments = 12, rows = 6) {
-  const g = new SphereGeometry(1, segments, rows); g.scale(rx, ry, rz); g.translate(x, y, z); return mesh(parent, g, tint);
+function orb(parent, tint, x, y, z, rx, ry, rz, segments = 12, rows = 6, smooth = false) {
+  const g = new SphereGeometry(1, segments, rows); g.scale(rx, ry, rz); g.translate(x, y, z); return mesh(parent, g, tint, '', smooth);
+}
+function headShell(parent) {
+  const g = new SphereGeometry(1, 24, 14), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const ux = p.getX(i), uy = p.getY(i), uz = p.getZ(i), taper = headTaper(uy);
+    p.setXYZ(i, ux * HEAD.rx * taper, HEAD.cy + uy * HEAD.ry, HEAD.rz * taper * (uz > 0 ? faceFlat(uz) : uz));
+  }
+  return mesh(parent, g, SKIN, '', true);
+}
+/** A flattened clump lying on the scalp: wide across the surface, thin along its outward normal. */
+function tuft(parent, tint, points, widths, thickness, center = [0, .03, -.02]) {
+  const sides = 6, p = [], idx = [], c = new Vector3(...center);
+  const T = new Vector3(), N = new Vector3(), B = new Vector3(), P = new Vector3();
+  for (let j = 0; j < points.length; j++) {
+    const previous = points[Math.max(0, j - 1)], next = points[Math.min(points.length - 1, j + 1)];
+    T.set(next[0] - previous[0], next[1] - previous[1], next[2] - previous[2]).normalize();
+    P.set(...points[j]); N.copy(P).sub(c); N.addScaledVector(T, -N.dot(T)).normalize(); B.crossVectors(T, N);
+    for (let k = 0; k < sides; k++) {
+      const a = k * Math.PI * 2 / sides, w = widths[j] * Math.cos(a), t = thickness[j] * Math.sin(a);
+      p.push([P.x + B.x * w + N.x * t, P.y + B.y * w + N.y * t, P.z + B.z * w + N.z * t]);
+    }
+  }
+  for (let j = 0; j < points.length - 1; j++) for (let k = 0; k < sides; k++) {
+    const a = j * sides + k, b = j * sides + (k + 1) % sides; idx.push(a, b, b + sides, a, b + sides, a + sides);
+  }
+  for (let k = 1; k < sides - 1; k++) idx.push(0, k + 1, k);
+  const end = (points.length - 1) * sides;
+  for (let k = 1; k < sides - 1; k++) idx.push(end, end + k, end + k + 1);
+  // Orient every triangle away from its section centre, independent of path direction.
+  const A = new Vector3(), Bv = new Vector3(), C = new Vector3(), M = new Vector3();
+  for (let i = 0; i < idx.length; i += 3) {
+    A.set(...p[idx[i]]); Bv.set(...p[idx[i + 1]]); C.set(...p[idx[i + 2]]);
+    M.set(0, 0, 0); for (let v = 0; v < 3; v++) M.add(new Vector3(...points[Math.floor(idx[i + v] / sides)])); M.multiplyScalar(1 / 3);
+    const normal = Bv.clone().sub(A).cross(C.clone().sub(A)), centroid = A.add(Bv).add(C).multiplyScalar(1 / 3);
+    if (normal.dot(centroid.sub(M)) < 0) [idx[i + 1], idx[i + 2]] = [idx[i + 2], idx[i + 1]];
+  }
+  const result = polygon(parent, tint, p, idx); smoothNormals(result.geometry); result.userData.smooth = true; return result;
 }
 /** Closed elliptical loft. Ring entries: [y, halfWidth, halfDepth, xOffset?, zOffset?]. */
 function loft(parent, tint, rings, segments = 12, flatFace = false, smooth = false) {
@@ -72,6 +120,12 @@ function loft(parent, tint, rings, segments = 12, flatFace = false, smooth = fal
     }
   }
   const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(vertices, 3)); g.setIndex(indices); return mesh(parent, g, tint, '', smooth);
+}
+/** Shared-vertex normals for a non-indexed surface, keeping its vertex order and colours. */
+function smoothNormals(g) {
+  const shape = new BufferGeometry(); shape.setAttribute('position', g.attributes.position.clone());
+  const merged = mergeVertices(shape); merged.computeVertexNormals();
+  g.setAttribute('normal', merged.toNonIndexed().attributes.normal);
 }
 function polygon(parent, tint, points, faces) {
   const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(points.flat(), 3)); g.setIndex(faces); return mesh(parent, g, tint);
@@ -176,8 +230,13 @@ function hair(parent, look) {
     for(let i=0;i<n;i++){const a=levels*(n+1)+i,b=a+1;f.push(a+offset,b+offset,b,a+offset,b,a);}
     for(let i=0;i<f.length;i+=3)[f[i+1],f[i+2]]=[f[i+2],f[i+1]];
     polygon(parent,look.hair,p,f);
+    // Strands fan from the centre parting over the crown into the curtain.
+    for(const side of [-1,1])for(let i=0;i<5;i++){
+      const theta=side*(.62+i*.58);
+      crownTuft(parent,[look.lock,look.hair,shine(look)][i%3],theta,.08,1.62,.012,.9);
+    }
     for(const side of [-1,1]){
-      lock(parent,look.lock,[[side*.018,.315,.10],[side*.13,.245,.221],[side*.225,.06,.233],[side*.255,-.17,.18]], [.04,.067,.051,.006],[.026,.032,.026,.008]);
+      lock(parent,look.lock,[[side*.018,.315,.10],[side*.13,.25,.20],[side*.222,.08,.165],[side*.25,-.17,.13]], [.04,.064,.05,.006],[.026,.03,.025,.008]);
       lock(parent,look.hair,[[side*.235,.10,.17],[side*.277,-.08,.187],[side*.26,-.27,.18],[side*.225,-.37,.14]],[.045,.052,.043,.013],[.026,.028,.023,.009]);
     }
   }else{
@@ -191,6 +250,13 @@ function hair(parent, look) {
       const middle=[start[0]*.22+end[0]*.64,Math.max(.21,end[1]*.85),.239];
       lock(parent,i%3===0?look.hair:look.lock,[start,middle,end],[.051,.068,.006],[.035,.042,.006]);
     });
+    // Chunky clumps around the crown give the volume and pointed silhouette.
+    const config=short?{count:13,lift:.016,width:.9,jitter:0}:look.style==='swept'?{count:15,lift:.03,width:1.05,jitter:.05}:{count:15,lift:.026,width:1,jitter:.22};
+    for(let i=0;i<config.count;i++){
+      const theta=.75+i*(Math.PI*2-1.5)/(config.count-1),wobble=Math.sin(i*2.4+1)*config.jitter;
+      const end=1.25+.85*(1-Math.cos(theta))/2;
+      crownTuft(parent,[look.hair,look.lock,shine(look)][i%3],theta+wobble*.4,.14,end+wobble*.3,config.lift*(1+Math.abs(wobble)),config.width,wobble);
+    }
     // Shallow swept nape tufts are rooted outside the scalp surface.
     for(const side of [-1,1]){
       lock(parent,look.hair,[[side*.23,.12,-.04],[side*.284,-.04,-.045],[side*.23,-.195,-.065]],[.043,.047,.008],[.045,.033,.008]);
@@ -201,33 +267,55 @@ function hair(parent, look) {
   parent.updateMatrixWorld(true);
   let minZ=Infinity,maxY=-Infinity;
   parent.traverse(n=>{if(n.isMesh){const p=n.geometry.attributes.position;for(let i=0;i<p.count;i++){minZ=Math.min(minZ,p.getZ(i));maxY=Math.max(maxY,p.getY(i));}}});
-  const top=look.style==='swept'?.436669260263443:look.style==='tousled'?.411598652601242:.354999989271164;
+  const top=look.style==='swept'?.52:look.style==='tousled'?.47:look.style==='long'?.40:.41;
   const back=long?-.30137306451797485:-.3001147508621216;
-  parent.traverse(n=>{if(n.isMesh){const p=n.geometry.attributes.position;for(let i=0;i<p.count;i++){p.setY(i,-.20+(p.getY(i)+.20)*(top+.20)/(maxY+.20));if(p.getZ(i)<0)p.setZ(i,p.getZ(i)*back/minZ);}n.geometry.computeVertexNormals();}});
+  parent.traverse(n=>{if(n.isMesh){const p=n.geometry.attributes.position;for(let i=0;i<p.count;i++){p.setY(i,-.20+(p.getY(i)+.20)*(top+.20)/(maxY+.20));if(p.getZ(i)<0)p.setZ(i,p.getZ(i)*back/minZ);}if(n.userData.smooth)smoothNormals(n.geometry);else n.geometry.computeVertexNormals();}});
+}
+const shine = look => '#' + new Color(look.lock).multiplyScalar(1.16).getHexString();
+/** One clump following the scalp from polar angle phiA to phiB at azimuth theta (0 = forward). */
+function crownTuft(parent, tint, theta, phiA, phiB, lift, width = 1, curl = 0) {
+  const steps = [0, .3, .6, .85, 1], raise = [0, .45, .85, 1, 1.7];
+  const points = steps.map((s, i) => {
+    const phi = phiA + (phiB - phiA) * s, a = theta + curl * s * s, out = 1 + lift * raise[i] / .29;
+    return [Math.sin(a) * Math.sin(phi) * .294 * out, .025 + Math.cos(phi) * .335 * out, Math.cos(a) * Math.sin(phi) * .272 * out - .018];
+  });
+  return tuft(parent, tint, points, [.05, .074, .07, .048, .005].map(w => w * width), [.02, .03, .029, .021, .004], [0, .025, -.018]);
 }
 function face(parent, look) {
   const ksu = look.style === 'long';
+  // The face group is narrowed by .94, so surface lookups use head-space x.
+  const on = (x, y, offset) => headZ(x * .94, y) + offset;
   for (const side of [-1, 1]) {
-    orb(parent, SKIN, side * .263, -.045, -.005, .057, .083, .045, 10, 5);
-    orb(parent, SKIN_SHADE, side * .291, -.046, .027, .022, .044, .009, 8, 4);
-    orb(parent, INK, side * .101 + (ksu ? .005 : 0), .014, ksu ? .222 : .213, ksu ? .028 : .027, .046, .010);
-    stroke(parent, look.hair, [[side * .065, .105, .212], [side * .108, .119, .212], [side * .151, .105, .202]], ksu ? .006 : .009);
-    if (ksu) stroke(parent, INK, [[side * .065,.055,.223],[side * .083,.073,.222],[side * .113,.075,.220],[side * .14,.056,.216]], .0045);
+    orb(parent, SKIN, side * .263, -.045, -.005, .055, .08, .045, 10, 6, true);
+    orb(parent, SKIN_SHADE, side * .289, -.046, .025, .02, .042, .009, 8, 5, true);
+    const ex = side * .098 + (ksu ? .004 : 0), ey = .006, ez = on(ex, ey, .002);
+    orb(parent, INK, ex, ey, ez, ksu ? .036 : .035, .054, .012, 12, 6, true);
+    orb(parent, '#ffffff', ex + side * .011, ey + .022, ez + .009, .012, .014, .005, 8, 5, true);
+    orb(parent, '#ffffff', ex - side * .009, ey - .021, ez + .009, .006, .006, .004, 6, 4, true);
+    const bx = side * .155, by = -.072;
+    orb(parent, BLUSH, bx, by, on(bx, by, -.008), .044, .026, .016, 12, 6, true);
+    const brow = [[.062, .098], [.100, .112], [.142, .1]].map(([x, y]) => [side * x, y, on(side * x, y, .004)]);
+    stroke(parent, look.hair, brow, ksu ? .0055 : .0075);
+    if (ksu) stroke(parent, INK, [[.062,.048],[.08,.064],[.11,.066],[.138,.048]].map(([x, y]) => [side * x, y, on(side * x, y, .006)]), .0045);
   }
-  polygon(parent, SKIN_SHADE, [[-.025,-.063,.211],[.025,-.063,.211],[0,.005,.214],[0,-.045,.266],[0,-.079,.23]], [0,3,2,2,3,1,0,4,3,3,4,1]);
-  const smile = Array.from({ length: 9 }, (_, i) => { const x = -.068 + i * .017; return [x, -.139 + .023 * (x / .068) ** 2, .198 - .005 * (x / .068) ** 2]; });
-  stroke(parent, '#9b512f', smile, .0032);
+  // A small soft button nose, not a pointed wedge.
+  orb(parent, SKIN_SHADE, 0, -.052, on(0, -.052, .003), .018, .013, .011, 10, 6, true);
+  const smile = Array.from({ length: 9 }, (_, i) => { const x = -.052 + i * .013, y = -.128 + .018 * (x / .052) ** 2; return [x, y, on(x, y, .002)]; });
+  stroke(parent, '#a8553a', smile, .0034);
   if (!look.glasses) return;
+  const lens = .03;
   for (const side of [-1, 1]) {
-    const cx = side * .104, cy = .018, w = .087, h = .061;
+    const cx = side * .1, cy = .01, w = .084, h = .058, depth = on(cx, cy, lens);
     const contour = look.style === 'short'
-      ? [[-.065,-h],[.055,-h],[w,-.034],[w,.036],[.054,h],[-.055,h],[-w,.035],[-w,-.03]]
-      : [[-.062,-h],[.063,-h],[w,-.041],[w,.047],[.070,h],[-.072,h],[-w,.044],[-w,-.043]];
-    const path = contour.map(([x,y]) => [cx + x, cy + y, .237 - Math.abs(cx+x) * .035]); path.push(path[0]);
+      ? [[-.062,-h],[.052,-h],[w,-.032],[w,.034],[.051,h],[-.052,h],[-w,.033],[-w,-.028]]
+      : [[-.059,-h],[.06,-h],[w,-.039],[w,.045],[.067,h],[-.069,h],[-w,.042],[-w,-.041]];
+    const path = contour.map(([x,y]) => [cx + x, cy + y, depth - Math.abs(x) * .12]); path.push(path[0]);
     stroke(parent, look.glasses, path, look.frame);
-    stroke(parent, look.glasses, [[side * .185,.047,.229],[side * .258,.037,.11],[side * .26,.005,.04]], look.frame * .7);
+    const edge = cx + side * w;
+    stroke(parent, look.glasses, [[edge, cy + .03, depth - w * .12], [side * .262, cy + .02, .11], [side * .265, -.01, .03]], look.frame * .7);
   }
-  stroke(parent, look.glasses, [[-.019,.042,.239],[0,.051,.245],[.019,.042,.239]], look.frame * .8);
+  const bridge = on(0, .04, lens + .006);
+  stroke(parent, look.glasses, [[-.019, .036, bridge - .004], [0, .044, bridge], [.019, .036, bridge - .004]], look.frame * .8);
 }
 function tunic(parent, look) {
   const slim=look.style!=='swept',waist=slim?.177:.205;
@@ -247,6 +335,26 @@ function tunic(parent, look) {
     lock(parent, look.belt, [[.12,.023,.175],[.087,-.012,.201],[.069,-.055,.202]], [.018,.034,.016], [.012,.018,.01]);
     orb(parent, '#a87530', .125, .014, .193, .024, .023, .018, 8, 4);
     loft(parent, look.belt, [[-.307,.032,.011,.21,.225],[-.12,.026,.013,.161,.203],[.022,.018,.011,.131,.173]], 4);
+  }
+}
+/** Blender part surfaces (client/scripts/avatar-parts/<id>.json), read only under Node; null keeps the fallback. */
+function loadAvatarParts(id) {
+  const fs = globalThis.process?.getBuiltinModule?.('node:fs');
+  if (!fs) return null;
+  // AVATAR_PARTS_DIR lets a candidate sculpture be reviewed without touching the committed parts.
+  const dir = globalThis.process.env.AVATAR_PARTS_DIR;
+  const file = dir ? dir.replace(/\/?$/, '/') + id + '.json' : new URL('./avatar-parts/' + id + '.json', import.meta.url);
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+  catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+}
+function sculpted(parent, surfaces = []) {
+  for (const surface of surfaces) {
+    const indexed = new BufferGeometry(), tint = new Color(surface.color), count = surface.position.length / 3;
+    indexed.setAttribute('position', new Float32BufferAttribute(surface.position, 3));
+    indexed.setAttribute('normal', new Float32BufferAttribute(surface.normal, 3));
+    indexed.setAttribute('color', new Float32BufferAttribute(Array.from({ length: count * 3 }, (_, i) => [tint.r, tint.g, tint.b][i % 3]), 3));
+    indexed.setIndex(surface.index);
+    parent.add(new Mesh(indexed.toNonIndexed(), MAT)); indexed.dispose();
   }
 }
 function batch(parent) {
@@ -273,7 +381,8 @@ function animations() {
   // Dense keys keep the analytic contact trajectory accurate between GLTF samples.
   const times=Array.from({length:257},(_,i)=>i/256),walkTimes=times.map(t=>t*.9);
   const idleWave=idleSamples.map(t=>Math.sin(t*Math.PI*2)),wave=times.map(t=>Math.sin(t*Math.PI*2));
-  const idle=[qTrack('head',idleTimes,idleWave.map(s=>[0,s*.018,0])),
+  const rest=idleTimes.map(()=>[0,0,0]);
+  const idle=[qTrack('head',idleTimes,idleWave.map(s=>[0,s*.018,0])),qTrack('skirt-front',idleTimes,rest),qTrack('skirt-back',idleTimes,rest),
     new VectorKeyframeTrack('torso.scale',idleTimes,idleWave.flatMap(s=>[1+s*.002,1+s*.003,1+s*.002]))];
   const contact=times.map(t=>{
     const z=.3-1.2*(t%.5),down=Math.sqrt(.6199**2-z*z);
@@ -282,6 +391,7 @@ function animations() {
   // A slight counter-lean and restrained sway keep the fixed tunic clear of the knees.
   const walk=[qTrack('torso',walkTimes,wave.map(s=>[-.025,s*.018,s*.005])),qTrack('head',walkTimes,wave.map(s=>[.025,-s*.015,-s*.003])),
     new VectorKeyframeTrack('torso.position',walkTimes,contact.flatMap(p=>[0,.95+p.offset,0]))];
+  const thighs=[];
   for(const side of [-1,1]){
     const suffix=side<0?'left':'right';
     idle.push(qTrack('shoulder-'+suffix,idleTimes,idleWave.map(s=>[-.055+s*.012,0,side*(.19+s*.009)])));
@@ -300,7 +410,13 @@ function animations() {
       return [hip,knee,-hip-knee];
     });
     for(const[j,joint]of['hip','knee','ankle'].entries())walk.push(qTrack(joint+'-'+suffix,walkTimes,poses.map(p=>[p[j],0,0])));
+    thighs.push(poses.map(p=>p[0]));
   }
+  // Negative hip rotation swings a thigh forward: the front panel follows the leading thigh, the
+  // back panel the trailing one, nearly as far, so the hem keeps covering the trousers.
+  const PANEL_FOLLOW=.9;
+  walk.push(qTrack('skirt-front',walkTimes,times.map((_,i)=>[Math.min(0,thighs[0][i],thighs[1][i])*PANEL_FOLLOW,0,0])));
+  walk.push(qTrack('skirt-back',walkTimes,times.map((_,i)=>[Math.max(0,thighs[0][i],thighs[1][i])*PANEL_FOLLOW,0,0])));
   const jump = idle.filter(track => !/^(shoulder|elbow)-/.test(track.name)).map(track => track.clone());
   for (const side of [-1, 1]) {
     const suffix = side < 0 ? 'left' : 'right';
@@ -314,42 +430,58 @@ export function createAvatarModel(id) {
   if (!AVATAR_IDS.includes(id)) throw new RangeError('Unknown avatar: '+id);
   const look=APPEARANCES[id], root=new Group(); root.name='avatar';
   root.userData={avatarId:id,origin:'ground between feet',units:'metres',forward:'+Z',author:'Original TASK-043 procedural sculpture; no third-party art',walkCycleMetres:1.2};
-  const torso=group(root,'torso',0,.95,0); tunic(torso,look);
-  const neck=group(torso,'neck',0,.365,0); loft(neck,SKIN,[[-.015,.076,.07],[.105,.073,.071]],12);
-  const head=group(torso,'head',0,.67,0); head.scale.x=.84;
-  loft(head,SKIN,[[-.279,.045,.085],[-.25,.139,.157],[-.19,.192,.204],[-.10,.223,.225],[-.04,.237,.233],[.10,.240,.232],[.17,.226,.217],[.22,.210,.198],[.28,.12,.12],[.29,.045,.045]],24,true,true);
-  const facial=group(head,'face'); facial.scale.x=.94; face(facial,look);
-  const coiffure=group(head,'hair'); root.updateMatrixWorld(true); hair(coiffure,look);
+  // Blender-authored surfaces (TASK-125) replace the procedural fallback per joint.
+  const doc=loadAvatarParts(id), parts=doc?.parts, nodes=doc?.nodes??{}, at=(name,fallback)=>nodes[name]??fallback;
+  const sculpt=(target,name,fallback)=>parts?sculpted(target,parts[name]):fallback();
+  const torso=group(root,'torso',0,.95,0); sculpt(torso,'torso',()=>tunic(torso,look));
+  // The hem's front and back panels (split at the side slits) pivot at hip height so the walk can
+  // swing them with the thighs and the tunic stays over the trousers. Empty for the fallback.
+  for(const name of ['skirt-front','skirt-back']){const panel=group(torso,name,...at(name,[0,-.17,0])); if(parts?.[name])sculpted(panel,parts[name]);}
+  const neck=group(torso,'neck',...at('neck',[0,.365,0])); sculpt(neck,'neck',()=>loft(neck,SKIN,[[-.015,.076,.07],[.105,.073,.071]],12));
+  // The fallback head grows in width and height only, keeping the shared depth envelope.
+  const head=group(torso,'head',...at('head',[0,parts?.63:.73,0])); if(!parts)head.scale.set(1.08,1.2,1);
+  sculpt(head,'head',()=>headShell(head));
+  const facial=group(head,'face'); sculpt(facial,'face',()=>{facial.scale.x=.94; face(facial,look);});
+  const coiffure=group(head,'hair'); sculpt(coiffure,'hair',()=>{root.updateMatrixWorld(true); hair(coiffure,look);});
   for (const side of [-1,1]) {
     const suffix=side<0?'left':'right';
-    const shoulder=group(torso,'shoulder-'+suffix,side*.235,.305,0); shoulder.rotation.z=side*.19; shoulder.rotation.x=-.055;
-    loft(shoulder,look.tunic,[[-.155,.087,.092],[-.13,.088,.094],[-.035,.090,.094],[.015,.076,.078],[.045,.030,.035]],12);
-    loft(shoulder,look.style==='long'?CREAM:new Color(look.tunic).multiplyScalar(.97),[[-.161,.090,.095],[-.125,.089,.096]],10);
-    const elbow=group(shoulder,'elbow-'+suffix,0,-.215,0); elbow.rotation.x=-.07;
-    loft(elbow,SKIN,[[-.188,.050,.052],[-.13,.054,.055],[-.045,.064,.061],[.015,.064,.061],[.11,.06,.058]],10);
-    const wrist=group(elbow,'wrist-'+suffix,0,-.195,0);
-    // Narrow the palm and raise its bottom, so the fingers extend below it.
-    // Its top and outside edge still contribute to the shared real bounds.
-    orb(wrist,SKIN,side*.016412675,-.0335,.008,.047,.0715,.042,10,5);
-    const thumb=orb(wrist,SKIN,-side*.040,-.026,.038,.018,.038,.022,8,4); thumb.geometry.rotateZ(-side*.24);
-    for(let finger=0;finger<4;finger++)orb(wrist,SKIN,side*(-.027+finger*.018),finger===1||finger===2?-.09799999:-.094,.014,.011,.030,.012,8,4);
+    const shoulder=group(torso,'shoulder-'+suffix,...at('shoulder-'+suffix,[side*.235,.305,0])); shoulder.rotation.z=side*.19; shoulder.rotation.x=-.055;
+    sculpt(shoulder,'shoulder-'+suffix,()=>{
+      loft(shoulder,look.tunic,[[-.155,.087,.092],[-.13,.088,.094],[-.035,.090,.094],[.015,.076,.078],[.045,.030,.035]],12);
+      loft(shoulder,look.style==='long'?CREAM:new Color(look.tunic).multiplyScalar(.97),[[-.161,.090,.095],[-.125,.089,.096]],10);
+    });
+    const elbow=group(shoulder,'elbow-'+suffix,...at('elbow-'+suffix,[0,-.215,0])); elbow.rotation.x=-.07;
+    sculpt(elbow,'elbow-'+suffix,()=>loft(elbow,SKIN,[[-.188,.050,.052],[-.13,.054,.055],[-.045,.064,.061],[.015,.064,.061],[.11,.06,.058]],10));
+    const wrist=group(elbow,'wrist-'+suffix,...at('wrist-'+suffix,[0,-.195,0]));
+    sculpt(wrist,'wrist-'+suffix,()=>{
+      // Narrow the palm and raise its bottom, so the fingers extend below it.
+      orb(wrist,SKIN,side*.016412675,-.0335,.008,.047,.0715,.042,10,5);
+      const thumb=orb(wrist,SKIN,-side*.040,-.026,.038,.018,.038,.022,8,4); thumb.geometry.rotateZ(-side*.24);
+      for(let finger=0;finger<4;finger++)orb(wrist,SKIN,side*(-.027+finger*.018),finger===1||finger===2?-.09799999:-.094,.014,.011,.030,.012,8,4);
+    });
     const hip=group(root,'hip-'+suffix,side*.126,.78,0);
-    loft(hip,PANTS,[[-.32,.100,.087],[-.25,.100,.085],[-.09,.088,.085],[.01,.075,.08]],10);
+    sculpt(hip,'hip-'+suffix,()=>loft(hip,PANTS,[[-.32,.100,.087],[-.25,.100,.085],[-.09,.088,.085],[.01,.075,.08]],10));
     const knee=group(hip,'knee-'+suffix,0,-.32,0);
-    orb(knee,PANTS,0,-.002,0,.095,.06,.095,10,5);
-    loft(knee,PANTS,[[-.19,.074,.077],[-.16,.106,.112],[-.05,.117,.11],[.025,.09,.09]],10);
-    loft(knee,CREAM,[[-.20,.076,.08],[-.175,.082,.085]],10);
-    loft(knee,SKIN,[[-.295,.051,.056],[-.195,.058,.061]],10);
+    sculpt(knee,'knee-'+suffix,()=>{
+      orb(knee,PANTS,0,-.002,0,.095,.06,.095,10,5);
+      loft(knee,PANTS,[[-.19,.074,.077],[-.16,.106,.112],[-.05,.117,.11],[.025,.09,.09]],10);
+      loft(knee,CREAM,[[-.20,.076,.08],[-.175,.082,.085]],10);
+      loft(knee,SKIN,[[-.295,.051,.056],[-.195,.058,.061]],10);
+    });
     const ankle=group(knee,'ankle-'+suffix,0,-.30,0);
-    loft(ankle,BOOT,[[-.13,.09,.145,0,.046],[-.09,.086,.145,0,.049],[-.045,.071,.12,0,.03],[.018,.065,.072,0,-.005]],10);
-    loft(ankle,SOLE,[[-.16,.091,.15,0,.048],[-.132,.094,.153,0,.048]],10);
-    loft(ankle,'#63412d',[[-.029,.071,.078],[.027,.074,.077]],10);
+    sculpt(ankle,'ankle-'+suffix,()=>{
+      loft(ankle,BOOT,[[-.13,.09,.145,0,.046],[-.09,.086,.145,0,.049],[-.045,.071,.12,0,.03],[.018,.065,.072,0,-.005]],10);
+      loft(ankle,SOLE,[[-.16,.091,.15,0,.048],[-.132,.094,.153,0,.048]],10);
+      loft(ankle,'#63412d',[[-.029,.071,.078],[.027,.074,.077]],10);
+    });
   }
   batch(root); root.updateMatrixWorld(true);
   // Authored visual proportions; no invisible bounding mesh or collision change.
   const bounds=new Box3().setFromObject(root), size=bounds.getSize(new Vector3());
   const proportion=AVATAR_PROPORTIONS[id];
-  root.scale.set(proportion.width/size.x,proportion.height/size.y,proportion.depth/size.z);
+  // Generated sculptures keep their own shape: one uniform scale from the authored height.
+  if(doc?.uniformScale){const s=proportion.height/size.y; root.scale.set(s,s,s);}
+  else root.scale.set(proportion.width/size.x,proportion.height/size.y,proportion.depth/size.z);
   root.updateMatrixWorld(true);
   return {root,animations:animations()};
 }
