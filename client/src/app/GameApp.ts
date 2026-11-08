@@ -1,6 +1,7 @@
 import { isGraphicsQuality, type GraphicsQuality } from '../render/GraphicsQuality';
 import { readGraphicsQuality, rememberGraphicsQuality } from './graphicsPreference';
 import { CITY_BOUNDS } from '../../../shared/city/catalogue';
+import { SHOTGUN_ENABLED } from './features';
 import { ShotgunSimulation } from '../../../shared/shotgun/Simulation.ts';
 import type { ShotgunState } from '../../../shared/shotgun/types.ts';
 import type { CameraView, RenderAdapter } from '../render/RenderAdapter';
@@ -258,6 +259,7 @@ export class GameApp {
     this.patch({firstPerson});this.presentCamera();
   }
   private acceptShotgun(state: ShotgunState): void {
+    if(!SHOTGUN_ENABLED)return;
     if(this.shotgunState?.sceneId===state.sceneId && state.revision<this.shotgunState.revision)return;
     this.shotgunState=state;
     const id=this.session?.playerId;if(!id)return;
@@ -267,7 +269,7 @@ export class GameApp {
     if(ammo!==this.snapshot.shotgunAmmo || reloading!==this.snapshot.shotgunReloading)this.patch({shotgunAmmo:ammo,shotgunReloading:reloading});
   }
   private weaponAction(action: 'fire'|'reload'): void {
-    if(!this.canControl())return;
+    if(!SHOTGUN_ENABLED || !this.canControl())return;
     const aim=this.renderer?.shotgunAim?.();
     const yaw=aim?.yaw ?? Math.atan2(Math.sin(this.camera.yaw),Math.cos(this.camera.yaw));
     const pitch=aim?.pitch ?? this.camera.pitch;
@@ -278,7 +280,7 @@ export class GameApp {
     }
   }
   private updateLocalShotgun(delta: number): void {
-    if(this.session instanceof OnlineSession)return;
+    if(!SHOTGUN_ENABLED || this.session instanceof OnlineSession)return;
     const player=this.current?.entities.find(e=>e.id===this.session?.playerId);if(!player?.transform || !this.snapshot.worldReady)return;
     if(!this.localShotgun) {
       const origin=player.transform.position;

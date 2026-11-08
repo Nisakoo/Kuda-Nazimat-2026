@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { expectCapture, resume } from './helpers';
 import { mkdir } from 'node:fs/promises';
+import { SHOTGUN_ENABLED } from '../src/app/features';
 test('V switches the camera; shotgun fires, reloads and ignores menu input',async({page},testInfo)=>{
+  test.skip(!SHOTGUN_ENABLED,'shotgun is hidden by SHOTGUN_ENABLED in client/src/app/features.ts');
   const evidence = process.env.SHOTGUN_EVIDENCE_DIR ?? testInfo.outputPath('screenshots'); await mkdir(evidence, { recursive: true });
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   await page.route('**/config.json',route=>route.fulfill({json:{session:'local',mapId:'demo',debug:true}}));
