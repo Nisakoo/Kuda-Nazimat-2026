@@ -1,4 +1,4 @@
-/** Minimal DER encoder for the X.509 fields TLS-006 needs; no parsing (node:crypto reads certificates back). */
+/** Minimal DER encoder for the X.509 fields the certificate needs; no parsing (node:crypto reads certificates back). */
 
 function length(n: number): Buffer {
   if (n < 0x80) return Buffer.from([n]);

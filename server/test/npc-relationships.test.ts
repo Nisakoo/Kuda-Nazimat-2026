@@ -5,7 +5,7 @@ import { systemClock, systemScheduler } from '../src/common/time.ts';
 import { silentLogger } from '../src/common/logger.ts';
 import type { NpcAnswerRequest, NpcResponder } from '../src/npc/NpcResponder.ts';
 
-describe('NPC relationships & fact memory integration (NPC-AI-007..011)', () => {
+describe('NPC relationships & fact memory integration', () => {
   async function fixture() {
     const stores = memoryStores();
     let lastRequest: NpcAnswerRequest | undefined;
@@ -55,7 +55,7 @@ describe('NPC relationships & fact memory integration (NPC-AI-007..011)', () => 
     expect(getLastRequest()?.npc.attitude).toBe('displeased');
   });
 
-  it('repeated insult stays displeased without escalating (NPC-AI-008)', async () => {
+  it('repeated insult stays displeased without escalating', async () => {
     const { stores, ask, getLastRequest } = await fixture();
     await ask('s1', 'p1', 'npc1', 'You are stupid');
     expect(stores.dialogue.attitude?.('p1', 'npc1', 's1')).toBe('displeased');
@@ -65,7 +65,7 @@ describe('NPC relationships & fact memory integration (NPC-AI-007..011)', () => 
     expect(getLastRequest()?.npc.attitude).toBe('displeased');
   });
 
-  it('apology in displeased returns attitude strictly to ordinary (NPC-AI-008)', async () => {
+  it('apology in displeased returns attitude strictly to ordinary', async () => {
     const { stores, ask, getLastRequest } = await fixture();
     await ask('s1', 'p1', 'npc1', 'You are an idiot');
     expect(stores.dialogue.attitude?.('p1', 'npc1', 's1')).toBe('displeased');
@@ -81,7 +81,7 @@ describe('NPC relationships & fact memory integration (NPC-AI-007..011)', () => 
     expect(getLastRequest()?.npc.attitude).toBe('ordinary');
   });
 
-  it('quotes, vocabulary questions and third-party insults do NOT degrade attitude (NPC-AI-009)', async () => {
+  it('quotes, vocabulary questions and third-party insults do NOT degrade attitude', async () => {
     const { stores, ask, getLastRequest } = await fixture();
     await ask('s1', 'p1', 'npc1', 'He said "you are stupid"');
     expect(stores.dialogue.attitude?.('p1', 'npc1', 's1')).toBe('ordinary');
@@ -93,7 +93,7 @@ describe('NPC relationships & fact memory integration (NPC-AI-007..011)', () => 
     expect(stores.dialogue.attitude?.('p1', 'npc1', 's1')).toBe('ordinary');
   });
 
-  it('new AUTH session starts fresh with ordinary attitude (NPC-AI-010)', async () => {
+  it('new AUTH session starts fresh with ordinary attitude', async () => {
     const { stores, ask } = await fixture();
     await ask('session-old', 'p1', 'npc1', 'Ты дурак!');
     expect(stores.dialogue.attitude?.('p1', 'npc1', 'session-old')).toBe('displeased');
@@ -104,7 +104,7 @@ describe('NPC relationships & fact memory integration (NPC-AI-007..011)', () => 
     expect(stores.dialogue.attitude?.('p1', 'npc1', 'session-new')).toBe('ordinary');
   });
 
-  it('extracts player facts and provides them to future requests (NPC-AI-003, NPC-AI-011)', async () => {
+  it('extracts player facts and provides them to future requests', async () => {
     const { ask, getLastRequest } = await fixture();
     await ask('s1', 'p1', 'npc1', 'Меня зовут Лука, я пришел из Ура');
     // Next request receives the fact in prompt request

@@ -15,7 +15,7 @@ import { makeWorld, npc } from './a-helpers.ts';
 
 const entry = (address: string, internal = false): NetworkInterfaceInfo => ({ address, internal, family: 'IPv4', netmask: '255.255.255.0', mac: '00:00:00:00:00:00', cidr: null });
 
-it('lists non-loopback IPv4 per interface, private ranges first and link-local last (OFFLINE-002)', () => {
+it('lists non-loopback IPv4 per interface, private ranges first and link-local last', () => {
   const list = lanAddresses({ lo: [entry('127.0.0.1', true)], vpn: [entry('198.18.0.1')], eth: [entry('169.254.1.2')], wifi: [entry('192.168.1.96'), { ...entry('fe80::1'), family: 'IPv6', scopeid: 0 }], lab: [entry('10.0.0.5')], corp: [entry('172.20.1.1')] });
   expect(list.map((a) => a.address)).toEqual(['192.168.1.96', '10.0.0.5', '172.20.1.1', '198.18.0.1', '169.254.1.2']);
   expect(['172.15.0.1', '172.32.0.1', '11.0.0.1'].map(addressKind)).toEqual(['other', 'other', 'other']);
@@ -40,7 +40,7 @@ it('builds the connection block with the operator address and the right warnings
   for (const platform of ['win32', 'darwin', 'linux'] as const) expect(firewallHint(platform).length).toBeGreaterThan(20);
 });
 
-it('recognizes only loopback peers and parses --config/--port in any order (OFFLINE-003, 010)', () => {
+it('recognizes only loopback peers and parses --config/--port in any order', () => {
   expect(['127.0.0.1', '::1', '::ffff:127.0.0.1'].every(isLoopback)).toBe(true);
   expect(['192.168.1.96', '::ffff:192.168.1.96', undefined].some(isLoopback)).toBe(false);
   expect(serverArguments(['--port', '9090'])).toMatchObject({ port: 9090 });
@@ -48,7 +48,7 @@ it('recognizes only loopback peers and parses --config/--port in any order (OFFL
   for (const args of [['--port', '0'], ['--port', '70000'], ['--port'], ['--host', 'x'], ['--port', '8o']]) expect(() => serverArguments(args)).toThrow('Использование');
 });
 
-// ── Real server (OFFLINE-018) ────────────────────────────────────────────────
+// ── Real server ────────────────────────────────────────────────
 const lan = lanAddresses().find((a) => a.kind !== 'link-local') ?? lanAddresses()[0];
 
 it.skipIf(!lan)(`two players over a non-loopback IPv4 (${lan?.address ?? 'нет адреса — пропуск, не успех'}): login, movement, chat and protected world`, async () => {
@@ -73,7 +73,7 @@ it.skipIf(!lan)('operator screen and status are 404 from a non-loopback address'
   for (const path of ['/operator', '/api/operator/status', '/api/operator/metrics', '/api/operator/accounts']) expect((await fetch(`https://${lan!.address}:${port}${path}`)).status).toBe(404);
 });
 
-it('operator screen shows seats, presence and NPC state without secrets; logs carry IP but no tokens or texts (OFFLINE-010, 016)', async () => {
+it('operator screen shows seats, presence and NPC state without secrets; logs carry IP but no tokens or texts', async () => {
   const logger = memoryLogger(); const lines = logger.records;
   const { origin, guest, connect } = await setup({ disconnectGraceMs: 300 }, undefined, 'test', logger);
   const session = await guest('Аня'); const client = await connect(session.token);
@@ -97,13 +97,13 @@ it('operator screen shows seats, presence and NPC state without secrets; logs ca
   const body = JSON.stringify(status); expect(body).not.toContain(session.token); expect(body).not.toContain('секретный текст');
 });
 
-it('a busy port fails with a clear message and a way out (OFFLINE-003)', async () => {
+it('a busy port fails with a clear message and a way out', async () => {
   const { app, config } = await setup();
   const address = app.server.address(); if (!address || typeof address === 'string') throw new Error();
   await expect(startApplication({ ...config, port: address.port }, createGame, silentLogger)).rejects.toThrow(`Порт ${address.port} уже занят`);
 });
 
-it('lan:check reports every start precondition and fails on a busy port, missing build/world or a newer database (OFFLINE-008)', async () => {
+it('lan:check reports every start precondition and fails on a busy port, missing build/world or a newer database', async () => {
   const world = await makeWorld([npc('guide', 0, 6)]); const root = dirname(world.worldDir);
   defer(() => rm(root, { recursive: true, force: true }));
   const blocker = createServer(); await new Promise<void>((resolve) => blocker.listen(0, '127.0.0.1', resolve)); defer(() => new Promise((resolve) => blocker.close(() => resolve())));

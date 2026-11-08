@@ -1,7 +1,7 @@
 import { BROADCAST_MS_BUCKETS, FAST_MS_BUCKETS, MS_BUCKETS, RTT_MS_BUCKETS, quantile, type MetricsRegistry } from '../common/metrics.ts';
 
 /**
- * OBS-013 metrics history: a frame every 10 s from the OBS-007 registry, kept in one ring of 1440 frames
+ * Metrics history: a frame every 10 s from the metrics registry, kept in one ring of 1440 frames
  * (4 hours). Windows use bucket increments, never the cumulative `snapshot().p95`. Pure apart from the
  * injected registry and readers; the composition root owns the timer.
  */
@@ -77,7 +77,7 @@ function histTotals(registry: MetricsRegistry): number[] {
   return totals;
 }
 
-/** Seats are capped at 4 (SERVER-004 maxPlayers); each keeps RTT, FPS and frame time. */
+/** Seats are capped at 4 (`maxPlayers` config); each keeps RTT, FPS and frame time. */
 const PLAYER_SLOTS = 4;
 const ROW = VALUE_NAMES.length + histLength + PLAYER_SLOTS * 3;
 /** Float32 storage rounds; two decimals are enough for ms and FPS. */
@@ -158,7 +158,7 @@ export class MetricsHistory {
     return Array.from({ length: this.size - first }, (_, i) => this.read(first + i));
   }
 
-  /** Heap estimate for the OBS-013 1 MB budget: both buffers plus the player id lists. */
+  /** Heap estimate for the 1 MB budget: both buffers plus the player id lists. */
   approxBytes(): number {
     return this.data.byteLength + this.times.byteLength + this.ids.reduce((sum, list) => sum + 16 + list.length * 8, 0);
   }
@@ -181,7 +181,7 @@ export function mergeFrames(frames: readonly Frame[]): Frame | null {
   return { at: last.at, spanMs: frames.reduce((sum, frame) => sum + frame.spanMs, 0), values, hist, players: last.players };
 }
 
-/** JSON form of a frame for `metrics.minute` (OBS-015); `null` for missing values. */
+/** JSON form of a frame for `metrics.minute`; `null` for missing values. */
 export function frameToJson(frame: Frame): Record<string, unknown> {
   return {
     at: frame.at, spanMs: frame.spanMs,
@@ -213,7 +213,7 @@ export interface Summary {
   readonly tick: { readonly p50: number | null; readonly p95: number | null; readonly max: number | null };
   readonly broadcast: { readonly p95: number | null; readonly max: number | null };
   readonly rtt: { readonly p50: number | null; readonly p95: number | null; readonly max: number | null };
-  /** Visible tabs only (OBS-011). */
+  /** Visible tabs only. */
   readonly fps: { readonly min: number | null; readonly p50: number | null };
   readonly npc: {
     readonly accepted: number | null; readonly completed: number | null; readonly timeouts: number | null; readonly busy: number | null; readonly failed: number | null;
@@ -234,7 +234,7 @@ export function median(values: readonly number[]): number | null {
   return sorted.length % 2 ? sorted[middle]! : (sorted[middle - 1]! + sorted[middle]!) / 2;
 }
 
-/** One summary for status windows, `metrics.minute`, the report and the load profile (OBS-013, 017). */
+/** One summary for status windows, `metrics.minute`, the report and the load profile. */
 export function summarize(frames: readonly Frame[]): Summary {
   const merged = mergeFrames(frames);
   const value = (name: ValueName) => merged ? frameValue(merged, name) : null;

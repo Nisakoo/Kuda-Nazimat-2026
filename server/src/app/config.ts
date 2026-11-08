@@ -6,7 +6,7 @@ import { NPC_TIMING, validNpcTimeoutMs } from '../../../shared/protocol/npcTimin
 import { isIP } from 'node:net';
 import { LEVELS, type LogsConfig } from '../common/logger.ts';
 
-/** SERVER-009: the environment selects a preset; files and arguments override it. */
+/** The environment selects a preset; files and arguments override it. */
 export const ENVIRONMENTS = ['development', 'production', 'test'] as const;
 export type Environment = (typeof ENVIRONMENTS)[number];
 
@@ -15,10 +15,10 @@ export interface Config extends GameConfig {
   env: Environment;
   host: string; port: number; clientDir: string; defaultMap: string; dbPath: string;
   sessionTtlMs: number; logWorldAccess: boolean; clientDebug: boolean;
-  /** passwordless enables `guest` and `dev` login (AUTH-001, AUTH-016); never in production. */
+  /** passwordless enables `guest` and `dev` login; never in production. */
   auth: { maxSessions: number; passwordless: boolean };
   logs: LogsConfig;
-  /** TLS-016: HTTPS is always on; only the certificate directory and extra names are configurable. */
+  /** HTTPS is always on; only the certificate directory and extra names are configurable. */
   tls: { dir: string; extraNames: string[] };
   monitoring: { pingIntervalMs: number; validateOutgoing: boolean };
   language: { adapter: string; options: Record<string, unknown> };
@@ -132,7 +132,7 @@ function port(value: string | undefined): number {
 }
 /**
  * Command line of the server and its CLIs. `--env` beats APP_ENV, `--port` beats PORT; positional words
- * (e.g. the backup destination) are returned in `rest`. Defaults to development (SERVER-009).
+ * (e.g. the backup destination) are returned in `rest`. Defaults to development.
  */
 export function serverArguments(args = process.argv.slice(2), environ: NodeJS.ProcessEnv = process.env): ServerArguments {
   const result: ServerArguments = { configPath: defaultConfigPath, env: environ.APP_ENV ? environment(environ.APP_ENV) : 'development', rest: [] };

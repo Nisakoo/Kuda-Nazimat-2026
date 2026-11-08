@@ -8,13 +8,13 @@ import type { PerfReport } from '../obs/clientPerf.ts';
 import { BodyError, bearer, body, error, fields, type RequestContext } from './util.ts';
 
 const TEXT: Readonly<Record<string, number>> = { message: 500, stack: 4000, source: 500, build: 500, map: 500 };
-/** Allowed ranges of the numeric fields (OBS-011). */
+/** Allowed ranges of the numeric fields. */
 const NUMBERS: Readonly<Record<string, readonly [number, number]>> = { fps: [0, 1000], frameMs: [0, 10_000], drawCalls: [0, 1_000_000] };
 const clean = (value: string, max: number): string => value.replace(/[\x00-\x08\x0b-\x1f\x7f-\x9f]/g, '').slice(0, max);
 const number = (value: unknown, [min, max]: readonly [number, number]): boolean => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
 
 /**
- * OBS-011: client error and perf reports, authenticated and rate-limited per session and kind
+ * Client error and perf reports, authenticated and rate-limited per session and kind
  * (errors 10/min, perf 12/min). Perf feeds the admin screen through `perf` and the client histograms.
  */
 export function telemetryHandler(deps: { sessions: SessionVerifier; clock: Clock; logger: Logger; metrics?: MetricsRegistry; perf?: (playerId: string, report: PerfReport) => void }) {

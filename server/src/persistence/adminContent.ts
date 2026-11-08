@@ -7,7 +7,7 @@ const MAX_JOURNAL = 100_000;
 const optional = (value: unknown): number | null => value === null || value === undefined ? null : Number(value);
 const parsed = (value: unknown): Record<string, unknown> | null => value === null || value === undefined ? null : JSON.parse(String(value)) as Record<string, unknown>;
 
-/** ADMIN-SRV / STORE-014: NPC layer, change journal and read-only account views over the shared connection. */
+/** NPC layer, change journal and read-only account views over the shared connection. */
 export function sqliteAdminContent(db: DatabaseSync): AdminContentStore {
   // SQLite lower() folds ASCII only; journal search must ignore case in Cyrillic too.
   db.function('unicode_lower', { deterministic: true }, (value) => typeof value === 'string' ? value.toLowerCase() : value);

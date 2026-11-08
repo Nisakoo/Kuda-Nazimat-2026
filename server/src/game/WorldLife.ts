@@ -78,7 +78,7 @@ export class WorldLife {
     }
   }
   catalogue(): readonly WorldLifeDefinition[] { return [...this.definitions.values()]; }
-  /** ADMIN-SRV-008: current and initial places of the map's pots and apples. */
+  /** Current and initial places of the map's pots and apples. */
   view(mapId: string): SceneView | null {
     const d = this.definitions.get(mapId); if (!d) return null;
     const home = new Map(d.instances.map(i => [i.id, i.position]));
@@ -91,7 +91,7 @@ export class WorldLife {
     };
   }
   /**
-   * ADMIN-SRV-008: pots go home unless a player or a skipped pot occupies the home; returns the apples
+   * Pots go home unless a player or a skipped pot occupies the home; returns the apples
    * whose home stays clear of every pot afterwards. Pots are RAM state, as after a restart.
    */
   resetPots(mapId: string, players: readonly PlacedPlayer[]): { reset: number; skipped: string[]; apples: { id: string; position: Vector3 }[]; skippedApples: string[] } | null {

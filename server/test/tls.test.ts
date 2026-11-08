@@ -18,7 +18,7 @@ afterEach(async () => { for (const dir of directories.splice(0)) await rm(dir, {
 const NAMES = ['localhost', '127.0.0.1', '::1'];
 const NOW = new Date('2026-11-01T12:00:00Z');
 
-describe('certificate (TLS-001, 003, 005, 006)', () => {
+describe('certificate', () => {
   it('is a self-signed ECDSA P-256 server certificate with the required fields', () => {
     const { cert, key } = issueCertificate({ names: [...NAMES, '192.168.1.96', 'babylon.local', 'fe80::1'], now: NOW });
     const x509 = new X509Certificate(cert);
@@ -55,7 +55,7 @@ describe('certificate (TLS-001, 003, 005, 006)', () => {
   });
 });
 
-describe('certificate store (TLS-004, 005, 009, 014)', () => {
+describe('certificate store', () => {
   it('creates once, keeps the key private and never replaces an existing certificate silently', async () => {
     const dir = await temporary(); const config = { dir: join(dir, 'tls'), extraNames: [] };
     const first = await loadCertificate(config, NAMES, NOW);
@@ -104,7 +104,7 @@ describe('certificate store (TLS-004, 005, 009, 014)', () => {
   });
 });
 
-describe('transport on one port (TLS-007, 008, 009)', () => {
+describe('transport on one port', () => {
   it('serves login, API, world and Socket.IO polling and WebSocket only over TLS', async () => {
     const { origin, port, guest, connect } = await setup();
     const session = await guest('Аня');
@@ -118,7 +118,7 @@ describe('transport on one port (TLS-007, 008, 009)', () => {
     expect(port).toBeGreaterThan(0);
   });
 
-  it('answers plain HTTP only with the trust page, the certificate, health and redirects (S4)', async () => {
+  it('answers plain HTTP only with the trust page, the certificate, health and redirects', async () => {
     const { port, post, config } = await setup();
     const plain = (method: string, path: string, headers: Record<string, string> = {}, body?: string) => new Promise<{ status: number; headers: Record<string, string | string[] | undefined>; text: string }>((resolve, reject) => {
       const req = plainRequest({ host: '127.0.0.1', port, method, path, headers: { Host: `127.0.0.1:${port}`, ...headers } }, (res) => {
@@ -141,7 +141,7 @@ describe('transport on one port (TLS-007, 008, 009)', () => {
     expect(config.tls.dir).toBeTruthy();
   });
 
-  it('shows the same trust page and certificate over http and https, never the key (S7)', async () => {
+  it('shows the same trust page and certificate over http and https, never the key', async () => {
     const { origin, port, app } = await setup();
     const { certificate } = app;
     const viaHttps = await fetch(`${origin}/setup`); const html = await viaHttps.text();
@@ -155,7 +155,7 @@ describe('transport on one port (TLS-007, 008, 009)', () => {
     expect((await fetch(`${origin}/setup`, { method: 'POST' })).status).toBe(405);
   });
 
-  it('counts devices that reject the certificate and shows them on the operator screen (TLS-011, 012)', async () => {
+  it('counts devices that reject the certificate and shows them on the operator screen', async () => {
     const { origin, port } = await setup();
     const stranger = issueCertificate({ names: NAMES, now: new Date() }).cert;
     await new Promise<void>((resolve) => {

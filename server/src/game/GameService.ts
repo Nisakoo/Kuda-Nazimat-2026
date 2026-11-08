@@ -29,7 +29,7 @@ interface Seat {
   lifeRevision: number;
   lifeSentAt: number;
   readonly seatedAt: number;
-  /** Attach times within the last 10 minutes, for the unstable-connection warning (OBS-010). */
+  /** Attach times within the last 10 minutes, for the unstable-connection warning. */
   attaches: number[];
 }
 
@@ -76,12 +76,12 @@ export class GameService {
     });
   }
 
-  /** SERVER-006: an account that already has a seat may always reconnect; a new one needs a free slot. */
+  /** An account that already has a seat may always reconnect; a new one needs a free slot. */
   canAdmit(accountId: string): boolean {
     return this.seats.has(accountId) || this.seats.size < this.settings.maxPlayers;
   }
 
-  /** AUTH-005: the newest connection takes control; the previous one is closed. False when no slot is free. */
+  /** The newest connection takes control; the previous one is closed. False when no slot is free. */
   attach(identity: PlayerIdentity, channel: Channel): boolean {
     if (!this.canAdmit(identity.accountId)) return false;
     const now = this.clock.now();
@@ -110,7 +110,7 @@ export class GameService {
 
   isControlling(channel: Channel): boolean { return this.seatOf(channel) !== undefined; }
 
-  /** REALTIME-006: keep the entity for the grace period, then save and free the seat. */
+  /** Keep the entity for the grace period, then save and free the seat. */
   detach(channel: Channel): void {
     const seat = this.seatOf(channel);
     if (!seat) return;
@@ -152,7 +152,7 @@ export class GameService {
       const saved = this.loadSaved(playerId);
       const usable = !force && saved !== null && saved.mapId === mapId && this.world.isSafeSupport(mapId, saved.position);
       const spawn = initial?.mapId === mapId && this.world.isSafeSupport(mapId, initial.position) ? initial.position : map.spawn;
-      // REALTIME-010: never stack players; a free saved position is kept with its rotation.
+      // Never stack players; a free saved position is kept with its rotation.
       const others = this.world.playerPositions(mapId);
       const placement = usable && isFree(saved.position, others) ? { position: saved.position, rotationY: saved.rotationY }
         : chooseSpawn(usable ? saved.position : spawn, (x, z) => this.world.isSafeSupport(mapId, { x, y: map.heightAt(x, z), z }), others);
@@ -245,12 +245,12 @@ export class GameService {
     }
   }
 
-  /** ADMIN-SRV-005: the NPC is in the live set (enabled and not deleted). */
+  /** The NPC is in the live set (enabled and not deleted). */
   hasNpc(npcId: string): boolean { return this.world.hasNpc(npcId); }
 
   sceneView(mapId: string): SceneView | null { return this.world.life?.view(mapId) ?? null; }
 
-  /** ADMIN-SRV-008: pots and apples of the map back home; players get the next scene-state as usual. */
+  /** Pots and apples of the map back home; players get the next scene-state as usual. */
   resetScene(mapId: string): SceneReset | null {
     const life = this.world.life; const store = this.lifeStore;
     if (!life || !store?.resetApples) return null;
@@ -280,7 +280,7 @@ export class GameService {
     return this.world.checkInteraction(seat.identity.playerId, targetId);
   }
 
-  /** REALTIME-008: deliver to every joined player of the sender's map, the sender included. */
+  /** Deliver to every joined player of the sender's map, the sender included. */
   chat(channel: Channel, requestId: string, text: string): boolean {
     const seat = this.joinedSeat(channel);
     if (!seat) return false;
@@ -326,7 +326,7 @@ export class GameService {
       this.deltaBytes.observe(delta.bytes);
       const { bytes, ...body } = delta;
       if (bytes > LIMITS.packetBytes - 4096) {
-        // OBS-003: an oversized delta would be rejected by the client; the revision gap makes it resync.
+        // An oversized delta would be rejected by the client; the revision gap makes it resync.
         this.log.error('game.packet.oversize', 'Delta больше лимита пакета, не отправлена', { playerId: seat.identity.playerId, bytes, entities: entities.length });
         continue;
       }
@@ -336,7 +336,7 @@ export class GameService {
     }
   }
 
-  /** STORE-003: periodic save of moved players; never called from inside a tick. */
+  /** Periodic save of moved players; never called from inside a tick. */
   saveMoved(): void { this.persist(this.world.takeDirty()); }
 
   /** Shutdown: save everyone still in the world and close connections. */
@@ -364,12 +364,12 @@ export class GameService {
     }));
   }
 
-  /** AUTH-012: every connection of a revoked session is closed with the reason; the seat follows the normal grace. */
+  /** Every connection of a revoked session is closed with the reason; the seat follows the normal grace. */
   closeSessions(sessionKeys: ReadonlySet<string>, message: string): void {
     for (const seat of this.seats.values()) if (seat.channel?.sessionKey && sessionKeys.has(seat.channel.sessionKey)) seat.channel.close(message);
   }
 
-  /** OBS-004 dump state: counts and IDs only. */
+  /** Incident dump state: counts and IDs only. */
   state(): Record<string, unknown> {
     return { tick: this.world.tick, seats: [...this.seats.values()].map((seat) => ({ playerId: seat.identity.playerId, connected: seat.channel !== null, joined: seat.stream !== null, revision: seat.stream?.revision ?? null, releaseAt: seat.releaseAt })) };
   }

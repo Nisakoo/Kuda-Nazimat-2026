@@ -5,7 +5,7 @@ export interface SetupView { readonly info: CertificateInfo; readonly host: stri
 const escape = (text: string) => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const date = (value: Date) => value.toISOString().slice(0, 10);
 
-/** TLS-010: static trust page, the same over HTTP and HTTPS; no scripts, no players, no internal paths. */
+/** Static trust page, the same over HTTP and HTTPS; no scripts, no players, no internal paths. */
 export function setupPage({ info, host }: SetupView): string {
   const game = escape(`https://${host}/`);
   return `<!doctype html>

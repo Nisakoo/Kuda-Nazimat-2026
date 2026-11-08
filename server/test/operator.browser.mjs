@@ -63,7 +63,7 @@ try {
     if (!request.url().startsWith(origin)) external.push(request.url());
     if (request.method() === 'POST') mutations.push(request.url());
   });
-  // OBS-011: a client FPS report shows up in the clients table with its threshold.
+  // A client FPS report shows up in the clients table with its threshold.
   assert.equal((await fetch(origin + '/api/telemetry/client', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + second.body.token }, body: JSON.stringify({ v: 1, kind: 'perf', fps: 22, visible: true, frameMs: 48, drawCalls: 140 }) })).status, 204);
   await page.goto(origin + '/operator');
   await expect(page.locator('#overview-cards')).toContainText('2 из 4');

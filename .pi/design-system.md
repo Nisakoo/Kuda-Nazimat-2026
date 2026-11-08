@@ -1,6 +1,6 @@
 # Вавилон — клиентский UI
 
-Основание: specs/client-auth-screens.md, specs/client-game-hud.md, specs/client-avatar-select.md, все11 PNG в specs/images/, Svelte UI и GameApp. Это токены представления, не решения открытых игровых вопросов. Коррекции TASK-048 пока кандидаты до независимой повторной проверки.
+Основание: docs/game/ui.md, docs/game/art-style.md, референсы в docs/game/images/, Svelte UI и GameApp. Это токены представления, не решения открытых игровых вопросов. Коррекции остаются кандидатами до независимой повторной проверки.
 
 ```json
 {

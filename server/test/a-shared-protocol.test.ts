@@ -15,7 +15,7 @@ function outcome(fixture: Fixture): string {
   catch (error) { return error instanceof ProtocolError ? error.code : 'crash'; }
 }
 
-describe('PROTO v1 fixtures (SHARED-004)', () => {
+describe('PROTO v1 fixtures', () => {
   it.each(shared)('$direction valid=$valid', (fixture) => {
     const result = outcome(fixture);
     if (fixture.valid) expect(result).toBe('valid');
@@ -23,7 +23,7 @@ describe('PROTO v1 fixtures (SHARED-004)', () => {
   });
 });
 
-describe('client/shared source (SHARED-006)', () => {
+describe('client/shared source', () => {
   if (existsSync(fileURLToPath(clientUrl))) {
     it('client fixtures give the same outcome', () => {
       for (const fixture of load(clientUrl)) expect(outcome(fixture) === 'valid', JSON.stringify(fixture.packet)).toBe(fixture.valid);
@@ -37,7 +37,7 @@ describe('client/shared source (SHARED-006)', () => {
   }
 });
 
-describe('one walkability rule for client and server (SHARED-005 / S3)', () => {
+describe('one walkability rule for client and server', () => {
   it('the client chunk guard imports the shared rule instead of a copy', () => {
     const guard = readFileSync(new URL('../../client/src/map/ChunkManager.ts', import.meta.url), 'utf8');
     expect(guard).toMatch(/from '(\.\.\/)+shared\/map\/walkability\.ts'/);

@@ -1,11 +1,11 @@
 /**
- * Structured log port (OBS-001). `event` is a stable machine id from the OBS catalogue, `msg` a short
- * human text. Callers pass IDs, codes and durations only — never tokens, passwords or player texts (OBS-006).
+ * Structured log port. `event` is a stable machine id from the OBS catalogue, `msg` a short
+ * human text. Callers pass IDs, codes and durations only — never tokens, passwords or player texts.
  */
 export const LEVELS = ['debug', 'info', 'warn', 'error', 'fatal'] as const;
 export type Level = (typeof LEVELS)[number];
 export type Fields = Readonly<Record<string, unknown>>;
-/** Sink configuration (SERVER-004 `logs`, OBS-002). */
+/** Sink configuration (the `logs` config section). */
 export interface LogsConfig { consoleLevel: Level; fileLevel: Level | 'off'; dir: string; maxFileMb: number; maxTotalMb: number; retentionDays: number }
 
 export interface Logger {

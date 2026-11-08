@@ -10,11 +10,11 @@ export interface ServerCertificate {
   readonly certPath: string; readonly keyPath: string;
   /** True when this call generated the certificate: every device has to trust it (again). */
   readonly created: boolean;
-  /** Current addresses the certificate does not cover; players there get a name mismatch (TLS-004). */
+  /** Current addresses the certificate does not cover; players there get a name mismatch. */
   readonly uncovered: readonly string[];
 }
 
-/** Days before expiry when the connection block, `/operator` and `lan:check` start warning (TLS-004). */
+/** Days before expiry when the connection block, `/operator` and `lan:check` start warning. */
 export const EXPIRY_WARNING_DAYS = 30;
 const RENEW = 'npm --prefix server run tls -- renew';
 
@@ -25,19 +25,19 @@ export class TlsError extends Error {
 
 export const certificatePaths = (config: TlsConfig) => ({ certPath: join(config.dir, 'server.crt'), keyPath: join(config.dir, 'server.key') });
 
-/** `<hostname>.local` when the host name is a plain DNS label; this name survives IP changes (TLS-013). */
+/** `<hostname>.local` when the host name is a plain DNS label; this name survives IP changes. */
 export function localName(hostname = osHostname()): string | null {
   const label = hostname.toLowerCase().replace(/\.local\.?$/, '').split('.')[0] ?? '';
   return /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label) ? `${label}.local` : null;
 }
 
-/** TLS-003: localhost, loopback, `<hostname>.local`, every current IPv4 and the configured extra names. */
+/** Localhost, loopback, `<hostname>.local`, every current IPv4 and the configured extra names. */
 export function certificateNames(config: TlsConfig, addresses: readonly LanAddress[], hostname?: string): string[] {
   const local = localName(hostname);
   return [...new Set(['localhost', ...(local ? [local] : []), '127.0.0.1', '::1', ...addresses.map((entry) => entry.address), ...config.extraNames.map((name) => name.toLowerCase())])];
 }
 
-/** Atomic create with 0600 for the key: temp file, then rename over the target (TLS-005). */
+/** Atomic create with 0600 for the key: temp file, then rename over the target. */
 async function writePrivate(path: string, content: string, mode: number): Promise<void> {
   const temp = `${path}.${process.pid}.tmp`;
   await writeFile(temp, content, { mode, flag: 'w' });
@@ -79,7 +79,7 @@ function result(config: TlsConfig, pair: { cert: string; key: string }, names: r
 }
 
 /**
- * TLS-001, 004, 009: reads the certificate or creates it on the first run. An existing certificate is never
+ * Reads the certificate or creates it on the first run. An existing certificate is never
  * replaced silently, because every device trusts exactly this one; an expired or broken one stops the start.
  */
 export async function loadCertificate(config: TlsConfig, names: readonly string[], now: Date): Promise<ServerCertificate> {
@@ -92,7 +92,7 @@ export async function loadCertificate(config: TlsConfig, names: readonly string[
   return certificate;
 }
 
-/** TLS-014: a new certificate for the current names; the previous trust on devices stops working. */
+/** A new certificate for the current names; the previous trust on devices stops working. */
 export async function renewCertificate(config: TlsConfig, names: readonly string[], now: Date): Promise<ServerCertificate> {
   return result(config, await issue(config, names, now), names, true);
 }

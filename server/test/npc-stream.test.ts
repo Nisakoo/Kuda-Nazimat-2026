@@ -13,7 +13,7 @@ const deps = { clock: systemClock, scheduler: systemScheduler };
 afterEach(() => vi.useRealTimers());
 const question = (requestId = 'r', connectionId = 'c'): NpcQuestion => ({ sessionId: 'test-session', authorize: () => true, connectionId, requestId, player: { accountId: 'a', playerId: 'p', displayName: 'Аня' }, npc: answerRequest().npc, question: 'Расскажи' });
 
-it('throttle sends the newest text at most once per interval, skips repeats and stops cleanly (PROTO-007)', async () => {
+it('throttle sends the newest text at most once per interval, skips repeats and stops cleanly', async () => {
   vi.useFakeTimers(); const sent: [number, string][] = [];
   const throttle = new PartialThrottle(systemScheduler, 100, (seq, text) => sent.push([seq, text]));
   throttle.push('a'); throttle.push('ab'); throttle.push('abc');

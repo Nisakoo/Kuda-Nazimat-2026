@@ -3,7 +3,7 @@ import { World } from '../src/game/World.ts';
 import { loadWorld } from '../src/world/loader.ts';
 import { makeWorld, npc, SPAWN } from './a-helpers.ts';
 
-/** A simulation bug is emulated by poisoning one step of the shared kinematics (OBS-005 / S4). */
+/** A simulation bug is emulated by poisoning one step of the shared kinematics. */
 const poison = vi.hoisted(() => ({ playerAt: null as { x: number; z: number } | null }));
 vi.mock('../../shared/movement/simulation.ts', async (original) => {
   const real = await original<typeof import('../../shared/movement/simulation.ts')>();
@@ -17,7 +17,7 @@ vi.mock('../../shared/movement/simulation.ts', async (original) => {
   };
 });
 
-it('S4: a non-finite position is reported and the player returns to safe support without affecting others', async () => {
+it('a non-finite position is reported and the player returns to safe support without affecting others', async () => {
   const loaded = await loadWorld(await makeWorld([npc('guide', -4, 0)]));
   const reported: { name: string; fields: Record<string, unknown> }[] = [];
   const world = new World(loaded.maps, loaded.npcs, undefined, { invariant: (name, fields) => reported.push({ name, fields }) });

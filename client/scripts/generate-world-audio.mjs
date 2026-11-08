@@ -1,4 +1,4 @@
-// Original procedural sound designs for NEXT-015. No recordings, samples, speech, or remote inputs.
+// Original procedural sound designs. No recordings, samples, speech, or remote inputs.
 // Run from any directory: node client/scripts/generate-world-audio.mjs
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';

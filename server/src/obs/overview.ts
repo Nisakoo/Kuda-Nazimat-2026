@@ -26,18 +26,18 @@ export interface OverviewDeps {
   readonly stepMs?: number;
 }
 
-/** A seated player as the admin sees it: presence (OFFLINE-010, OBS-010) plus the last client report (OBS-011). */
+/** A seated player as the admin sees it: presence plus the last client report. */
 export type PlayerStatus = PlayerPresence & PerfView;
 
 const MINUTE_FRAMES = 6;
-/** Upper bound of the history response (OBS-014 ≤ 256 KiB): longer buffers are merged into wider points. */
+/** Upper bound of the history response (≤ 256 KiB): longer buffers are merged into wider points. */
 const MAX_POINTS = 480;
 /** Infinity (only the overflow bucket) cannot be JSON; the page shows «выше шкалы». */
 const out = (value: number | null): number | string | null => (value === Infinity ? 'inf' : value);
 
 /**
- * OBS-013–015 runtime: samples the history every 10 s, writes `metrics.minute`, and answers the admin
- * screen (status groups and history series) and the report printed at shutdown (OBS-017).
+ * Metrics runtime: samples the history every 10 s, writes `metrics.minute`, and answers the admin
+ * screen (status groups and history series) and the report printed at shutdown.
  */
 export function createOverview(deps: OverviewDeps) {
   const now = deps.now ?? Date.now;
@@ -61,7 +61,7 @@ export function createOverview(deps: OverviewDeps) {
   };
   const timer = setInterval(sample, deps.stepMs ?? HISTORY_STEP_MS); timer.unref();
 
-  /** Median FPS of the last minute per player (OBS-010), falling back to the current report. */
+  /** Median FPS of the last minute per player, falling back to the current report. */
   const minuteFps = (player: PlayerStatus): number | null => {
     const values = history.window(60_000).flatMap((f) => f.players.filter((p) => p.playerId === player.playerId && p.fps !== null).map((p) => p.fps!));
     return values.length ? median(values) : player.fps;
@@ -78,7 +78,7 @@ export function createOverview(deps: OverviewDeps) {
     });
   }
 
-  /** OBS-014 groups for the tiles and cards of «Обзор», «Сервер», «Клиенты». */
+  /** Status groups for the tiles and cards of «Обзор», «Сервер», «Клиенты». */
   function status(): Record<string, unknown> {
     const list = players();
     const w5 = summarize(history.window(5 * 60_000)); const w60 = summarize(history.window(60 * 60_000));
@@ -113,7 +113,7 @@ export function createOverview(deps: OverviewDeps) {
     };
   }
 
-  /** OBS-014 series over the whole buffer; points are merged when the buffer is longer than MAX_POINTS. */
+  /** History series over the whole buffer; points are merged when the buffer is longer than MAX_POINTS. */
   function series(): Record<string, unknown> {
     const frames = history.frames();
     const group = Math.max(1, Math.ceil(frames.length / MAX_POINTS));
@@ -150,10 +150,10 @@ export function createOverview(deps: OverviewDeps) {
     health,
     status,
     series,
-    /** Last 10 minutes of frames for incident dumps (OBS-004). */
+    /** Last 10 minutes of frames for incident dumps. */
     recent: () => history.window(10 * 60_000).map(frameToJson),
     approxBytes: () => history.approxBytes(),
-    /** OBS-017 table for this run, printed at a clean shutdown. */
+    /** Acceptance table for this run, printed at a clean shutdown. */
     report: (): string => {
       history.sample();
       const summary = summarize(history.frames());

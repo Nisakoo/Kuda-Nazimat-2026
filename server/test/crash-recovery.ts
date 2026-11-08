@@ -1,4 +1,4 @@
-/** STORE S3: real process SIGKILL between default 10-second saves; run explicitly on Node 24. */
+/** Real process SIGKILL between default 10-second saves; run explicitly on Node 24. */
 import assert from 'node:assert/strict';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { once } from 'node:events';

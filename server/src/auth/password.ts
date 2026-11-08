@@ -1,6 +1,6 @@
 import { randomBytes, randomInt, scrypt, timingSafeEqual } from 'node:crypto';
 
-/** AUTH-008 parameters; stored with every hash so they can be raised later without a migration. */
+/** Scrypt parameters; stored with every hash so they can be raised later without a migration. */
 export const SCRYPT = { N: 2 ** 15, r: 8, p: 1, keyLength: 32, saltLength: 16 } as const;
 const MAX_MEMORY = 128 * SCRYPT.N * SCRYPT.r * 2;
 
@@ -8,7 +8,7 @@ export class HashQueueFullError extends Error {}
 
 /**
  * At most `concurrency` scrypt computations run at once (they occupy libuv threads, not the game loop);
- * a computation that cannot start within `waitMs` fails instead of piling up (AUTH-008).
+ * a computation that cannot start within `waitMs` fails instead of piling up.
  */
 export class PasswordHasher {
   private active = 0;
@@ -60,7 +60,7 @@ function parse(stored: string): { N: number; r: number; p: number; salt: Buffer;
   return { N: N!, r: r!, p: p!, salt: Buffer.from(parts[4]!, 'base64url'), key: Buffer.from(parts[5]!, 'base64url') };
 }
 
-/** AUTH-007: 6–128 characters after NFC, no control characters, not the name itself. Returns an error text or the normalized password. */
+/** 6–128 characters after NFC, no control characters, not the name itself. Returns an error text or the normalized password. */
 export function checkPassword(raw: unknown, name: string): { ok: true; password: string } | { ok: false; message: string } {
   if (typeof raw !== 'string') return { ok: false, message: 'Введите пароль.' };
   const password = raw.normalize('NFC');
@@ -71,6 +71,6 @@ export function checkPassword(raw: unknown, name: string): { ok: true; password:
   return { ok: true, password };
 }
 
-/** AUTH-010: 10 characters without look-alikes (0/O, 1/l/I). */
+/** 10 characters without look-alikes (0/O, 1/l/I). */
 const ALPHABET = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export function temporaryPassword(): string { return Array.from({ length: 10 }, () => ALPHABET[randomInt(ALPHABET.length)]).join(''); }

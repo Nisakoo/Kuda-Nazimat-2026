@@ -16,7 +16,7 @@ export function createNpcDialogueService(deps: { responder: NpcResponder; dialog
   const logger = deps.logger.child('npc');
   const firstPartial = (deps.metrics ?? new MetricsRegistry()).histogram('npc_first_partial_ms', 'Время от приёма вопроса до первого временного текста', MS_BUCKETS);
   const queue = createGenerationQueue({ ...deps, onIdle: scheduleRecovery }, config);
-  /** ADMIN-SRV-005: unfinished game-channel questions per NPC, so a withdrawn NPC can cancel them. */
+  /** Unfinished game-channel questions per NPC, so a withdrawn NPC can cancel them. */
   const inflight = new Map<string, Set<{ connectionId: string; requestId: string }>>();
   let available = false, stopped = false;
   let starting: Promise<void> | undefined;

@@ -1,10 +1,10 @@
 import type { PlayerPresence } from '../contracts.ts';
 import { THRESHOLDS as T } from './thresholds.ts';
 
-/** A seated player with the per-minute values OBS-010 judges; FPS is null without a fresh visible report. */
+/** A seated player with the per-minute values the health rules judge; FPS is null without a fresh visible report. */
 export type HealthPlayer = Pick<PlayerPresence, 'name' | 'reconnects' | 'rttMs'> & { readonly fps?: number | null };
 
-/** OBS-010 inputs, taken from the history windows (OBS-013); every value may be missing early after start. */
+/** Health rule inputs, taken from the history windows; every value may be missing early after start. */
 export interface HealthInputs {
   readonly tickP95Ms: number | null; readonly broadcastP95Ms: number | null; readonly eventLoopP99Ms: number | null;
   readonly npcReady: boolean; readonly languageReady: boolean;
@@ -20,7 +20,7 @@ export interface Health { readonly level: HealthLevel; readonly reasons: readonl
 const GB = 1024 ** 3;
 const ms = (value: number): string => (value === Infinity ? 'выше шкалы' : `${Math.round(value * 10) / 10} мс`);
 
-/** Pure rules of OBS-010; thresholds come from the shared table and are tuned after OFFLINE-017 measurements. */
+/** Pure health rules; thresholds come from the shared table and are tuned after load measurements. */
 export function evaluateHealth(input: HealthInputs): Health {
   const reasons: { level: 'yellow' | 'red'; text: string }[] = [];
   const add = (level: 'yellow' | 'red', text: string) => reasons.push({ level, text });

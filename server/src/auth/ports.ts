@@ -2,20 +2,20 @@ import type { PlayerIdentity } from '../contracts.ts';
 
 export interface AccountRecord {
   readonly identity: PlayerIdentity;
-  /** `scrypt$…` (AUTH-008) or null for a passwordless development/test account. */
+  /** `scrypt$…` or null for a passwordless development/test account. */
   readonly passwordHash: string | null;
   readonly mustChangePassword: boolean;
   readonly tempPasswordExpiresAt: number | null;
   readonly lastLoginAt: number | null;
-  /** AUTH-017. */
+  /** Role of the account (player or administrator). */
   readonly role: AccountRole;
 }
 export type AccountRole = 'player' | 'admin';
-/** AUTH-018: a game session never opens the admin API and vice versa. */
+/** A game session never opens the admin API and vice versa. */
 export type SessionScope = 'game' | 'admin';
 export interface AccountStore {
   requiresAvatar?(accountId: string): boolean;
-  /** Passwordless login (AUTH-001 guest/dev): one name key — one account and player. */
+  /** Passwordless login (guest/dev): one name key — one account and player. */
   findOrCreate(name: string, nameKey: string, now: number): PlayerIdentity;
   find(nameKey: string): AccountRecord | null;
   /** Throws NameTakenError when the key exists. */
@@ -28,7 +28,7 @@ export class NameTakenError extends Error {}
 
 export interface StoredSession {
   readonly tokenHash: string; readonly accountId: string; readonly createdAt: number; readonly expiresAt: number;
-  /** Public id for logs and the operator (AUTH-002); generated when omitted. */
+  /** Public id for logs and the operator; generated when omitted. */
   readonly id?: string; readonly ip?: string;
   /** `game` when omitted. */
   readonly scope?: SessionScope;

@@ -26,9 +26,9 @@ export interface GatewayDeps {
   readonly logger: Logger;
   readonly metrics?: Metrics;
   readonly corsOrigins: readonly string[];
-  /** Engine.IO heartbeat; also the RTT sample period (OBS-010). Default 25 s as in Socket.IO. */
+  /** Engine.IO heartbeat; also the RTT sample period. Default 25 s as in Socket.IO. */
   readonly pingIntervalMs?: number;
-  /** OBS-005: every outgoing packet passes parseServerMessage (development). */
+  /** Every outgoing packet passes parseServerMessage (development). */
   readonly validateOutgoing?: boolean;
 }
 
@@ -42,7 +42,7 @@ const MAX_TIMER_MS = 2_147_000_000;
 const MAX_CONTROL_IDS = 4096;
 const MAX_OUTBOUND_PACKETS = 32;
 const MAX_OUTBOUND_BYTES = 1024 * 1024;
-/** PROTO-007: npc-partial at most 10 times per second per question. */
+/** Npc-partial at most 10 times per second per question. */
 const PARTIAL_INTERVAL_MS = 100;
 
 class HandshakeError extends Error {
@@ -50,7 +50,7 @@ class HandshakeError extends Error {
   constructor(code: ErrorCode, message: string) { super(message); this.data = { code, message }; }
 }
 
-/** REALTIME-001…009: Socket.IO namespace /game speaking PROTO v3. Thin: parse → service → serialize. */
+/** Socket.IO namespace /game speaking PROTO v3. Thin: parse → service → serialize. */
 export function attachGateway(server: HttpServer, deps: GatewayDeps): { close(): Promise<void> } {
   const io = new Server(server, {
     path: '/socket.io',
@@ -107,7 +107,7 @@ class Connection implements Channel {
   private readonly log: Logger;
   private readonly identity: PlayerIdentity;
   private readonly expiresAt: number;
-  /** Device address for operational logs (OFFLINE-016). */
+  /** Device address for operational logs. */
   private readonly ip: string;
   private readonly usedRequestIds = new Set<string>();
   private readonly inputBucket: TokenBucket;
@@ -123,7 +123,7 @@ class Connection implements Channel {
   private closed = false;
   private workCancelled = false;
   private readonly metrics: GatewayMetrics;
-  /** Heartbeat RTT samples of the last minute (OBS-010). */
+  /** Heartbeat RTT samples of the last minute. */
   private rtt: { at: number; ms: number }[] = [];
   private pingAt = 0;
   private droppedInputs = 0;
@@ -354,7 +354,7 @@ class Connection implements Channel {
     }
   }
 
-  /** NPC-001: target and distance are checked here; queueing and answering belong to NpcQuestions. */
+  /** Target and distance are checked here; queueing and answering belong to NpcQuestions. */
   private ask(requestId: string, targetId: string, question: string, stream: boolean): void {
     const target = this.deps.game.interact(this, targetId);
     if (!target.ok) { this.error(requestId, 'FORBIDDEN', target.reason === 'too-far' ? 'Подойдите ближе.' : 'Собеседник недоступен.'); return; }
@@ -382,7 +382,7 @@ class Connection implements Channel {
   private deliver(requestId: string, targetId: string, answer: NpcAnswer): void {
     this.endStream(requestId);
     if (!this.npcAccess(targetId)) {
-      // ADMIN-SRV-005: the administrator withdrew the NPC; the player still waits for this answer.
+      // The administrator withdrew the NPC; the player still waits for this answer.
       if (!this.closed && this.deps.game.hasNpc?.(targetId) === false && this.deps.game.isControlling(this) && this.deps.sessions.isActive?.(this.sessionId, this.identity.playerId) === true) this.error(requestId, 'UNAVAILABLE', 'Собеседник сейчас недоступен.');
       return;
     }

@@ -18,7 +18,7 @@ function setup() {
   session.connect({ kind: 'mock' }); clock.advance(100);
   return { clock, adapter, session, sent, notices };
 }
-it('PROTO-007: accepts only increasing whole snapshots and makes the final answer authoritative', () => {
+it('accepts only increasing whole snapshots and makes the final answer authoritative', () => {
   const s = setup();
   const requestId = s.session.askNpc('guide', 'Вопрос', true)!;
   s.clock.advance(50);
@@ -37,7 +37,7 @@ it('PROTO-007: accepts only increasing whole snapshots and makes the final answe
   expect(s.notices.mock.calls.filter(([notice]) => notice.type === 'npc-partial')).toHaveLength(1);
   s.session.dispose(); expect(s.clock.pending).toBe(0);
 });
-it('PROTO-007: cancels one question without replay, ignores late messages and bounds a silent stream', () => {
+it('cancels one question without replay, ignores late messages and bounds a silent stream', () => {
   const s = setup();
   const requestId = s.session.askNpc('guide', 'First', true)!;
   expect(s.session.askNpc('guide', 'Overlapping', true)).toBeNull();
@@ -56,7 +56,7 @@ it('PROTO-007: cancels one question without replay, ignores late messages and bo
   expect(s.sent.filter(message => message.type === 'npc-question' && message.text === 'Third')).toHaveLength(1);
   s.session.dispose(); expect(s.clock.pending).toBe(0);
 });
-it('MOVE-012: sends a diagonal intention when its tangent is ready', () => {
+it('sends a diagonal intention when its tangent is ready', () => {
   const s = setup();
   s.session.setMovementGuard(position => position.x <= 0);
   s.session.send({ type: 'move', direction: { x: 1, z: 1 } });

@@ -52,7 +52,7 @@ it('resolves live positions by stable playerId without account or persisted-posi
   world.remove('p'); expect(game.playerLocation('p')).toBeNull();
 });
 
-describe('world loading (SERVER-WORLD-002)', () => {
+describe('world loading', () => {
   it('validates sizes and indexes chunk, collision, model and manifest files', () => {
     expect(loaded.maps.get('test')!.bootstrap.manifestUrl).toBe('maps/test/manifest.json');
     expect(loaded.files.get('maps/test/chunks/0_0.json')?.uses[0]?.kind).toBe('chunk');
@@ -60,7 +60,7 @@ describe('world loading (SERVER-WORLD-002)', () => {
   });
 });
 
-describe('authoritative movement (REALTIME-003)', () => {
+describe('authoritative movement', () => {
   it('stops at a wall instead of passing through it', () => {
     const world = fresh();
     walk(world, { x: 1, z: 0 }, 4);
@@ -102,7 +102,7 @@ describe('authoritative movement (REALTIME-003)', () => {
   });
 });
 
-describe('AOI stream (PROTO-008 §3)', () => {
+describe('AOI stream', () => {
   it('sends whole changed entities, removals, and nothing when idle', () => {
     const stream = new AoiStream();
     const a = { id: 'a', transform: { position: { x: 0, y: 0, z: 0 }, rotationY: 0 }, character: { kind: 'player' as const, name: 'A' } };
@@ -114,7 +114,7 @@ describe('AOI stream (PROTO-008 §3)', () => {
   });
 });
 
-describe('spawn placement (REALTIME-010 / S8)', () => {
+describe('spawn placement', () => {
   it('spreads new players around spawn and moves a saved position away from an occupant', () => {
     const world = new World(loaded.maps, loaded.npcs);
     const saved = new Map<string, SavedPosition>();

@@ -4,7 +4,7 @@ import { levelRank, type Level, type LogRecord, type LogSink } from '../common/l
 
 const HEAD = new Set(['ts', 'seq', 'runId', 'level', 'module', 'event', 'msg']);
 
-/** Human-readable line for the operator's console; not an interface (OBS-002). */
+/** Human-readable line for the operator's console; not an interface. */
 export function consoleSink(minLevel: Level, write: (line: string) => void = (line) => process.stdout.write(`${line}\n`)): LogSink {
   return (record) => {
     if (levelRank(record.level) < levelRank(minLevel)) return;
@@ -27,7 +27,7 @@ export interface FileSinkOptions {
 }
 
 /**
- * JSONL file with size rotation, total size and age limits (OBS-002). Lines are buffered and appended
+ * JSONL file with size rotation, total size and age limits. Lines are buffered and appended
  * in batches; error/fatal flush immediately. Overflow and write failures drop lines and are counted.
  */
 export class FileSink {

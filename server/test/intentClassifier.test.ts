@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { classifyPlayerIntent, transitionAttitude } from '../src/npc/intentClassifier.ts';
 
-describe('NPC intent classification & attitude transitions (NPC-AI-007, NPC-AI-008)', () => {
+describe('NPC intent classification & attitude transitions', () => {
   describe('classifyPlayerIntent', () => {
     it('detects direct insults in Russian, English and Spanish', () => {
       expect(classifyPlayerIntent('ты дурак!')).toBe('insult');
@@ -15,20 +15,20 @@ describe('NPC intent classification & attitude transitions (NPC-AI-007, NPC-AI-0
       expect(classifyPlayerIntent('cállate')).toBe('insult');
     });
 
-    it('does NOT treat quotes as insults (S5 · NPC-AI-009)', () => {
+    it('does NOT treat quotes as insults', () => {
       expect(classifyPlayerIntent('Он сказал «ты дурак»')).toBe('neutral');
       expect(classifyPlayerIntent('He said "you are stupid"')).toBe('neutral');
       expect(classifyPlayerIntent("someone said 'you idiot'")).toBe('neutral');
     });
 
-    it('does NOT treat vocabulary inquiries as insults (S5 · NPC-AI-009)', () => {
+    it('does NOT treat vocabulary inquiries as insults', () => {
       expect(classifyPlayerIntent('что значит дурак?')).toBe('neutral');
       expect(classifyPlayerIntent('что такое идиот?')).toBe('neutral');
       expect(classifyPlayerIntent('what does idiot mean?')).toBe('neutral');
       expect(classifyPlayerIntent('qué significa tonto?')).toBe('neutral');
     });
 
-    it('does NOT treat third-party insults as insults to NPC (S5 · NPC-AI-009)', () => {
+    it('does NOT treat third-party insults as insults to NPC', () => {
       expect(classifyPlayerIntent('царь дурак')).toBe('neutral');
       expect(classifyPlayerIntent('стражник идиот')).toBe('neutral');
       expect(classifyPlayerIntent('the king is bad and stupid')).toBe('neutral');
@@ -64,15 +64,15 @@ describe('NPC intent classification & attitude transitions (NPC-AI-007, NPC-AI-0
       expect(transitionAttitude('friendly', 'insult')).toBe('displeased');
     });
 
-    it('repeated insult in displeased stays displeased without escalating (NPC-AI-008)', () => {
+    it('repeated insult in displeased stays displeased without escalating', () => {
       expect(transitionAttitude('displeased', 'insult')).toBe('displeased');
     });
 
-    it('apology in displeased returns to ordinary (NPC-AI-008)', () => {
+    it('apology in displeased returns to ordinary', () => {
       expect(transitionAttitude('displeased', 'apology')).toBe('ordinary');
     });
 
-    it('repeated apology in ordinary does NOT grant friendly (NPC-AI-008)', () => {
+    it('repeated apology in ordinary does NOT grant friendly', () => {
       expect(transitionAttitude('ordinary', 'apology')).toBe('ordinary');
     });
 
@@ -80,7 +80,7 @@ describe('NPC intent classification & attitude transitions (NPC-AI-007, NPC-AI-0
       expect(transitionAttitude('friendly', 'apology')).toBe('friendly');
     });
 
-    it('server-confirmed help transitions ordinary to friendly (S6)', () => {
+    it('server-confirmed help transitions ordinary to friendly', () => {
       expect(transitionAttitude('ordinary', 'help_confirmed')).toBe('friendly');
     });
 

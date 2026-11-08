@@ -26,7 +26,7 @@ import { bearer, body, clientIp, error, json, type RequestContext } from './util
 
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
 const BABEL_STATUS = { INVALID: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, CONFLICT: 409, NOT_READY: 409, RATE_LIMIT: 429, UNAVAILABLE: 503 } as const;
-/** Routes logged at debug: high-volume polling and static files (OBS-012). */
+/** Routes logged at debug: high-volume polling and static files. */
 const QUIET = new Set(['/world/*', 'static', '/api/operator/status', '/api/operator/history', '/api/admin/status', '/api/admin/history', '/api/babylon:state']);
 
 export interface HttpDeps {
@@ -37,16 +37,16 @@ export interface HttpDeps {
   readonly babylon?: BabylonService; cancelBabylon?(connectionId: string): void;
   /** Operator screen pieces that live outside HTTP (health, recorder); absent in tests that do not need them. */
   readonly operator?: Pick<OperatorDeps, 'languageReady' | 'health' | 'warnings' | 'dump' | 'overview' | 'version'> & Partial<Pick<OperatorDeps, 'content'>>;
-  /** OBS-011 perf reports for the admin screen. */
+  /** Client perf reports for the admin screen. */
   readonly clientPerf?: (playerId: string, report: PerfReport) => void;
-  /** TLS-003: the server certificate; every route is served with it (TLS-007). */
+  /** The server certificate; every route is served with it. */
   readonly certificate: ServerCertificate;
-  /** Current addresses the certificate does not cover, evaluated on demand (TLS-004). */
+  /** Current addresses the certificate does not cover, evaluated on demand. */
   readonly uncoveredNames?: () => readonly string[];
 }
 
 /**
- * TLS-012: the reason a handshake failed, from the OpenSSL code Node reports. A reset before the handshake ends is
+ * The reason a handshake failed, from the OpenSSL code Node reports. A reset before the handshake ends is
  * what Node-like clients do after rejecting the certificate (browsers send an alert), so it counts as untrusted.
  */
 export function handshakeFailure(code: string | undefined): 'untrusted' | 'protocol' | 'other' {
@@ -56,7 +56,7 @@ export function handshakeFailure(code: string | undefined): 'untrusted' | 'proto
 }
 const UNTRUSTED_KEEP = 20;
 
-/** AUTH-014: per-session token buckets; the map is cleared when it grows past any realistic session count. */
+/** Per-session token buckets; the map is cleared when it grows past any realistic session count. */
 function sessionLimiter(clock: Clock, rate: number, burst: number) {
   const buckets = new Map<string, TokenBucket>();
   return (key: string): boolean => {
@@ -77,7 +77,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
   const babylonLimit = sessionLimiter(deps.clock, 10, 20);
   const worldLimit = sessionLimiter(deps.clock, 50, 300);
   const tlsFailures = metrics.counter('tls_handshake_failures_total', 'Неудачные TLS-рукопожатия по причине');
-  /** TLS-012: devices that rejected the certificate, newest last, one entry per IP. */
+  /** Devices that rejected the certificate, newest last, one entry per IP. */
   const untrusted = new Map<string, { ts: number; reason: string }>();
   const certNames = new Set(deps.certificate.info.names);
   const adminBuckets = new Map<string, TokenBucket>();
@@ -142,7 +142,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
     const access = deps.game.worldFile(path.slice('/world/'.length), session.identity.accountId);
     let data: Buffer | undefined;
     let failed = false;
-    // SERVER-WORLD-005: a vanished or unreadable allowlisted file is a server error, reported without the disk path.
+    // A vanished or unreadable allowlisted file is a server error, reported without the disk path.
     if (access.ok) { try { data = await readFile(access.file.absolutePath); } catch (cause) { failed = true; log.error('world.file.read_failed', 'Файл мира не прочитан', { path, error: cause }); } }
     const status = data ? 200 : failed ? 500 : 404;
     if (data) worldBytes.inc({}, data.byteLength);
@@ -162,7 +162,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
     return url.host;
   }
 
-  /** TLS-010: `/setup` and `/server.crt` look the same over HTTP and HTTPS. True when handled. */
+  /** `/setup` and `/server.crt` look the same over HTTP and HTTPS. True when handled. */
   function setupRoutes(req: IncomingMessage, res: ServerResponse, path: string, context: RequestContext): boolean {
     if (path !== '/setup' && path !== '/server.crt') return false;
     context.route = path;
@@ -175,7 +175,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
     return true;
   }
 
-  /** TLS-008: the only things served without TLS. Nothing else is read, so no password or token is processed. */
+  /** The only things served without TLS. Nothing else is read, so no password or token is processed. */
   function plain(req: IncomingMessage, res: ServerResponse, context: RequestContext): void {
     let path: string;
     try { path = decodeURIComponent((req.url ?? '/').split('?')[0]!); } catch { path = ''; }
@@ -305,7 +305,7 @@ export function createHttpServer(config: Config, deps: HttpDeps) {
     const now = deps.clock.now();
     if (now - lastFailureLog >= 10_000) { lastFailureLog = now; log.warn('tls.handshake.failed', 'TLS-рукопожатие не удалось', { reason, ip: address, code: (cause as NodeJS.ErrnoException).code }); }
   });
-  /** `server` is the listening socket (address, close); `secure` carries HTTPS and Socket.IO (TLS-007). */
+  /** `server` is the listening socket (address, close); `secure` carries HTTPS and Socket.IO. */
   const server = Object.assign(transport.listener, { closeAllConnections: () => transport.closeAllConnections() });
   return { server, secure: transport.secure, rejectNewRequests() { stopping = true; } };
 }

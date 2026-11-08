@@ -18,7 +18,7 @@ function service(options: { passwordless?: boolean; maxSessions?: number } = {})
 }
 const code = async (promise: Promise<unknown>) => { try { await promise; return 'ok'; } catch (error) { return error instanceof AuthError ? error.code : String(error); } };
 
-describe('passwords (AUTH-007, 008)', () => {
+describe('passwords', () => {
   it('checks length, control characters and the name; temporary passwords avoid look-alikes', () => {
     expect(checkPassword('12345', 'Аня').ok).toBe(false);
     expect(checkPassword('аня', 'Аня').ok).toBe(false);
@@ -48,8 +48,8 @@ describe('passwords (AUTH-007, 008)', () => {
   });
 });
 
-describe('AuthService (AUTH-001–016)', () => {
-  it('S5: registers with a password, refuses a taken name and answers unknown names like wrong passwords', async () => {
+describe('AuthService', () => {
+  it('registers with a password, refuses a taken name and answers unknown names like wrong passwords', async () => {
     const { auth, stores, logger } = service();
     const session = await auth.register('Аня', 'секрет12', '10.0.0.1');
     expect(Object.keys(session)).toEqual(['token', 'expiresAt']);
@@ -65,7 +65,7 @@ describe('AuthService (AUTH-001–016)', () => {
     expect(logger.records.map((r) => r.event)).toEqual(expect.arrayContaining(['auth.register', 'auth.login', 'auth.login.failed']));
   });
 
-  it('AUTH-001/016: production refuses passwordless login; development offers guest and dev; a password account needs its password', async () => {
+  it('production refuses passwordless login; development offers guest and dev; a password account needs its password', async () => {
     const prod = service({ passwordless: false });
     expect(prod.auth.mode()).toEqual({ password: true, guest: false, dev: false });
     expect(await code(prod.auth.guest('Аня'))).toBe('DISABLED'); expect(await code(prod.auth.dev(undefined))).toBe('DISABLED');
@@ -79,7 +79,7 @@ describe('AuthService (AUTH-001–016)', () => {
     expect(await code(dev.auth.dev('Вера'))).toBe('PASSWORD_REQUIRED');
   });
 
-  it('S7: five failures lock the name even for the right password, other names still work, unlock lifts it', async () => {
+  it('five failures lock the name even for the right password, other names still work, unlock lifts it', async () => {
     const { auth, logger, advance } = service();
     await auth.register('Аня', 'секрет12', '10.0.0.2'); await auth.register('Борис', 'секрет34', '10.0.0.3');
     for (let i = 0; i < 5; i++) expect(await code(auth.login('Аня', 'неверно12', '10.0.0.4'))).toBe('CREDENTIALS');
@@ -97,14 +97,14 @@ describe('AuthService (AUTH-001–016)', () => {
     expect(((await auth.login('Аня', 'секрет12').catch((e: AuthError) => e)) as AuthError).retryAfterSeconds).toBeGreaterThan(3000);
   });
 
-  it('AUTH-013: per-IP requests are limited across names', async () => {
+  it('per-IP requests are limited across names', async () => {
     const { auth } = service({ passwordless: true });
     for (let i = 0; i < 30; i++) expect(await code(auth.guest(`Игрок${i}`, '10.9.9.9'))).toBe('ok');
     expect(await code(auth.guest('Лишний', '10.9.9.9'))).toBe('RATE_LIMIT');
     expect(await code(auth.guest('Другой', '10.9.9.8'))).toBe('ok');
   });
 
-  it('S8: a temporary password forces a change, then only the new password works and the temporary one expires', async () => {
+  it('a temporary password forces a change, then only the new password works and the temporary one expires', async () => {
     const { auth, revoked, advance } = service();
     const first = await auth.register('Вера', 'секрет12');
     const reset = await auth.operator.resetPassword('вера');
@@ -120,7 +120,7 @@ describe('AuthService (AUTH-001–016)', () => {
     expect(await code(auth.operator.resetPassword('Никто'))).toBe('INVALID');
   });
 
-  it('AUTH-009/012: logout and password change revoke; logout is idempotent and silent for unknown tokens', async () => {
+  it('logout and password change revoke; logout is idempotent and silent for unknown tokens', async () => {
     const { auth, revoked } = service();
     const a = await auth.register('Аня', 'секрет12'); const b = await auth.login('Аня', 'секрет12');
     auth.logout(a.token); auth.logout(a.token); auth.logout('garbage'); auth.logout('x'.repeat(43));
@@ -132,7 +132,7 @@ describe('AuthService (AUTH-001–016)', () => {
     expect(auth.operator.revoke('аня')).toBe(1); expect((await auth.verify(c.token)).ok).toBe(false);
   });
 
-  it('AUTH-002: at most maxSessions active sessions, the oldest is revoked with reason limit', async () => {
+  it('at most maxSessions active sessions, the oldest is revoked with reason limit', async () => {
     const { auth, revoked } = service({ maxSessions: 2 });
     const sessions = [await auth.register('Аня', 'секрет12')];
     for (let i = 0; i < 2; i++) sessions.push(await auth.login('Аня', 'секрет12'));
@@ -144,7 +144,7 @@ describe('AuthService (AUTH-001–016)', () => {
   });
 });
 
-describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
+describe('HTTP and live sessions', () => {
   it('serves the auth API with exact bodies, codes and Retry-After', async () => {
     const { post, origin } = await setup({ auth: { passwordless: false } });
     expect(await (await fetch(`${origin}/api/auth/mode`)).json()).toEqual({ password: true, guest: false, dev: false });
@@ -160,7 +160,7 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     expect((await post('/api/auth/unknown', {})).status).toBe(404);
   });
 
-  it('S6/S9: logout and operator revoke close the live socket with a reason; CSRF-less actions are refused', async () => {
+  it('logout and operator revoke close the live socket with a reason; CSRF-less actions are refused', async () => {
     const { post, connect, origin, port } = await setup();
     const anya = (await post('/api/auth/dev', { name: 'Аня' })).body as { token: string };
     const client = await connect(anya.token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');
@@ -183,7 +183,7 @@ describe('HTTP and live sessions (AUTH-006, 009, 010, 012, 014)', () => {
     expect(await post('/api/auth/password', { name: 'Борис', password: reset.body!.temporaryPassword, newPassword: 'свой-пароль' })).toMatchObject({ status: 200 });
   });
 
-  it('S10: a session that floods /world/* gets 429 and stays valid', async () => {
+  it('a session that floods /world/* gets 429 and stays valid', async () => {
     const { post, connect, origin } = await setup();
     const { token } = (await post('/api/auth/dev', {})).body as { token: string };
     const client = await connect(token); client.command('join', { mapId: 'test' }); await client.wait((p) => p.type === 'joined');

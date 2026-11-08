@@ -1,17 +1,31 @@
 # Project guide
 
-Offline multiplayer 3D language-learning game. Browser clients use one LAN server for authority, auth, SQLite persistence, and local adaptive AI; solo play also works on the server laptop with Wi-Fi off.
+Offline multiplayer 3D language-learning game (stylized Babylon, up to 4 players). Browser clients (`client/`, Svelte 5 + Three.js) talk to one LAN server (`server/`, Node 24, Socket.IO, SQLite, local LLM for NPCs); `shared/` is the executable protocol contract. Solo play also works on the server laptop with Wi-Fi off. Docs are in Russian, AGENTS.md files in English.
 
-- Start: [README.md](README.md); boundaries: [architecture.md](architecture.md); requirements: `specs/`; implementation and concise verification results: `tasks/`.
-- Follow [.agents/skills/sdd/SKILL.md](.agents/skills/sdd/SKILL.md). Spec metadata separates document readiness from implementation progress.
-- Client: `client/`, TypeScript strict, Vite, Svelte 5, Three.js only, Socket.IO Client, Vitest. Core, local/online sessions, GLB streaming, bounded world cache, input/UI and mock network demo exist. Server work must not modify `client/`.
-- **Client agents, before starting work:** tell the developer about the open server handoffs — [TASK-081](tasks/081-client-perf-telemetry-handoff.md) (send FPS `perf` reports every 10 s for the admin panel), and [TASK-098](tasks/098-client-https-handoff.md) (HTTPS/WSS, https defaults for manual addresses, `/setup` hint on TLS errors), and [TASK-101](tasks/101-client-admin-content-handoff.md) (live NPC edits in ordinary deltas). Remove a handoff from this line when its task is done or declined.
-- Server: `server/`, Node 24, TypeScript strict, Socket.IO, node:sqlite, Vitest; implements PROTO v3 the client already speaks (plus server-ready NPC streaming PROTO-007). Shared executable contract: `shared/` (pure TS, no deps/DOM/Node).
-- Keep Core/domain headless, dependencies acyclic and pointing inward, adapters thin and isolated. Ports only at real boundaries; one composition root (GameApp / server `app`); no DI container, event bus or empty abstractions.
-- No runtime internet. Real game channels require auth; client world window ≤25 chunks, shared resources and 128 MiB payload guard. LocalSession/mock NPCs do not prove server or AI acceptance.
-- NPC LLM plan: specs/server-llm-runtime.md and specs/npc-llm-evaluation.md. 4 players, MLX/Ollama, one model, 1 generation by default or qualified concurrency 2; ≤4 unfinished requests total, ≤1/player. Total LLM RAM ≤4,000,000,000 bytes; profiles remain unverified.
-- Before adding NPC behavior, read [NPC authoring](docs/npc-authoring.md) and [NPC-AI](specs/npc-character-behavior.md). AUTH-scoped bounded history and the shared local BABEL bridge exist (TASK-070–072); A2 quality, full archive/compact memory, attitudes and model greetings remain incomplete. Resolve the documented gates before adding them.
-- Local AI installation: use [.agents/skills/install-local-ai/SKILL.md](.agents/skills/install-local-ai/SKILL.md). Python 3.12 dependencies use separate uv locks; runtime invokes prepared Python directly.
-- Setup: `npm --prefix client ci`, `npm --prefix server ci`. Commands: `make client`, `make client-test`, `make server` (development), `make start` (production), `make server-test`; server environment via `--env`/`APP_ENV` (SERVER-009); type/build/import/browser checks are documented in README.
-- Repository hygiene: never store generated verification artifacts (screenshots, videos, logs, raw measurements, profiler dumps, test reports or source archives) in this checkout; never recreate `tasks/evidence/`. Use OS temporary directories or an explicitly selected path outside the repository. Record commands, environment, concise results and limitations in task Markdown. Keep only required source assets and immutable test input fixtures in Git.
-- Acceptance: run `make client-test` for client changes and `make server-test` for server/shared changes, plus relevant type/build/scenario checks; record evidence and update docs/metadata. Missing configuration and unrun checks never count as passing.
+## Commands
+- Setup: `npm --prefix client ci`, `npm --prefix server ci`
+- Run: `make client` (Vite stand), `make server` (development), `make start` (production, offline)
+- Test: `make client-test`, `make server-test`; docs links: `make docs-check`
+
+## Map of zones (read the nested file before editing that zone)
+- `client/AGENTS.md` for `client/`; `client/src/render/AGENTS.md` for the renderer
+- `server/AGENTS.md` for `server/`; `server/src/npc/AGENTS.md` for NPC dialogue; `server/llm/AGENTS.md` for Python LLM workers
+- `shared/AGENTS.md` for `shared/` (the contract)
+- Agents load nested files only when they work in that directory, so open the relevant one yourself.
+
+## Docs and decisions
+- `docs/README.md` is the index: read the relevant doc before work (`docs/game/`, `docs/tech/`).
+- Check `docs/decisions/README.md` before changing anything it covers. Never edit an accepted decision; supersede it.
+- Record a new architectural decision in the same PR: MADR file if costly to reverse, crosses zones or constrains everyone; otherwise a Y-statement `D-<PR number>` in the README.
+
+## Never
+- No runtime internet: no CDN, cloud API, external fonts, telemetry or downloads at run time or in tests.
+- Do not change `client/` from server work (or `server/` from client work) without need; cross-zone changes go through `shared/`.
+- Keep Core/domain headless, dependencies acyclic and pointing inward, adapters thin, one composition root (client `GameApp`, server `app`). No DI container, event bus or empty abstractions.
+- LocalSession and mock NPCs prove neither server nor AI acceptance. Never claim a check passed without running it.
+- Never commit screenshots, videos, logs, raw measurements, profiler dumps, test reports or source archives; use OS temp dirs or a path outside the repo.
+
+## Done means
+- Tests of the touched zone pass (`make client-test` / `make server-test`, plus the zone's `check`).
+- Relevant docs, contract and decision are updated in the same PR.
+- The PR description lists commands run with results and what was NOT verified.

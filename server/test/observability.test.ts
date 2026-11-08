@@ -16,7 +16,7 @@ import { defer, setup } from './harness.ts';
 const temp = (): string => { const dir = mkdtempSync(join(tmpdir(), 'obs-')); defer(async () => rmSync(dir, { recursive: true, force: true })); return dir; };
 const lines = (file: string): Record<string, unknown>[] => readFileSync(file, 'utf8').trim().split('\n').map((line) => JSON.parse(line) as Record<string, unknown>);
 
-describe('logger and sinks (OBS-001–002)', () => {
+describe('logger and sinks', () => {
   it('writes the catalogue shape with runId, monotonic seq, bound context and serialized errors; a failing sink is contained', () => {
     const records: LogRecord[] = []; let calls = 0;
     const logger = createLogger(fanOut(() => { calls++; throw new Error('broken sink'); }, (record) => { records.push(record); }), 'run1', () => Date.UTC(2026, 10, 1));
@@ -31,7 +31,7 @@ describe('logger and sinks (OBS-001–002)', () => {
     expect(out).toHaveLength(1); expect(out[0]).toMatch(/^00:00:00\.000 ERROR \[realtime\] Ошибка \(http\.failed\)/); expect(out[0]).toContain('boom');
   });
 
-  it('S3: the file sink rotates, keeps the directory under its limit, drops old files and survives an unwritable directory', () => {
+  it('the file sink rotates, keeps the directory under its limit, drops old files and survives an unwritable directory', () => {
     const dir = temp(); let now = Date.UTC(2026, 10, 1);
     writeFileSync(join(dir, 'server-20260101-old.jsonl'), 'x\n'); utimesSync(join(dir, 'server-20260101-old.jsonl'), new Date(2026, 0, 1), new Date(2026, 0, 1));
     const sink = new FileSink({ dir, runId: 'r', minLevel: 'debug', maxFileBytes: 20_000, maxTotalBytes: 60_000, retentionMs: 14 * 86_400_000, now: () => now });
@@ -51,7 +51,7 @@ describe('logger and sinks (OBS-001–002)', () => {
     expect(reports).toContain('log.sink.failed');
   });
 
-  it('S2: an error dumps the preceding debug history and a snapshot; dumps are rate-limited unless forced', () => {
+  it('an error dumps the preceding debug history and a snapshot; dumps are rate-limited unless forced', () => {
     const dir = temp(); let now = 0;
     const recorder = new FlightRecorder({ dir, runId: 'r', capacity: 100, now: () => now, snapshot: () => ({ seats: 2 }) });
     const logger = createLogger(recorder.sink, 'r', () => now);
@@ -69,7 +69,7 @@ describe('logger and sinks (OBS-001–002)', () => {
   });
 });
 
-describe('metrics and health (OBS-007, 010)', () => {
+describe('metrics and health', () => {
   it('keeps counters, gauges and histograms with bucket counts and a JSON snapshot', () => {
     const metrics = new MetricsRegistry();
     metrics.counter('auth_attempts_total', 'Попытки').inc({ method: 'login', outcome: 'ok' }, 2);
@@ -85,7 +85,7 @@ describe('metrics and health (OBS-007, 010)', () => {
     expect(() => metrics.gauge('auth_attempts_total', 'x')).toThrow();
   });
 
-  it('applies the OBS-010 rules, including slow network and low FPS per player', () => {
+  it('applies the health rules, including slow network and low FPS per player', () => {
     const base: HealthInputs = { tickP95Ms: 1, broadcastP95Ms: 100, eventLoopP99Ms: 5, npcReady: true, languageReady: true, timeoutShare: 0, dbErrors5m: 0, logDropped5m: 0, diskFreeBytes: 10 * 1024 ** 3, players: [] };
     expect(evaluateHealth(base)).toEqual({ level: 'green', reasons: [] });
     expect(evaluateHealth({ ...base, tickP95Ms: 8, npcReady: false }).level).toBe('yellow');
@@ -100,7 +100,7 @@ describe('metrics and health (OBS-007, 010)', () => {
   });
 });
 
-describe('invariants and crashes (OBS-003, 005)', () => {
+describe('invariants and crashes', () => {
   it('an uncaught exception is logged as fatal with its stack and a dump, then the process exits with 1', () => {
     const dir = temp();
     const obs = new URL('../src/obs/index.ts', import.meta.url).href;
@@ -118,8 +118,8 @@ describe('invariants and crashes (OBS-003, 005)', () => {
   });
 });
 
-describe('end to end (OBS-006, 008, 010, 011)', () => {
-  it('S5/S6/S7/S13: no secrets or texts anywhere; status groups, history and dumps work; health explains problems', async () => {
+describe('end to end', () => {
+  it('no secrets or texts anywhere; status groups, history and dumps work; health explains problems', async () => {
     const factory = vi.spyOn(responders, 'createResponder').mockReturnValue({ async start() { throw new Error('no model'); }, async stop() {}, async answer() { throw new Error('unused'); } });
     const dir = temp(); const metrics = new MetricsRegistry(); const records: LogRecord[] = [];
     let state: () => unknown = () => null;
@@ -164,7 +164,7 @@ describe('end to end (OBS-006, 008, 010, 011)', () => {
     expect(records.map((r) => r.event)).toEqual(expect.arrayContaining(['app.start', 'auth.register', 'realtime.connect', 'realtime.join', 'game.seat.attach', 'realtime.disconnect', 'http.request', 'npc.responder.unavailable', 'app.ready']));
   });
 
-  it('S8: client reports are authenticated, validated, rate-limited per kind and logged without control characters', async () => {
+  it('client reports are authenticated, validated, rate-limited per kind and logged without control characters', async () => {
     const logger = memoryLogger();
     const { post } = await setup({}, undefined, 'test', logger);
     const { token } = (await post('/api/auth/dev', {})).body as { token: string };
@@ -181,7 +181,7 @@ describe('end to end (OBS-006, 008, 010, 011)', () => {
     expect(logger.records.find((r) => r.event === 'client.perf')).toMatchObject({ level: 'debug', fps: 58, visible: true, frameMs: 21, drawCalls: 140 });
   });
 
-  it('S10: the last visible perf report shows per player; a hidden tab does not count; no report means no data', async () => {
+  it('the last visible perf report shows per player; a hidden tab does not count; no report means no data', async () => {
     const { post, connect, origin } = await setup();
     const join = async (name: string) => {
       const { token } = (await post('/api/auth/dev', { name })).body as { token: string };

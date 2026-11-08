@@ -20,7 +20,7 @@ export class WindowLimiter {
 }
 
 /**
- * AUTH-013 per-name protection: `failures` failed attempts within `windowMs` lock the name for `lockMs`;
+ * Per-name protection: `failures` failed attempts within `windowMs` lock the name for `lockMs`;
  * a second lock within `repeatWindowMs` lasts `repeatLockMs`. Success clears the failures.
  */
 export class LoginLockout {

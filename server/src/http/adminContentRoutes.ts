@@ -44,8 +44,8 @@ function csv(entries: readonly JournalEntry[]): string {
 }
 
 /**
- * ADMIN-SRV-012: NPC, world, journal and account routes of the operator screen. The caller has already
- * checked loopback; `trusted` is the AUTH-010 CSRF guard for changes. False when the path is not ours.
+ * NPC, world, journal and account routes of the operator screen. The caller has already
+ * checked loopback; `trusted` is the CSRF guard for changes. False when the path is not ours.
  */
 export async function handleAdminContent(req: IncomingMessage, res: ServerResponse, path: string, admin: ContentAdmin, trusted: () => boolean, logger: Logger, context: RequestContext, actor?: Who): Promise<boolean> {
   const method = req.method ?? 'GET';

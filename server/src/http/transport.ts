@@ -6,9 +6,9 @@ export interface Credentials { readonly cert: string; readonly key: string }
 export interface Transport {
   /** The listening socket on host:port; `address()` and `close()` refer to it. */
   readonly listener: Listener;
-  /** Everything the game serves, including Socket.IO (TLS-007). */
+  /** Everything the game serves, including Socket.IO. */
   readonly secure: SecureServer;
-  /** Only the trust page, the certificate, health and redirects (TLS-008). */
+  /** Only the trust page, the certificate, health and redirects. */
   readonly plain: PlainServer;
   closeAllConnections(): void;
 }
@@ -17,7 +17,7 @@ const TLS_HANDSHAKE = 0x16;
 /** A connection that sends nothing is dropped; the HTTP servers apply their own request timeouts afterwards. */
 const FIRST_BYTE_TIMEOUT_MS = 10_000;
 
-/** TLS-007, 008: one port for both protocols; the first byte tells a TLS ClientHello from plain HTTP. */
+/** One port for both protocols; the first byte tells a TLS ClientHello from plain HTTP. */
 export function createTransport(credentials: Credentials, secureHandler: RequestListener, plainHandler: RequestListener, onTlsError: (error: Error, address: string | undefined) => void): Transport {
   const secure = createSecureServer({ ...credentials, minVersion: 'TLSv1.2', ALPNProtocols: ['http/1.1'], handshakeTimeout: FIRST_BYTE_TIMEOUT_MS }, secureHandler);
   const plain = createPlainServer(plainHandler);

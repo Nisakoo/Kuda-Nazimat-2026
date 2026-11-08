@@ -1,5 +1,5 @@
 /**
- * TASK-043: original, reproducible avatar sculpture. No imported art or textures.
+ * Original, reproducible avatar sculpture. No imported art or textures.
  * Metres, +Y up, +Z face forward, origin on the ground between the feet.
  * Public builder: createAvatarModel(id) -> { root, animations }. It is browser-safe.
  * CLI: node scripts/generate-avatar-models.mjs [--portraits]

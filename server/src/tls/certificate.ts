@@ -2,7 +2,7 @@ import { X509Certificate, createHash, createPrivateKey, generateKeyPairSync, ran
 import { isIP } from 'node:net';
 import { bitString, boolean, explicit, integer, octetString, oid, sequence, set, time, tlv, utf8String } from './der.ts';
 
-/** TLS-003: Apple accepts at most 825 days for a TLS server certificate, even a locally trusted one. */
+/** Apple accepts at most 825 days for a TLS server certificate, even a locally trusted one. */
 export const VALIDITY_DAYS = 825;
 /** Clock skew between the server and player laptops must not make a fresh certificate "not yet valid". */
 const BACKDATE_MS = 3600_000;
@@ -41,7 +41,7 @@ function alternativeName(name: string): Buffer {
   return isIP(name) ? tlv(0x87, ipBytes(name)) : tlv(0x82, Buffer.from(name, 'ascii'));
 }
 
-/** TLS-001, 003, 006: a self-signed ECDSA P-256 server certificate built with node:crypto only. */
+/** A self-signed ECDSA P-256 server certificate built with node:crypto only. */
 export function issueCertificate(request: CertificateRequest): IssuedCertificate {
   if (!request.names.length) throw new Error('Сертификату нужно хотя бы одно имя');
   const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
@@ -80,7 +80,7 @@ export function issueCertificate(request: CertificateRequest): IssuedCertificate
 }
 
 export interface CertificateInfo {
-  /** SHA-256 of the DER certificate, "AB12 CD34 …" for comparing by eye (TLS-011). */
+  /** SHA-256 of the DER certificate, "AB12 CD34 …" for comparing by eye. */
   readonly fingerprint: string;
   /** SHA-1 as well: Windows shows only this one in its trust prompt. */
   readonly fingerprintSha1: string;
@@ -89,7 +89,7 @@ export interface CertificateInfo {
   readonly names: readonly string[];
 }
 
-/** Reads back a certificate and checks it matches the key and its own signature (TLS-005, 009). */
+/** Reads back a certificate and checks it matches the key and its own signature. */
 export function describeCertificate(cert: string, key?: string): CertificateInfo {
   const x509 = new X509Certificate(cert);
   if (!x509.verify(x509.publicKey)) throw new Error('Подпись сертификата не сходится');

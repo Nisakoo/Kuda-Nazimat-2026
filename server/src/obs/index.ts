@@ -10,14 +10,14 @@ export interface Observability {
   readonly logger: Logger;
   readonly metrics: MetricsRegistry;
   readonly recorder: FlightRecorder;
-  /** Last-minute process health for the operator screen (OBS-010). */
+  /** Last-minute process health for the operator screen. */
   process(): { eventLoopP99Ms: number; rssBytes: number };
   /** Extra state for incident dumps, registered by the composition root once modules exist. */
   setSnapshot(snapshot: () => unknown): void;
   close(): void;
 }
 
-/** OBS-001–004 wiring: console + file + flight recorder, process monitors; one per process. */
+/** Observability wiring: console + file + flight recorder, process monitors; one per process. */
 export function createObservability(logs: LogsConfig, options: { runId?: string; consoleWrite?: (line: string) => void; now?: () => number } = {}): Observability {
   const runId = options.runId ?? randomBytes(4).toString('hex');
   const now = options.now ?? Date.now;
@@ -32,7 +32,7 @@ export function createObservability(logs: LogsConfig, options: { runId?: string;
     console({ ts: new Date(now()).toISOString(), seq: 0, runId, level: 'warn', module: 'obs', event, msg: event === 'log.dropped' ? 'Строки лога отброшены' : 'Не удалось записать лог в файл', ...fields });
   };
   if (logs.fileLevel !== 'off') file = new FileSink({ dir: logs.dir, runId, minLevel: logs.fileLevel, maxFileBytes: logs.maxFileMb << 20, maxTotalBytes: logs.maxTotalMb << 20, retentionMs: logs.retentionDays * 86_400_000, now, report });
-  // OBS-013: records per level feed the error and warning counts of the history.
+  // Records per level feed the error and warning counts of the history.
   const levels = metrics.counter('log_records_total', 'Записи журнала по уровню');
   const logger = createLogger(fanOut((record) => levels.inc({ level: record.level }), console, recorder.sink, ...(file ? [file.sink] : [])), runId, now);
 
@@ -61,7 +61,7 @@ export function createObservability(logs: LogsConfig, options: { runId?: string;
 }
 
 /**
- * OBS-003: a crash is recorded with its stack and a flight-recorder dump before the process exits;
+ * A crash is recorded with its stack and a flight-recorder dump before the process exits;
  * Node's own policy (exit on uncaught errors) is kept because the state may be inconsistent.
  */
 export function installProcessHooks(obs: Observability, exit: (code: number) => void = (code) => process.exit(code)): () => void {

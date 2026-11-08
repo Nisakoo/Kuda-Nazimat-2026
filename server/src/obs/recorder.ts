@@ -5,15 +5,15 @@ import { levelRank, type LogRecord, type LogSink } from '../common/logger.ts';
 export interface RecorderOptions {
   readonly dir: string | null; readonly runId: string; readonly capacity?: number; readonly minIntervalMs?: number;
   readonly now?: () => number;
-  /** Extra snapshot for the dump: metrics, seats, queue (OBS-004). Must contain no secrets or texts. */
+  /** Extra snapshot for the dump: metrics, seats, queue. Must contain no secrets or texts. */
   readonly snapshot?: () => unknown;
 }
 
-/** Key `info` events shown among the admin's last events (OBS-010). */
+/** Key `info` events shown among the admin's last events. */
 const KEY_EVENTS = new Set(['app.ready', 'game.seat.attach', 'game.seat.release', 'npc.responder.ready', 'language.ready', 'auth.operator.action', 'obs.incident.dumped']);
 
 /**
- * OBS-004 flight recorder: the last N records of every level stay in memory and are written to
+ * Flight recorder: the last N records of every level stay in memory and are written to
  * `incident-*.jsonl` on the first error, on an invariant violation and on request.
  */
 export class FlightRecorder {
@@ -32,7 +32,7 @@ export class FlightRecorder {
     this.sink = (record) => this.record(record);
   }
 
-  /** Last 20 events for the admin screen (OBS-010): warnings, errors and key `info` events. */
+  /** Last 20 events for the admin screen: warnings, errors and key `info` events. */
   warnings(): readonly LogRecord[] { return this.recent; }
 
   private record(record: LogRecord): void {

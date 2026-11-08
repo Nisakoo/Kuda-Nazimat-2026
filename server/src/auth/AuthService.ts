@@ -16,7 +16,7 @@ export function validName(value: unknown): string | null {
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
 const TEMP_PASSWORD_MS = 24 * 3_600_000;
 
-/** AUTH-006 error codes with their HTTP status; `message` is ready to show to the player. */
+/** Auth error codes with their HTTP status; `message` is ready to show to the player. */
 export const AUTH_STATUS = { INVALID: 400, CREDENTIALS: 401, NAME_TAKEN: 409, PASSWORD_REQUIRED: 403, PASSWORD_CHANGE_REQUIRED: 403, DISABLED: 403, RATE_LIMIT: 429, UNAVAILABLE: 503, FULL: 503 } as const;
 export type AuthErrorCode = keyof typeof AUTH_STATUS;
 export class AuthError extends Error {
@@ -25,7 +25,7 @@ export class AuthError extends Error {
   constructor(code: AuthErrorCode, message: string, retryAfterSeconds?: number) { super(message); this.code = code; this.retryAfterSeconds = retryAfterSeconds; }
 }
 
-/** Text the closed game connection shows for each revocation reason (AUTH-012). */
+/** Text the closed game connection shows for each revocation reason. */
 export const REVOKE_MESSAGES: Readonly<Record<RevokeReason, string>> = {
   logout: 'Вы вышли из игры.',
   'password-changed': 'Пароль изменён. Войдите снова.',
@@ -35,22 +35,22 @@ export const REVOKE_MESSAGES: Readonly<Record<RevokeReason, string>> = {
   'role-revoked': 'Роль администратора снята.',
 };
 
-/** AUTH-018: what an admin session proves; `verify` never accepts it. */
+/** What an admin session proves; `verify` never accepts it. */
 export type AdminCheck = { readonly ok: true; readonly identity: { accountId: string; playerId: string; displayName: string }; readonly sessionId: string; readonly expiresAt: number } | { readonly ok: false };
 
-/** ADMIN-SRV-009: who performed an administrator action; absent for the console. */
+/** Who performed an administrator action; absent for the console. */
 export interface AuditActor { readonly ip: string | null; readonly accountId?: string | null; readonly name?: string | null }
 export interface ServerSession { readonly token: string; readonly expiresAt: number }
 export interface AuthDeps {
   readonly accounts: AccountStore; readonly sessions: SessionStore; readonly clock: Clock; readonly ttlMs: number;
   readonly maxSessions?: number;
-  /** AUTH-018 admin session lifetime; 8 h by default. */
+  /** Admin session lifetime; 8 h by default. */
   readonly adminTtlMs?: number;
   readonly canAdmit?: (accountId: string | null) => boolean;
-  /** AUTH-001: guest and dev login; false in production. */
+  /** Guest and dev login; false in production. */
   readonly passwordless?: boolean;
   readonly hasher?: PasswordHasher; readonly logger?: Logger; readonly metrics?: Metrics;
-  /** ADMIN-SRV-009: journal of operator actions; never receives the temporary password. */
+  /** Journal of operator actions; never receives the temporary password. */
   readonly audit?: (entry: { readonly action: 'reset-password' | 'revoke' | 'unlock' | 'create-admin' | 'grant-admin' | 'revoke-admin'; readonly accountId: string | null; readonly name: string; readonly result: Record<string, number | boolean>; readonly by?: AuditActor }) => void;
 }
 export type AuthService = ReturnType<typeof createAuthService>;
@@ -127,7 +127,7 @@ export function createAuthService(deps: AuthDeps) {
 
   const service = {
     state(identity: { accountId: string }) { return { requiresAvatar: accounts.requiresAvatar?.(identity.accountId) ?? false }; },
-    /** AUTH-006 `GET /api/auth/mode`. */
+    /** `GET /api/auth/mode`. */
     mode: () => ({ password: true, guest: passwordless, dev: passwordless }),
     onRevoked(listener: (tokenHashes: readonly string[], reason: RevokeReason) => void): void { revoked = listener; },
 
@@ -135,7 +135,7 @@ export function createAuthService(deps: AuthDeps) {
       requirePasswordless('guest'); limitIp(ip, 'guest');
       return passwordlessLogin(nameOf(rawName), ip, 'guest');
     },
-    /** AUTH-016: development/test autologin; `dev` when no name is given. */
+    /** Development/test autologin; `dev` when no name is given. */
     async dev(rawName: unknown, ip = 'unknown'): Promise<ServerSession> {
       requirePasswordless('dev');
       return passwordlessLogin(rawName === undefined ? 'dev' : nameOf(rawName), ip, 'dev');
@@ -187,7 +187,7 @@ export function createAuthService(deps: AuthDeps) {
       notify(sessions.revoke({ accountId: record.identity.accountId }, 'password-changed', clock.now()), 'password-changed', { accountId: record.identity.accountId });
       return issue(record.identity, ip, scope === 'admin' ? 'admin.login' : 'login', scope);
     },
-    /** AUTH-009: idempotent; never reveals whether the token was valid. */
+    /** Idempotent; never reveals whether the token was valid. */
     logout(token: string): void {
       if (!TOKEN.test(token)) return;
       const hash = hashToken(token);
@@ -205,14 +205,14 @@ export function createAuthService(deps: AuthDeps) {
       if (!session || session.revokedAt !== null || session.expiresAt <= clock.now() || session.scope !== 'game') return { ok: false };
       return { ok: true, identity: session.identity, expiresAt: session.expiresAt, sessionId: session.sessionId };
     },
-    /** AUTH-018: admin scope and a current admin role; checked on every admin request. */
+    /** Admin scope and a current admin role; checked on every admin request. */
     async verifyAdmin(token: string): Promise<AdminCheck> {
       if (!TOKEN.test(token)) return { ok: false };
       const session = sessions.find(hashToken(token));
       if (!session || session.revokedAt !== null || session.expiresAt <= clock.now() || session.scope !== 'admin' || session.role !== 'admin') return { ok: false };
       return { ok: true, identity: session.identity, expiresAt: session.expiresAt, sessionId: session.sessionId };
     },
-    /** AUTH-019: a non-admin gets the same answer as a wrong password; the per-name lock is shared with the game login. */
+    /** A non-admin gets the same answer as a wrong password; the per-name lock is shared with the game login. */
     async adminLogin(rawName: unknown, rawPassword: unknown, ip = 'unknown'): Promise<ServerSession> {
       limitIp(ip, 'admin-login');
       const name = nameOf(rawName); const key = name.toLowerCase();
@@ -229,7 +229,7 @@ export function createAuthService(deps: AuthDeps) {
       lockout.succeed(key);
       return issue(record.identity, ip, 'admin.login', 'admin');
     },
-    /** AUTH-020: development/test only — admin session of account `admin` without a password. */
+    /** Development/test only — admin session of account `admin` without a password. */
     async adminDev(ip = 'unknown'): Promise<ServerSession> {
       requirePasswordless('admin-dev');
       limitIp(ip, 'admin-dev');
@@ -240,7 +240,7 @@ export function createAuthService(deps: AuthDeps) {
       return issue(identity, ip, 'admin.dev', 'admin');
     },
 
-    /** AUTH-010 operator actions; the caller has already checked loopback and CSRF. */
+    /** Operator actions; the caller has already checked loopback and CSRF. */
     operator: {
       async resetPassword(rawName: unknown, by?: AuditActor): Promise<{ name: string; temporaryPassword: string; expiresAt: number }> {
         const record = accounts.find(nameOf(rawName).toLowerCase());
@@ -270,12 +270,12 @@ export function createAuthService(deps: AuthDeps) {
         deps.audit?.({ action: 'unlock', accountId: accounts.find(name.toLowerCase())?.identity.accountId ?? null, name, result: { unlocked }, ...(by ? { by } : {}) });
         return unlocked;
       },
-      /** ADMIN-SRV-010: when the name may try to log in again, null when not locked. */
+      /** When the name may try to log in again, null when not locked. */
       lockedUntil(name: string): number | null { const wait = lockout.retryAfter(name.toLowerCase()); return wait ? clock.now() + wait * 1000 : null; },
       list: () => accounts.list(clock.now()).map(account => ({
         ...account, loginBlockedSeconds: lockout.retryAfter(account.name.toLowerCase()),
       })),
-      /** AUTH-020: new admin account with a one-time temporary password. */
+      /** New admin account with a one-time temporary password. */
       async createAdmin(rawName: unknown, by?: AuditActor): Promise<{ name: string; temporaryPassword: string; expiresAt: number }> {
         const name = nameOf(rawName); const now = clock.now();
         const password = temporaryPassword();
