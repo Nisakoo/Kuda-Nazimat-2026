@@ -430,7 +430,7 @@ export function createAvatarModel(id) {
   if (!AVATAR_IDS.includes(id)) throw new RangeError('Unknown avatar: '+id);
   const look=APPEARANCES[id], root=new Group(); root.name='avatar';
   root.userData={avatarId:id,origin:'ground between feet',units:'metres',forward:'+Z',author:'Original TASK-043 procedural sculpture; no third-party art',walkCycleMetres:1.2};
-  // Blender-authored surfaces (TASK-125) replace the procedural fallback per joint.
+  // Blender-authored surfaces replace the procedural fallback per joint.
   const doc=loadAvatarParts(id), parts=doc?.parts, nodes=doc?.nodes??{}, at=(name,fallback)=>nodes[name]??fallback;
   const sculpt=(target,name,fallback)=>parts?sculpted(target,parts[name]):fallback();
   const torso=group(root,'torso',0,.95,0); sculpt(torso,'torso',()=>tunic(torso,look));

@@ -78,7 +78,7 @@ function textileSign(x,y,z){
  const g=new Group();g.name=`wind-sign-${windIndex++}`;g.position.set(x,y+2.4,z);root.add(g);
  box(C.clay,0,-1.2,0,2.8,2.4,.1,g);for(let i=0;i<4;i++)band(0,-2+i*.45,.08,2.6,g);
 }
-// Avatar-style people (TASK-126); joint names and idle clips are the contract with the world and its tests.
+// Avatar-style people; joint names and idle clips are the contract with the world and its tests.
 function merchant(name,x,z,color=C.cream,action='idle'){
   const rig=residentRig(MARKET_CAST[name]);
   const joint=(key,parent,groupName='')=>{

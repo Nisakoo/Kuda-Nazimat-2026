@@ -1,6 +1,6 @@
-"""TASK-125: turn a locally generated image-to-3D mesh into rig-ready avatar parts.
+"""Turn a locally generated image-to-3D mesh into rig-ready avatar parts.
 
-The raw mesh comes from TripoSR (MIT), run offline on specs/images/<id>.png outside this
+The raw mesh comes from TripoSR (MIT), run offline on docs/game/images/<id>.png outside this
 repository; see client/scripts/character-assets.md. This script never downloads anything.
 
 Run from the repository root (Blender 4.2+):
@@ -742,7 +742,7 @@ def main():
         output['face'] = feature_surfaces(matrices['face'])
         triangles += sum(len(s['index']) // 3 for s in output['face'])
     os.makedirs(OUT, exist_ok=True)
-    document = {'generator': 'client/scripts/blender/convert-generated-avatar.py', 'source': 'TripoSR image-to-3D of specs/images/' + AVATAR + '.png',
+    document = {'generator': 'client/scripts/blender/convert-generated-avatar.py', 'source': 'TripoSR image-to-3D of docs/game/images/' + AVATAR + '.png',
                 'id': AVATAR, 'units': 'metres', 'up': '+Y', 'forward': '+Z', 'triangles': triangles,
                 'uniformScale': True, 'nodes': nodes, 'marks': {k: round(v, 4) for k, v in marks.items()},
                 'face': {k: round(v, 4) for k, v in face_info.items()}, 'parts': output}

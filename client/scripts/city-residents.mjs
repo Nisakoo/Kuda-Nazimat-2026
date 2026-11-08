@@ -1,5 +1,5 @@
 /**
- * TASK-126: city residents reuse the player avatar sculptures (bodies, faces, hair), recoloured
+ * City residents reuse the player avatar sculptures (bodies, faces, hair), recoloured
  * per resident and finished with role headwear. Each resident stays a static single batch.
  * Output pieces are non-indexed with position, normal and normalised 8-bit colour, as the city
  * generator's `mesh` helper produces. Metres, +Y up, +Z forward, origin on the ground.

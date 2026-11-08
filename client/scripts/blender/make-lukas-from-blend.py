@@ -1,7 +1,7 @@
-"""TASK-125: derive Lukas from the hand-built Ksu figure so all players share one body and style.
+"""Derive Lukas from the hand-built Ksu figure so all players share one body and style.
 
 Opens the Ksu source .blend, edits a copy and saves it to <out.blend>; the source is untouched.
-Following specs/images/lukas.png: short spiky sandy hair made of leaf-shaped tufts on a skull
+Following docs/game/images/lukas.png: short spiky sandy hair made of leaf-shaped tufts on a skull
 cap (ears left visible), black rectangular glasses, dark oval eyes without whites, fuller brows,
 a teal tunic with teal turned cuffs. Body, trousers, boots, sash and face proportions stay.
 Then run round-blend-avatar.py and import-blend-avatar.py with the id "lukas".

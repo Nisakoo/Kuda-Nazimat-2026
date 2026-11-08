@@ -1,4 +1,4 @@
-"""TASK-125: soften a faceted hand-built figure into rounder, smooth-shaded shapes for the game.
+"""Soften a faceted hand-built figure into rounder, smooth-shaded shapes for the game.
 
 Opens the source .blend, edits a copy and saves it to <out.blend>; the source file is untouched.
 Every part is baked to a mesh, the low-poly body parts get one Catmull-Clark subdivision and are

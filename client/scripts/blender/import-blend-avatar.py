@@ -1,4 +1,4 @@
-"""TASK-125: import a hand-built Blender character into rig-ready avatar parts.
+"""Import a hand-built Blender character into rig-ready avatar parts.
 
 The source .blend is a static, unrigged figure made of named parts with plain material colours
 (no textures), Z up, facing -Y. This script splits it onto the shared avatar rig by part name and

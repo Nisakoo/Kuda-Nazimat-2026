@@ -1,4 +1,4 @@
-"""TASK-125: refine the hand-built Ksu figure towards the player's own look (requested by her).
+"""Refine the hand-built Ksu figure towards the player's own look (requested by her).
 
 Opens the source .blend, edits a copy and saves it to <out.blend>; the source file is untouched.
 Changes: lighter warm skin with blush, almond brown eyes with pupils, glints and lash wings,

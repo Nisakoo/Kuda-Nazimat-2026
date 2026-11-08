@@ -1,4 +1,4 @@
-"""TASK-125: original player-avatar sculpture authored with Blender. No imported art or textures.
+"""Original player-avatar sculpture authored with Blender. No imported art or textures.
 
 Run from the repository root (Blender 4.2+):
   blender -b --factory-startup -P client/scripts/blender/build-avatar-parts.py -- [out_dir] [ids...]
