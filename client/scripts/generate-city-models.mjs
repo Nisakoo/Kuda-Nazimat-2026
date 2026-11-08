@@ -4,6 +4,7 @@ import { buildPackAnimal } from './city-pack-animals.mjs';
 import { decorateEast } from './city-details-east.mjs';
 import { decorateCrafts } from './city-details-crafts.mjs';
 import { decorateCivic } from './city-details-civic.mjs';
+import { residentPieces } from './city-residents.mjs';
 /** Original city assets. One batched mesh per district; no runtime network dependencies. */
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import ts from 'typescript';
@@ -425,17 +426,7 @@ for(const location of CITY_LOCATIONS.filter(l=>!['market','pasture','tower'].inc
  await save('city-'+location.id);
 }
 for(const npc of CITY_RESIDENTS.filter(n=>!n.legacy)) {
- const s=npc.child ? .72 : 1, skin='#c99870';
- mesh(new CylinderGeometry(.24,.36,.95,12),npc.color,0,.7*s,0,s,s,s);
- for(const x of [-.15,.15]){cylinder('#a57552',x*s,.2*s,0,.1*s,.4*s);ball('#644e3a',x*s,.08*s,.12*s,.13*s,.1*s,.22*s);}
- ball(skin,0,1.45*s,0,.23*s,.29*s,.23*s);for(const x of [-.32,.32])ball(skin,x*s,.82*s,0,.1*s,.38*s,.1*s);
- for(const x of [-.08,.08])ball('#473b32',x*s,1.48*s,.22*s,.025*s,.025*s,.015*s);
- const hatColor=npc.hat==='helmet'?'#ae9973':npc.hat==='straw'?'#dcc080':npc.hat==='crown'?'#dbb251':npc.hat==='flowers'?leaf:cream;
- cylinder(hatColor,0,1.7*s,0,.27*s,.15*s);if(npc.hat==='turban')ball(hatColor,0,1.78*s,0,.3*s,.18*s,.3*s);
- if(npc.hat==='straw')cylinder(hatColor,0,1.7*s,0,.44*s,.05*s);
- if(['wrap','band'].includes(npc.hat))box(hatColor,0,1.48*s,-.2*s,.45*s,.55*s,.12*s);
- if(npc.id==='belu') {cylinder(wood,.42,.9,0,.035,1.8);ball('#b7af98',.42,1.9,0,.06,.22,.06);}
- if(npc.id==='apil'||npc.id==='herodotus')ball('#695341',0,1.18, .17,.19,.23,.12);
+ pieces.push(...residentPieces(npc));
  await save('resident-'+npc.id);
 }
 
