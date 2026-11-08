@@ -1,7 +1,7 @@
 {
   "lukas": {
-    "candidateGlbSha256": "6a954c9fb3141abecc0f36caa92e3f4e8f1297ae38549c1fe79b9d8e2063078f",
-    "geometrySha256": "51b817926fda1444b8759aa9c7fa97da4934bc8655ba549659598c6b9a78c058",
+    "candidateGlbSha256": "5b079b40364c794b622a562caaab73050523595a1f3049b3d1523db85cabce15",
+    "geometrySha256": "ee40f087a1b6ee1da551485e94b37126f73cee0c3db5760d99c57c14f5ff7838",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -38,9 +38,9 @@
           1
         ],
         "scale": [
-          1.3102679127121797,
-          0.8463541763881546,
-          0.9489679881763339
+          1.0703813114345517,
+          1.0703813114345517,
+          1.0703813114345517
         ]
       },
       {
@@ -64,11 +64,91 @@
         ]
       },
       {
+        "name": "skirt-front",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          0.07384
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-front-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          -0.20324
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
         "name": "neck",
         "type": "Object3D",
         "position": [
           0,
-          0.365,
+          0.40357,
           0
         ],
         "quaternion": [
@@ -108,7 +188,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.73,
+          0.46357,
           0
         ],
         "quaternion": [
@@ -118,8 +198,8 @@
           1
         ],
         "scale": [
-          1.08,
-          1.2,
+          1,
+          1,
           1
         ]
       },
@@ -138,7 +218,7 @@
           1
         ],
         "scale": [
-          0.94,
+          1,
           1,
           1
         ]
@@ -227,9 +307,9 @@
         "name": "shoulder-left",
         "type": "Object3D",
         "position": [
-          -0.235,
-          0.305,
-          0
+          -0.3692,
+          0.07482,
+          -0.05862
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -247,9 +327,9 @@
         "name": "elbow-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          -0.0447,
+          -0.18047,
+          0.02159
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -267,9 +347,9 @@
         "name": "wrist-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          -0.02758,
+          -0.11201,
+          0.0055
         ],
         "quaternion": [
           0,
@@ -347,9 +427,9 @@
         "name": "shoulder-right",
         "type": "Object3D",
         "position": [
-          0.235,
-          0.305,
-          0
+          0.37559,
+          0.07696,
+          -0.06278
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -367,9 +447,9 @@
         "name": "elbow-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          0.04106,
+          -0.18188,
+          0.02255
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -387,9 +467,9 @@
         "name": "wrist-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          0.02534,
+          -0.11292,
+          0.00603
         ],
         "quaternion": [
           0,
@@ -726,8 +806,8 @@
     ]
   },
   "nic": {
-    "candidateGlbSha256": "4980597527907bda7b6752602affa30791f41d7b6db3133d7275f7fac59d7e62",
-    "geometrySha256": "49c029953372d5fc31f8644c4c81703b0ac24c3fd8e5d475a74bbc81856b3240",
+    "candidateGlbSha256": "bf916410a4bfe037249888faf89eef03304756bd26f9c504fe5a642fc34db2bd",
+    "geometrySha256": "a1d7b4f77cb3efa811b429262435393383bec7965c9da6d4cb83b96a92cb012b",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -764,9 +844,9 @@
           1
         ],
         "scale": [
-          1.0330958542538338,
-          0.8287292847699297,
-          0.9489679881763339
+          0.8823442904411368,
+          0.8823442904411368,
+          0.8823442904411368
         ]
       },
       {
@@ -790,11 +870,91 @@
         ]
       },
       {
+        "name": "skirt-front",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          0.09346
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-front-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          -0.21226
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
         "name": "neck",
         "type": "Object3D",
         "position": [
           0,
-          0.365,
+          0.431,
           0
         ],
         "quaternion": [
@@ -834,7 +994,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.73,
+          0.491,
           0
         ],
         "quaternion": [
@@ -844,8 +1004,8 @@
           1
         ],
         "scale": [
-          1.08,
-          1.2,
+          1,
+          1,
           1
         ]
       },
@@ -864,7 +1024,7 @@
           1
         ],
         "scale": [
-          0.94,
+          1,
           1,
           1
         ]
@@ -953,9 +1113,9 @@
         "name": "shoulder-left",
         "type": "Object3D",
         "position": [
-          -0.235,
-          0.305,
-          0
+          -0.31735,
+          0.07412,
+          -0.04773
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -973,9 +1133,9 @@
         "name": "elbow-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          -0.03639,
+          -0.17872,
+          0.0152
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -993,9 +1153,9 @@
         "name": "wrist-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          -0.02245,
+          -0.11066,
+          0.00164
         ],
         "quaternion": [
           0,
@@ -1073,9 +1233,9 @@
         "name": "shoulder-right",
         "type": "Object3D",
         "position": [
-          0.235,
-          0.305,
-          0
+          0.32219,
+          0.07592,
+          -0.04745
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -1093,9 +1253,9 @@
         "name": "elbow-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          0.03465,
+          -0.17975,
+          0.01432
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -1113,9 +1273,9 @@
         "name": "wrist-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          0.02138,
+          -0.11126,
+          0.00105
         ],
         "quaternion": [
           0,
@@ -1452,8 +1612,8 @@
     ]
   },
   "dan": {
-    "candidateGlbSha256": "22404bcfbcdb7c8b106f0c49466d79b92e0a0d8c3597fbd8ec45046bf1a166cc",
-    "geometrySha256": "737be3f953b145495beae3e41da1d15c8177b97fd4ae73f81c47d1bdc01781fc",
+    "candidateGlbSha256": "885a4fed6ae8af056b692cd987568b54b4f8e0addd4cbe0af2e894bb7f1cba4e",
+    "geometrySha256": "1dff7baf81107ca5c93dc3cdb2e4c79a7d9541b51cd28a56d257e7f2bba9f813",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -1490,9 +1650,9 @@
           1
         ],
         "scale": [
-          1.0330958542538338,
-          0.8021390392228797,
-          0.9489679881763339
+          0.9604441172780417,
+          0.9604441172780417,
+          0.9604441172780417
         ]
       },
       {
@@ -1516,11 +1676,91 @@
         ]
       },
       {
+        "name": "skirt-front",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          0.05696
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-front-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          -0.16612
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
         "name": "neck",
         "type": "Object3D",
         "position": [
           0,
-          0.365,
+          0.43136,
           0
         ],
         "quaternion": [
@@ -1560,7 +1800,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.73,
+          0.49136,
           0
         ],
         "quaternion": [
@@ -1570,8 +1810,8 @@
           1
         ],
         "scale": [
-          1.08,
-          1.2,
+          1,
+          1,
           1
         ]
       },
@@ -1590,7 +1830,7 @@
           1
         ],
         "scale": [
-          0.94,
+          1,
           1,
           1
         ]
@@ -1679,9 +1919,9 @@
         "name": "shoulder-left",
         "type": "Object3D",
         "position": [
-          -0.235,
-          0.305,
-          0
+          -0.29811,
+          0.07392,
+          -0.04656
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -1699,9 +1939,9 @@
         "name": "elbow-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          -0.03195,
+          -0.1775,
+          0.01468
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -1719,9 +1959,9 @@
         "name": "wrist-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          -0.01971,
+          -0.10988,
+          0.00138
         ],
         "quaternion": [
           0,
@@ -1799,9 +2039,9 @@
         "name": "shoulder-right",
         "type": "Object3D",
         "position": [
-          0.235,
-          0.305,
-          0
+          0.30382,
+          0.07693,
+          -0.0398
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -1819,9 +2059,9 @@
         "name": "elbow-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          0.02982,
+          -0.17907,
+          0.01089
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -1839,9 +2079,9 @@
         "name": "wrist-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          0.0184,
+          -0.11069,
+          -0.00102
         ],
         "quaternion": [
           0,
@@ -2178,8 +2418,8 @@
     ]
   },
   "ksu": {
-    "candidateGlbSha256": "597dafccf0e24f059d9fa2f8f7ce5a567a91827ac9d2917639b4a9b7e8f2207b",
-    "geometrySha256": "15ea5f9e386baf917a7ff7556692d2eca3d8c1b750b9f2229b083ff1ea95a0b6",
+    "candidateGlbSha256": "b0f846ec12ec4d51e231dadf8c0fe75535ec0f039a41865166edd6b17119bea7",
+    "geometrySha256": "41b3d022a89925cdbc61bf7bd3bdc6ebf08d52c4285fcbdcac3703d3a9e2db84",
     "neutralNodes": [
       {
         "name": "AuxScene",
@@ -2216,9 +2456,9 @@
           1
         ],
         "scale": [
-          1.0330958542538338,
-          0.8333333319535963,
-          0.9469487900305531
+          0.8765607783176924,
+          0.8765607783176924,
+          0.8765607783176924
         ]
       },
       {
@@ -2242,11 +2482,91 @@
         ]
       },
       {
+        "name": "skirt-front",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          0.06521
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-front-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back",
+        "type": "Object3D",
+        "position": [
+          0,
+          -0.17,
+          -0.18129
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "skirt-back-surface",
+        "type": "Mesh",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
         "name": "neck",
         "type": "Object3D",
         "position": [
           0,
-          0.365,
+          0.43136,
           0
         ],
         "quaternion": [
@@ -2286,7 +2606,7 @@
         "type": "Object3D",
         "position": [
           0,
-          0.73,
+          0.49136,
           0
         ],
         "quaternion": [
@@ -2296,8 +2616,8 @@
           1
         ],
         "scale": [
-          1.08,
-          1.2,
+          1,
+          1,
           1
         ]
       },
@@ -2316,7 +2636,7 @@
           1
         ],
         "scale": [
-          0.94,
+          1,
           1,
           1
         ]
@@ -2405,9 +2725,9 @@
         "name": "shoulder-left",
         "type": "Object3D",
         "position": [
-          -0.235,
-          0.305,
-          0
+          -0.31893,
+          0.07418,
+          -0.04818
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -2425,9 +2745,9 @@
         "name": "elbow-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          -0.03637,
+          -0.1782,
+          0.01595
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -2445,9 +2765,9 @@
         "name": "wrist-left",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          -0.02244,
+          -0.11037,
+          0.00213
         ],
         "quaternion": [
           0,
@@ -2525,9 +2845,9 @@
         "name": "shoulder-right",
         "type": "Object3D",
         "position": [
-          0.235,
-          0.305,
-          0
+          0.32355,
+          0.07633,
+          -0.0488
         ],
         "quaternion": [
           -0.02737254916462951,
@@ -2545,9 +2865,9 @@
         "name": "elbow-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.215,
-          0
+          0.03253,
+          -0.17898,
+          0.01568
         ],
         "quaternion": [
           -0.034992854604336196,
@@ -2565,9 +2885,9 @@
         "name": "wrist-right",
         "type": "Object3D",
         "position": [
-          0,
-          -0.195,
-          0
+          0.02007,
+          -0.11084,
+          0.00192
         ],
         "quaternion": [
           0,

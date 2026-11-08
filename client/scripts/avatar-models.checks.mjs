@@ -30,7 +30,8 @@ describe('original local avatar models',()=>{
       const {root}=createAvatarModel(id),b=bounds(root),size=b.getSize(new Vector3());
       expect(hierarchy(root)).toEqual(reference);
       expect(root.name).toBe('avatar');expect(root.userData.forward).toBe('+Z');
-      expect(size.x).toBeCloseTo(AVATAR_PROPORTIONS[id].width,6);expect(size.y).toBeCloseTo(AVATAR_PROPORTIONS[id].height,6);expect(size.z).toBeCloseTo(.56,6);
+      // Blender sculptures scale uniformly from the authored height: width and depth follow the shape and only stay inside the shared envelope.
+      expect(size.y).toBeCloseTo(AVATAR_PROPORTIONS[id].height,6);expect(size.x).toBeGreaterThan(.8);expect(size.x).toBeLessThan(1.5);expect(size.z).toBeLessThanOrEqual(.56+1e-6);
       expect(b.min.y).toBeCloseTo(0,6);expect(root.position.toArray()).toEqual([0,0,0]);
       for(const side of ['left','right']){
         expect(root.getObjectByName('elbow-'+side).parent.name).toBe('shoulder-'+side);
@@ -100,8 +101,8 @@ describe('original local avatar models',()=>{
         }if(node.geometry.index){const array=node.geometry.index.array;hash.update(Buffer.from(array.buffer,array.byteOffset,array.byteLength));}item.geometrySha256=hash.digest('hex');}
         nodes.push(item);
       });
-      const actual=loaded.scene.getObjectByName('avatar').scale.toArray(), ratios=[AVATAR_PROPORTIONS[id].width/.96,AVATAR_PROPORTIONS[id].height/1.8,1];
-      for(let axis=0;axis<3;axis++)expect(actual[axis]).toBeCloseTo(baseline[id].avatarScale[axis]*ratios[axis],6);
+      const actual=loaded.scene.getObjectByName('avatar').scale.toArray();
+      for(let axis=0;axis<3;axis++)expect(actual[axis]).toBeCloseTo(baseline[id].avatarScale[axis],6);
       expect(nodes).toEqual(baseline[id].nodes);
     }
   });
@@ -173,7 +174,11 @@ describe('original local avatar models',()=>{
     }
   },30000);
 
-  it('keeps the shared trouser surfaces inside the closed tunic throughout the gait',()=>{
+  it('keeps the shared trouser surfaces inside the closed tunic throughout the gait (procedural fallback)',()=>{
+    // The analytic tunic envelope below describes the procedural fallback sculpture. Shipped avatars use Blender parts
+    // (their own tunic shape), so the fallback is built here by pointing the parts loader at an empty directory.
+    const previous=process.env.AVATAR_PARTS_DIR;process.env.AVATAR_PARTS_DIR=join(tmpdir(),'avatar-parts-none');
+    try{
     for(const id of AVATAR_IDS){
     const {root,animations}=createAvatarModel(id),mixer=new AnimationMixer(root);
     mixer.clipAction(animations.find(c=>c.name==='walk')).play();
@@ -199,6 +204,7 @@ describe('original local avatar models',()=>{
     }
     mixer.stopAllAction();mixer.uncacheRoot(root);
     }
+    }finally{if(previous===undefined)delete process.env.AVATAR_PARTS_DIR;else process.env.AVATAR_PARTS_DIR=previous;}
   },30000);
 
   it('rebuilds the checked-in GLBs byte for byte',async()=>{

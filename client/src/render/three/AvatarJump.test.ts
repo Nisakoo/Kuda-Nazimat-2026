@@ -54,7 +54,7 @@ for (const id of ['lukas', 'nic', 'dan', 'ksu', 'fallback']) {
           expect(arm.rotation.x).toBeLessThan(-2.5);
           if (id !== 'fallback') {
             const wrist = arm.getObjectByName(arm.name.replace('shoulder', 'wrist'))!;
-            expect(wrist.getWorldPosition(new Vector3()).y - arm.getWorldPosition(new Vector3()).y).toBeGreaterThan(.25);
+            expect(wrist.getWorldPosition(new Vector3()).y - arm.getWorldPosition(new Vector3()).y).toBeGreaterThan(.15);
           }
         }
         expect(visuals.position('player')!.y).toBe(.4);

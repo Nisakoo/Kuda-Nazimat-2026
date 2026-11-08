@@ -1,9 +1,9 @@
 {
   "lukas": {
     "avatarScale": [
-      1.209478073272781,
-      0.7812500089736812,
-      0.9489679881763339
+      1.0703813114345517,
+      1.0703813114345517,
+      1.0703813114345517
     ],
     "nodes": [
       {
@@ -81,7 +81,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "c8f8aad9c0f2590c790c5854b169c84f6bf79f61ef04581713b1aad3a65ef252"
       },
       {
         "name": "knee-left-surface",
@@ -101,7 +101,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "ba6ca66348b774e76768bbdefb5b9a14172c5e3219021ab09d20d51ab544b72b"
       },
       {
         "name": "hip-left-surface",
@@ -121,7 +121,7 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "66b3536254cfb91ce65284ecd65c9f7c05c015c645505ab82b939c981cefb4d4"
       },
       {
         "name": "hip-right",
@@ -198,7 +198,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "cf5a6f52cd257633dd3a40be354f9e2dba508b4487d2645e38542bacb4605015"
       },
       {
         "name": "knee-right-surface",
@@ -218,7 +218,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "56dbd86d943655c1ec20d4f3a5ceca8e37a44e9fb980a1d415c44c07651cc76a"
       },
       {
         "name": "hip-right-surface",
@@ -238,15 +238,15 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "ebb556f48285b2b78ba10382811959f0a1829c39db816d722209d7ceaacc9562"
       }
     ]
   },
   "nic": {
     "avatarScale": [
-      1.209478073272781,
-      0.8287292847699297,
-      0.9489679881763339
+      0.8823442904411368,
+      0.8823442904411368,
+      0.8823442904411368
     ],
     "nodes": [
       {
@@ -324,7 +324,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "8c384e906ce7654ddb5942dff9894e643e1926beb1fa957f11d7f8d1ae850d1e"
       },
       {
         "name": "knee-left-surface",
@@ -344,7 +344,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "7d5dee40b3e6edee2fadaed04783511acf70f7e151f1ecbb82b9ad8a9124d1a8"
       },
       {
         "name": "hip-left-surface",
@@ -364,7 +364,7 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "30519c468f4acb4e32b51fde432b406c91fd7a0c557fab57c3b60fcd02aee805"
       },
       {
         "name": "hip-right",
@@ -441,7 +441,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "0fb4caa4200c4b187946e2f1bd9a64a8f96b0c3dc5a8a5dee2c6f82be7651405"
       },
       {
         "name": "knee-right-surface",
@@ -461,7 +461,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "a016915b55eb59958da3f74e45ca33c4c50e65b222e792356551c9091aa29839"
       },
       {
         "name": "hip-right-surface",
@@ -481,15 +481,15 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "ec7c4d586a96fe8dafba12fe27f346c61dc0ec3737c9c9635ee796222477ed2b"
       }
     ]
   },
   "dan": {
     "avatarScale": [
-      1.209478073272781,
-      0.8021390392228797,
-      0.9489679881763339
+      0.9604441172780417,
+      0.9604441172780417,
+      0.9604441172780417
     ],
     "nodes": [
       {
@@ -567,7 +567,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "53ef28adbcfdfc76e3142660230181d55624e413e1c57699af5690883b3c1f4a"
       },
       {
         "name": "knee-left-surface",
@@ -587,7 +587,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "7cdcb05669d468111a991977ce9a50b3579e32feda9d9335663508c52ce0ba97"
       },
       {
         "name": "hip-left-surface",
@@ -607,7 +607,7 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "d32ba6f3525d8077ea53c6c202f077cae3d64ac10cc6181da3a41f66ffa37190"
       },
       {
         "name": "hip-right",
@@ -684,7 +684,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "2aae00c5af584e4f61c509a7cfca6e3dbe75f2c433f0cb2c19a7280a76785a82"
       },
       {
         "name": "knee-right-surface",
@@ -704,7 +704,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "68c74407e9ff21e9ab17bfaa6de6cb82053a2bf753fd30642d4c6042d4b5e574"
       },
       {
         "name": "hip-right-surface",
@@ -724,15 +724,15 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "2189f3cbe5eb121ca3f8cfc9fc3ed7ce9b841ce4da2ad5c05c25f9361023c2cc"
       }
     ]
   },
   "ksu": {
     "avatarScale": [
-      1.209478073272781,
-      0.8333333319535963,
-      0.9469487900305531
+      0.8765607783176924,
+      0.8765607783176924,
+      0.8765607783176924
     ],
     "nodes": [
       {
@@ -810,7 +810,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "24491135f9953647a06fcac390d2c672b8540ea64fe1f0cb15206d7587af4839"
       },
       {
         "name": "knee-left-surface",
@@ -830,7 +830,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "1942206bc7dba2c2fcc326a15b14bdcb34019b170ebf37e559a6070225dddebf"
       },
       {
         "name": "hip-left-surface",
@@ -850,7 +850,7 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "38baf3c8fc1930cffab3c3742e27bcc6612547685ad19ce2b3f01aa59217dbba"
       },
       {
         "name": "hip-right",
@@ -927,7 +927,7 @@
           1,
           1
         ],
-        "geometrySha256": "acc388790b4386c6a6889cfbc0a80e026d24d185b8a8fc2f69a82d9f2b730137"
+        "geometrySha256": "c41ecec302ae6591a7cfc53b10c7d9c96e41ad84dc7246fc6b129896d48fbb55"
       },
       {
         "name": "knee-right-surface",
@@ -947,7 +947,7 @@
           1,
           1
         ],
-        "geometrySha256": "66f0ecaee2afda03d07b2f0e0c433487376b2e148c5969141fc49438c87d14d9"
+        "geometrySha256": "c605118c5b35caa8cc9f38e220c9fa24e83ef9ed612ed5b3a941b610f509d87e"
       },
       {
         "name": "hip-right-surface",
@@ -967,7 +967,7 @@
           1,
           1
         ],
-        "geometrySha256": "311ff63d4d69c92cd112df06551f5f03dde0f6f4205a53025de678e8c31799bd"
+        "geometrySha256": "d01c31f7a428b8cf1faa9b21b1adbefa9f01fb79e9d2493c72e78fd471940e69"
       }
     ]
   }

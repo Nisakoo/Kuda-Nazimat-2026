@@ -58,7 +58,7 @@ describe('avatar-only metadata walk pacing', () => {
     try {
       const pace = model.walkPace!(3), avatar = model.root.getObjectByName('avatar')!;
       expect(pace).toBeCloseTo(3 * .9 / (1.2 * avatar.scale.z), 6);
-      expect(pace).toBeGreaterThan(2.3); expect(pace).toBeLessThan(2.5);
+      expect(pace).toBeGreaterThan(2); expect(pace).toBeLessThan(AVATAR_WALK_MAX_PACE);
       const reference = await new GLTFLoader().parseAsync(bytes, '');
       const mixer = new AnimationMixer(reference.scene), clip = reference.animations.find(c => c.name === 'walk')!;
       mixer.clipAction(clip).setEffectiveTimeScale(pace).play(); mixer.update(1 / 60);
