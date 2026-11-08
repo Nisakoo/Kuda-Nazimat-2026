@@ -14,11 +14,16 @@ export function configureAvatarCamera(camera: OrthographicCamera, width: number,
   camera.position.set(0, 1.6, 5); camera.lookAt(0, .94, 0); camera.updateProjectionMatrix();
 }
 
-/** Keep the authored height differences visible, including the taller Lukas. */
+/** Authored height of the tallest avatar (Lukas, see generate-avatar-models.mjs). */
+export const TALLEST_AVATAR_METRES = 2.15;
+/** Preview height the camera frame is built around; the tallest avatar is shown this tall. */
+const PREVIEW_TALLEST_METRES = 2;
+
+/** One shared scale keeps the authored height differences visible while the tallest fits. */
 export function placeAvatarPreview(root: Object3D): void {
   const bounds = new Box3().setFromObject(root);
   if (!(bounds.getSize(new Vector3()).y > 0)) throw new Error('Empty avatar model');
-  const scale = 1.85 / 1.8;
+  const scale = PREVIEW_TALLEST_METRES / TALLEST_AVATAR_METRES;
   root.scale.multiplyScalar(scale); root.position.y = -bounds.min.y * scale;
 }
 

@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { AnimationMixer, Box3, CylinderGeometry, Group, Mesh, MeshBasicMaterial, OrthographicCamera, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { configureAvatarCamera, placeAvatarPreview } from './ThreeAvatarPreview';
+import { configureAvatarCamera, placeAvatarPreview, TALLEST_AVATAR_METRES } from './ThreeAvatarPreview';
 
 const ids = ['lukas', 'nic', 'dan', 'ksu'] as const;
 const modelsDir = process.env.AVATAR_PREVIEW_MODELS_DIR;
@@ -32,14 +32,15 @@ describe('avatar preview camera framing', () => {
       }
     }
     checkMesh(pedestal);
+    let tallest = 0;
     for (const id of ids) {
       const bytes = await readFile(file(id));
       const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
       const model = gltf.scene, group = new Group();
       const bounds = new Box3().setFromObject(model), height = bounds.getSize(new Vector3()).y;
-      expect(height).toBeGreaterThan(0);
+      expect(height).toBeGreaterThan(0); tallest = Math.max(tallest, height);
       placeAvatarPreview(model); group.add(model);
-      expect(new Box3().setFromObject(model).getSize(new Vector3()).y).toBeCloseTo((id === 'lukas' ? 1.95 : 1.8) * 1.85 / 1.8, 5);
+      expect(new Box3().setFromObject(model).getSize(new Vector3()).y).toBeCloseTo(height * 2 / TALLEST_AVATAR_METRES, 5);
       const mixer = new AnimationMixer(model), idle = gltf.animations.find(clip => clip.name === 'idle');
       expect(idle).toBeDefined(); mixer.clipAction(idle!).play();
       for (let angle = 0; angle < 8; angle++) {
@@ -52,6 +53,7 @@ describe('avatar preview camera framing', () => {
       }
       mixer.stopAllAction(); mixer.uncacheRoot(model);
     }
+    expect(tallest).toBeCloseTo(TALLEST_AVATAR_METRES, 5);
     console.log('preview projected maximum absolute NDC', worst, worstPoint);
     expect(worst.x).toBeLessThanOrEqual(.98); expect(worst.y).toBeLessThanOrEqual(.98); expect(worst.z).toBeLessThanOrEqual(.98);
     pedestal.geometry.dispose(); pedestal.material.dispose();

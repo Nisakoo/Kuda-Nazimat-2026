@@ -8,6 +8,7 @@ import type { Lease } from '../../shared/AsyncLeaseCache';
 import { AVATAR_WALK_MAX_PACE, avatarWalkPacing } from './AvatarWalkPace';
 import type { GraphicsQuality } from '../GraphicsQuality';
 import { configureShadows, freezeStaticTransforms } from './modelPresentation';
+import { layerAvatarClothing } from './avatarClothLayering';
 
 interface Template { readonly scene: Object3D; readonly animations: AnimationClip[]; readonly sources: readonly Lease<ArrayBuffer>[] }
 export interface ModelInstance {
@@ -197,6 +198,7 @@ export class GltfLibrary {
       });
       const gltf = await new GLTFLoader(manager).parseAsync(main.value, '');
       succeeded = true;
+      layerAvatarClothing(gltf.scene);
       return { scene: gltf.scene, animations: gltf.animations, sources: leases };
     } finally {
       if (!succeeded) for (const lease of leases) lease.release();
